@@ -103,7 +103,7 @@ var processDegreesExternalSupervisors = function (resQuery, options) {
 };
 
 module.exports.getDegrees = function (req, res, next) {
-    permissions.checkPermissions('person', 'read',
+    permissions.checkPermissions(
         (options) => { actionGetDegrees(options) },
         { req, res, next }
     );
@@ -535,7 +535,7 @@ var actionDeleteExtSupervisors = function (options) {
 };
 
 module.exports.updateDegrees = function (req, res, next) {
-    permissions.checkPermissions('person', 'change',
+    permissions.checkPermissions(
         (options) => { actionUpdateDegrees(options) },
         { req, res, next }
     );
@@ -544,14 +544,14 @@ module.exports.updateDegrees = function (req, res, next) {
 module.exports.deleteDegrees = function (req, res, next) {
     // we start by deleting first supervisors, then external supervisors
     // only then we delete the degree
-    permissions.checkPermissions('person', 'change',
+    permissions.checkPermissions(
         (options) => { actionDeleteDegreesDeleteSupervisors(options) },
         { req, res, next }
     );
 };
 
 module.exports.createDegrees = function (req, res, next) {
-    permissions.checkPermissions('person', 'change',
+    permissions.checkPermissions(
         (options) => { actionCreateDegrees(options) },
         { req, res, next }
     );

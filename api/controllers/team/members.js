@@ -19,7 +19,7 @@ var actionGetLabMembers = function (options) {
         options);
 };
 module.exports.getLabMembers = function (req, res, next) {
-    permissions.checkPermissions('labs-affiliations', 'read',
+    permissions.checkPermissions(
         (options) => { actionGetLabMembers(options) },
         { req, res, next }
     );

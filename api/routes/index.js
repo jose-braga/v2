@@ -53,7 +53,7 @@ router.post('/people/:personID/degrees', cors(corsOptions), degrees.createDegree
  */
 var members = require('../controllers/team/members');
 
-router.get('/labs/:labID/members', cors(corsOptions), members.getLabMembers); //regardless of group to belongs now or belonged in the past
+router.get('/labs/:labID/members-affiliation', cors(corsOptions), members.getLabMembers); //regardless of group to belongs now or belonged in the past
 
 
 module.exports = router;

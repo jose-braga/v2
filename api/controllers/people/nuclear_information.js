@@ -19,7 +19,7 @@ var actionGetNationalities = function (options) {
 };
 
 module.exports.getNationalities = function (req, res, next) {
-    permissions.checkPermissions('people', 'read',
+    permissions.checkPermissions(
         (options) => { actionGetNationalities(options) },
         { req, res, next }
     );    
@@ -147,7 +147,7 @@ var actionUpdateNationalities = function (options) {
 };
 
 module.exports.changeNationalities = function (req, res, next) {
-    permissions.checkPermissions('people', 'change',
+    permissions.checkPermissions(
         (options) => { actionUpdateNationalities(options) },
         { req, res, next }
     );
@@ -164,7 +164,7 @@ var actionGetNuclearInfo = function (options) {
 };
 
 module.exports.getNuclearInfo = function (req, res, next) {
-    permissions.checkPermissions('people', 'read',
+    permissions.checkPermissions(
         (options) => { actionGetNuclearInfo(options) },
         { req, res, next }
     );
@@ -227,7 +227,7 @@ var actionUpdateNuclearInfo = function(options) {
 };
 
 module.exports.updateNuclearInfo = function (req, res, next) {
-    permissions.checkPermissions('people', 'change',
+    permissions.checkPermissions(
         (options) => { actionUpdateNuclearInfo(options) },
         { req, res, next }
     );
