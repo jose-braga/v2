@@ -17,8 +17,7 @@ module.exports.login = function (req, res, next) {
             return;
         }
         if (user) {
-            var token = jwtUtils.generateJWT(user.user_id, user.username, user.person_id,
-                user.permission_id, user.permission_lab_id, user.permission_group_id);
+            var token = jwtUtils.generateJWT(user);
             responses.sendJSONResponse(res, 200, {
                 "token": token
             });

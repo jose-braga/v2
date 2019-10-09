@@ -48,7 +48,7 @@ var actionGetPhoto = function (options) {
 };
 
 module.exports.getPhoto = function (req, res, next) {
-    permissions.checkPermissionsMultipart('standard', 'read',
+    permissions.checkPermissions('people-photos', 'read',
         (options) => { actionGetPhoto(options) },
         { req, res, next }
     );    
@@ -128,7 +128,7 @@ var actionUploadPhoto = function (options) {
 };
 
 module.exports.uploadPhoto = function (req, res, next) {
-    permissions.checkPermissionsMultipart('standard', 'change',
+    permissions.checkPermissions('people-photos', 'change',
         (options) => { actionUploadPhoto(options) },
         { req, res, next }
     );

@@ -113,7 +113,7 @@ export default {
             if (this.$store.state.session.loggedIn) {
                 let personID = this.$store.state.session.personID;
                 let imageType = 1;
-                let urlSubmit = 'api/people/' + personID + '/photo/' + imageType;
+                let urlSubmit = 'api/people/' + personID + '/photos/' + imageType;
                 subUtil.getInfoPopulate(this, urlSubmit, false)
                 .then( (result) => {
                     if (result !== undefined) {
@@ -132,7 +132,7 @@ export default {
                 if (this.$store.state.session.loggedIn) {
                     this.progress = true;
                     const personID = this.$store.state.session.personID;
-                    let urlSubmit = 'api/people/' + personID + '/photo/' + 1;
+                    let urlSubmit = 'api/people/' + personID + '/photos/' + 1;
                     this.cropImage(urlSubmit, personID);                                       
                 }
             }

@@ -10,9 +10,33 @@ const session = {
         showLogin: false,
         personID: undefined,
         userID: undefined,
-        permissionID: [],
-        permissionLabID: [],
-        permissionGroupID: []
+        username: undefined,
+        cities: [],
+        currentCities: [],
+        labs: [],
+        currentLabs: [],
+        groups: [],
+        currentGroups: [],
+        units: [],
+        currentUnits: [],
+        technicianOffices: [],
+        currentTechnicianOffices: [],
+        scienceManagerOffices: [],
+        currentScienceManagerOffices: [],
+        administrativeOffices: [],
+        currentAdministrativeOffices: [],
+        permissionLevel: undefined,
+        permissionPeople: [],
+        permissionLabs: [],
+        permissionLabsGroups: [],
+        permissionGroups: [],
+        permissionUnits: [],
+        permissionUnitsCities: [],
+        permissionCities: [],
+        permissionDocuments: [],
+        permissionWebAreas: [],
+        baseURL: undefined,
+
     },
     mutations: {
         checkExistingSession(state) {
@@ -21,9 +45,32 @@ const session = {
                 if (token_json.exp > Date.now() / 1000) {
                     state.personID = token_json.personID;
                     state.userID = token_json.userID;
-                    state.permissionID = token_json.permissionID;
-                    state.permissionLabID = token_json.permission_lab_id;
-                    state.permissionGroupID = token_json.permission_group_id;
+                    state.username = token_json.username;
+                    state.cities = token_json.cities;
+                    state.currentCities = token_json.currentCities;
+                    state.labs = token_json.labs;
+                    state.currentLabs = token_json.currentLabs;
+                    state.groups = token_json.groups;
+                    state.currentGroups = token_json.currentGroups;
+                    state.units = token_json.units;
+                    state.currentUnits = token_json.currentUnits;
+                    state.technicianOffices = token_json.technicianOffices;
+                    state.currentTechnicianOffices = token_json.currentTechnicianOffices;
+                    state.scienceManagerOffices = token_json.scienceManagerOffices;
+                    state.currentScienceManagerOffices = token_json.currentScienceManagerOffices;
+                    state.administrativeOffices = token_json.administrativeOffices;
+                    state.currentAdministrativeOffices = token_json.currentAdministrativeOffices;
+                    state.permissionLevel = token_json.permissionLevel;
+                    state.permissionPeople = token_json.permissionPeople;
+                    state.permissionLabs = token_json.permissionLabs;
+                    state.permissionLabsGroups = token_json.permissionLabsGroups;
+                    state.permissionGroups = token_json.permissionGroups;
+                    state.permissionUnits = token_json.permissionUnits;
+                    state.permissionUnitsCities = token_json.permissionUnitsCities;
+                    state.permissionCities = token_json.permissionCities;
+                    state.permissionDocuments = token_json.permissionDocuments;
+                    state.permissionWebAreas = token_json.permissionWebAreas;
+                    state.baseURL = token_json.base_url;                    
                     state.loggedIn = true;
                 } else {
                     router.push({ path: '/' });
@@ -42,24 +89,66 @@ const session = {
             let token_json = readLocalStorage(token);
             state.personID = token_json.personID;
             state.userID = token_json.userID;
-            state.permissionID = token_json.permissionID;
-            state.permissionLabID = token_json.permission_lab_id;
-            state.permissionGroupID = token_json.permission_group_id;
-            // eslint-disable-next-line
-            //console.log(token_json)            
+            state.username = token_json.username;
+            state.cities = token_json.cities;
+            state.currentCities = token_json.currentCities;
+            state.labs = token_json.labs;
+            state.currentLabs = token_json.currentLabs;
+            state.groups = token_json.groups;
+            state.currentGroups = token_json.currentGroups;
+            state.units = token_json.units;
+            state.currentUnits = token_json.currentUnits;
+            state.technicianOffices = token_json.technicianOffices;
+            state.currentTechnicianOffices = token_json.currentTechnicianOffices;
+            state.scienceManagerOffices = token_json.scienceManagerOffices;
+            state.currentScienceManagerOffices = token_json.currentScienceManagerOffices;
+            state.administrativeOffices = token_json.administrativeOffices;
+            state.currentAdministrativeOffices = token_json.currentAdministrativeOffices;
+            state.permissionLevel = token_json.permissionLevel;
+            state.permissionPeople = token_json.permissionPeople;
+            state.permissionLabs = token_json.permissionLabs;
+            state.permissionLabsGroups = token_json.permissionLabsGroups;
+            state.permissionGroups = token_json.permissionGroups;
+            state.permissionUnits = token_json.permissionUnits;
+            state.permissionUnitsCities = token_json.permissionUnitsCities;
+            state.permissionCities = token_json.permissionCities;
+            state.permissionDocuments = token_json.permissionDocuments;
+            state.permissionWebAreas = token_json.permissionWebAreas;
+            state.baseURL = token_json.base_url;
         },
         logoutProcedure(state) {
             localStorage.removeItem('v2-token');
             state.loggedIn = false;
             state.personID = undefined;
             state.userID = undefined;
-            state.permissionID = [];
-            state.permissionLabID = [];
-            state.permissionGroupID = [];
+            state.username = undefined;
+            state.cities = [];
+            state.currentCities = [];
+            state.labs = [];
+            state.currentLabs = [];
+            state.groups = [];
+            state.currentGroups = [];
+            state.units = [];
+            state.currentUnits = [];
+            state.technicianOffices = [];
+            state.currentTechnicianOffices = [];
+            state.scienceManagerOffices = [];
+            state.currentScienceManagerOffices = [];
+            state.administrativeOffices = [];
+            state.currentAdministrativeOffices = [];
+            state.permissionLevel = undefined;
+            state.permissionPeople = [];
+            state.permissionLabs = [];
+            state.permissionLabsGroups = [];
+            state.permissionGroups = [];
+            state.permissionUnits = [];
+            state.permissionUnitsCities = [];
+            state.permissionCities = [];
+            state.permissionDocuments = [];
+            state.permissionWebAreas = [];
+            state.baseURL = undefined;
             router.push({ path: '/' });           
         },
-
     }
-
 }
 export default session

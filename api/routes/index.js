@@ -32,15 +32,15 @@ var authentication = require('../controllers/authentication/authentication');
 router.post('/login', cors(corsOptions), authentication.login);
 router.put('/change-password/:userID', cors(corsOptions), authentication.changePassword);
 
-// Nuclear information
+// Nuclear information (TODO: improve its RESTfulness)
 router.get('/people/:personID/nuclear-info', cors(corsOptions), nuclearInformation.getNuclearInfo);
 router.put('/people/:personID/nuclear-info', cors(corsOptions), nuclearInformation.updateNuclearInfo);
 router.get('/people/:personID/nationalities', cors(corsOptions), nuclearInformation.getNationalities);
 router.put('/people/:personID/nationalities', cors(corsOptions), nuclearInformation.changeNationalities);
 
 // Photo
-router.post('/people/:personID/photo/:imageType', cors(corsOptions), photo.uploadPhoto);
-router.get('/people/:personID/photo/:imageType', cors(corsOptions), photo.getPhoto);
+router.post('/people/:personID/photos/:imageType', cors(corsOptions), photo.uploadPhoto);
+router.get('/people/:personID/photos/:imageType', cors(corsOptions), photo.getPhoto);
 
 //Degrees (degreeID is the id on the degrees_people table)
 router.get('/people/:personID/degrees', cors(corsOptions), degrees.getDegrees);
@@ -53,7 +53,7 @@ router.post('/people/:personID/degrees', cors(corsOptions), degrees.createDegree
  */
 var members = require('../controllers/team/members');
 
-router.get('/team/:labID', cors(corsOptions), members.getMembers);
+router.get('/labs/:labID/members', cors(corsOptions), members.getLabMembers); //regardless of group to belongs now or belonged in the past
 
 
 module.exports = router;

@@ -41,7 +41,8 @@ const routes = [
         component: Team,
         children: [
             { 
-                path: 'members', components: { 
+                path: 'members', 
+                components: { 
                     default: TeamMembersTab, 
                     help: TeamMembersTabHelp 
                 } 

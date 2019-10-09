@@ -1,6 +1,6 @@
 <template>
 <v-container fluid>
-    <v-tabs color="rgba(255,255,255,0)" 
+    <v-tabs
             v-if="loggedIn && hasPermissions"
             show-arrows
             @change="tabChanged">
@@ -24,7 +24,7 @@
         </div>
     </v-flex>
     <v-flex v-if="loggedIn && !hasPermissions">
-        <div>You do not have permission to access this section. Please contact
+        <div>You do not have permission to access this section. Please contact the app administrator.
         </div>
     </v-flex>
     
@@ -48,10 +48,12 @@ export default {
     },
     computed: {
         hasPermissions () {
-            if (this.$store.state.session.permissionID.includes(500)) {
+            // TODO: should look also to web areas permissions
+            console.log(this.$store.state.session)
+           if (this.$store.state.session.permissionLabs.length > 0) {
                 return true;
             }
-            return false;
+            return false;           
         },
         loggedIn () {
             return this.$store.state.session.loggedIn;

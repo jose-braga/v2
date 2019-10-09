@@ -1,5 +1,5 @@
 <template>
-<v-layout row wrap>
+<v-layout wrap>
     <v-flex xs12 sm12 md6 lg6 pa-1>
         <p>Teste</p>
     </v-flex>
@@ -34,10 +34,9 @@ export default {
     methods: {
           initialize() {
             if (this.$store.state.session.loggedIn) {
-                let personID = this.$store.state.session.personID;
-                let teamID = personID;
-                teamID = 2
-                let urlSubmit = 'api/team/' + teamID;
+                //let personID = this.$store.state.session.personID;
+                let labID = 2;
+                let urlSubmit = 'api/labs/' + labID + '/members';
                 subUtil.getInfoPopulate(this, urlSubmit, true)
                 .then( (result) => {
                     // eslint-disable-next-line
