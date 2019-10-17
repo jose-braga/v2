@@ -27,7 +27,7 @@ const navigation = {
         },
         showHelp({ commit }) {
             commit('showHelp')
-        }
+        },
 
     }
 

@@ -3,9 +3,29 @@ const responses = require('../utilities/responses');
 const time = require('../utilities/time');
 
 var hasAccessEndpoint = function (reqMethod, reqEndpoint, permissionsEndpoints) {
-    let access = false;
-
-    return access;
+    let reqEndpointParts = reqEndpoint.split('/');
+    reqEndpointParts.splice(0, 1); // the string starts by a '/' (always!!?)
+    let lastPath = reqEndpointParts[reqEndpointParts.length - 1];
+    
+    for (let ind in permissionsEndpoints) {
+        // we want to compare the request endpoint with the permissions:
+        // if lastPath is a number then we are interested in the remaining parts
+        // otherwise we are interested in reqEnpoint
+        let urlCompare;
+        if (Number.isNaN(parseInt(lastPath, 10)) 
+            || permissionsEndpoints[ind].include_last_id) {
+            urlCompare = reqEndpoint;
+        } else {
+            // remove last path
+            reqEndpointParts.splice(reqEndpointParts.length - 1, 1);
+            urlCompare = '/' + reqEndpointParts.join('/');
+        }
+        if (permissionsEndpoints[ind].endpoint_url === urlCompare
+            && permissionsEndpoints[ind].method_name === reqMethod) {
+            return true;
+        }
+    }
+    return false;
 };
 
 var TARGET_MANAGER_PERMISSION_LEVEL = 3;
@@ -33,13 +53,13 @@ module.exports.checkPermissions = function (callback, callbackOptions) {
     
     let reqEndpoint = req.path;
     let reqMethod = req.method;
-    let resourcePersonID = req.params.personID;
+    let resourcePersonID;
+    if (req.params.personID !== undefined && req.params.personID !== null) {
+        resourcePersonID = parseInt(req.params.personID, 10);
+    }   
 
     let reqEndpointParts = reqEndpoint.split('/');
     reqEndpointParts.splice(0,1); // the string starts by a '/' (always!!?)
-
-    console.log(reqEndpoint)
-    console.log(reqEndpointParts)
 
     if (permissionsLevel === 1) {
         // admin can do whatever he wants, no checking is necessary
@@ -60,6 +80,7 @@ module.exports.checkPermissions = function (callback, callbackOptions) {
                 && reqEndpointParts[0] === 'people') {
         // any user can read its data
         // any user can change its data except for affiliation
+        // Assuming that reqEndpointParts.length > 2
         if (reqEndpointParts[2] !== 'affiliations') {
             return callback(callbackOptions);
         } else if (reqMethod === 'GET') {
@@ -72,17 +93,25 @@ module.exports.checkPermissions = function (callback, callbackOptions) {
             });
             return;
         }
+    } else if (reqEndpointParts[0] === 'documents') {
+        // TODO: for documents permissions
 
-    } else if (resourceType === 'documents') {
-        // for documents permissions
+    } else if (hasAccessEndpoint(reqMethod, reqEndpoint, permissionsEndpoints)){
+        return callback(callbackOptions);
 
-    } else {
-        // other permission situations require a more thorough treatment
-        // get owner data from resource to be accessed
+        /*
         if (resourceType.includes('photos')) {
             return getResourceOwnership(resourceType, operationResource, callback, callbackOptions, true);
         } else {
             return getResourceOwnership(resourceType, operationResource, callback, callbackOptions, false);
         }
+        */
+    } else {
+        responses.sendJSONResponse(res, 403, {
+            "status": "error",
+            "statusCode": 403,
+            "error": "User is not authorized to this operation."
+        });
+        return;
     }
 };

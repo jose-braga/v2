@@ -2,7 +2,7 @@
 <v-card>
     <v-card-title primary-title>
         <div>
-            <h3 class="headline">Help for Team Members Tab</h3>
+            <h3 class="headline">Help for Pre-Registration Tab</h3>
         </div>
     </v-card-title>
     <v-card-text>

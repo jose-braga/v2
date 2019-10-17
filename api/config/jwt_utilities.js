@@ -8,6 +8,7 @@ module.exports.generateJWT = function (user) {
         userID: user.user_id,
         username: user.username,
         personID: user.person_id,
+        currentUnits: user.current_units,
         permissionsLevel: user.permissions_level,
         permissionsEndpoints: user.permissions_endpoints,
         permissionsWebAreas: user.permissions_web_areas,

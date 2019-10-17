@@ -63,7 +63,8 @@ const session = {
             state.permissionsEndpoints = [];
             state.permissionsWebAreas = [];
             state.baseURL = undefined;
-            router.push({ path: '/' });           
+            router.push({ path: '/' });
+            //router.go();
         },
     }
 }

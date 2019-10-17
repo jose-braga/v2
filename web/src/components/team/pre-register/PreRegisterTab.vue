@@ -2,26 +2,16 @@
 <v-container>
     <v-row>
         <v-col cols="12">
-            <CurrentMembers :lab-id="labId"></CurrentMembers>
-        </v-col>
-        <v-col cols="12">
-            <!-- <PastMembers></PastMembers> -->
+            prereg<!-- <CurrentMembers></CurrentMembers> -->
         </v-col>
     </v-row>
-</v-container>    
+</v-container>
+    
 </template>
 
 <script>
 
-import CurrentMembers from './CurrentMembersList'
-
 export default {
-    components: {
-        CurrentMembers,
-    },
-    props: {
-        labId: Number,
-    },
     data() {
         return {
             progress: false,
@@ -37,7 +27,7 @@ export default {
 
     methods: {
           
-    },
+     },
 
 }
 </script>

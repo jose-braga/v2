@@ -1,7 +1,8 @@
 import VueRouter from 'vue-router'
+
 import Person from '../components/person/Person' // this is not lazy-loaded
 import PersonalTab from '../components/person/personal/PersonalTab'// this is not lazy-loaded
-import Group from '../components/group/Group'
+import Group from '../components/group/Group' //to be lazy-loaded in the future
 
 const PersonalTabHelp = () => import('../components/person/personal/PersonalTabHelp.vue')
 const AcademicTab = () => import('../components/person/academic/AcademicTab.vue')
@@ -9,6 +10,8 @@ const AcademicTabHelp = () => import('../components/person/academic/AcademicTabH
 const Team = () => import('../components/team/Team.vue')
 const TeamMembersTab = () => import('../components/team/members/MembersTab.vue')
 const TeamMembersTabHelp = () => import('../components/team/members/MembersTabHelp.vue')
+const PreRegisterTab = () => import('../components/team/pre-register/PreRegisterTab.vue')
+const PreRegisterTabHelp = () => import('../components/team/pre-register/PreRegisterTabHelp.vue')
 
 const routes = [
     { 
@@ -31,23 +34,30 @@ const routes = [
                 components: { 
                     default: AcademicTab,
                     help: AcademicTabHelp
-                }
+                },
             },
             { path: '', redirect: 'personal' }
         ]
     },
     { 
-        path: '/team', 
+        path: '/team',
         component: Team,
         children: [
+            {
+                path: 'pre-register',
+                components: {
+                    default: PreRegisterTab,
+                    help: PreRegisterTabHelp
+                }
+            },
             { 
-                path: 'members', 
+                path: ':labName',
                 components: { 
                     default: TeamMembersTab, 
                     help: TeamMembersTabHelp 
-                } 
+                },
             },
-            { path: '', redirect: 'members' },
+            //{ path: '', redirect: '' },
         ]
     },
     { path: '/group', component: Group },

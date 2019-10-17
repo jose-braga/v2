@@ -1,3 +1,6 @@
+# ignore TODO list
+.TODO
+
 # VS Code settings
 .vscode
 

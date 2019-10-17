@@ -17,8 +17,6 @@ var corsOptions = {
 
 router.options('*', cors())
 
-
-
 /**
  * Person Routes
  */
@@ -39,7 +37,7 @@ router.get('/people/:personID/nationalities', cors(corsOptions), nuclearInformat
 router.put('/people/:personID/nationalities', cors(corsOptions), nuclearInformation.changeNationalities);
 
 // Photo
-router.post('/people/:personID/photos/:imageType', cors(corsOptions), photo.uploadPhoto);
+router.put('/people/:personID/photos/:imageType', cors(corsOptions), photo.uploadPhoto);
 router.get('/people/:personID/photos/:imageType', cors(corsOptions), photo.getPhoto);
 
 //Degrees (degreeID is the id on the degrees_people table)
@@ -52,8 +50,18 @@ router.post('/people/:personID/degrees', cors(corsOptions), degrees.createDegree
  * Team Routes
  */
 var members = require('../controllers/team/members');
-
+router.get('/labs/:labID', cors(corsOptions), members.getLabInfo); 
 router.get('/labs/:labID/members-affiliation', cors(corsOptions), members.getLabMembers); //regardless of group to belongs now or belonged in the past
 
+
+router.use(function (req, res, next) {
+  var err = new Error('Not Found');
+  err.status = 404;
+  next(err);
+});
+router.use(function (err, req, res, next) {
+    res.status(err.status || 500);
+    res.json({"message": "Route not found or other problem."});
+});
 
 module.exports = router;

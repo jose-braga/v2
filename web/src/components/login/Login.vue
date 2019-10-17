@@ -1,83 +1,98 @@
 <template>
-    <v-layout row justify-center>
-        <v-dialog v-model="dialog"
-                @input="v => v || closeDialog()" 
-                max-width="400px">
-            <v-form ref="form"
-                    @submit.prevent="submitForm">
-                <v-card>
-                    <v-card-title>
-                        <span class="headline">Fill in login credentials</span>
-                    </v-card-title>
-                    <v-flex px-4 pb-2>                    
-                        <v-text-field
-                            v-model.trim="$v.data.username.$model"
-                            label="Username">
-                        </v-text-field>
-                        <div v-if="!$v.data.username.required">
-                            <p class="caption red--text">Username is required.</p>
-                        </div>
-                        <v-text-field
-                            v-model="$v.data.password.$model"
-                            :label="passwordLabel"
-                            type="password">
-                        </v-text-field>
-                        <div v-if="!$v.data.password.required">                                
-                            <p class="caption red--text">{{passwordLabel}} is required.</p>
-                        </div>
-                        <v-text-field v-if="showChangePassword"
-                            v-model="$v.data.newPassword.$model"
-                            label="New Password"
-                            type="password">
-                        </v-text-field>
-                        <div v-if="!$v.data.newPassword.required">
-                            <p class="caption red--text">Insert new password.</p>
-                        </div>
-                        <v-text-field v-if="showChangePassword"
-                            v-model="$v.data.newPasswordConfirm.$model"
-                            label="Confirm New Password"
-                            type="password">
-                        </v-text-field>
-                        <div v-if="!$v.data.newPasswordConfirm.required">
-                            <p class="caption red--text">Please confirm password.</p>
-                        </div>
-                        <div v-if="!$v.data.newPasswordConfirm.confirmPassword
+    <v-dialog v-model="dialog"
+            @input="v => v || closeDialog()" 
+            max-width="400px">
+        <v-form ref="form"
+                @submit.prevent="submitForm">
+            <v-card pa-2>
+                <v-card-title>
+                    <span class="headline">Fill in login credentials</span>
+                </v-card-title>
+                <v-container>
+                    <v-row>
+                        <v-col cols="12">
+                            <v-text-field
+                                v-model.trim="$v.data.username.$model"
+                                label="Username">
+                            </v-text-field>
+                            <div v-if="!$v.data.username.required">
+                                <p class="caption red--text">Username is required.</p>
+                            </div>
+                        </v-col>
+                        <v-col cols="12">
+                            <v-text-field
+                                v-model="$v.data.password.$model"
+                                :label="passwordLabel"
+                                type="password">
+                            </v-text-field>
+                            <div v-if="!$v.data.password.required">                                
+                                <p class="caption red--text">{{passwordLabel}} is required.</p>
+                            </div>
+                        </v-col>
+                        <v-col cols="12" v-if="showChangePassword">
+                            <v-text-field v-if="showChangePassword"
+                                v-model="$v.data.newPassword.$model"
+                                label="New Password"
+                                type="password">
+                            </v-text-field>
+                            <div v-if="!$v.data.newPassword.required">
+                                <p class="caption red--text">Insert new password.</p>
+                            </div>
+                        </v-col>
+                        <v-col cols="12" v-if="showChangePassword">
+                            <v-text-field v-if="showChangePassword"
+                                v-model="$v.data.newPasswordConfirm.$model"
+                                label="Confirm New Password"
+                                type="password">
+                            </v-text-field>
+                            <div v-if="!$v.data.newPasswordConfirm.required">
+                                <p class="caption red--text">Please confirm password.</p>
+                            </div>
+                            <div v-if="!$v.data.newPasswordConfirm.confirmPassword
                                     && $v.data.newPassword.$dirty
                                     && $v.data.newPasswordConfirm.$dirty
                                     && showChangePassword">                                
                                 <p class="caption red--text">Values don't match.</p>
-                        </div>
-                        <div v-if="formError">                                
-                            <p class="caption red--text">Unable to submit form.</p>
-                        </div>
-                    </v-flex>
-                    <v-card-actions>
-                        <v-layout column wrap align-center>
-                            <v-layout row wrap>
-                                <v-spacer></v-spacer>
+                            </div>
+                        </v-col>  
+                        <v-col v-if="formError" cols="12">
+                            <div v-if="formError">  
+                                <p class="caption red--text">Unable to submit form.</p>
+                            </div>
+                        </v-col>
+                    </v-row>
+                </v-container>
+                <v-card-actions>
+                    <v-container>
+                        <v-row justify="center" align-content="center">
+                            <v-col v-show="!showChangePassword">
                                 <v-btn type="submit" 
                                         v-show="!showChangePassword"
                                         color="blue darken-1" outlined>
                                         Login</v-btn>
+                            </v-col>
+                            <v-col v-show="!showChangePassword">
                                 <v-btn color="blue darken-1" outlined 
                                         v-show="!showChangePassword"
                                         @click="changePassword">Change Password</v-btn>
+                            </v-col>
+                            <v-col v-show="showChangePassword">
                                 <v-btn color="blue darken-1" outlined
                                         v-show="showChangePassword"
                                         @click="submitChange">Submit</v-btn>
-                            </v-layout>
-                            <div v-if="loginError">                                
+                            </v-col>
+                            <v-col cols="12" v-if="loginError">                                
                                 <p class="caption red--text">There was a problem with your login!</p>
-                            </div>
-                            <div v-if="changePasswordError">                                
+                            </v-col>
+                            <v-col cols="12" v-if="changePasswordError">                                
                                 <p class="caption red--text">There was a problem changing password!</p>
-                            </div>
-                        </v-layout>
-                    </v-card-actions>
-                </v-card>                
-            </v-form>
-        </v-dialog>
-    </v-layout>    
+                            </v-col>
+                        </v-row>
+                    </v-container>                    
+                </v-card-actions>
+            </v-card>                
+        </v-form>
+    </v-dialog>  
 </template>
 
 <script>

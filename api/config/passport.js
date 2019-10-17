@@ -49,6 +49,68 @@ function makeEndpointURL(data) {
     }
     return data;
 }
+function processLabsGroupsUnitsData(user, labs) {
+    let today = time.moment();
+    let current_units = [];
+    let used_current_units = [];
+    for (let ind in labs) {
+        if (time.moment(labs[ind].valid_from).isBefore(today)
+            || labs[ind].valid_from === null) {
+            if (time.moment(labs[ind].valid_until).isAfter(today)
+                    || labs[ind].valid_until === null) {
+                for (let indGroup in labs[ind].groups) {
+                    for (let indUnit in labs[ind].groups[indGroup].units) {
+                        // the unit must exist now
+                        if (time.moment(labs[ind].groups[indGroup].units[indUnit].started).isBefore(today)
+                            || labs[ind].groups[indGroup].units[indUnit].started === null) {
+                            if (time.moment(labs[ind].groups[indGroup].units[indUnit].finished).isAfter(today)
+                                || labs[ind].groups[indGroup].units[indUnit].finished === null) {
+                                if (used_current_units.indexOf(labs[ind].groups[indGroup].units[indUnit].id) === -1) {
+                                    current_units.push(labs[ind].groups[indGroup].units[indUnit].id);
+                                    used_current_units.push(labs[ind].groups[indGroup].units[indUnit].id);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    } 
+    user.current_units = current_units;
+    user.labs = labs;
+    return user;
+}
+function processNonResearcherUnitsData(user, offices) {
+    let today = time.moment();
+    let current_units = [];
+    let used_current_units = [];
+    for (let ind in offices) {
+        if (time.moment(offices[ind].valid_from).isBefore(today)
+            || offices[ind].valid_from === null) {
+            if (time.moment(offices[ind].valid_until).isAfter(today)
+                    || offices[ind].valid_until === null) {
+                for (let indUnit in offices[ind].units) {
+                    if (used_current_units.indexOf(offices[ind].units[indUnit].id) === -1) {
+                        current_units.push(offices[ind].units[indUnit].id);
+                        used_current_units.push(offices[ind].units[indUnit].id);
+                    }
+                }
+            }
+        }
+    }
+    // the unlikely case that a user has a simultaneous role as researcher 
+    // and non-researcher (user.current_units holds the units found as a researcher)
+    if (user.current_units !== undefined && user.current_units.length > 0) {
+        for (let indUnit in user.current_units) {
+            if (used_current_units.indexOf(user.current_units[indUnit]) === -1) {
+                current_units.push(user.current_units[indUnit]);
+                used_current_units.push(user.units[indUnit]);
+            }
+        }
+    }
+    user.current_units = current_units;
+    return user;
+}
 
 passport.use(
     'local-login',
@@ -225,7 +287,7 @@ var getTechnicianUnitsInfo = function (req, done, user, tech_offices, i) {
             if (i + 1 < tech_offices.length) {
                 return getTechnicianUnitsInfo(req, done, user, tech_offices, i + 1);
             } else {
-                user = processNonResearcherUnitsData(user, tech_offices, 'technician');
+                user = processNonResearcherUnitsData(user, tech_offices);
                 return getUserScienceManagerOffices(req, done, user);
             }
         });
@@ -281,7 +343,7 @@ var getScienceManagerUnitsInfo = function (req, done, user, sc_man_offices, i) {
             if (i + 1 < sc_man_offices.length) {
                 return getScienceManagerUnitsInfo(req, done, user, sc_man_offices, i + 1);
             } else {
-                user = processNonResearcherUnitsData(user, sc_man_offices, 'science_manager');
+                user = processNonResearcherUnitsData(user, sc_man_offices);
                 return getUserAdministrativeOffices(req, done, user);
             }
         });
@@ -310,7 +372,7 @@ var getUserAdministrativeOffices = function (req, done, user) {
             } else {
                 user.administrative_offices = [];
                 user.current_administrative_offices = [];
-                return getUserCities(req, done, user);
+                return getUserEndpointPermissions(req, done, user);
             }
         });
     });
@@ -337,7 +399,7 @@ var getAdministrativeUnitsInfo = function (req, done, user, administrative_offic
             if (i + 1 < administrative_offices.length) {
                 return getAdministrativeUnitsInfo(req, done, user, administrative_offices, i + 1);
             } else {
-                user = processNonResearcherUnitsData(user, administrative_offices, 'administrative');
+                user = processNonResearcherUnitsData(user, administrative_offices);
                 return getUserEndpointPermissions(req, done, user);
             }
         });
@@ -378,10 +440,10 @@ var getUserEndpointPermissions = function (req, done, user) {
 
 var getPermissionWebAreas = function (req, done, user) {
     var query =
-        'SELECT permissions_web_app_areas.*, web_app_areas.app_area_en, web_app_areas.app_area_pt' +
-        ' FROM permissions_web_app_areas' +
-        ' JOIN web_app_areas ON web_app_areas.id = permissions_web_app_areas.app_area_id'
-        ' WHERE permissions_web_app_areas.user_id = ?;';
+        'SELECT permissions_web_app_areas.*, web_app_areas.app_area_en, web_app_areas.app_area_pt'
+        + ' FROM permissions_web_app_areas'
+        + ' JOIN web_app_areas ON web_app_areas.id = permissions_web_app_areas.app_area_id'
+        + ' WHERE permissions_web_app_areas.user_id = ?;';
     var places = [user.user_id];
     pool.getConnection(function (err, connection) {
         if (err) {

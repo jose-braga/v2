@@ -1,12 +1,14 @@
 <template>
-    <v-layout wrap>
-        <v-flex xs12 sm12 md6 lg6 pa-1>
-            <NuclearInformation></NuclearInformation>                
-        </v-flex>
-        <v-flex xs12 sm12 md6 lg6 pa-1>
-            <Photo></Photo>                
-        </v-flex>
-    </v-layout>
+    <v-container>
+        <v-row>
+            <v-col cols="12" md="6">
+                <NuclearInformation></NuclearInformation>                
+            </v-col>
+            <v-col cols="12" md="6">
+                <Photo></Photo>                
+            </v-col>
+        </v-row>
+    </v-container>
 </template>
 
 <script>

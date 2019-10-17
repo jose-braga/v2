@@ -13,51 +13,57 @@
             <input type="hidden" 
                     name="person_id"
                     :value="ownerPersonID" />
-            <v-flex px-4 pb-2>
-                <p v-if="!hasImage">No image saved.</p>
-                <div v-if="hasImage">
-                    <img v-bind:src="imgSrc" />
-                </div>               
-                <p v-if="hasImage">To change image click "Browse" below.</p>
-                <input type="file" ref="fileInput"
-                    name="image" accept="image/*"
-                    style="font-size: 1.2em; padding: 10px 0;"
-                    @change="setImage" />
-                <vue-cropper v-if="hasNewImage"
-                    ref="cropper"
-                    :src="newImgSrc"
-                    alt="Source Image"
-                    preview=".preview"
-                    responsive
-                    :view-mode="1"
-                    :aspect-ratio="1"
-                    drag-mode="crop">
-                </vue-cropper>
-            </v-flex>
-            <v-flex v-if="hasNewImage"
-                    px-4 pb-2 justify-center offset-xs2 offset-md4>
-                <div class="preview" v-bind:style="previewStyle"></div>
-            </v-flex>
+            <v-container>
+                <v-row>
+                    <v-col>
+                        <p v-if="!hasImage">No image saved.</p>
+                        <div v-if="hasImage">
+                            <img v-bind:src="imgSrc" />
+                        </div>               
+                        <p v-if="hasImage">To change image click "Browse" below.</p>
+                        <input type="file" ref="fileInput"
+                            name="image" accept="image/*"
+                            style="font-size: 1.2em; padding: 10px 0;"
+                            @change="setImage" />
+                        <vue-cropper v-if="hasNewImage"
+                            ref="cropper"
+                            :src="newImgSrc"
+                            alt="Source Image"
+                            preview=".preview"
+                            responsive
+                            :view-mode="1"
+                            :aspect-ratio="1"
+                            drag-mode="crop">
+                        </vue-cropper>
+                    </v-col>
+                    <v-col v-if="hasNewImage"
+                            px-4 pb-2 justify-center offset-xs2 offset-md4>
+                        <div class="preview" v-bind:style="previewStyle"></div>
+                    </v-col>
+                </v-row>
+            </v-container>
             <v-container fluid fill-height>
-                <v-layout column>
+                <v-row>
                     <div v-if="formError">                                
                         <p class="caption red--text">Please add an image.</p>
                     </div>
-                    <v-layout row align-center justify-end>
-                        <div>
-                            <v-btn type="submit" 
-                                outlined color="blue">Update</v-btn>
-                        </div>
-                        <div style="width: 35px;">
-                            <v-progress-circular indeterminate 
-                                    v-show="progress"
-                                    :size="20" :width="2"                                         
-                                    color="primary"></v-progress-circular>
-                            <v-icon v-show="success" color="green">done</v-icon>
-                            <v-icon v-show="error" color="red">error</v-icon>
-                        </div>
-                    </v-layout>
-                </v-layout>
+                    <v-container>
+                        <v-row align="center" justify="end">
+                            <div>
+                                <v-btn type="submit" 
+                                    outlined color="blue">Update</v-btn>
+                            </div>
+                            <div class="request-status-container">
+                                <v-progress-circular indeterminate 
+                                        v-show="progress"
+                                        :size="20" :width="2"                                         
+                                        color="primary"></v-progress-circular>
+                                <v-icon v-show="success" color="green">mdi-check</v-icon>
+                                <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
+                            </div>
+                        </v-row>
+                    </v-container>
+                </v-row>
             </v-container>
         </v-form>
     </v-card>
@@ -172,7 +178,7 @@ export default {
                     formData.append('person_id', personID);
                     formData.append('file', blob);
                     
-                    this.$http.post(url, 
+                    this.$http.put(url, 
                         formData,
                         {
                             headers: {'Authorization': 'Bearer ' + localStorage['v2-token'],

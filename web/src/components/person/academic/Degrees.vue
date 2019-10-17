@@ -1,680 +1,702 @@
 <template>
-<v-layout>
-    <v-flex xs12 sm12 md6 lg6 pa-1>
-        <v-card>
-            <v-card-title primary-title>
-                <div>
-                    <h3 class="headline">Finished Degrees</h3>
-                </div>
-            </v-card-title>
-            <v-card-text></v-card-text>
-            <v-flex px-4 pb-2>
-                <div v-if="$v.data.finished.$model.length === 0">
-                    No finished degrees
-                </div>
-                <v-form ref="form"
-                    @submit.prevent="submitForm">
-                    <v-expansion-panels>
-                        <v-expansion-panel 
-                                v-for="(v,i) in $v.data.finished.$each.$iter" 
-                                :key="i"
-                                v-model="degreesPanel">
-                            <v-expansion-panel-header>
-                                <div>
-                                    <b>{{v.$model.degree_name}}</b>, {{v.$model.area}}, 
-                                        from {{v.$model.start}} to {{v.$model.end}} 
-                                </div>
-                            </v-expansion-panel-header>
-                            <v-expansion-panel-content>
-                                <v-card>
-                                    <v-card-text>
-                                    </v-card-text>
-                                    <v-flex px-4 pb-2>
-                                        <v-layout align-center justify-end>
-                                            <v-btn @click="removeItem(data.finished, i, 'degree')"
-                                                    small outlined color="red">Remove degree</v-btn>
-                                        </v-layout>
-                                        <v-layout v-bind="toColumn">
-                                            <v-flex pr-2>
-                                                <v-select v-model="v.$model.degree_id"
-                                                    @change="updateSelect(v.$model, 'degree_id', 'degree_name', degrees,'id','name_en')"
-                                                    :items="degrees" item-value="id" item-text="name_en"
-                                                    label="Degree">
-                                                </v-select>
-                                            </v-flex>
-                                            <v-flex pr-2>
-                                                <v-text-field 
-                                                    v-model="v.$model.program"
-                                                    label="Degree Program">
-                                                </v-text-field>
-                                                <div v-if="!v.program.maxLength">
-                                                    <p class="caption red--text">Maximum characters: 100</p>
-                                                </div>
-                                            </v-flex>
-                                        </v-layout>
-                                    </v-flex>
-                                    <v-flex px-4 pb-2>
-                                        <v-layout v-bind="toColumn">
-                                            <v-flex pr-2>
-                                                <v-text-field 
-                                                    v-model="v.$model.institution"
-                                                    label="Institution">
-                                                </v-text-field>
-                                                <div v-if="!v.institution.maxLength">
-                                                    <p class="caption red--text">Maximum characters: 100</p>
-                                                </div>
-                                            </v-flex>
-                                            <v-flex pr-2>
-                                                <v-text-field 
-                                                    v-model="v.$model.area"
-                                                    label="Field">
-                                                </v-text-field>
-                                                <div v-if="!v.area.maxLength">
-                                                    <p class="caption red--text">Maximum characters: 100</p>
-                                                </div>
-                                            </v-flex>
-                                        </v-layout>
-                                    </v-flex>
-                                    <v-flex px-4 pb-2>
-                                        <v-text-field 
-                                            v-model="v.$model.title"
-                                            label="Thesis title">
-                                        </v-text-field>
-                                        <div v-if="!v.title.maxLength">
-                                            <p class="caption red--text">Maximum characters: 300</p>
-                                        </div>
-                                    </v-flex>
-                                    <v-flex px-4 pb-2>
-                                        <v-layout v-bind="toColumn">
-                                            <v-flex pr-2>
-                                                <v-menu ref="v.$model.show_date_start" v-model="v.$model.show_date_start"
-                                                    :close-on-content-click="false"
-                                                    :nudge-right="10"
-                                                    transition="scale-transition" 
-                                                    offset-y full-width min-width="290px"> 
-                                                    <template v-slot:activator="{ on }">
-                                                        <v-text-field v-model="v.$model.start"
-                                                            label="Started" v-on="on">
-                                                        </v-text-field>
-                                                    </template>
-                                                    <v-date-picker v-model="v.$model.start" 
-                                                            @input="v.$model.show_date_start = false"
-                                                            no-title></v-date-picker>
-                                                </v-menu>
-                                            </v-flex>
-                                            <v-flex pr-2>
-                                                <v-menu ref="v.$model.show_date_end" v-model="v.$model.show_date_end"
-                                                    :close-on-content-click="false"
-                                                    :nudge-right="10"
-                                                    transition="scale-transition" 
-                                                    offset-y full-width min-width="290px"> 
-                                                    <template v-slot:activator="{ on }">
-                                                        <v-text-field v-model="v.$model.end"
-                                                            label="Ended" v-on="on">
-                                                        </v-text-field>
-                                                    </template>
-                                                    <v-date-picker v-model="v.$model.end" 
-                                                            @input="v.$model.show_date_end = false" 
-                                                            no-title></v-date-picker>
-                                                </v-menu>
-                                            </v-flex>
-                                        </v-layout>
-                                    </v-flex>
-                                    <v-flex px-4 pb-2>
-                                        <h5>LAQV/UCIBIO supervisors</h5>                                        
-                                        <v-layout v-bind="toColumn">
-                                            <v-expansion-panels>
-                                                <v-expansion-panel v-model="v.$model.supervisors_panel"
-                                                    v-for="(vsup,j) in v.$model.supervisors" 
-                                                    :key="i.toString() + '-' + j.toString()">
-                                                    <v-expansion-panel-header>
-                                                        <div><b>{{vsup.colloquial_name}}</b></div>
-                                                    </v-expansion-panel-header>
-                                                    <v-expansion-panel-content>
-                                                        <v-flex px-4 pb-2>
-                                                            <v-layout row align-center justify-end>
-                                                                <v-btn @click="removeItem(v.$model.supervisors, j, 'supervisor', data.finished, i, 'deleteSupervisors')"
-                                                                        small outlined color="red">Remove</v-btn>
-                                                            </v-layout>
-                                                            <v-layout v-bind="toColumn">
-                                                                <v-flex pr-2>
-                                                                    <v-autocomplete
-                                                                        v-model="vsup.supervisor_id"
-                                                                        @change="updateSelect(vsup, 'supervisor_id', 'colloquial_name', people,'id','colloquial_name')"
-                                                                        :loading="loadingPeople"
-                                                                        :items="people" item-value="id" item-text="colloquial_name"
-                                                                        :search-input.sync="vsup.supervisor_search"
-                                                                        cache-items
-                                                                        flat
-                                                                        hide-no-data
-                                                                        hide-details
-                                                                        label="Supervisor">
-                                                                    </v-autocomplete>
-                                                                </v-flex>                                                    
-                                                            </v-layout>
-                                                            <v-layout v-bind="toColumn">
-                                                                <v-flex pr-2>
-                                                                    <v-select v-model="vsup.supervisor_type_id"
-                                                                        :items="supervisorTypes" item-value="id" item-text="name_en"
-                                                                        label="Supervisor type">
-                                                                    </v-select>
-                                                                </v-flex>
-                                                                <v-flex pr-2>
-                                                                    <v-menu ref="vsup.show_date_start" v-model="vsup.show_date_start"
-                                                                        :close-on-content-click="false"
-                                                                        :nudge-right="10"
-                                                                        transition="scale-transition" 
-                                                                        offset-y full-width min-width="290px"> 
-                                                                        <template v-slot:activator="{ on }">
-                                                                            <v-text-field v-model="vsup.valid_from"
-                                                                                label="Started" v-on="on">
-                                                                            </v-text-field>
-                                                                        </template>
-                                                                        <v-date-picker v-model="vsup.valid_from" 
-                                                                                @input="vsup.show_date_start = false"
-                                                                                no-title></v-date-picker>
-                                                                    </v-menu>
-                                                                </v-flex>
-                                                                <v-flex pr-2>
-                                                                    <v-menu ref="vsup.show_date_end" v-model="vsup.show_date_end"
-                                                                        :close-on-content-click="false"
-                                                                        :nudge-right="10"
-                                                                        transition="scale-transition" 
-                                                                        offset-y full-width min-width="290px"> 
-                                                                        <template v-slot:activator="{ on }">
-                                                                            <v-text-field v-model="vsup.valid_until"
-                                                                                label="Ended" v-on="on">
-                                                                            </v-text-field>
-                                                                        </template>
-                                                                        <v-date-picker v-model="vsup.valid_until" 
-                                                                                @input="vsup.show_date_end = false"
-                                                                                no-title></v-date-picker>
-                                                                    </v-menu>
-                                                                </v-flex>
-                                                            </v-layout>
-                                                        </v-flex>
-                                                        
-                                                    </v-expansion-panel-content>
-                                                </v-expansion-panel>
-                                            </v-expansion-panels>
-                                            <v-flex pl-2 mt-4>
-                                                <v-btn small outlined
-                                                    @click="addItem(v.$model.supervisors,'supervisor',v.$model)">
-                                                    Add supervisor</v-btn>
-                                            </v-flex>
-                                        </v-layout>
-                                        <v-flex my-2>
-                                            <v-divider></v-divider>
-                                        </v-flex>
-                                        <h5>Supervisors, other institutions</h5>
-                                        <v-layout v-bind="toColumn">
-                                            <v-expansion-panels>
-                                                <v-expansion-panel 
-                                                    v-model="v.$model.ext_supervisors_panel"
-                                                    v-for="(vsup,j) in v.external_supervisors.$each.$iter" 
-                                                    :key="i.toString() + '-' + j.toString() + '-ext'">
-                                                    <v-expansion-panel-header>
-                                                        <div><b>{{vsup.$model.colloquial_name}}</b>, 
-                                                                {{vsup.$model.organization}}
-                                                        </div>
-                                                    </v-expansion-panel-header>
-                                                    <v-expansion-panel-content>
-                                                        <v-flex px-4 pb-2>
-                                                            <v-layout row align-center justify-end>
-                                                                <v-btn @click="removeItem(v.$model.external_supervisors, j, 'extSupervisor', data.finished, i, 'deleteExtSupervisors')"
-                                                                        small outlined color="red">Remove</v-btn>
-                                                            </v-layout>
-                                                            <v-layout v-bind="toColumn">
-                                                                <v-flex pr-2>
-                                                                    <v-text-field light
-                                                                        v-model="vsup.$model.colloquial_name"
-                                                                        label="Name">
-                                                                    </v-text-field>
-                                                                    <div v-if="!vsup.colloquial_name.maxLength">
-                                                                        <p class="caption red--text">Maximum characters: 100</p>
-                                                                    </div>
-                                                                </v-flex>
-                                                                <v-flex pr-2>
-                                                                    <v-text-field 
-                                                                        v-model="vsup.$model.organization"
-                                                                        label="Organization">
-                                                                    </v-text-field>
-                                                                    <div v-if="!vsup.organization.maxLength">
-                                                                        <p class="caption red--text">Maximum characters: 100</p>
-                                                                    </div>
-                                                                </v-flex>
-                                                            </v-layout>
-                                                            <v-layout v-bind="toColumn">
-                                                                <v-flex pr-2>
-                                                                    <v-select v-model="vsup.$model.supervisor_type_id"
-                                                                        :items="supervisorTypes" item-value="id" item-text="name_en"
-                                                                        label="Supervisor type">
-                                                                    </v-select>
-                                                                </v-flex>
-                                                                <v-flex pr-2>
-                                                                    <v-menu ref="vsup.show_date_start" v-model="vsup.$model.show_date_start"
-                                                                        :close-on-content-click="false"
-                                                                        :nudge-right="10"
-                                                                        transition="scale-transition" 
-                                                                        offset-y full-width min-width="290px"> 
-                                                                        <template v-slot:activator="{ on }">
-                                                                            <v-text-field v-model="vsup.$model.valid_from"
-                                                                                label="Started" v-on="on">
-                                                                            </v-text-field>
-                                                                        </template>
-                                                                        <v-date-picker v-model="vsup.$model.valid_from" 
-                                                                                @input="vsup.$model.show_date_start = false"
-                                                                                no-title></v-date-picker>
-                                                                    </v-menu>
-                                                                </v-flex>
-                                                                <v-flex pr-2>
-                                                                    <v-menu ref="vsup.show_date_end" v-model="vsup.$model.show_date_end"
-                                                                        :close-on-content-click="false"
-                                                                        :nudge-right="10"
-                                                                        transition="scale-transition" 
-                                                                        offset-y full-width min-width="290px"> 
-                                                                        <template v-slot:activator="{ on }">
-                                                                            <v-text-field v-model="vsup.$model.valid_until"
-                                                                                label="Ended" v-on="on">
-                                                                            </v-text-field>
-                                                                        </template>
-                                                                        <v-date-picker v-model="vsup.$model.valid_until" 
-                                                                                @input="vsup.$model.show_date_end = false"
-                                                                                no-title></v-date-picker>
-                                                                    </v-menu>
-                                                                </v-flex>
-                                                            </v-layout>
-                                                        </v-flex>
-                                                        
-                                                    </v-expansion-panel-content>
-                                                </v-expansion-panel>
-                                            </v-expansion-panels>
-                                            <v-flex pl-2 mt-4> 
-                                                <v-btn small outlined
-                                                    @click="addItem(v.$model.external_supervisors,'external_supervisor',v.$model)">
-                                                    Add external supervisor
-                                                </v-btn>
-                                            </v-flex>
-                                        </v-layout>
-                                    </v-flex>                                
-                                </v-card>
-                            </v-expansion-panel-content>
-                        </v-expansion-panel>
-                    </v-expansion-panels>
-
-                    <v-flex pl-2 mt-4> 
-                        <v-btn outlined @click="addItem(data.finished, 'degree', 'degreesPanel')">Add a degree</v-btn>
-                    </v-flex>
-                    <v-layout column>
-                        <div v-if="formError">                                
-                            <p class="caption red--text">Unable to submit form.</p>
-                        </div>
-                        <v-layout row align-center justify-end>
-                            <div>
-                                <v-btn type="submit" 
-                                    outlined color="blue">Save</v-btn>
-                            </div>
-                            <div style="width: 35px;">
-                                <v-progress-circular indeterminate 
-                                        v-show="progress"
-                                        :size="20" :width="2"                                         
-                                        color="primary"></v-progress-circular>
-                                <v-icon v-show="success" color="green">done</v-icon>
-                                <v-icon v-show="error" color="red">error</v-icon>
-                            </div>
-                        </v-layout>
-                    </v-layout>
-                    <div v-if="$v.$invalid">
-                        <p class="caption red--text">At least one field is invalid.</p>
+<v-container>
+    <v-row>
+        <v-col cols="12" md="6">
+            <v-card>
+                <v-card-title primary-title>
+                    <div>
+                        <h3 class="headline">Finished Degrees</h3>
                     </div>
-                </v-form>
-            </v-flex>
-        </v-card>
-    </v-flex>
-    <v-flex xs12 sm12 md6 lg6 pa-1>
-        <v-card>
-            <v-card-title primary-title>
-                <div>
-                    <h3 class="headline">Ongoing Degrees</h3>
-                </div>
-            </v-card-title>
-            <v-card-text></v-card-text>
-            <v-flex px-4 pb-2>
-                <div v-if="$v.data.ongoing.$model.length === 0">
-                    No ongoing degrees
-                </div>
-                <v-form ref="formOngoing"
-                    @submit.prevent="submitForm">
-                    <v-expansion-panels>
-                        <v-expansion-panel
-                            v-model="ongoingDegreesPanel"
-                            v-for="(v,i) in $v.data.ongoing.$each.$iter" 
-                            :key="i.toString() + '-ongoing'">
-                            <v-expansion-panel-header>
-                                <div><b>{{v.$model.degree_name}}</b>, {{v.$model.area}}, 
-                                        from {{v.$model.start}} to {{v.$model.end}} 
-                                </div>
-                            </v-expansion-panel-header>
-                            <v-expansion-panel-content>
-                                <v-card>
-                                    <v-card-text>
-                                    </v-card-text>
-                                    <v-flex px-4 pb-2>
-                                        <v-layout align-center justify-end>
-                                            <v-btn @click="removeItem(data.ongoing, i, 'degree')"
-                                                    small outlined color="red">Remove degree</v-btn>
-                                        </v-layout>
-                                        <v-layout v-bind="toColumn">
-                                            <v-flex pr-2>
-                                                <v-select v-model="v.$model.degree_id"
-                                                    @change="updateSelect(v.$model, 'degree_id', 'degree_name', degrees,'id','name_en')"
-                                                    :items="degrees" item-value="id" item-text="name_en"
-                                                    label="Degree">
-                                                </v-select>
-                                            </v-flex>
-                                            <v-flex pr-2>
-                                                <v-text-field 
-                                                    v-model="v.$model.program"
-                                                    label="Degree Program">
-                                                </v-text-field>
-                                                <div v-if="!v.program.maxLength">
-                                                    <p class="caption red--text">Maximum characters: 100</p>
-                                                </div>
-                                            </v-flex>
-                                        </v-layout>
-                                    </v-flex>
-                                    <v-flex px-4 pb-2>
-                                        <v-layout v-bind="toColumn">
-                                            <v-flex pr-2>
-                                                <v-text-field 
-                                                    v-model="v.$model.institution"
-                                                    label="Institution">
-                                                </v-text-field>
-                                                <div v-if="!v.institution.maxLength">
-                                                    <p class="caption red--text">Maximum characters: 100</p>
-                                                </div>
-                                            </v-flex>
-                                            <v-flex pr-2>
-                                                <v-text-field 
-                                                    v-model="v.$model.area"
-                                                    label="Field">
-                                                </v-text-field>
-                                                <div v-if="!v.area.maxLength">
-                                                    <p class="caption red--text">Maximum characters: 100</p>
-                                                </div>
-                                            </v-flex>
-                                        </v-layout>
-                                    </v-flex>
-                                    <v-flex px-4 pb-2>
-                                        <v-text-field 
-                                            v-model="v.$model.title"
-                                            label="Thesis title">
-                                        </v-text-field>
-                                        <div v-if="!v.title.maxLength">
-                                            <p class="caption red--text">Maximum characters: 300</p>
-                                        </div>
-                                    </v-flex>
-                                    <v-flex px-4 pb-2>
-                                        <v-layout v-bind="toColumn">
-                                            <v-flex pr-2>
-                                                <v-menu ref="v.$model.show_date_start" v-model="v.$model.show_date_start"
-                                                    :close-on-content-click="false"
-                                                    :nudge-right="10"
-                                                    transition="scale-transition" 
-                                                    offset-y full-width min-width="290px"> 
-                                                    <template v-slot:activator="{ on }">
-                                                        <v-text-field v-model="v.$model.start"
-                                                            label="Started" v-on="on">
-                                                        </v-text-field>
-                                                    </template>
-                                                    <v-date-picker v-model="v.$model.start" 
-                                                            @input="v.$model.show_date_start = false"
-                                                            no-title></v-date-picker>
-                                                </v-menu>
-                                            </v-flex>
-                                            <v-flex pr-2>
-                                                <v-menu ref="v.$model.show_date_end" v-model="v.$model.show_date_end"
-                                                    :close-on-content-click="false"
-                                                    :nudge-right="10"
-                                                    transition="scale-transition" 
-                                                    offset-y full-width min-width="290px"> 
-                                                    <template v-slot:activator="{ on }">
-                                                        <v-text-field v-model="v.$model.end"
-                                                            label="Ended" v-on="on">
-                                                        </v-text-field>
-                                                    </template>
-                                                    <v-date-picker v-model="v.$model.end" 
-                                                            @input="v.$model.show_date_end = false"
-                                                            no-title></v-date-picker>
-                                                </v-menu>
-                                            </v-flex>
-                                            <v-flex pr-2>
-                                                <v-menu ref="v.$model.show_date_estimate_end" v-model="v.$model.show_date_estimate_end"
-                                                    :close-on-content-click="false"
-                                                    :nudge-right="10"
-                                                    transition="scale-transition" 
-                                                    offset-y full-width min-width="290px"> 
-                                                    <template v-slot:activator="{ on }">
-                                                        <v-text-field v-model="v.$model.estimate_end"
-                                                            label="Estimated end" v-on="on">
-                                                        </v-text-field>
-                                                    </template>
-                                                    <v-date-picker v-model="v.$model.estimate_end" 
-                                                            @input="v.$model.show_date_estimate_end = false"
-                                                            no-title></v-date-picker>
-                                                </v-menu>
-                                            </v-flex>
-                                        </v-layout>
-                                    </v-flex>
-                                    <v-flex px-4 pb-2>
-                                        <h5>LAQV/UCIBIO supervisors</h5>
-                                        <v-layout v-bind="toColumn">
-                                            <v-expansion-panels>
-                                                <v-expansion-panel v-model="v.$model.supervisors_panel"
-                                                    v-for="(vsup,j) in v.$model.supervisors"
-                                                    :key="i.toString() + '-' + j.toString() + '-ongoing'">
-                                                    <v-expansion-panel-header>
-                                                        <div><b>{{vsup.colloquial_name}}</b></div>
-                                                    </v-expansion-panel-header>
-                                                    <v-expansion-panel-content>                                                    
-                                                        <v-flex px-4 pb-2>
-                                                            <v-layout row align-center justify-end>
-                                                                <v-btn @click="removeItem(v.$model.supervisors, j, 'supervisor', data.ongoing, i, 'deleteSupervisors')"
-                                                                        small outlined color="red">Remove</v-btn>
-                                                            </v-layout>
-                                                            <v-layout v-bind="toColumn">
-                                                                <v-flex pr-2>
-                                                                    <v-autocomplete
-                                                                        v-model="vsup.supervisor_id"
-                                                                        @change="updateSelect(vsup, 'supervisor_id', 'colloquial_name', people,'id','colloquial_name')"
-                                                                        :loading="loadingPeople"
-                                                                        :items="people" item-value="id" item-text="colloquial_name"
-                                                                        :search-input.sync="vsup.supervisor_search"
-                                                                        cache-items
-                                                                        flat
-                                                                        hide-no-data
-                                                                        hide-details
-                                                                        label="Supervisor">
-                                                                    </v-autocomplete>
-                                                                </v-flex>                                                    
-                                                            </v-layout>
-                                                            <v-layout v-bind="toColumn">
-                                                                <v-flex pr-2>
-                                                                    <v-select v-model="vsup.supervisor_type_id"
-                                                                        :items="supervisorTypes" item-value="id" item-text="name_en"
-                                                                        label="Supervisor type">
-                                                                    </v-select>
-                                                                </v-flex>
-                                                                <v-flex pr-2>
-                                                                    <v-menu ref="vsup.show_date_start" v-model="vsup.show_date_start"
-                                                                        :close-on-content-click="false"
-                                                                        :nudge-right="10"
-                                                                        transition="scale-transition" 
-                                                                        offset-y full-width min-width="290px"> 
-                                                                        <template v-slot:activator="{ on }">
-                                                                            <v-text-field v-model="vsup.valid_from"
-                                                                                label="Started" v-on="on">
-                                                                            </v-text-field>
-                                                                        </template>
-                                                                        <v-date-picker v-model="vsup.valid_from" 
-                                                                                @input="vsup.show_date_start = false"
-                                                                                no-title></v-date-picker>
-                                                                    </v-menu>
-                                                                </v-flex>
-                                                                <v-flex pr-2>
-                                                                    <v-menu ref="vsup.show_date_end" v-model="vsup.show_date_end"
-                                                                        :close-on-content-click="false"
-                                                                        :nudge-right="10"
-                                                                        transition="scale-transition" 
-                                                                        offset-y full-width min-width="290px"> 
-                                                                        <template v-slot:activator="{ on }">
-                                                                            <v-text-field v-model="vsup.valid_until"
-                                                                                label="Ended" v-on="on">
-                                                                            </v-text-field>
-                                                                        </template>
-                                                                        <v-date-picker v-model="vsup.valid_until" 
-                                                                                @input="vsup.show_date_end = false"
-                                                                                no-title></v-date-picker>
-                                                                    </v-menu>
-                                                                </v-flex>
-                                                            </v-layout>
-                                                        </v-flex>
-                                                        
-                                                    </v-expansion-panel-content>
-                                                </v-expansion-panel>
-                                            </v-expansion-panels>
-                                            <v-flex pl-2 mt-4>
-                                                <v-btn small outlined
-                                                    @click="addItem(v.$model.supervisors,'supervisor',v.$model)">
-                                                    Add supervisor</v-btn>
-                                            </v-flex>
-                                        </v-layout>
-                                        <v-flex my-2>
-                                            <v-divider></v-divider>
-                                        </v-flex>
-                                        <h5>Supervisors, other institutions</h5>
-                                        <v-layout v-bind="toColumn">
-                                            <v-expansion-panels>
-                                                <v-expansion-panel v-model="v.$model.ext_supervisors_panel"
-                                                    v-for="(vsup,j) in v.external_supervisors.$each.$iter" 
-                                                    :key="i.toString() + '-' + j.toString() + '-ongoing-ext'">
-                                                    <v-expansion-panel-header>
-                                                        <div><b>{{vsup.$model.colloquial_name}}</b>, {{vsup.$model.organization}}
+                </v-card-title>
+                <v-card-text></v-card-text>
+                <v-container>
+                    <div v-if="$v.data.finished.$model.length === 0">
+                        No finished degrees
+                    </div>
+                    <v-form ref="form"
+                        @submit.prevent="submitForm">
+                        <v-expansion-panels>
+                            <v-expansion-panel 
+                                    v-for="(v,i) in $v.data.finished.$each.$iter" 
+                                    :key="i"
+                                    v-model="degreesPanel">
+                                <v-expansion-panel-header>
+                                    <div>
+                                        <b>{{v.$model.degree_name}}</b>, {{v.$model.area}}, 
+                                            from {{v.$model.start}} to {{v.$model.end}} 
+                                    </div>
+                                </v-expansion-panel-header>
+                                <v-expansion-panel-content>
+                                    <v-card class="pa-4">
+                                        <v-card-text></v-card-text>
+                                        <v-container>
+                                            <v-row justify="end">
+                                                <v-btn @click="removeItem(data.finished, i, 'degree')"
+                                                     small outlined color="red">Remove degree</v-btn>
+                                            </v-row>
+                                            <v-row>
+                                                <v-col>                                                    
+                                                    <v-row>
+                                                        <v-col cols="12" sm="6">
+                                                            <v-select v-model="v.$model.degree_id"
+                                                                @change="updateSelect(v.$model, 'degree_id', 'degree_name', degrees,'id','name_en')"
+                                                                :items="degrees" item-value="id" item-text="name_en"
+                                                                label="Degree">
+                                                            </v-select>
+                                                        </v-col>
+                                                        <v-col cols="12" sm="6">
+                                                            <v-text-field 
+                                                                v-model="v.$model.program"
+                                                                label="Degree Program">
+                                                            </v-text-field>
+                                                            <div v-if="!v.program.maxLength">
+                                                                <p class="caption red--text">Maximum characters: 100</p>
                                                             </div>
-                                                    </v-expansion-panel-header>
-                                                    <v-expansion-panel-content>
-                                                        <v-flex px-4 pb-2>
-                                                            <v-layout row align-center justify-end>
-                                                                <v-btn @click="removeItem(v.$model.external_supervisors, j, 'extSupervisor', data.ongoing, i, 'deleteExtSupervisors')"
-                                                                        small outlined color="red">Remove</v-btn>
-                                                            </v-layout>
-                                                            <v-layout v-bind="toColumn">
-                                                                <v-flex pr-2>
-                                                                    <v-text-field light
-                                                                        v-model="vsup.$model.colloquial_name"
-                                                                        label="Name">
+                                                        </v-col>
+                                                    </v-row>
+                                                </v-col>
+                                            </v-row>
+                                            <v-row>
+                                                <v-col>
+                                                    <v-row>
+                                                        <v-col cols="12" sm="6">
+                                                            <v-text-field 
+                                                                v-model="v.$model.institution"
+                                                                label="Institution">
+                                                            </v-text-field>
+                                                            <div v-if="!v.institution.maxLength">
+                                                                <p class="caption red--text">Maximum characters: 100</p>
+                                                            </div>
+                                                        </v-col>
+                                                        <v-col cols="12" sm="6">
+                                                            <v-text-field 
+                                                                v-model="v.$model.area"
+                                                                label="Field">
+                                                            </v-text-field>
+                                                            <div v-if="!v.area.maxLength">
+                                                                <p class="caption red--text">Maximum characters: 100</p>
+                                                            </div>
+                                                        </v-col>
+                                                    </v-row>
+                                                </v-col>
+                                            </v-row>
+                                            <v-row>
+                                                <v-col>
+                                                    <v-text-field 
+                                                        v-model="v.$model.title"
+                                                        label="Thesis title">
+                                                    </v-text-field>
+                                                    <div v-if="!v.title.maxLength">
+                                                        <p class="caption red--text">Maximum characters: 300</p>
+                                                    </div>
+                                                </v-col>
+                                            </v-row>
+                                            <v-row>
+                                                <v-col>
+                                                    <v-row>
+                                                        <v-col cols="12" sm="6">
+                                                            <v-menu ref="v.$model.show_date_start" v-model="v.$model.show_date_start"
+                                                                :close-on-content-click="false"
+                                                                :nudge-right="10"
+                                                                transition="scale-transition" 
+                                                                offset-y full-width min-width="290px"> 
+                                                                <template v-slot:activator="{ on }">
+                                                                    <v-text-field v-model="v.$model.start"
+                                                                        label="Started" v-on="on">
                                                                     </v-text-field>
-                                                                    <div v-if="!vsup.colloquial_name.maxLength">
-                                                                        <p class="caption red--text">Maximum characters: 100</p>
-                                                                    </div>
-                                                                </v-flex>
-                                                                <v-flex pr-2>
-                                                                    <v-text-field 
-                                                                        v-model="vsup.$model.organization"
-                                                                        label="Organization">
+                                                                </template>
+                                                                <v-date-picker v-model="v.$model.start" 
+                                                                        @input="v.$model.show_date_start = false"
+                                                                        no-title></v-date-picker>
+                                                            </v-menu>
+                                                        </v-col>
+                                                        <v-col cols="12" sm="6">
+                                                            <v-menu ref="v.$model.show_date_end" v-model="v.$model.show_date_end"
+                                                                :close-on-content-click="false"
+                                                                :nudge-right="10"
+                                                                transition="scale-transition" 
+                                                                offset-y full-width min-width="290px"> 
+                                                                <template v-slot:activator="{ on }">
+                                                                    <v-text-field v-model="v.$model.end"
+                                                                        label="Ended" v-on="on">
                                                                     </v-text-field>
-                                                                    <div v-if="!vsup.organization.maxLength">
-                                                                        <p class="caption red--text">Maximum characters: 100</p>
+                                                                </template>
+                                                                <v-date-picker v-model="v.$model.end" 
+                                                                        @input="v.$model.show_date_end = false" 
+                                                                        no-title></v-date-picker>
+                                                            </v-menu>
+                                                        </v-col>
+                                                    </v-row>
+                                                </v-col>
+                                            </v-row>
+                                            <v-row>
+                                                <v-col>
+                                                    <h5>LAQV/UCIBIO supervisors</h5>                                        
+                                                    <v-row>
+                                                        <v-expansion-panels>
+                                                            <v-expansion-panel v-model="v.$model.supervisors_panel"
+                                                                v-for="(vsup,j) in v.$model.supervisors" 
+                                                                :key="i.toString() + '-' + j.toString()">
+                                                                <v-expansion-panel-header>
+                                                                    <div><b>{{vsup.colloquial_name}}</b></div>
+                                                                </v-expansion-panel-header>
+                                                                <v-expansion-panel-content>
+                                                                    <v-col>
+                                                                        <v-row align="center" justify="end">
+                                                                            <v-btn @click="removeItem(v.$model.supervisors, j, 'supervisor', data.finished, i, 'deleteSupervisors')"
+                                                                                    small outlined color="red">Remove</v-btn>
+                                                                        </v-row>
+                                                                        <v-row>
+                                                                            <v-col>
+                                                                                <v-autocomplete
+                                                                                    v-model="vsup.supervisor_id"
+                                                                                    @change="updateSelect(vsup, 'supervisor_id', 'colloquial_name', people,'id','colloquial_name')"
+                                                                                    :loading="loadingPeople"
+                                                                                    :items="people" item-value="id" item-text="colloquial_name"
+                                                                                    :search-input.sync="vsup.supervisor_search"
+                                                                                    cache-items
+                                                                                    flat
+                                                                                    hide-no-data
+                                                                                    hide-details
+                                                                                    label="Supervisor">
+                                                                                </v-autocomplete>
+                                                                            </v-col>                                                    
+                                                                        </v-row>
+                                                                        <v-row>
+                                                                            <v-col cols="12" sm="6">
+                                                                                <v-select v-model="vsup.supervisor_type_id"
+                                                                                    :items="supervisorTypes" item-value="id" item-text="name_en"
+                                                                                    label="Supervisor type">
+                                                                                </v-select>
+                                                                            </v-col>
+                                                                            <v-col cols="12" sm="3">
+                                                                                <v-menu ref="vsup.show_date_start" v-model="vsup.show_date_start"
+                                                                                    :close-on-content-click="false"
+                                                                                    :nudge-right="10"
+                                                                                    transition="scale-transition" 
+                                                                                    offset-y full-width min-width="290px"> 
+                                                                                    <template v-slot:activator="{ on }">
+                                                                                        <v-text-field v-model="vsup.valid_from"
+                                                                                            label="Started" v-on="on">
+                                                                                        </v-text-field>
+                                                                                    </template>
+                                                                                    <v-date-picker v-model="vsup.valid_from" 
+                                                                                            @input="vsup.show_date_start = false"
+                                                                                            no-title></v-date-picker>
+                                                                                </v-menu>
+                                                                            </v-col>
+                                                                            <v-col cols="12" sm="3">
+                                                                                <v-menu ref="vsup.show_date_end" v-model="vsup.show_date_end"
+                                                                                    :close-on-content-click="false"
+                                                                                    :nudge-right="10"
+                                                                                    transition="scale-transition" 
+                                                                                    offset-y full-width min-width="290px"> 
+                                                                                    <template v-slot:activator="{ on }">
+                                                                                        <v-text-field v-model="vsup.valid_until"
+                                                                                            label="Ended" v-on="on">
+                                                                                        </v-text-field>
+                                                                                    </template>
+                                                                                    <v-date-picker v-model="vsup.valid_until" 
+                                                                                            @input="vsup.show_date_end = false"
+                                                                                            no-title></v-date-picker>
+                                                                                </v-menu>
+                                                                            </v-col>
+                                                                        </v-row>
+                                                                    </v-col>                                                                    
+                                                                </v-expansion-panel-content>
+                                                            </v-expansion-panel>
+                                                        </v-expansion-panels>
+                                                        <v-col>
+                                                            <v-btn small outlined
+                                                                @click="addItem(v.$model.supervisors,'supervisor',v.$model)">
+                                                                Add supervisor</v-btn>
+                                                        </v-col>
+                                                    </v-row>
+                                                    <v-col>
+                                                        <v-divider></v-divider>
+                                                    </v-col>
+                                                    <h5>Supervisors, other institutions</h5>
+                                                    <v-row>
+                                                        <v-expansion-panels>
+                                                            <v-expansion-panel 
+                                                                v-model="v.$model.ext_supervisors_panel"
+                                                                v-for="(vsup,j) in v.external_supervisors.$each.$iter" 
+                                                                :key="i.toString() + '-' + j.toString() + '-ext'">
+                                                                <v-expansion-panel-header>
+                                                                    <div><b>{{vsup.$model.colloquial_name}}</b>, 
+                                                                            {{vsup.$model.organization}}
                                                                     </div>
-                                                                </v-flex>
-                                                            </v-layout>
-                                                            <v-layout v-bind="toColumn">
-                                                                <v-flex pr-2>
-                                                                    <v-select v-model="vsup.$model.supervisor_type_id"
-                                                                        :items="supervisorTypes" item-value="id" item-text="name_en"
-                                                                        label="Supervisor type">
-                                                                    </v-select>
-                                                                </v-flex>
-                                                                <v-flex pr-2>
-                                                                    <v-menu ref="vsup.show_date_start" v-model="vsup.$model.show_date_start"
-                                                                        :close-on-content-click="false"
-                                                                        :nudge-right="10"
-                                                                        transition="scale-transition" 
-                                                                        offset-y full-width min-width="290px"> 
-                                                                        <template v-slot:activator="{ on }">
-                                                                            <v-text-field v-model="vsup.$model.valid_from"
-                                                                                label="Started" v-on="on">
-                                                                            </v-text-field>
-                                                                        </template>
-                                                                        <v-date-picker v-model="vsup.$model.valid_from" 
-                                                                                @input="vsup.$model.show_date_start = false"
-                                                                                no-title></v-date-picker>
-                                                                    </v-menu>
-                                                                </v-flex>
-                                                                <v-flex pr-2>
-                                                                    <v-menu ref="vsup.show_date_end" v-model="vsup.$model.show_date_end"
-                                                                        :close-on-content-click="false"
-                                                                        :nudge-right="10"
-                                                                        transition="scale-transition" 
-                                                                        offset-y full-width min-width="290px"> 
-                                                                        <template v-slot:activator="{ on }">
-                                                                            <v-text-field v-model="vsup.$model.valid_until"
-                                                                                label="Ended" v-on="on">
-                                                                            </v-text-field>
-                                                                        </template>
-                                                                        <v-date-picker v-model="vsup.$model.valid_until" 
-                                                                                @input="vsup.$model.show_date_end = false"
-                                                                                no-title></v-date-picker>
-                                                                    </v-menu>
-                                                                </v-flex>
-                                                            </v-layout>
-                                                        </v-flex>
-                                                        
-                                                    </v-expansion-panel-content>
-                                                </v-expansion-panel>
-                                            </v-expansion-panels>                                        
-                                            <v-flex pl-2 mt-4> 
-                                                <v-btn small outlined
-                                                    @click="addItem(v.$model.external_supervisors,'external_supervisor',v.$model)">
-                                                    Add external supervisor
-                                                </v-btn>
-                                            </v-flex>
-                                        </v-layout>
-                                    </v-flex>                                
-                                </v-card>
-                            </v-expansion-panel-content>
-                        </v-expansion-panel>
-                    </v-expansion-panels>
-                    <v-flex pl-2 mt-4> 
-                        <v-btn outlined @click="addItem(data.ongoing, 'degree', 'ongoingDegreesPanel')">Add a degree</v-btn>
-                    </v-flex>
-                    <v-layout column>
-                        <div v-if="formError">                                
-                            <p class="caption red--text">Unable to submit form.</p>
+                                                                </v-expansion-panel-header>
+                                                                <v-expansion-panel-content>
+                                                                    <v-col>
+                                                                        <v-row align="center" justify="end">
+                                                                            <v-btn @click="removeItem(v.$model.external_supervisors, j, 'extSupervisor', data.finished, i, 'deleteExtSupervisors')"
+                                                                                    small outlined color="red">Remove</v-btn>
+                                                                        </v-row>
+                                                                        <v-row>
+                                                                            <v-col cols="12" sm="6">
+                                                                                <v-text-field light
+                                                                                    v-model="vsup.$model.colloquial_name"
+                                                                                    label="Name">
+                                                                                </v-text-field>
+                                                                                <div v-if="!vsup.colloquial_name.maxLength">
+                                                                                    <p class="caption red--text">Maximum characters: 100</p>
+                                                                                </div>
+                                                                            </v-col>
+                                                                            <v-col cols="12" sm="6">
+                                                                                <v-text-field 
+                                                                                    v-model="vsup.$model.organization"
+                                                                                    label="Organization">
+                                                                                </v-text-field>
+                                                                                <div v-if="!vsup.organization.maxLength">
+                                                                                    <p class="caption red--text">Maximum characters: 100</p>
+                                                                                </div>
+                                                                            </v-col>
+                                                                        </v-row>
+                                                                        <v-row>
+                                                                            <v-col cols="12" sm="6">
+                                                                                <v-select v-model="vsup.$model.supervisor_type_id"
+                                                                                    :items="supervisorTypes" item-value="id" item-text="name_en"
+                                                                                    label="Supervisor type">
+                                                                                </v-select>
+                                                                            </v-col>
+                                                                            <v-col cols="12" sm="3">
+                                                                                <v-menu ref="vsup.show_date_start" v-model="vsup.$model.show_date_start"
+                                                                                    :close-on-content-click="false"
+                                                                                    :nudge-right="10"
+                                                                                    transition="scale-transition" 
+                                                                                    offset-y full-width min-width="290px"> 
+                                                                                    <template v-slot:activator="{ on }">
+                                                                                        <v-text-field v-model="vsup.$model.valid_from"
+                                                                                            label="Started" v-on="on">
+                                                                                        </v-text-field>
+                                                                                    </template>
+                                                                                    <v-date-picker v-model="vsup.$model.valid_from" 
+                                                                                            @input="vsup.$model.show_date_start = false"
+                                                                                            no-title></v-date-picker>
+                                                                                </v-menu>
+                                                                            </v-col>
+                                                                            <v-col cols="12" sm="3">
+                                                                                <v-menu ref="vsup.show_date_end" v-model="vsup.$model.show_date_end"
+                                                                                    :close-on-content-click="false"
+                                                                                    :nudge-right="10"
+                                                                                    transition="scale-transition" 
+                                                                                    offset-y full-width min-width="290px"> 
+                                                                                    <template v-slot:activator="{ on }">
+                                                                                        <v-text-field v-model="vsup.$model.valid_until"
+                                                                                            label="Ended" v-on="on">
+                                                                                        </v-text-field>
+                                                                                    </template>
+                                                                                    <v-date-picker v-model="vsup.$model.valid_until" 
+                                                                                            @input="vsup.$model.show_date_end = false"
+                                                                                            no-title></v-date-picker>
+                                                                                </v-menu>
+                                                                            </v-col>
+                                                                        </v-row>
+                                                                    </v-col>                                                                    
+                                                                </v-expansion-panel-content>
+                                                            </v-expansion-panel>
+                                                        </v-expansion-panels>
+                                                        <v-col> 
+                                                            <v-btn small outlined
+                                                                @click="addItem(v.$model.external_supervisors,'external_supervisor',v.$model)">
+                                                                Add external supervisor
+                                                            </v-btn>
+                                                        </v-col>
+                                                    </v-row>
+                                                </v-col>
+                                            </v-row>
+                                        </v-container>                                        
+                                    </v-card>
+                                </v-expansion-panel-content>
+                            </v-expansion-panel>
+                        </v-expansion-panels>
+                        <v-col> 
+                            <v-btn outlined @click="addItem(data.finished, 'degree', 'degreesPanel')">Add a degree</v-btn>
+                        </v-col>
+                        <v-row>
+                            <v-col v-if="formError">
+                                <div v-if="formError">                                
+                                    <p class="caption red--text">Unable to submit form.</p>
+                                </div>
+                            </v-col>
+                            
+                            <v-row align="center" justify="end">
+                                <div>
+                                    <v-btn type="submit" 
+                                        outlined color="blue">Save</v-btn>
+                                </div>
+                                <div class="request-status-container">
+                                    <v-progress-circular indeterminate 
+                                            v-show="progress"
+                                            :size="20" :width="2"                                         
+                                            color="primary"></v-progress-circular>
+                                    <v-icon v-show="success" color="green">mdi-check</v-icon>
+                                    <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
+                                </div>
+                            </v-row>
+                        </v-row>
+                        <div v-if="$v.$invalid">
+                            <p class="caption red--text">At least one field is invalid.</p>
                         </div>
-                        <v-layout row align-center justify-end>
-                            <div>
-                                <v-btn type="submit" 
-                                    outlined color="blue">Save</v-btn>
-                            </div>
-                            <div style="width: 35px;">
-                                <v-progress-circular indeterminate 
-                                        v-show="progress"
-                                        :size="20" :width="2"                                         
-                                        color="primary"></v-progress-circular>
-                                <v-icon v-show="success" color="green">done</v-icon>
-                                <v-icon v-show="error" color="red">error</v-icon>
-                            </div>
-                        </v-layout>
-                    </v-layout>
-                    <div v-if="$v.$invalid">
-                        <p class="caption red--text">At least one field is invalid.</p>
+                    </v-form>                    
+                </v-container>                
+            </v-card>
+        </v-col>
+        <v-col cols="12" md="6">
+            <v-card>
+                <v-card-title primary-title>
+                    <div>
+                        <h3 class="headline">Ongoing Degrees</h3>
                     </div>
-                </v-form>
-            </v-flex>
-        </v-card>
-    </v-flex>
-</v-layout>    
+                </v-card-title>
+                <v-card-text></v-card-text>
+                <v-container>
+                    <div v-if="$v.data.ongoing.$model.length === 0">
+                        No ongoing degrees
+                    </div>
+                    <v-form ref="formOngoing"
+                        @submit.prevent="submitFormOngoing">
+                        <v-expansion-panels>
+                            <v-expansion-panel
+                                v-model="ongoingDegreesPanel"
+                                v-for="(v,i) in $v.data.ongoing.$each.$iter" 
+                                :key="i.toString() + '-ongoing'">
+                                <v-expansion-panel-header>
+                                    <div><b>{{v.$model.degree_name}}</b>, {{v.$model.area}}, 
+                                            from {{v.$model.start}} to {{v.$model.end}} 
+                                    </div>
+                                </v-expansion-panel-header>
+                                <v-expansion-panel-content>
+                                    <v-card class="pa-4">
+                                        <v-card-text></v-card-text>
+                                        <v-container>
+                                            <v-row justify="end">
+                                                <v-btn @click="removeItem(data.ongoing, i, 'degree')"
+                                                            small outlined color="red">Remove degree</v-btn>
+                                            </v-row>
+                                            <v-row>
+                                                <v-col>
+                                                    <v-row>
+                                                        <v-col cols="12" sm="6">
+                                                            <v-select v-model="v.$model.degree_id"
+                                                                @change="updateSelect(v.$model, 'degree_id', 'degree_name', degrees,'id','name_en')"
+                                                                :items="degrees" item-value="id" item-text="name_en"
+                                                                label="Degree">
+                                                            </v-select>
+                                                        </v-col>
+                                                        <v-col cols="12" sm="6">
+                                                            <v-text-field 
+                                                                v-model="v.$model.program"
+                                                                label="Degree Program">
+                                                            </v-text-field>
+                                                            <div v-if="!v.program.maxLength">
+                                                                <p class="caption red--text">Maximum characters: 100</p>
+                                                            </div>
+                                                        </v-col>
+                                                    </v-row>
+                                                </v-col>
+                                            </v-row>
+                                            <v-row>
+                                                <v-col>
+                                                    <v-row>
+                                                        <v-col cols="12" sm="6">
+                                                            <v-text-field 
+                                                                v-model="v.$model.institution"
+                                                                label="Institution">
+                                                            </v-text-field>
+                                                            <div v-if="!v.institution.maxLength">
+                                                                <p class="caption red--text">Maximum characters: 100</p>
+                                                            </div>
+                                                        </v-col>
+                                                        <v-col cols="12" sm="6">
+                                                            <v-text-field 
+                                                                v-model="v.$model.area"
+                                                                label="Field">
+                                                            </v-text-field>
+                                                            <div v-if="!v.area.maxLength">
+                                                                <p class="caption red--text">Maximum characters: 100</p>
+                                                            </div>
+                                                        </v-col>
+                                                    </v-row>
+                                                </v-col>
+                                            </v-row>
+                                            <v-row>
+                                                <v-col>
+                                                    <v-text-field 
+                                                        v-model="v.$model.title"
+                                                        label="Thesis title">
+                                                    </v-text-field>
+                                                    <div v-if="!v.title.maxLength">
+                                                        <p class="caption red--text">Maximum characters: 300</p>
+                                                    </div>
+                                                </v-col>        
+                                            </v-row>
+                                            <v-row>
+                                                <v-col>
+                                                    <v-row>
+                                                        <v-col cols="12" sm="4">
+                                                            <v-menu ref="v.$model.show_date_start" v-model="v.$model.show_date_start"
+                                                                :close-on-content-click="false"
+                                                                :nudge-right="10"
+                                                                transition="scale-transition" 
+                                                                offset-y full-width min-width="290px"> 
+                                                                <template v-slot:activator="{ on }">
+                                                                    <v-text-field v-model="v.$model.start"
+                                                                        label="Started" v-on="on">
+                                                                    </v-text-field>
+                                                                </template>
+                                                                <v-date-picker v-model="v.$model.start" 
+                                                                        @input="v.$model.show_date_start = false"
+                                                                        no-title></v-date-picker>
+                                                            </v-menu>
+                                                        </v-col>
+                                                        <v-col cols="12" sm="4">
+                                                            <v-menu ref="v.$model.show_date_end" v-model="v.$model.show_date_end"
+                                                                :close-on-content-click="false"
+                                                                :nudge-right="10"
+                                                                transition="scale-transition" 
+                                                                offset-y full-width min-width="290px"> 
+                                                                <template v-slot:activator="{ on }">
+                                                                    <v-text-field v-model="v.$model.end"
+                                                                        label="Ended" v-on="on">
+                                                                    </v-text-field>
+                                                                </template>
+                                                                <v-date-picker v-model="v.$model.end" 
+                                                                        @input="v.$model.show_date_end = false"
+                                                                        no-title></v-date-picker>
+                                                            </v-menu>
+                                                        </v-col>
+                                                        <v-col cols="12" sm="4">
+                                                            <v-menu ref="v.$model.show_date_estimate_end" v-model="v.$model.show_date_estimate_end"
+                                                                :close-on-content-click="false"
+                                                                :nudge-right="10"
+                                                                transition="scale-transition" 
+                                                                offset-y full-width min-width="290px"> 
+                                                                <template v-slot:activator="{ on }">
+                                                                    <v-text-field v-model="v.$model.estimate_end"
+                                                                        label="Estimated end" v-on="on">
+                                                                    </v-text-field>
+                                                                </template>
+                                                                <v-date-picker v-model="v.$model.estimate_end" 
+                                                                        @input="v.$model.show_date_estimate_end = false"
+                                                                        no-title></v-date-picker>
+                                                            </v-menu>
+                                                        </v-col>
+                                                    </v-row>
+                                                </v-col>                                                
+                                            </v-row>
+                                            <v-row>    
+                                                <v-col>
+                                                    <h5>LAQV/UCIBIO supervisors</h5>
+                                                    <v-row>
+                                                        <v-expansion-panels>
+                                                            <v-expansion-panel v-model="v.$model.supervisors_panel"
+                                                                v-for="(vsup,j) in v.$model.supervisors"
+                                                                :key="i.toString() + '-' + j.toString() + '-ongoing'">
+                                                                <v-expansion-panel-header>
+                                                                    <div><b>{{vsup.colloquial_name}}</b></div>
+                                                                </v-expansion-panel-header>
+                                                                <v-expansion-panel-content>                                                    
+                                                                    <v-col>
+                                                                        <v-row align="center" justify="end">
+                                                                            <v-btn @click="removeItem(v.$model.supervisors, j, 'supervisor', data.ongoing, i, 'deleteSupervisors')"
+                                                                                    small outlined color="red">Remove</v-btn>
+                                                                        </v-row>
+                                                                        <v-row>
+                                                                            <v-col>
+                                                                                <v-autocomplete
+                                                                                    v-model="vsup.supervisor_id"
+                                                                                    @change="updateSelect(vsup, 'supervisor_id', 'colloquial_name', people,'id','colloquial_name')"
+                                                                                    :loading="loadingPeople"
+                                                                                    :items="people" item-value="id" item-text="colloquial_name"
+                                                                                    :search-input.sync="vsup.supervisor_search"
+                                                                                    cache-items
+                                                                                    flat
+                                                                                    hide-no-data
+                                                                                    hide-details
+                                                                                    label="Supervisor">
+                                                                                </v-autocomplete>
+                                                                            </v-col>                                                    
+                                                                        </v-row>
+                                                                        <v-row>
+                                                                            <v-col cols="12" sm="6">
+                                                                                <v-select v-model="vsup.supervisor_type_id"
+                                                                                    :items="supervisorTypes" item-value="id" item-text="name_en"
+                                                                                    label="Supervisor type">
+                                                                                </v-select>
+                                                                            </v-col>
+                                                                            <v-col cols="12" sm="3">
+                                                                                <v-menu ref="vsup.show_date_start" v-model="vsup.show_date_start"
+                                                                                    :close-on-content-click="false"
+                                                                                    :nudge-right="10"
+                                                                                    transition="scale-transition" 
+                                                                                    offset-y full-width min-width="290px"> 
+                                                                                    <template v-slot:activator="{ on }">
+                                                                                        <v-text-field v-model="vsup.valid_from"
+                                                                                            label="Started" v-on="on">
+                                                                                        </v-text-field>
+                                                                                    </template>
+                                                                                    <v-date-picker v-model="vsup.valid_from" 
+                                                                                            @input="vsup.show_date_start = false"
+                                                                                            no-title></v-date-picker>
+                                                                                </v-menu>
+                                                                            </v-col>
+                                                                            <v-col cols="12" sm="3">
+                                                                                <v-menu ref="vsup.show_date_end" v-model="vsup.show_date_end"
+                                                                                    :close-on-content-click="false"
+                                                                                    :nudge-right="10"
+                                                                                    transition="scale-transition" 
+                                                                                    offset-y full-width min-width="290px"> 
+                                                                                    <template v-slot:activator="{ on }">
+                                                                                        <v-text-field v-model="vsup.valid_until"
+                                                                                            label="Ended" v-on="on">
+                                                                                        </v-text-field>
+                                                                                    </template>
+                                                                                    <v-date-picker v-model="vsup.valid_until" 
+                                                                                            @input="vsup.show_date_end = false"
+                                                                                            no-title></v-date-picker>
+                                                                                </v-menu>
+                                                                            </v-col>
+                                                                        </v-row>
+                                                                    </v-col>                                                                    
+                                                                </v-expansion-panel-content>
+                                                            </v-expansion-panel>
+                                                        </v-expansion-panels>
+                                                        <v-col>
+                                                            <v-btn small outlined
+                                                                @click="addItem(v.$model.supervisors,'supervisor',v.$model)">
+                                                                Add supervisor</v-btn>
+                                                        </v-col>
+                                                    </v-row>
+                                                    <v-col>
+                                                        <v-divider></v-divider>
+                                                    </v-col>
+                                                    <h5>Supervisors, other institutions</h5>
+                                                    <v-row>
+                                                        <v-expansion-panels>
+                                                            <v-expansion-panel v-model="v.$model.ext_supervisors_panel"
+                                                                v-for="(vsup,j) in v.external_supervisors.$each.$iter" 
+                                                                :key="i.toString() + '-' + j.toString() + '-ongoing-ext'">
+                                                                <v-expansion-panel-header>
+                                                                    <div><b>{{vsup.$model.colloquial_name}}</b>, {{vsup.$model.organization}}
+                                                                        </div>
+                                                                </v-expansion-panel-header>
+                                                                <v-expansion-panel-content>
+                                                                    <v-col>
+                                                                        <v-row align="center" justify="end">
+                                                                            <v-btn @click="removeItem(v.$model.external_supervisors, j, 'extSupervisor', data.ongoing, i, 'deleteExtSupervisors')"
+                                                                                    small outlined color="red">Remove</v-btn>
+                                                                        </v-row>
+                                                                        <v-row>
+                                                                            <v-col cols="12" sm="6">
+                                                                                <v-text-field light
+                                                                                    v-model="vsup.$model.colloquial_name"
+                                                                                    label="Name">
+                                                                                </v-text-field>
+                                                                                <div v-if="!vsup.colloquial_name.maxLength">
+                                                                                    <p class="caption red--text">Maximum characters: 100</p>
+                                                                                </div>
+                                                                            </v-col>
+                                                                            <v-col cols="12" sm="6">
+                                                                                <v-text-field 
+                                                                                    v-model="vsup.$model.organization"
+                                                                                    label="Organization">
+                                                                                </v-text-field>
+                                                                                <div v-if="!vsup.organization.maxLength">
+                                                                                    <p class="caption red--text">Maximum characters: 100</p>
+                                                                                </div>
+                                                                            </v-col>
+                                                                        </v-row>
+                                                                        <v-row>
+                                                                            <v-col cols="12" sm="6">
+                                                                                <v-select v-model="vsup.$model.supervisor_type_id"
+                                                                                    :items="supervisorTypes" item-value="id" item-text="name_en"
+                                                                                    label="Supervisor type">
+                                                                                </v-select>
+                                                                            </v-col>
+                                                                            <v-col cols="12" sm="3">
+                                                                                <v-menu ref="vsup.show_date_start" v-model="vsup.$model.show_date_start"
+                                                                                    :close-on-content-click="false"
+                                                                                    :nudge-right="10"
+                                                                                    transition="scale-transition" 
+                                                                                    offset-y full-width min-width="290px"> 
+                                                                                    <template v-slot:activator="{ on }">
+                                                                                        <v-text-field v-model="vsup.$model.valid_from"
+                                                                                            label="Started" v-on="on">
+                                                                                        </v-text-field>
+                                                                                    </template>
+                                                                                    <v-date-picker v-model="vsup.$model.valid_from" 
+                                                                                            @input="vsup.$model.show_date_start = false"
+                                                                                            no-title></v-date-picker>
+                                                                                </v-menu>
+                                                                            </v-col>
+                                                                            <v-col cols="12" sm="3">
+                                                                                <v-menu ref="vsup.show_date_end" v-model="vsup.$model.show_date_end"
+                                                                                    :close-on-content-click="false"
+                                                                                    :nudge-right="10"
+                                                                                    transition="scale-transition" 
+                                                                                    offset-y full-width min-width="290px"> 
+                                                                                    <template v-slot:activator="{ on }">
+                                                                                        <v-text-field v-model="vsup.$model.valid_until"
+                                                                                            label="Ended" v-on="on">
+                                                                                        </v-text-field>
+                                                                                    </template>
+                                                                                    <v-date-picker v-model="vsup.$model.valid_until" 
+                                                                                            @input="vsup.$model.show_date_end = false"
+                                                                                            no-title></v-date-picker>
+                                                                                </v-menu>
+                                                                            </v-col>
+                                                                        </v-row>
+                                                                    </v-col>                                                                    
+                                                                </v-expansion-panel-content>
+                                                            </v-expansion-panel>
+                                                        </v-expansion-panels>                                        
+                                                        <v-col> 
+                                                            <v-btn small outlined
+                                                                @click="addItem(v.$model.external_supervisors,'external_supervisor',v.$model)">
+                                                                Add external supervisor
+                                                            </v-btn>
+                                                        </v-col>
+                                                    </v-row>
+                                                </v-col>
+                                            </v-row>
+                                        </v-container>                                        
+                                    </v-card>
+                                </v-expansion-panel-content>
+                            </v-expansion-panel>
+                        </v-expansion-panels>
+                        <v-col> 
+                            <v-btn outlined @click="addItem(data.ongoing, 'degree', 'ongoingDegreesPanel')">Add a degree</v-btn>
+                        </v-col>
+                        <v-row>
+                            <div v-if="ongoingFormError">                                
+                                <p class="caption red--text">Unable to submit form.</p>
+                            </div>
+                            <v-row align="center" justify="end">
+                                <div>
+                                    <v-btn type="submit" 
+                                        outlined color="blue">Save</v-btn>
+                                </div>
+                                <div class="request-status-container">
+                                    <v-progress-circular indeterminate 
+                                            v-show="progress"
+                                            :size="20" :width="2"                                         
+                                            color="primary"></v-progress-circular>
+                                    <v-icon v-show="success" color="green">mdi-check</v-icon>
+                                    <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
+                                </div>
+                            </v-row>
+                        </v-row>
+                        <div v-if="$v.$invalid">
+                            <p class="caption red--text">At least one field is invalid.</p>
+                        </div>
+                    </v-form>
+                </v-container>
+            </v-card>
+        </v-col>
+    </v-row>
+</v-container>
 </template>
 
 <script>
@@ -735,6 +757,7 @@ export default {
             success: false,
             error: false,
             formError: false,
+            ongoigFormError: false,
             
             data: {
                 ongoing: [],
@@ -783,12 +806,87 @@ export default {
                 });                
             } else {
                 this.$refs.form.reset();
+                this.$refs.formOngoing.reset();
             }        
         },
         submitForm() {
             if (this.$v.$invalid) {
                 this.formError = true;
                 setTimeout(() => {this.formError = false;}, 3000)
+            } else {
+                if (this.$store.state.session.loggedIn) {
+                    let personID = this.$store.state.session.personID;
+                    let urlCreate = [];
+                    let urlDelete = [];
+                    let urlUpdate = [];
+                    this.progress = true;
+                    let degrees = this.data.finished.concat(this.data.ongoing);
+                    for (let ind in degrees) {
+                        if (degrees[ind].id === 'new') {
+                            degrees[ind].person_id = personID;
+                            urlCreate.push({
+                                    url: 'api/people/' + personID + '/degrees',
+                                    body: degrees[ind],
+                                });
+                            
+                        } else {
+                            urlUpdate.push({
+                                    url: 'api/people/' + personID 
+                                            + '/degrees/' + degrees[ind].id,
+                                    body: degrees[ind],
+                                });
+                        }
+                    }
+                    for (let ind in this.toDelete) {
+                        urlDelete.push('api/people/' + personID 
+                                    + '/degrees/' + this.toDelete[ind].id);
+                    }
+
+                    this.$http.all(
+                        urlUpdate.map(el => 
+                            this.$http.put(el.url, 
+                                { data: el.body, },
+                                { headers: 
+                                    {'Authorization': 'Bearer ' + localStorage['v2-token']
+                                },
+                            }))
+                        .concat(
+                            urlCreate.map(el => 
+                                this.$http.post(el.url, 
+                                    { data: el.body, },
+                                    { headers: 
+                                        {'Authorization': 'Bearer ' + localStorage['v2-token']
+                                    },
+                                })))
+                        .concat(
+                            urlDelete.map(el => 
+                                this.$http.delete(el,
+                                    { headers: 
+                                        {'Authorization': 'Bearer ' + localStorage['v2-token']
+                                    },
+                                })))
+                    )
+                    .then(this.$http.spread( () => {
+                        this.progress = false;
+                        this.success = true;
+                        setTimeout(() => {this.success = false;}, 1500)
+                        this.initialize();
+                    }))
+                    .catch((error) => {
+                        this.progress = false;
+                        this.error = true;
+                        this.initialize();
+                        setTimeout(() => {this.error = false;}, 6000)
+                        // eslint-disable-next-line
+                        console.log(error)
+                    })                    
+                }
+            }
+        },
+        submitFormOngoing() {
+            if (this.$v.$invalid) {
+                this.ongoingFormError = true;
+                setTimeout(() => {this.ongoingFormError = false;}, 3000)
             } else {
                 if (this.$store.state.session.loggedIn) {
                     let personID = this.$store.state.session.personID;

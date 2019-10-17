@@ -6,9 +6,12 @@
         </div>
     </v-card-title>
     <v-card-text>
-        <v-flex px-4 pb-2>
-
-        </v-flex>
+        <v-container>
+            <v-row>
+                <v-col>
+                </v-col>
+            </v-row>
+        </v-container>
     </v-card-text>        
 </v-card>
 </template>
