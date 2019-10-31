@@ -16,14 +16,14 @@
                     <v-form ref="form"
                         @submit.prevent="submitForm">
                         <v-expansion-panels>
-                            <v-expansion-panel 
-                                    v-for="(v,i) in $v.data.finished.$each.$iter" 
+                            <v-expansion-panel
+                                    v-for="(v,i) in $v.data.finished.$each.$iter"
                                     :key="i"
                                     v-model="degreesPanel">
                                 <v-expansion-panel-header>
                                     <div>
-                                        <b>{{v.$model.degree_name}}</b>, {{v.$model.area}}, 
-                                            from {{v.$model.start}} to {{v.$model.end}} 
+                                        <b>{{v.$model.degree_name}}</b>, {{v.$model.area}},
+                                            from {{v.$model.start}} to {{v.$model.end}}
                                     </div>
                                 </v-expansion-panel-header>
                                 <v-expansion-panel-content>
@@ -35,7 +35,7 @@
                                                      small outlined color="red">Remove degree</v-btn>
                                             </v-row>
                                             <v-row>
-                                                <v-col>                                                    
+                                                <v-col>
                                                     <v-row>
                                                         <v-col cols="12" sm="6">
                                                             <v-select v-model="v.$model.degree_id"
@@ -45,7 +45,7 @@
                                                             </v-select>
                                                         </v-col>
                                                         <v-col cols="12" sm="6">
-                                                            <v-text-field 
+                                                            <v-text-field
                                                                 v-model="v.$model.program"
                                                                 label="Degree Program">
                                                             </v-text-field>
@@ -60,7 +60,7 @@
                                                 <v-col>
                                                     <v-row>
                                                         <v-col cols="12" sm="6">
-                                                            <v-text-field 
+                                                            <v-text-field
                                                                 v-model="v.$model.institution"
                                                                 label="Institution">
                                                             </v-text-field>
@@ -69,7 +69,7 @@
                                                             </div>
                                                         </v-col>
                                                         <v-col cols="12" sm="6">
-                                                            <v-text-field 
+                                                            <v-text-field
                                                                 v-model="v.$model.area"
                                                                 label="Field">
                                                             </v-text-field>
@@ -82,7 +82,7 @@
                                             </v-row>
                                             <v-row>
                                                 <v-col>
-                                                    <v-text-field 
+                                                    <v-text-field
                                                         v-model="v.$model.title"
                                                         label="Thesis title">
                                                     </v-text-field>
@@ -98,14 +98,14 @@
                                                             <v-menu ref="v.$model.show_date_start" v-model="v.$model.show_date_start"
                                                                 :close-on-content-click="false"
                                                                 :nudge-right="10"
-                                                                transition="scale-transition" 
-                                                                offset-y full-width min-width="290px"> 
+                                                                transition="scale-transition"
+                                                                offset-y min-width="290px">
                                                                 <template v-slot:activator="{ on }">
                                                                     <v-text-field v-model="v.$model.start"
                                                                         label="Started" v-on="on">
                                                                     </v-text-field>
                                                                 </template>
-                                                                <v-date-picker v-model="v.$model.start" 
+                                                                <v-date-picker v-model="v.$model.start"
                                                                         @input="v.$model.show_date_start = false"
                                                                         no-title></v-date-picker>
                                                             </v-menu>
@@ -114,15 +114,15 @@
                                                             <v-menu ref="v.$model.show_date_end" v-model="v.$model.show_date_end"
                                                                 :close-on-content-click="false"
                                                                 :nudge-right="10"
-                                                                transition="scale-transition" 
-                                                                offset-y full-width min-width="290px"> 
+                                                                transition="scale-transition"
+                                                                offset-y min-width="290px">
                                                                 <template v-slot:activator="{ on }">
                                                                     <v-text-field v-model="v.$model.end"
                                                                         label="Ended" v-on="on">
                                                                     </v-text-field>
                                                                 </template>
-                                                                <v-date-picker v-model="v.$model.end" 
-                                                                        @input="v.$model.show_date_end = false" 
+                                                                <v-date-picker v-model="v.$model.end"
+                                                                        @input="v.$model.show_date_end = false"
                                                                         no-title></v-date-picker>
                                                             </v-menu>
                                                         </v-col>
@@ -131,11 +131,11 @@
                                             </v-row>
                                             <v-row>
                                                 <v-col>
-                                                    <h5>LAQV/UCIBIO supervisors</h5>                                        
+                                                    <h5>LAQV/UCIBIO supervisors</h5>
                                                     <v-row>
                                                         <v-expansion-panels>
                                                             <v-expansion-panel v-model="v.$model.supervisors_panel"
-                                                                v-for="(vsup,j) in v.$model.supervisors" 
+                                                                v-for="(vsup,j) in v.$model.supervisors"
                                                                 :key="i.toString() + '-' + j.toString()">
                                                                 <v-expansion-panel-header>
                                                                     <div><b>{{vsup.colloquial_name}}</b></div>
@@ -160,7 +160,7 @@
                                                                                     hide-details
                                                                                     label="Supervisor">
                                                                                 </v-autocomplete>
-                                                                            </v-col>                                                    
+                                                                            </v-col>
                                                                         </v-row>
                                                                         <v-row>
                                                                             <v-col cols="12" sm="6">
@@ -173,14 +173,14 @@
                                                                                 <v-menu ref="vsup.show_date_start" v-model="vsup.show_date_start"
                                                                                     :close-on-content-click="false"
                                                                                     :nudge-right="10"
-                                                                                    transition="scale-transition" 
-                                                                                    offset-y full-width min-width="290px"> 
+                                                                                    transition="scale-transition"
+                                                                                    offset-y min-width="290px">
                                                                                     <template v-slot:activator="{ on }">
                                                                                         <v-text-field v-model="vsup.valid_from"
                                                                                             label="Started" v-on="on">
                                                                                         </v-text-field>
                                                                                     </template>
-                                                                                    <v-date-picker v-model="vsup.valid_from" 
+                                                                                    <v-date-picker v-model="vsup.valid_from"
                                                                                             @input="vsup.show_date_start = false"
                                                                                             no-title></v-date-picker>
                                                                                 </v-menu>
@@ -189,20 +189,20 @@
                                                                                 <v-menu ref="vsup.show_date_end" v-model="vsup.show_date_end"
                                                                                     :close-on-content-click="false"
                                                                                     :nudge-right="10"
-                                                                                    transition="scale-transition" 
-                                                                                    offset-y full-width min-width="290px"> 
+                                                                                    transition="scale-transition"
+                                                                                    offset-y min-width="290px">
                                                                                     <template v-slot:activator="{ on }">
                                                                                         <v-text-field v-model="vsup.valid_until"
                                                                                             label="Ended" v-on="on">
                                                                                         </v-text-field>
                                                                                     </template>
-                                                                                    <v-date-picker v-model="vsup.valid_until" 
+                                                                                    <v-date-picker v-model="vsup.valid_until"
                                                                                             @input="vsup.show_date_end = false"
                                                                                             no-title></v-date-picker>
                                                                                 </v-menu>
                                                                             </v-col>
                                                                         </v-row>
-                                                                    </v-col>                                                                    
+                                                                    </v-col>
                                                                 </v-expansion-panel-content>
                                                             </v-expansion-panel>
                                                         </v-expansion-panels>
@@ -218,12 +218,12 @@
                                                     <h5>Supervisors, other institutions</h5>
                                                     <v-row>
                                                         <v-expansion-panels>
-                                                            <v-expansion-panel 
+                                                            <v-expansion-panel
                                                                 v-model="v.$model.ext_supervisors_panel"
-                                                                v-for="(vsup,j) in v.external_supervisors.$each.$iter" 
+                                                                v-for="(vsup,j) in v.external_supervisors.$each.$iter"
                                                                 :key="i.toString() + '-' + j.toString() + '-ext'">
                                                                 <v-expansion-panel-header>
-                                                                    <div><b>{{vsup.$model.colloquial_name}}</b>, 
+                                                                    <div><b>{{vsup.$model.colloquial_name}}</b>,
                                                                             {{vsup.$model.organization}}
                                                                     </div>
                                                                 </v-expansion-panel-header>
@@ -244,7 +244,7 @@
                                                                                 </div>
                                                                             </v-col>
                                                                             <v-col cols="12" sm="6">
-                                                                                <v-text-field 
+                                                                                <v-text-field
                                                                                     v-model="vsup.$model.organization"
                                                                                     label="Organization">
                                                                                 </v-text-field>
@@ -264,14 +264,14 @@
                                                                                 <v-menu ref="vsup.show_date_start" v-model="vsup.$model.show_date_start"
                                                                                     :close-on-content-click="false"
                                                                                     :nudge-right="10"
-                                                                                    transition="scale-transition" 
-                                                                                    offset-y full-width min-width="290px"> 
+                                                                                    transition="scale-transition"
+                                                                                    offset-y min-width="290px">
                                                                                     <template v-slot:activator="{ on }">
                                                                                         <v-text-field v-model="vsup.$model.valid_from"
                                                                                             label="Started" v-on="on">
                                                                                         </v-text-field>
                                                                                     </template>
-                                                                                    <v-date-picker v-model="vsup.$model.valid_from" 
+                                                                                    <v-date-picker v-model="vsup.$model.valid_from"
                                                                                             @input="vsup.$model.show_date_start = false"
                                                                                             no-title></v-date-picker>
                                                                                 </v-menu>
@@ -280,24 +280,24 @@
                                                                                 <v-menu ref="vsup.show_date_end" v-model="vsup.$model.show_date_end"
                                                                                     :close-on-content-click="false"
                                                                                     :nudge-right="10"
-                                                                                    transition="scale-transition" 
-                                                                                    offset-y full-width min-width="290px"> 
+                                                                                    transition="scale-transition"
+                                                                                    offset-y min-width="290px">
                                                                                     <template v-slot:activator="{ on }">
                                                                                         <v-text-field v-model="vsup.$model.valid_until"
                                                                                             label="Ended" v-on="on">
                                                                                         </v-text-field>
                                                                                     </template>
-                                                                                    <v-date-picker v-model="vsup.$model.valid_until" 
+                                                                                    <v-date-picker v-model="vsup.$model.valid_until"
                                                                                             @input="vsup.$model.show_date_end = false"
                                                                                             no-title></v-date-picker>
                                                                                 </v-menu>
                                                                             </v-col>
                                                                         </v-row>
-                                                                    </v-col>                                                                    
+                                                                    </v-col>
                                                                 </v-expansion-panel-content>
                                                             </v-expansion-panel>
                                                         </v-expansion-panels>
-                                                        <v-col> 
+                                                        <v-col>
                                                             <v-btn small outlined
                                                                 @click="addItem(v.$model.external_supervisors,'external_supervisor',v.$model)">
                                                                 Add external supervisor
@@ -306,30 +306,30 @@
                                                     </v-row>
                                                 </v-col>
                                             </v-row>
-                                        </v-container>                                        
+                                        </v-container>
                                     </v-card>
                                 </v-expansion-panel-content>
                             </v-expansion-panel>
                         </v-expansion-panels>
-                        <v-col> 
+                        <v-col>
                             <v-btn outlined @click="addItem(data.finished, 'degree', 'degreesPanel')">Add a degree</v-btn>
                         </v-col>
                         <v-row>
                             <v-col v-if="formError">
-                                <div v-if="formError">                                
+                                <div v-if="formError">
                                     <p class="caption red--text">Unable to submit form.</p>
                                 </div>
                             </v-col>
-                            
+
                             <v-row align="center" justify="end">
                                 <div>
-                                    <v-btn type="submit" 
+                                    <v-btn type="submit"
                                         outlined color="blue">Save</v-btn>
                                 </div>
                                 <div class="request-status-container">
-                                    <v-progress-circular indeterminate 
+                                    <v-progress-circular indeterminate
                                             v-show="progress"
-                                            :size="20" :width="2"                                         
+                                            :size="20" :width="2"
                                             color="primary"></v-progress-circular>
                                     <v-icon v-show="success" color="green">mdi-check</v-icon>
                                     <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
@@ -339,8 +339,8 @@
                         <div v-if="$v.$invalid">
                             <p class="caption red--text">At least one field is invalid.</p>
                         </div>
-                    </v-form>                    
-                </v-container>                
+                    </v-form>
+                </v-container>
             </v-card>
         </v-col>
         <v-col cols="12" md="6">
@@ -360,11 +360,11 @@
                         <v-expansion-panels>
                             <v-expansion-panel
                                 v-model="ongoingDegreesPanel"
-                                v-for="(v,i) in $v.data.ongoing.$each.$iter" 
+                                v-for="(v,i) in $v.data.ongoing.$each.$iter"
                                 :key="i.toString() + '-ongoing'">
                                 <v-expansion-panel-header>
-                                    <div><b>{{v.$model.degree_name}}</b>, {{v.$model.area}}, 
-                                            from {{v.$model.start}} to {{v.$model.end}} 
+                                    <div><b>{{v.$model.degree_name}}</b>, {{v.$model.area}},
+                                            from {{v.$model.start}} to {{v.$model.end}}
                                     </div>
                                 </v-expansion-panel-header>
                                 <v-expansion-panel-content>
@@ -386,7 +386,7 @@
                                                             </v-select>
                                                         </v-col>
                                                         <v-col cols="12" sm="6">
-                                                            <v-text-field 
+                                                            <v-text-field
                                                                 v-model="v.$model.program"
                                                                 label="Degree Program">
                                                             </v-text-field>
@@ -401,7 +401,7 @@
                                                 <v-col>
                                                     <v-row>
                                                         <v-col cols="12" sm="6">
-                                                            <v-text-field 
+                                                            <v-text-field
                                                                 v-model="v.$model.institution"
                                                                 label="Institution">
                                                             </v-text-field>
@@ -410,7 +410,7 @@
                                                             </div>
                                                         </v-col>
                                                         <v-col cols="12" sm="6">
-                                                            <v-text-field 
+                                                            <v-text-field
                                                                 v-model="v.$model.area"
                                                                 label="Field">
                                                             </v-text-field>
@@ -423,14 +423,14 @@
                                             </v-row>
                                             <v-row>
                                                 <v-col>
-                                                    <v-text-field 
+                                                    <v-text-field
                                                         v-model="v.$model.title"
                                                         label="Thesis title">
                                                     </v-text-field>
                                                     <div v-if="!v.title.maxLength">
                                                         <p class="caption red--text">Maximum characters: 300</p>
                                                     </div>
-                                                </v-col>        
+                                                </v-col>
                                             </v-row>
                                             <v-row>
                                                 <v-col>
@@ -439,14 +439,14 @@
                                                             <v-menu ref="v.$model.show_date_start" v-model="v.$model.show_date_start"
                                                                 :close-on-content-click="false"
                                                                 :nudge-right="10"
-                                                                transition="scale-transition" 
-                                                                offset-y full-width min-width="290px"> 
+                                                                transition="scale-transition"
+                                                                offset-y min-width="290px">
                                                                 <template v-slot:activator="{ on }">
                                                                     <v-text-field v-model="v.$model.start"
                                                                         label="Started" v-on="on">
                                                                     </v-text-field>
                                                                 </template>
-                                                                <v-date-picker v-model="v.$model.start" 
+                                                                <v-date-picker v-model="v.$model.start"
                                                                         @input="v.$model.show_date_start = false"
                                                                         no-title></v-date-picker>
                                                             </v-menu>
@@ -455,14 +455,14 @@
                                                             <v-menu ref="v.$model.show_date_end" v-model="v.$model.show_date_end"
                                                                 :close-on-content-click="false"
                                                                 :nudge-right="10"
-                                                                transition="scale-transition" 
-                                                                offset-y full-width min-width="290px"> 
+                                                                transition="scale-transition"
+                                                                offset-y min-width="290px">
                                                                 <template v-slot:activator="{ on }">
                                                                     <v-text-field v-model="v.$model.end"
                                                                         label="Ended" v-on="on">
                                                                     </v-text-field>
                                                                 </template>
-                                                                <v-date-picker v-model="v.$model.end" 
+                                                                <v-date-picker v-model="v.$model.end"
                                                                         @input="v.$model.show_date_end = false"
                                                                         no-title></v-date-picker>
                                                             </v-menu>
@@ -471,22 +471,22 @@
                                                             <v-menu ref="v.$model.show_date_estimate_end" v-model="v.$model.show_date_estimate_end"
                                                                 :close-on-content-click="false"
                                                                 :nudge-right="10"
-                                                                transition="scale-transition" 
-                                                                offset-y full-width min-width="290px"> 
+                                                                transition="scale-transition"
+                                                                offset-y min-width="290px">
                                                                 <template v-slot:activator="{ on }">
                                                                     <v-text-field v-model="v.$model.estimate_end"
                                                                         label="Estimated end" v-on="on">
                                                                     </v-text-field>
                                                                 </template>
-                                                                <v-date-picker v-model="v.$model.estimate_end" 
+                                                                <v-date-picker v-model="v.$model.estimate_end"
                                                                         @input="v.$model.show_date_estimate_end = false"
                                                                         no-title></v-date-picker>
                                                             </v-menu>
                                                         </v-col>
                                                     </v-row>
-                                                </v-col>                                                
+                                                </v-col>
                                             </v-row>
-                                            <v-row>    
+                                            <v-row>
                                                 <v-col>
                                                     <h5>LAQV/UCIBIO supervisors</h5>
                                                     <v-row>
@@ -497,7 +497,7 @@
                                                                 <v-expansion-panel-header>
                                                                     <div><b>{{vsup.colloquial_name}}</b></div>
                                                                 </v-expansion-panel-header>
-                                                                <v-expansion-panel-content>                                                    
+                                                                <v-expansion-panel-content>
                                                                     <v-col>
                                                                         <v-row align="center" justify="end">
                                                                             <v-btn @click="removeItem(v.$model.supervisors, j, 'supervisor', data.ongoing, i, 'deleteSupervisors')"
@@ -517,7 +517,7 @@
                                                                                     hide-details
                                                                                     label="Supervisor">
                                                                                 </v-autocomplete>
-                                                                            </v-col>                                                    
+                                                                            </v-col>
                                                                         </v-row>
                                                                         <v-row>
                                                                             <v-col cols="12" sm="6">
@@ -530,14 +530,14 @@
                                                                                 <v-menu ref="vsup.show_date_start" v-model="vsup.show_date_start"
                                                                                     :close-on-content-click="false"
                                                                                     :nudge-right="10"
-                                                                                    transition="scale-transition" 
-                                                                                    offset-y full-width min-width="290px"> 
+                                                                                    transition="scale-transition"
+                                                                                    offset-y min-width="290px">
                                                                                     <template v-slot:activator="{ on }">
                                                                                         <v-text-field v-model="vsup.valid_from"
                                                                                             label="Started" v-on="on">
                                                                                         </v-text-field>
                                                                                     </template>
-                                                                                    <v-date-picker v-model="vsup.valid_from" 
+                                                                                    <v-date-picker v-model="vsup.valid_from"
                                                                                             @input="vsup.show_date_start = false"
                                                                                             no-title></v-date-picker>
                                                                                 </v-menu>
@@ -546,20 +546,20 @@
                                                                                 <v-menu ref="vsup.show_date_end" v-model="vsup.show_date_end"
                                                                                     :close-on-content-click="false"
                                                                                     :nudge-right="10"
-                                                                                    transition="scale-transition" 
-                                                                                    offset-y full-width min-width="290px"> 
+                                                                                    transition="scale-transition"
+                                                                                    offset-y min-width="290px">
                                                                                     <template v-slot:activator="{ on }">
                                                                                         <v-text-field v-model="vsup.valid_until"
                                                                                             label="Ended" v-on="on">
                                                                                         </v-text-field>
                                                                                     </template>
-                                                                                    <v-date-picker v-model="vsup.valid_until" 
+                                                                                    <v-date-picker v-model="vsup.valid_until"
                                                                                             @input="vsup.show_date_end = false"
                                                                                             no-title></v-date-picker>
                                                                                 </v-menu>
                                                                             </v-col>
                                                                         </v-row>
-                                                                    </v-col>                                                                    
+                                                                    </v-col>
                                                                 </v-expansion-panel-content>
                                                             </v-expansion-panel>
                                                         </v-expansion-panels>
@@ -576,7 +576,7 @@
                                                     <v-row>
                                                         <v-expansion-panels>
                                                             <v-expansion-panel v-model="v.$model.ext_supervisors_panel"
-                                                                v-for="(vsup,j) in v.external_supervisors.$each.$iter" 
+                                                                v-for="(vsup,j) in v.external_supervisors.$each.$iter"
                                                                 :key="i.toString() + '-' + j.toString() + '-ongoing-ext'">
                                                                 <v-expansion-panel-header>
                                                                     <div><b>{{vsup.$model.colloquial_name}}</b>, {{vsup.$model.organization}}
@@ -599,7 +599,7 @@
                                                                                 </div>
                                                                             </v-col>
                                                                             <v-col cols="12" sm="6">
-                                                                                <v-text-field 
+                                                                                <v-text-field
                                                                                     v-model="vsup.$model.organization"
                                                                                     label="Organization">
                                                                                 </v-text-field>
@@ -619,14 +619,14 @@
                                                                                 <v-menu ref="vsup.show_date_start" v-model="vsup.$model.show_date_start"
                                                                                     :close-on-content-click="false"
                                                                                     :nudge-right="10"
-                                                                                    transition="scale-transition" 
-                                                                                    offset-y full-width min-width="290px"> 
+                                                                                    transition="scale-transition"
+                                                                                    offset-y min-width="290px">
                                                                                     <template v-slot:activator="{ on }">
                                                                                         <v-text-field v-model="vsup.$model.valid_from"
                                                                                             label="Started" v-on="on">
                                                                                         </v-text-field>
                                                                                     </template>
-                                                                                    <v-date-picker v-model="vsup.$model.valid_from" 
+                                                                                    <v-date-picker v-model="vsup.$model.valid_from"
                                                                                             @input="vsup.$model.show_date_start = false"
                                                                                             no-title></v-date-picker>
                                                                                 </v-menu>
@@ -635,24 +635,24 @@
                                                                                 <v-menu ref="vsup.show_date_end" v-model="vsup.$model.show_date_end"
                                                                                     :close-on-content-click="false"
                                                                                     :nudge-right="10"
-                                                                                    transition="scale-transition" 
-                                                                                    offset-y full-width min-width="290px"> 
+                                                                                    transition="scale-transition"
+                                                                                    offset-y min-width="290px">
                                                                                     <template v-slot:activator="{ on }">
                                                                                         <v-text-field v-model="vsup.$model.valid_until"
                                                                                             label="Ended" v-on="on">
                                                                                         </v-text-field>
                                                                                     </template>
-                                                                                    <v-date-picker v-model="vsup.$model.valid_until" 
+                                                                                    <v-date-picker v-model="vsup.$model.valid_until"
                                                                                             @input="vsup.$model.show_date_end = false"
                                                                                             no-title></v-date-picker>
                                                                                 </v-menu>
                                                                             </v-col>
                                                                         </v-row>
-                                                                    </v-col>                                                                    
+                                                                    </v-col>
                                                                 </v-expansion-panel-content>
                                                             </v-expansion-panel>
-                                                        </v-expansion-panels>                                        
-                                                        <v-col> 
+                                                        </v-expansion-panels>
+                                                        <v-col>
                                                             <v-btn small outlined
                                                                 @click="addItem(v.$model.external_supervisors,'external_supervisor',v.$model)">
                                                                 Add external supervisor
@@ -661,27 +661,27 @@
                                                     </v-row>
                                                 </v-col>
                                             </v-row>
-                                        </v-container>                                        
+                                        </v-container>
                                     </v-card>
                                 </v-expansion-panel-content>
                             </v-expansion-panel>
                         </v-expansion-panels>
-                        <v-col> 
+                        <v-col>
                             <v-btn outlined @click="addItem(data.ongoing, 'degree', 'ongoingDegreesPanel')">Add a degree</v-btn>
                         </v-col>
                         <v-row>
-                            <div v-if="ongoingFormError">                                
+                            <div v-if="ongoingFormError">
                                 <p class="caption red--text">Unable to submit form.</p>
                             </div>
                             <v-row align="center" justify="end">
                                 <div>
-                                    <v-btn type="submit" 
+                                    <v-btn type="submit"
                                         outlined color="blue">Save</v-btn>
                                 </div>
                                 <div class="request-status-container">
-                                    <v-progress-circular indeterminate 
+                                    <v-progress-circular indeterminate
                                             v-show="progress"
-                                            :size="20" :width="2"                                         
+                                            :size="20" :width="2"
                                             color="primary"></v-progress-circular>
                                     <v-icon v-show="success" color="green">mdi-check</v-icon>
                                     <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
@@ -721,7 +721,7 @@ var processDegrees = function(vm, result) {
             let this_degree = vm.degrees.find(el => el.id === result[ind].degree_id)
             if (this_degree !== undefined) {
                 result[ind].degree_name = this_degree.name_en;
-            }            
+            }
         }
         result[ind].start = time.momentToDate(result[ind].start);
         result[ind].end = time.momentToDate(result[ind].end);
@@ -757,8 +757,8 @@ export default {
             success: false,
             error: false,
             formError: false,
-            ongoigFormError: false,
-            
+            ongoingFormError: false,
+
             data: {
                 ongoing: [],
                 finished: [],
@@ -803,11 +803,11 @@ export default {
                 subUtil.getInfoPopulate(this, urlSubmit, true)
                 .then( (result) => {
                     this.data = processDegrees(this, result);
-                });                
+                });
             } else {
                 this.$refs.form.reset();
                 this.$refs.formOngoing.reset();
-            }        
+            }
         },
         submitForm() {
             if (this.$v.$invalid) {
@@ -828,40 +828,40 @@ export default {
                                     url: 'api/people/' + personID + '/degrees',
                                     body: degrees[ind],
                                 });
-                            
+
                         } else {
                             urlUpdate.push({
-                                    url: 'api/people/' + personID 
+                                    url: 'api/people/' + personID
                                             + '/degrees/' + degrees[ind].id,
                                     body: degrees[ind],
                                 });
                         }
                     }
                     for (let ind in this.toDelete) {
-                        urlDelete.push('api/people/' + personID 
+                        urlDelete.push('api/people/' + personID
                                     + '/degrees/' + this.toDelete[ind].id);
                     }
 
                     this.$http.all(
-                        urlUpdate.map(el => 
-                            this.$http.put(el.url, 
+                        urlUpdate.map(el =>
+                            this.$http.put(el.url,
                                 { data: el.body, },
-                                { headers: 
+                                { headers:
                                     {'Authorization': 'Bearer ' + localStorage['v2-token']
                                 },
                             }))
                         .concat(
-                            urlCreate.map(el => 
-                                this.$http.post(el.url, 
+                            urlCreate.map(el =>
+                                this.$http.post(el.url,
                                     { data: el.body, },
-                                    { headers: 
+                                    { headers:
                                         {'Authorization': 'Bearer ' + localStorage['v2-token']
                                     },
                                 })))
                         .concat(
-                            urlDelete.map(el => 
+                            urlDelete.map(el =>
                                 this.$http.delete(el,
-                                    { headers: 
+                                    { headers:
                                         {'Authorization': 'Bearer ' + localStorage['v2-token']
                                     },
                                 })))
@@ -879,7 +879,7 @@ export default {
                         setTimeout(() => {this.error = false;}, 6000)
                         // eslint-disable-next-line
                         console.log(error)
-                    })                    
+                    })
                 }
             }
         },
@@ -902,40 +902,40 @@ export default {
                                     url: 'api/people/' + personID + '/degrees',
                                     body: degrees[ind],
                                 });
-                            
+
                         } else {
                             urlUpdate.push({
-                                    url: 'api/people/' + personID 
+                                    url: 'api/people/' + personID
                                             + '/degrees/' + degrees[ind].id,
                                     body: degrees[ind],
                                 });
                         }
                     }
                     for (let ind in this.toDelete) {
-                        urlDelete.push('api/people/' + personID 
+                        urlDelete.push('api/people/' + personID
                                     + '/degrees/' + this.toDelete[ind].id);
                     }
 
                     this.$http.all(
-                        urlUpdate.map(el => 
-                            this.$http.put(el.url, 
+                        urlUpdate.map(el =>
+                            this.$http.put(el.url,
                                 { data: el.body, },
-                                { headers: 
+                                { headers:
                                     {'Authorization': 'Bearer ' + localStorage['v2-token']
                                 },
                             }))
                         .concat(
-                            urlCreate.map(el => 
-                                this.$http.post(el.url, 
+                            urlCreate.map(el =>
+                                this.$http.post(el.url,
                                     { data: el.body, },
-                                    { headers: 
+                                    { headers:
                                         {'Authorization': 'Bearer ' + localStorage['v2-token']
                                     },
                                 })))
                         .concat(
-                            urlDelete.map(el => 
+                            urlDelete.map(el =>
                                 this.$http.delete(el,
-                                    { headers: 
+                                    { headers:
                                         {'Authorization': 'Bearer ' + localStorage['v2-token']
                                     },
                                 })))
@@ -953,7 +953,7 @@ export default {
                         setTimeout(() => {this.error = false;}, 6000)
                         // eslint-disable-next-line
                         console.log(error)
-                    })                    
+                    })
                 }
             }
         },
@@ -982,26 +982,26 @@ export default {
             if (type === 'degree') {
                 list.push({id: 'new', degree_id: null, area: null, program: null,
                     institution: null, start: null, end: null, title: null,
-                    supervisors: [], external_supervisors:[], 
+                    supervisors: [], external_supervisors:[],
                     deleteSupervisors: [], deleteExtSupervisors: [],
                     show_date_start: false, show_date_end: false})
                 this[panel] = list.length - 1;
             }
             if (type === 'supervisor') {
-                list.push({id: 'new', supervisor_id: null, 
+                list.push({id: 'new', supervisor_id: null,
                     supervisor_type_id: null,
                     valid_from: null, valid_until: null,
                     show_date_start: false, show_date_end: false});
                     panel.supervisors_panel = list.length - 1;
             }
             if (type === 'external_supervisor') {
-                list.push({id: 'new', colloquial_name: null, organization: null, 
+                list.push({id: 'new', colloquial_name: null, organization: null,
                     supervisor_type_id: null,
                     valid_from: null, valid_until: null,
                     show_date_start: false, show_date_end: false});
                     panel.ext_supervisors_panel = list.length - 1;
             }
-            
+
         },
         removeItem(list, ind, type, listSup, indSup, keySup) {
             if (type === 'degree' && list[ind].id !== 'new') {
@@ -1013,15 +1013,11 @@ export default {
             if (type === 'extSupervisor' && list[ind].id !== 'new') {
                 listSup[indSup][keySup].push(list[ind].id);
             }
-            list.splice(ind, 1);            
+            list.splice(ind, 1);
         },
         updateSelect(data, data_id, data_text, list, list_id, list_text) {
             for (let ind in list) {
                 if (list[ind][list_id] === data[data_id]) {
-                    // eslint-disable-next-line
-                    console.log(list[ind])
-                    // eslint-disable-next-line
-                    console.log(data)
                     this.$set(data, data_text, list[ind][list_text])
                 }
             }

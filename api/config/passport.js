@@ -9,39 +9,57 @@ function makeEndpointURL(data) {
     for (let ind in data) {
         let url = '';
         // resource1 exists always
-        url = '/' + data[ind].resource1_type_name + '/' + data[ind].resource1_id;
-        if (data[ind].resource2_type_name !== null && data[ind].resource2_type_name !== undefined)  {
-            url = url + '/' + data[ind].resource2_type_name;
-        } else {
+        if (data[ind].resource1_resource_id_generic === 1) {
+            url = '/' + data[ind].resource1_type_name + '/' + '*';
+        } else if (data[ind].resource1_resource_id_generic === null
+                || data[ind].resource1_resource_id_generic === undefined) {
+            url = '/' + data[ind].resource1_type_name;
             data[ind].endpoint_url = url;
-            continue;
+            continue
+        } else {
+            url = '/' + data[ind].resource1_type_name + '/' + data[ind].resource1_id;
         }
-        if (data[ind].resource2_id !== null && data[ind].resource2_id !== undefined) {
-            url = url + '/' + data[ind].resource2_id;
+        if (data[ind].resource2_type_name !== null && data[ind].resource2_type_name !== undefined)  {
+            if (data[ind].resource2_resource_id_generic === 1) {
+                url = url + '/' + data[ind].resource2_type_name + '/' + '*';
+            } else if (data[ind].resource2_resource_id_generic === null
+                || data[ind].resource2_resource_id_generic === undefined) {
+                url = url + '/' + data[ind].resource2_type_name;
+                data[ind].endpoint_url = url;
+                continue
+            } else {
+                url = url + '/' + data[ind].resource2_type_name + '/' + data[ind].resource2_id;
+            }
         } else {
             data[ind].endpoint_url = url;
             continue;
         }
         if (data[ind].resource3_type_name !== null && data[ind].resource3_type_name !== undefined) {
-            url = url + '/' + data[ind].resource3_type_name;
-        } else {
-            data[ind].endpoint_url = url;
-            continue;
-        }
-        if (data[ind].resource3_id !== null && data[ind].resource3_id !== undefined) {
-            url = url + '/' + data[ind].resource3_id;
+            if (data[ind].resource3_resource_id_generic === 1) {
+                url = url + '/' + data[ind].resource3_type_name + '/' + '*';
+            } else if (data[ind].resource3_resource_id_generic === null
+                || data[ind].resource3_resource_id_generic === undefined) {
+                url = url + '/' + data[ind].resource3_type_name;
+                data[ind].endpoint_url = url;
+                continue
+            } else {
+                url = url + '/' + data[ind].resource3_type_name + '/' + data[ind].resource3_id;
+            }
         } else {
             data[ind].endpoint_url = url;
             continue;
         }
         if (data[ind].resource4_type_name !== null && data[ind].resource4_type_name !== undefined) {
-            url = url + '/' + data[ind].resource4_type_name;
-        } else {
-            data[ind].endpoint_url = url;
-            continue;
-        }
-        if (data[ind].resource4_id !== null && data[ind].resource4_id !== undefined) {
-            url = url + '/' + data[ind].resource4_id;
+            if (data[ind].resource4_resource_id_generic === 1) {
+                url = url + '/' + data[ind].resource4_type_name + '/' + '*';
+            } else if (data[ind].resource4_resource_id_generic === null
+                || data[ind].resource4_resource_id_generic === undefined) {
+                url = url + '/' + data[ind].resource4_type_name;
+                data[ind].endpoint_url = url;
+                continue
+            } else {
+                url = url + '/' + data[ind].resource4_type_name + '/' + data[ind].resource4_id;
+            }
         } else {
             data[ind].endpoint_url = url;
             continue;
@@ -75,7 +93,7 @@ function processLabsGroupsUnitsData(user, labs) {
                 }
             }
         }
-    } 
+    }
     user.current_units = current_units;
     user.labs = labs;
     return user;
@@ -98,7 +116,7 @@ function processNonResearcherUnitsData(user, offices) {
             }
         }
     }
-    // the unlikely case that a user has a simultaneous role as researcher 
+    // the unlikely case that a user has a simultaneous role as researcher
     // and non-researcher (user.current_units holds the units found as a researcher)
     if (user.current_units !== undefined && user.current_units.length > 0) {
         for (let indUnit in user.current_units) {
@@ -121,7 +139,7 @@ passport.use(
         passReqToCallback: true // allows us to pass back the entire request to the callback
     },
     function (req, username, password, done) {
-        var query = 
+        var query =
             'SELECT users.id AS user_id, users.username, users.password,' +
             ' users.permission_level_id AS permissions_level,' +
             ' people.id as person_id' +
@@ -405,7 +423,6 @@ var getAdministrativeUnitsInfo = function (req, done, user, administrative_offic
         });
     });
 }
-
 var getUserEndpointPermissions = function (req, done, user) {
     let userID = user.user_id;
     var query =
@@ -437,7 +454,6 @@ var getUserEndpointPermissions = function (req, done, user) {
         });
     });
 };
-
 var getPermissionWebAreas = function (req, done, user) {
     var query =
         'SELECT permissions_web_app_areas.*, web_app_areas.app_area_en, web_app_areas.app_area_pt'

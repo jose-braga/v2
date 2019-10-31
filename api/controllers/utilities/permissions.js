@@ -3,24 +3,13 @@ const responses = require('../utilities/responses');
 const time = require('../utilities/time');
 
 var hasAccessEndpoint = function (reqMethod, reqEndpoint, permissionsEndpoints) {
-    let reqEndpointParts = reqEndpoint.split('/');
-    reqEndpointParts.splice(0, 1); // the string starts by a '/' (always!!?)
-    let lastPath = reqEndpointParts[reqEndpointParts.length - 1];
-    
     for (let ind in permissionsEndpoints) {
-        // we want to compare the request endpoint with the permissions:
-        // if lastPath is a number then we are interested in the remaining parts
-        // otherwise we are interested in reqEnpoint
-        let urlCompare;
-        if (Number.isNaN(parseInt(lastPath, 10)) 
-            || permissionsEndpoints[ind].include_last_id) {
-            urlCompare = reqEndpoint;
-        } else {
-            // remove last path
-            reqEndpointParts.splice(reqEndpointParts.length - 1, 1);
-            urlCompare = '/' + reqEndpointParts.join('/');
-        }
-        if (permissionsEndpoints[ind].endpoint_url === urlCompare
+        let endpointPerm = permissionsEndpoints[ind].endpoint_url
+        endpointPerm = endpointPerm.replace(/\*/g, '\\d+');
+        let endpointRegex = new RegExp('^' + endpointPerm + '$')
+        // the request endpoint must match the one
+        // of the endpoints in the permissions and its method
+        if (endpointRegex.test(reqEndpoint)
             && permissionsEndpoints[ind].method_name === reqMethod) {
             return true;
         }
@@ -28,9 +17,9 @@ var hasAccessEndpoint = function (reqMethod, reqEndpoint, permissionsEndpoints) 
     return false;
 };
 
-var TARGET_MANAGER_PERMISSION_LEVEL = 3;
-var TEAM_MANAGER_PERMISSION_LEVEL = 4;
-var STANDARD_USER_PERMISSION_LEVEL = 5;
+//var TARGET_MANAGER_PERMISSION_LEVEL = 3;
+//var TEAM_MANAGER_PERMISSION_LEVEL = 4;
+//var STANDARD_USER_PERMISSION_LEVEL = 5;
 
 /**
  * Middleware to check requester permissions to a resource
@@ -44,19 +33,19 @@ var STANDARD_USER_PERMISSION_LEVEL = 5;
 module.exports.checkPermissions = function (callback, callbackOptions) {
     let { req, res, next } = callbackOptions; // should contain always these 3
     // get requester permission data
-    let { 
-        personID, 
+    let {
+        personID,
         userID,
-        permissionsLevel, 
+        permissionsLevel,
         permissionsEndpoints,
     } = req.payload;
-    
+
     let reqEndpoint = req.path;
     let reqMethod = req.method;
     let resourcePersonID;
     if (req.params.personID !== undefined && req.params.personID !== null) {
         resourcePersonID = parseInt(req.params.personID, 10);
-    }   
+    }
 
     let reqEndpointParts = reqEndpoint.split('/');
     reqEndpointParts.splice(0,1); // the string starts by a '/' (always!!?)

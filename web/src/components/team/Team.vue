@@ -14,7 +14,10 @@
        <v-tabs-items>
             <!-- use :max="N" in keep-alive if necessary-->
             <keep-alive>
-                <router-view :lab-id="labID"></router-view>
+                <router-view v-if="currentLab && data.labPositions"
+                    :lab-id="labID"
+                    :lab-data="currentLab"
+                    :lab-positions="data.labPositions"></router-view>
             </keep-alive>
             <v-dialog v-model="showHelp" content-class="help">
                 <router-view name="help"></router-view>
@@ -33,10 +36,10 @@
             </div>
         </v-col>
     </v-row>
-    
-</v-container> 
-    
-  
+
+</v-container>
+
+
 </template>
 
 <script>
@@ -47,10 +50,12 @@ export default {
         return {
             activeTab: 0,
             labID: undefined,
+            currentLab: undefined,
             data: {
                 myLabs: [],
                 myLabsMembers: [],
-            },            
+                labPositions: undefined,
+            },
         }
     },
     mounted: function () {
@@ -66,8 +71,8 @@ export default {
                 if (permissionsWebAreas[ind].app_area_en === 'Team') {
                     return true;
                 }
-            }            
-            return false;           
+            }
+            return false;
         },
         loggedIn () {
             return this.$store.state.session.loggedIn;
@@ -80,16 +85,16 @@ export default {
                 if (state !== this.$store.state.navigation.showHelp) {
                     this.$store.dispatch('showHelp')
                 }
-            }            
+            }
         },
         labData () {
             let labData = this.data.myLabs;
             for (let ind in labData) {
-                labData[ind].link = '/team/' 
+                labData[ind].link = '/team/'
                 + labData[ind].name.toLowerCase().replace(/\s/g,'-');
             }
             return labData;
-        },  
+        },
     },
     created() {
         this.initialize();
@@ -108,23 +113,14 @@ export default {
                         .then( (result) => {
                             this.data.myLabs.push(result);
                         });
-                    }
 
-                    /*
-                    if (this_session.permissionsEndpoints[ind].resource1_type_name === 'labs'
-                        && this_session.permissionsEndpoints[ind].resource2_type_name === 'members-affiliation'
-                        && this_session.permissionsEndpoints[ind].method_name === 'GET') {
-                        let urlSubmit = 'api/' + this_session.permissionsEndpoints[ind].endpoint_url;
+                        urlSubmit = 'api/v2/lab-positions';
                         subUtil.getInfoPopulate(this, urlSubmit, true)
                         .then( (result) => {
-                            myLabsMembers.push(result);
-                            
+                            this.data.labPositions = result;
                         });
                     }
-                    */
                 }
-            } else {
-                this.$refs.form.reset();
             }
         },
         tabChanged: function(tab) {
@@ -132,11 +128,11 @@ export default {
             for (let ind in this.data.myLabs) {
                 if (this.data.myLabs[ind].link === tab) {
                     this.labID = this.data.myLabs[ind].id;
+                    this.currentLab = this.data.myLabs[ind];
                 }
             }
-                
+
         },
-        
     }
 }
 

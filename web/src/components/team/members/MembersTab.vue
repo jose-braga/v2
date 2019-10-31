@@ -2,25 +2,37 @@
 <v-container>
     <v-row>
         <v-col cols="12">
-            <CurrentMembers :lab-id="labId"></CurrentMembers>
+            <CurrentMembers
+                :lab-id="labId"
+                :lab-data="labData"
+                :lab-positions="labPositions"
+            ></CurrentMembers>
         </v-col>
         <v-col cols="12">
-            <!-- <PastMembers></PastMembers> -->
+            <PastMembers
+                :lab-id="labId"
+                :lab-data="labData"
+                :lab-positions="labPositions"
+            ></PastMembers>
         </v-col>
     </v-row>
-</v-container>    
+</v-container>
 </template>
 
 <script>
 
 import CurrentMembers from './CurrentMembersList'
+import PastMembers from './PastMembersList'
 
 export default {
     components: {
         CurrentMembers,
+        PastMembers,
     },
     props: {
         labId: Number,
+        labData: Object,
+        labPositions: Array,
     },
     data() {
         return {
@@ -36,7 +48,7 @@ export default {
     },
 
     methods: {
-          
+
     },
 
 }
@@ -45,3 +57,4 @@ export default {
 <style>
 
 </style>
+

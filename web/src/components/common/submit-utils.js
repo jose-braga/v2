@@ -2,7 +2,7 @@ var compareOriginal = function (original, current, key) {
     let create = [];
     let update = [];
     let trash = [];
-    
+
     for (let el in original) {
         let toDelete = true;
         for (let elCurr in current) {
@@ -43,7 +43,7 @@ var getInfoPopulate = function (vm, url, all) {
                 } else {
                     return undefined;
                 }
-                
+
             }
         })
         .catch((error) => {
@@ -58,13 +58,13 @@ var getPublicInfo = function (vm, url, data, sortKey) {
         .then((result) => {
             let res = result.data.result;
             if (sortKey !== undefined && res !== undefined && res.length > 0) {
-                // sniffs content to chekc if it is string, 
+                // sniffs content to chekc if it is string,
                 // otherwise considered to be number
                 if (typeof res[0][sortKey] === 'string' || res[0][sortKey] instanceof String) {
                     res.sort((a, b) => a[sortKey].localeCompare(b[sortKey]))
                 } else {
                     res.sort((a, b) => a[sortKey] - b[sortKey])
-                }                
+                }
             }
             vm[data] = res;
             return res;
@@ -75,8 +75,20 @@ var getPublicInfo = function (vm, url, data, sortKey) {
         });
 };
 
+var checkPermissions = function(reqURL, reqMethod, permURL, permMethod) {
+    let endpointPerm = permURL.replace(/\*/g, '\\d+');
+    let endpointRegex = new RegExp('^' + endpointPerm + '$');
+    if (endpointRegex.test(reqURL)
+        && reqMethod === permMethod) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 export default {
     compareOriginal,
     getInfoPopulate,
     getPublicInfo,
+    checkPermissions,
 }

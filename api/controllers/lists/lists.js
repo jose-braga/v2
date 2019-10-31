@@ -22,8 +22,17 @@ var getDegrees = function (req, res, next) {
 var getPeopleSimple = function (req, res, next) {
     var querySQL = '';
     var places = [];
-    querySQL = querySQL + 'SELECT id, colloquial_name FROM people' 
+    querySQL = querySQL + 'SELECT id, colloquial_name FROM people'
                         + ' WHERE status = 1;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+}
+
+var getLabPositions = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM lab_positions ORDER BY sort_order ASC;';
     //places.push()
     sql.makeSQLOperation(req, res, querySQL, places);
     return;
@@ -40,7 +49,7 @@ var getSupervisorTypes = function (req, res, next) {
 }
 
 module.exports.listItems = function (req, res, next) {
-    let category = req.params.listCategory;    
+    let category = req.params.listCategory;
     if (category === 'countries') {
         getCountries(req, res, next);
     }
@@ -49,6 +58,9 @@ module.exports.listItems = function (req, res, next) {
     }
     if (category === 'people') {
         getPeopleSimple(req, res, next);
+    }
+    if (category === 'lab-positions') {
+        getLabPositions(req, res, next);
     }
     if (category === 'supervisor-types') {
         getSupervisorTypes(req, res, next);
