@@ -69,6 +69,7 @@ function makeEndpointURL(data) {
     for (let ind in data) {
         permissions.push(
             {
+                method_name: data[ind].method_name,
                 endpoint_url: data[ind].endpoint_url,
                 allow_all_subpaths: data[ind].allow_all_subpaths,
             }

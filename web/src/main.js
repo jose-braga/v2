@@ -15,6 +15,10 @@ Vue.use(Vuelidate)
 
 Vue.prototype.$http = axios
 Vue.prototype.$http.defaults.baseURL = process.env.VUE_APP_API_BASE_URL
+axios.defaults.headers.get['Access-Control-Allow-Origin'] = process.env.VUE_APP_REQUEST_ORIGIN
+axios.defaults.headers.post['Access-Control-Allow-Origin'] = process.env.VUE_APP_REQUEST_ORIGIN
+axios.defaults.headers.put['Access-Control-Allow-Origin'] = process.env.VUE_APP_REQUEST_ORIGIN
+axios.defaults.headers.delete['Access-Control-Allow-Origin'] = process.env.VUE_APP_REQUEST_ORIGIN
 
 Vue.filter('formatDate', function (value) {
   if (value) {
