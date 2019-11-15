@@ -53,7 +53,7 @@ export default {
             currentLab: undefined,
             data: {
                 myLabs: [],
-                myLabsMembers: [],
+                //myLabsMembers: [],
                 labPositions: undefined,
             },
         }
@@ -138,7 +138,7 @@ export default {
 
 </script>
 
-<style>
+<style scoped>
 .selected-tab {
     background-color: #ffffff;
 }

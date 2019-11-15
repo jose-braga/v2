@@ -6,7 +6,7 @@
         </v-col>
     </v-row>
 </v-container>
-    
+
 </template>
 
 <script>
@@ -26,12 +26,12 @@ export default {
     },
 
     methods: {
-          
+
      },
 
 }
 </script>
 
-<style>
+<style scoped>
 
 </style>

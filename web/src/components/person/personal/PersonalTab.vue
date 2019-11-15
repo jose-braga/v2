@@ -2,10 +2,10 @@
     <v-container>
         <v-row>
             <v-col cols="12" md="6">
-                <NuclearInformation></NuclearInformation>                
+                <NuclearInformation></NuclearInformation>
             </v-col>
             <v-col cols="12" md="6">
-                <Photo></Photo>                
+                <Photo></Photo>
             </v-col>
         </v-row>
     </v-container>
@@ -24,6 +24,6 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 
 </style>

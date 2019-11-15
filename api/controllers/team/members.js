@@ -102,6 +102,12 @@ var actionUpdateLabMemberPosition = function (options) {
     options.operation = 'U';
     let positionID = req.params.positionID;
     let positionData = req.body.data;
+    if (positionData.valid_from === '') {
+        positionData.valid_from = null;
+    }
+    if (positionData.valid_until === '') {
+        positionData.valid_until = null;
+    }
     var places = [];
     querySQL = 'UPDATE people_labs'
             + ' SET lab_position_id = ?,'
@@ -139,6 +145,12 @@ var actionAddLabMemberPositionHistory = function (resQuery, options) {
         updated = now;
         //positionData = {};
     }
+    if (positionData.valid_from === '') {
+        positionData.valid_from = null;
+    }
+    if (positionData.valid_until === '') {
+        positionData.valid_until = null;
+    }
     querySQL = 'INSERT INTO people_labs_history'
         + ' (people_labs_id, person_id, lab_id, lab_position_id, dedication, valid_from, valid_until, created, updated, operation, changed_by)'
         + ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
@@ -168,6 +180,12 @@ var actionCreateLabMemberPosition = function (options) {
     let labID = req.params.labID;
     let personID = req.params.memberID;
     let positionData = req.body.data;
+    if (positionData.valid_from === '') {
+        positionData.valid_from = null;
+    }
+    if (positionData.valid_until === '') {
+        positionData.valid_until = null;
+    }
     var places = [];
     querySQL = 'INSERT INTO people_labs'
         + ' (person_id, lab_id, lab_position_id, dedication, valid_from, valid_until)'

@@ -3,12 +3,12 @@
             v-model="drawer" :value="drawer" width=200 app>
         <v-list>
             <template v-for="(tile, index) in tiles">
-                <router-link 
-                        :to="tile.link" 
+                <router-link
+                        :to="tile.link"
                         style="text-decoration: none;"
                         :key="`route-${index}`"
                         :class="{ activetile: tile.isActive, inactivetile: !tile.isActive }">
-                    <v-list-item 
+                    <v-list-item
                             :key="`title-${index}`"
                             @click="changeTile(tiles, index)">
                         <v-list-item-content>
@@ -31,7 +31,7 @@ import subUtil from '../common/submit-utils'
 
 export default {
     mounted() {
-        this.initialize();             
+        this.initialize();
     },
     computed: {
         drawer: {
@@ -41,8 +41,8 @@ export default {
             set(state) {
                 if (state !== this.$store.state.navigation.drawer) {
                     this.$store.dispatch('changeDrawer');
-                }         
-            }            
+                }
+            }
         },
         currentTile () {
             return this.$store.state.navigation.activeTile;
@@ -84,12 +84,12 @@ export default {
                     subUtil.getInfoPopulate(this, urlSubmit, true)
                     .then( (result) => {
                         if (result !== undefined) {
-                            this.tiles[ind].link = '/team/' 
+                            this.tiles[ind].link = '/team/'
                                 + result.name.toLowerCase().replace(/\s/g,'-');
                         } else {
                             this.tiles[ind].link = '/team';
                         }
-                        
+
                     })
                 }
             }
@@ -158,7 +158,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .activetile div{
     background-color: transparent;
 }
@@ -167,7 +167,7 @@ export default {
     background-color: #f0f0f0;
 }
 
-.inactivetile .v-list__tile__content,  
+.inactivetile .v-list__tile__content,
 .inactivetile .v-list__tile__title,
 .inactivetile .v-list__tile__avatar {
     background-color: transparent;

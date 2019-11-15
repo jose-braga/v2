@@ -12,9 +12,9 @@
                     </v-col>
                 </v-row>
             </v-container>
-        </v-card-text>        
+        </v-card-text>
     </v-card>
-    
+
 </template>
 
 <script>
@@ -23,6 +23,6 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 
 </style>

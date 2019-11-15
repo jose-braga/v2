@@ -6,7 +6,7 @@
             </div>
         </v-card-title>
         <v-card-text></v-card-text>
-        <v-container> 
+        <v-container>
             <v-form ref="form"
                     @submit.prevent="submitForm">
                 <v-text-field
@@ -40,8 +40,8 @@
                         <v-menu ref="date_menu" v-model="date_menu"
                             :close-on-content-click="false"
                             :nudge-right="10"
-                            transition="scale-transition" 
-                            offset-y min-width="290px"> 
+                            transition="scale-transition"
+                            offset-y min-width="290px">
                             <template v-slot:activator="{ on }">
                                 <v-text-field v-model="data.birth_date"
                                     label="Birth date" v-on="on">
@@ -55,7 +55,7 @@
                             v-model="data.countries" multiple
                             :loading="loadingCountries"
                             :items="countries" item-value="id" item-text="name"
-                            :search-input.sync="searchCountries"                    
+                            :search-input.sync="searchCountries"
                             return-object
                             cache-items
                             flat
@@ -67,18 +67,18 @@
                 </v-row>
                 <v-container fluid fill-height>
                     <v-row>
-                        <div v-if="formError">                                
+                        <div v-if="formError">
                             <p class="caption red--text">Unable to submit form.</p>
                         </div>
                         <v-row align-content="center" justify="end">
                             <div>
-                                <v-btn type="submit" 
+                                <v-btn type="submit"
                                     outlined color="blue">Update</v-btn>
                             </div>
                             <div class="request-status-container">
-                                <v-progress-circular indeterminate 
+                                <v-progress-circular indeterminate
                                         v-show="progress"
-                                        :size="20" :width="2"                                         
+                                        :size="20" :width="2"
                                         color="primary"></v-progress-circular>
                                 <v-icon v-show="success" color="green">mdi-check</v-icon>
                                 <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
@@ -86,9 +86,9 @@
                         </v-row>
                     </v-row>
                 </v-container>
-            </v-form>            
-        </v-container>        
-    </v-card>    
+            </v-form>
+        </v-container>
+    </v-card>
 </template>
 
 <script>
@@ -98,7 +98,7 @@ import {maxLength, required} from 'vuelidate/lib/validators'
 
 var submitNuclearInformation = function (vm, urlSubmit) {
     vm.data.person_id = vm.data.id;
-    return vm.$http.put(urlSubmit, 
+    return vm.$http.put(urlSubmit,
         {
             data: vm.data,
         },
@@ -111,7 +111,7 @@ var submitNationalities = function (vm, urlSubmit) {
     const result = subUtil.compareOriginal(
         vm.original.countries, vm.data.countries, 'id');
     result.person_id = vm.$store.state.session.personID;
-    return vm.$http.put(urlSubmit, 
+    return vm.$http.put(urlSubmit,
         {
             data: result,
         },
@@ -140,7 +140,7 @@ export default {
                 countries: undefined,
             },
             genders: [
-                {id: 'M', value: 'Male'}, 
+                {id: 'M', value: 'Male'},
                 {id: 'F', value: 'Female'},
             ],
             countries: [],
@@ -192,7 +192,7 @@ export default {
                     if (mounting) {
                         this.original.countries = result;
                     }
-                });                
+                });
             } else {
                 this.$refs.form.reset();
             }
@@ -224,7 +224,7 @@ export default {
                         console.log(error)
                     })
                 }
-            }            
+            }
         },
         getCountries() {
             var this_vm = this;
@@ -243,6 +243,6 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 
 </style>

@@ -6,6 +6,7 @@ var jwtUtils = require('./jwt_utilities');
 var time = require('../controllers/utilities/time');
 
 function makeEndpointURL(data) {
+    let permissions = [];
     for (let ind in data) {
         let url = '';
         // resource1 exists always
@@ -65,7 +66,15 @@ function makeEndpointURL(data) {
             continue;
         }
     }
-    return data;
+    for (let ind in data) {
+        permissions.push(
+            {
+                endpoint_url: data[ind].endpoint_url,
+                allow_all_subpaths: data[ind].allow_all_subpaths,
+            }
+        )
+    }
+    return permissions;
 }
 function processLabsGroupsUnitsData(user, labs) {
     let today = time.moment();
@@ -423,6 +432,9 @@ var getAdministrativeUnitsInfo = function (req, done, user, administrative_offic
         });
     });
 }
+
+// TODO: Think about adding current City
+
 var getUserEndpointPermissions = function (req, done, user) {
     let userID = user.user_id;
     var query =
@@ -456,7 +468,7 @@ var getUserEndpointPermissions = function (req, done, user) {
 };
 var getPermissionWebAreas = function (req, done, user) {
     var query =
-        'SELECT permissions_web_app_areas.*, web_app_areas.app_area_en, web_app_areas.app_area_pt'
+        'SELECT permissions_web_app_areas.app_area_id, web_app_areas.app_area_en, web_app_areas.app_area_pt'
         + ' FROM permissions_web_app_areas'
         + ' JOIN web_app_areas ON web_app_areas.id = permissions_web_app_areas.app_area_id'
         + ' WHERE permissions_web_app_areas.user_id = ?;';

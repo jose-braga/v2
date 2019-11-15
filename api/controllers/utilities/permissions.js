@@ -4,15 +4,27 @@ const time = require('../utilities/time');
 
 var hasAccessEndpoint = function (reqMethod, reqEndpoint, permissionsEndpoints) {
     for (let ind in permissionsEndpoints) {
-        let endpointPerm = permissionsEndpoints[ind].endpoint_url
+        let endpointPerm = permissionsEndpoints[ind].endpoint_url;
+        let allow_all_subpaths = permissionsEndpoints[ind].allow_all_subpaths;
         endpointPerm = endpointPerm.replace(/\*/g, '\\d+');
-        let endpointRegex = new RegExp('^' + endpointPerm + '$')
-        // the request endpoint must match the one
-        // of the endpoints in the permissions and its method
-        if (endpointRegex.test(reqEndpoint)
-            && permissionsEndpoints[ind].method_name === reqMethod) {
-            return true;
+        if (!allow_all_subpaths) {
+            let endpointRegex = new RegExp('^' + endpointPerm + '$')
+            // the request endpoint must match
+            // the endpoints in the permissions and its method
+            if (endpointRegex.test(reqEndpoint)
+                && permissionsEndpoints[ind].method_name === reqMethod) {
+                return true;
+            }
+        } else {
+            let endpointRegex = new RegExp('^' + endpointPerm)
+            // the request endpoint must match
+            // the endpoints in the permissions and its method
+            if (endpointRegex.test(reqEndpoint)
+                && permissionsEndpoints[ind].method_name === reqMethod) {
+                return true;
+            }
         }
+
     }
     return false;
 };

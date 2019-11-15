@@ -1,6 +1,6 @@
 <template>
     <v-dialog v-model="dialog"
-            @input="v => v || closeDialog()" 
+            @input="v => v || closeDialog()"
             max-width="400px">
         <v-form ref="form"
                 @submit.prevent="submitForm">
@@ -25,7 +25,7 @@
                                 :label="passwordLabel"
                                 type="password">
                             </v-text-field>
-                            <div v-if="!$v.data.password.required">                                
+                            <div v-if="!$v.data.password.required">
                                 <p class="caption red--text">{{passwordLabel}} is required.</p>
                             </div>
                         </v-col>
@@ -51,12 +51,12 @@
                             <div v-if="!$v.data.newPasswordConfirm.confirmPassword
                                     && $v.data.newPassword.$dirty
                                     && $v.data.newPasswordConfirm.$dirty
-                                    && showChangePassword">                                
+                                    && showChangePassword">
                                 <p class="caption red--text">Values don't match.</p>
                             </div>
-                        </v-col>  
+                        </v-col>
                         <v-col v-if="formError" cols="12">
-                            <div v-if="formError">  
+                            <div v-if="formError">
                                 <p class="caption red--text">Unable to submit form.</p>
                             </div>
                         </v-col>
@@ -66,13 +66,13 @@
                     <v-container>
                         <v-row justify="center" align-content="center">
                             <v-col v-show="!showChangePassword">
-                                <v-btn type="submit" 
+                                <v-btn type="submit"
                                         v-show="!showChangePassword"
                                         color="blue darken-1" outlined>
                                         Login</v-btn>
                             </v-col>
                             <v-col v-show="!showChangePassword">
-                                <v-btn color="blue darken-1" outlined 
+                                <v-btn color="blue darken-1" outlined
                                         v-show="!showChangePassword"
                                         @click="changePassword">Change Password</v-btn>
                             </v-col>
@@ -81,18 +81,18 @@
                                         v-show="showChangePassword"
                                         @click="submitChange">Submit</v-btn>
                             </v-col>
-                            <v-col cols="12" v-if="loginError">                                
+                            <v-col cols="12" v-if="loginError">
                                 <p class="caption red--text">There was a problem with your login!</p>
                             </v-col>
-                            <v-col cols="12" v-if="changePasswordError">                                
+                            <v-col cols="12" v-if="changePasswordError">
                                 <p class="caption red--text">There was a problem changing password!</p>
                             </v-col>
                         </v-row>
-                    </v-container>                    
+                    </v-container>
                 </v-card-actions>
-            </v-card>                
+            </v-card>
         </v-form>
-    </v-dialog>  
+    </v-dialog>
 </template>
 
 <script>
@@ -121,7 +121,7 @@ export default {
             },
             set: function (val) {
                 this.$store.commit('makeLogin', {val: val});
-            }            
+            }
         },
     },
     methods: {
@@ -132,7 +132,7 @@ export default {
             } else {
                 const urlSubmit = 'api/login';
                 return this.$http.post(
-                    urlSubmit, 
+                    urlSubmit,
                     {
                         username: this.data.username,
                         password: this.data.password,
@@ -140,7 +140,7 @@ export default {
                     .then((result) => {
                         // the user is logged in
                         if (!this.showChangePassword) {
-                            this.$store.commit('afterLoginProcedure', 
+                            this.$store.commit('afterLoginProcedure',
                             {
                                 token: result.data.token,
                                 showLogin: false,
@@ -155,7 +155,7 @@ export default {
                             }
 
                         } else {
-                            this.$store.commit('afterLoginProcedure', 
+                            this.$store.commit('afterLoginProcedure',
                             {
                                 token: result.data.token,
                                 showLogin: true,
@@ -184,7 +184,7 @@ export default {
                     let userID = this.$store.state.session.userID;
                     const urlSubmit = 'api/change-password/' + userID;
                     return this.$http.put(
-                        urlSubmit, 
+                        urlSubmit,
                         {
                             username: this.data.username,
                             password: this.data.password,
@@ -214,7 +214,7 @@ export default {
                     console.log(error)
                 });
             }
-            
+
         },
         changePassword: function () {
             this.showChangePassword = true;
@@ -239,6 +239,6 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 
 </style>

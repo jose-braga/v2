@@ -1,7 +1,8 @@
 <template>
 <v-container>
+    <!-- TODO: Separate finished and ongoing degrees -->
     <v-row>
-        <v-col cols="12" md="6">
+        <v-col cols="12" md="6" v-if="degrees && supervisorTypes">
             <v-card>
                 <v-card-title primary-title>
                     <div>
@@ -9,7 +10,7 @@
                     </div>
                 </v-card-title>
                 <v-card-text></v-card-text>
-                <v-container>
+                <v-container v-if="$v.data.finished.$each.$iter">
                     <div v-if="$v.data.finished.$model.length === 0">
                         No finished degrees
                     </div>
@@ -343,7 +344,7 @@
                 </v-container>
             </v-card>
         </v-col>
-        <v-col cols="12" md="6">
+        <v-col cols="12" md="6" v-if="degrees && supervisorTypes">
             <v-card>
                 <v-card-title primary-title>
                     <div>
@@ -1060,6 +1061,6 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 
 </style>

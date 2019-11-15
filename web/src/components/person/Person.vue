@@ -1,6 +1,6 @@
 <template>
 <v-container>
-    <v-tabs 
+    <v-tabs
             v-if="loggedIn"
             show-arrows
             @change="tabChanged">
@@ -28,8 +28,8 @@
             </div>
         </v-row>
     </v-container>
-    
-</v-container> 
+
+</v-container>
 </template>
 
 <script>
@@ -61,7 +61,7 @@ export default {
                     this.$store.dispatch('showHelp')
                 }
             }
-            
+
         },
     },
     methods: {
@@ -74,7 +74,7 @@ export default {
 
 </script>
 
-<style>
+<style scoped>
 .selected-tab {
     background-color: #ffffff;
 }
