@@ -14,7 +14,7 @@
        <v-tabs-items>
             <!-- use :max="N" in keep-alive if necessary-->
             <keep-alive>
-                <router-view v-if="currentLab && data.labPositions"
+                <router-view v-if="data.labPositions && currentLab"
                     :lab-id="labID"
                     :lab-data="currentLab"
                     :lab-positions="data.labPositions"></router-view>
@@ -48,7 +48,7 @@ import subUtil from '../common/submit-utils'
 export default {
     data () {
         return {
-            activeTab: 0,
+            //activeTab: 0,
             labID: undefined,
             currentLab: undefined,
             data: {
@@ -90,8 +90,8 @@ export default {
         labData () {
             let labData = this.data.myLabs;
             for (let ind in labData) {
-                labData[ind].link = '/team/'
-                + labData[ind].name.toLowerCase().replace(/\s/g,'-');
+                this.$set(labData[ind], 'link', '/team/'
+                + labData[ind].name.toLowerCase().replace(/\s/g,'-'));
             }
             return labData;
         },
@@ -103,17 +103,25 @@ export default {
     methods: {
         initialize() {
             let this_session = this.$store.state.session;
+            let firstLab = true;
             if (this_session.loggedIn) {
                 for (let ind in this_session.permissionsEndpoints) {
-                    if (this_session.permissionsEndpoints[ind].resource1_type_name === 'labs'
-                        && this_session.permissionsEndpoints[ind].resource2_type_name === null
+                    let decomposedPath = this_session.permissionsEndpoints[ind].decomposedPath
+                    if (decomposedPath[0] === 'labs'
+                        && decomposedPath.length === 2
                         && this_session.permissionsEndpoints[ind].method_name === 'GET') {
                         let urlSubmit = 'api' + this_session.permissionsEndpoints[ind].endpoint_url;
                         subUtil.getInfoPopulate(this, urlSubmit, true)
                         .then( (result) => {
+                            this.$set(result, 'link', '/team/'
+                                + result.name.toLowerCase().replace(/\s/g,'-'));
                             this.data.myLabs.push(result);
+                            if (firstLab) {
+                                firstLab = false;
+                                //this.activeTab = result.link;
+                                this.$router.replace(result.link)
+                            }
                         });
-
                         urlSubmit = 'api/v2/lab-positions';
                         subUtil.getInfoPopulate(this, urlSubmit, true)
                         .then( (result) => {
@@ -124,7 +132,7 @@ export default {
             }
         },
         tabChanged: function(tab) {
-            this.activeTab = tab;
+            //this.activeTab = tab;
             for (let ind in this.data.myLabs) {
                 if (this.data.myLabs[ind].link === tab) {
                     this.labID = this.data.myLabs[ind].id;

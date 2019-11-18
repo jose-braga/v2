@@ -3,7 +3,7 @@ var cors = require('cors')
 var router = express.Router();
 
 var corsOptions = {
-  origin: process.env.CORS_ORIGIN,
+  origin: '*',
 }
 
 router.options('*', cors())

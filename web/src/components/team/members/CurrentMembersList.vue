@@ -357,9 +357,10 @@ export default {
             let foundEndpoint = false;
             if (this_session.loggedIn) {
                 for (let ind in this_session.permissionsEndpoints) {
-                    if (this_session.permissionsEndpoints[ind].resource1_type_name === 'labs'
-                        && this_session.permissionsEndpoints[ind].resource1_id === this.labId
-                        && this_session.permissionsEndpoints[ind].resource2_type_name === 'members-affiliation'
+                    let decomposedPath = this_session.permissionsEndpoints[ind].decomposedPath;
+                    if (decomposedPath[0] === 'labs'
+                        && parseInt(decomposedPath[1], 10) === this.labId
+                        && decomposedPath[2] === 'members-affiliation'
                         && this_session.permissionsEndpoints[ind].method_name === 'GET') {
                         foundEndpoint = true;
                         let urlSubmit = 'api' + this_session.permissionsEndpoints[ind].endpoint_url;

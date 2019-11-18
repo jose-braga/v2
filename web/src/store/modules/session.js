@@ -27,13 +27,20 @@ const session = {
                     state.username = token_json.username;
                     state.permissionsLevel = token_json.permissionsLevel;
                     state.permissionsEndpoints = token_json.permissionsEndpoints;
+                    for (let ind in state.permissionsEndpoints) {
+                        let decomposedPath = state.permissionsEndpoints[ind]
+                                                .endpoint_url
+                                                .split('/')
+                        decomposedPath.splice(0, 1);
+                        state.permissionsEndpoints[ind].decomposedPath = decomposedPath;
+                    }
                     state.permissionsWebAreas = token_json.permissionsWebAreas;
-                    state.baseURL = token_json.base_url;                    
+                    state.baseURL = token_json.base_url;
                     state.loggedIn = true;
                 } else {
                     router.push({ path: '/' });
                     localStorage.removeItem('v2-token');
-                }              
+                }
             }
         },
         makeLogin(state, payload) {
@@ -50,6 +57,13 @@ const session = {
             state.username = token_json.username;
             state.permissionsLevel = token_json.permissionsLevel;
             state.permissionsEndpoints = token_json.permissionsEndpoints;
+            for (let ind in state.permissionsEndpoints) {
+                let decomposedPath = state.permissionsEndpoints[ind]
+                                        .endpoint_url
+                                        .split('/')
+                decomposedPath.splice(0, 1);
+                state.permissionsEndpoints[ind].decomposedPath = decomposedPath;
+            }
             state.permissionsWebAreas = token_json.permissionsWebAreas;
             state.baseURL = token_json.base_url;
         },
