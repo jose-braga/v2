@@ -4,6 +4,8 @@ import Person from '../components/person/Person' // this is not lazy-loaded
 import PersonalTab from '../components/person/personal/PersonalTab'// this is not lazy-loaded
 import Group from '../components/group/Group' //to be lazy-loaded in the future
 
+const PersonOnBehalf = () => import('../components/person-on-behalf/personOnBehalf.vue')
+
 const PersonalTabHelp = () => import('../components/person/personal/PersonalTabHelp.vue')
 const AcademicTab = () => import('../components/person/academic/AcademicTab.vue')
 const AcademicTabHelp = () => import('../components/person/academic/AcademicTabHelp.vue')
@@ -14,24 +16,24 @@ const PreRegisterTab = () => import('../components/team/pre-register/PreRegister
 const PreRegisterTabHelp = () => import('../components/team/pre-register/PreRegisterTabHelp.vue')
 
 const routes = [
-    { 
-        path: '/', 
-        redirect: '/person/personal' 
+    {
+        path: '/',
+        redirect: '/person/personal'
     },
-    { 
-        path: '/person', 
-        component: Person, 
+    {
+        path: '/person',
+        component: Person,
         children: [
-            { 
-                path: 'personal', 
-                components: { 
+            {
+                path: 'personal',
+                components: {
                     default: PersonalTab,
                     help: PersonalTabHelp
                 }
             },
-            { 
-                path: 'academic', 
-                components: { 
+            {
+                path: 'academic',
+                components: {
                     default: AcademicTab,
                     help: AcademicTabHelp
                 },
@@ -39,7 +41,11 @@ const routes = [
             { path: '', redirect: 'personal' }
         ]
     },
-    { 
+    {
+        path: '/person-on-behalf',
+        component: PersonOnBehalf,
+    },
+    {
         path: '/team',
         component: Team,
         children: [
@@ -50,11 +56,11 @@ const routes = [
                     help: PreRegisterTabHelp
                 }
             },
-            { 
+            {
                 path: ':labName',
-                components: { 
-                    default: TeamMembersTab, 
-                    help: TeamMembersTabHelp 
+                components: {
+                    default: TeamMembersTab,
+                    help: TeamMembersTabHelp
                 },
             },
             //{ path: '', redirect: '' },

@@ -1,6 +1,6 @@
 <template>
     <p>
-        Group
+        Behalf
     </p>
 
 </template>
@@ -9,8 +9,8 @@
 export default {
     mounted: function () {
         this.$store.commit('setActiveTile', {
-            newTile: 3,
-            newToolbarText: 'Edit your group details'
+            newTile: 1,
+            newToolbarText: 'Edit other people data'
         });
     },
     computed: {

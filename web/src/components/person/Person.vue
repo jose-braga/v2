@@ -1,5 +1,5 @@
 <template>
-<v-container>
+<div>
     <v-tabs
             v-if="loggedIn"
             show-arrows
@@ -20,16 +20,14 @@
             </v-dialog>
         </v-tabs-items>
     </v-tabs>
-    <v-container>
-        <v-row v-if="!loggedIn">
-            <div>Please login first (
-                the symbol <v-icon color="green darken">mdi-login</v-icon>
-                in the toolbar above).
-            </div>
-        </v-row>
-    </v-container>
+    <v-row v-if="!loggedIn" class="pa-4">
+        <div>Please login first (
+            the symbol <v-icon color="green darken">mdi-login</v-icon>
+            in the toolbar above).
+        </div>
+    </v-row>
+</div>
 
-</v-container>
 </template>
 
 <script>

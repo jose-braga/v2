@@ -12,7 +12,7 @@ var actionGetDegrees = function (options) {
     let personID = req.params.personID;
     var querySQL = '';
     var places = [];
-    querySQL = querySQL + 'SELECT * from degrees_people'
+    querySQL = querySQL + 'SELECT * FROM degrees_people'
                         + ' WHERE person_id = ?;';
     places.push(personID)
     return sql.getSQLOperationResult(req, res, querySQL, places,
@@ -218,7 +218,7 @@ var actionDeleteDegreesDeleteSupervisors = function (options) {
     places.push(personDegreeID)
     return sql.makeSQLOperation(req, res, querySQL, places,
         (options) => { actionDeleteDegreesDeleteExtSupervisors(options) },
-        options);    
+        options);
 };
 
 var actionDeleteDegreesDeleteExtSupervisors = function (options) {
@@ -295,7 +295,7 @@ var processSupervisors = function (resQuery, options) {
                 return actionUpdateExtSupervisors({ req, res, next, i: 0 });
             }
 
-        } else if (data.external_supervisors.length === 0 
+        } else if (data.external_supervisors.length === 0
                 && data.deleteExtSupervisors.length > 0) {
             return actionDeleteExtSupervisors({ req, res, next, i: 0 });
         } else {
@@ -305,7 +305,7 @@ var processSupervisors = function (resQuery, options) {
                 message: {
                     "status": "success", "statusCode": 200, "message": "success",
                 }
-            });             
+            });
         }
     }
 };
@@ -336,21 +336,21 @@ var actionUpdateSupervisors = function (options) {
                 (options) => { actionUpdateSupervisors(options) },
                 { req, res, next, i: i + 1 });
         }
-        
+
     } else {
         if (req.body.data.deleteSupervisors.length > 0) {
             return sql.makeSQLOperation(req, res, querySQL, places,
                 (options) => { actionDeleteSupervisors(options) },
-                { req, res, next, i: 0 });            
+                { req, res, next, i: 0 });
         } else if (req.body.data.external_supervisors.length > 0) {
             if (req.body.data.external_supervisors[0].id === 'new') {
                 return sql.makeSQLOperation(req, res, querySQL, places,
                     (options) => { actionCreateExtSupervisors(options) },
-                    { req, res, next, i: 0 });                
+                    { req, res, next, i: 0 });
             } else {
                 return sql.makeSQLOperation(req, res, querySQL, places,
                     (options) => { actionUpdateExtSupervisors(options) },
-                    { req, res, next, i: 0 });                
+                    { req, res, next, i: 0 });
             }
         } else if (req.body.data.external_supervisors.length === 0
                 && req.body.data.deleteExtSupervisors.length > 0) {
@@ -372,7 +372,7 @@ var actionCreateSupervisors = function (options) {
     querySQL = querySQL + 'INSERT INTO degrees_supervisors'
                         + ' (degree_person_id, supervisor_type_id, supervisor_id, valid_from, valid_until)'
                         + ' VALUES (?,?,?,?,?);';
-    places.push(personDegreeID,        
+    places.push(personDegreeID,
         data.supervisor_type_id,
         data.supervisor_id,
         data.valid_from,
@@ -419,7 +419,7 @@ var actionDeleteSupervisors = function (options) {
     let data = req.body.data.deleteSupervisors;
     var querySQL = '';
     var places = [];
-    querySQL = querySQL + 'DELETE FROM degrees_supervisors' 
+    querySQL = querySQL + 'DELETE FROM degrees_supervisors'
                         + ' WHERE id = ?;';
     places.push(data[i]);
     if (i + 1 < req.body.data.deleteSupervisors.length) {

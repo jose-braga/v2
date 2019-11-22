@@ -60,7 +60,7 @@ export default {
     },
     mounted: function () {
         this.$store.commit('setActiveTile', {
-            newTile: 1,
+            newTile: 2,
             newToolbarText: 'Edit your team details',
         });
     },

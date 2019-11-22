@@ -22,7 +22,7 @@ module.exports.getNationalities = function (req, res, next) {
     permissions.checkPermissions(
         (options) => { actionGetNationalities(options) },
         { req, res, next }
-    );    
+    );
 };
 
 var updateNationalities = function (options) {
@@ -36,14 +36,14 @@ var updateNationalities = function (options) {
                         + ' SET country_id = ?'
                         + ' WHERE id = ?;';
     places.push(
-        update[i].id, 
+        update[i].id,
         update[i].people_countries_id);
     if (i + 1 < update.length) {
-        return sql.makeSQLOperation(req, res, querySQL, places, 
+        return sql.makeSQLOperation(req, res, querySQL, places,
             (options) => { updateNationalities(options) },
             {req, res, next, i: i + 1}
         );
-                
+
     } else if (create.length > 0) {
         let optionsCreate = { req, res, next, i: 0 };
         return createNationalities(optionsCreate);
@@ -195,9 +195,9 @@ var actionAddPeopleHistory = function (options) {
             status: 200,
             message: {
                 "status": "success", "statusCode": 200, "count": 0,
-                "result": "OK - Create people history entry!"
+                "result": "OK - Created people history entry!"
             }
-        })    
+        })
 };
 
 var actionUpdateNuclearInfo = function(options) {

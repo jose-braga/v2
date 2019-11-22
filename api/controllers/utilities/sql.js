@@ -3,12 +3,13 @@ var server = require('../../config/mysql_connection');
 var pool = server.pool;
 /**
  * Makes SQL query and sends HTTP response
- * @param {*} req 
- * @param {*} res 
- * @param {*} sql 
- * @param {*} places 
- * @param {*} callback 
- * @param {*} callbackOptions 
+ * (use when query result is not needed afterwards)
+ * @param {*} req
+ * @param {*} res
+ * @param {*} sql
+ * @param {*} places
+ * @param {*} callback
+ * @param {*} callbackOptions
  */
 var makeSQLOperation = function (req, res, sql, places, callback, callbackOptions) {
     pool.getConnection(function (err, connection) {
@@ -40,13 +41,14 @@ var makeSQLOperation = function (req, res, sql, places, callback, callbackOption
 }
 
 /**
- * Makes SQL query and calls subsequent callbacks
- * @param {*} req 
- * @param {*} res 
- * @param {*} sql 
- * @param {*} places 
- * @param {*} callback 
- * @param {*} callbackOptions 
+ * Makes SQL query and calls subsequent callbacks,
+ * makes it easier to reuse query result
+ * @param {*} req
+ * @param {*} res
+ * @param {*} sql
+ * @param {*} places
+ * @param {*} callback
+ * @param {*} callbackOptions
  */
 var getSQLOperationResult = function (req, res, sql, places, callback, callbackOptions) {
     pool.getConnection(function (err, connection) {
@@ -62,7 +64,7 @@ var getSQLOperationResult = function (req, res, sql, places, callback, callbackO
                     console.log(err.stack);
                     return;
                 }
-                return callback(resQuery, callbackOptions);                
+                return callback(resQuery, callbackOptions);
             }
         )
     })

@@ -1,10 +1,10 @@
 <template>
   <v-app>
-    <Drawer></Drawer>  
+    <Drawer></Drawer>
     <UpperToolbar></UpperToolbar>
 
     <v-content>
-      <router-view></router-view>  
+      <router-view></router-view>
     </v-content>
   </v-app>
 </template>
@@ -17,7 +17,7 @@ export default {
   name: 'App',
   components: {
     Drawer,
-    UpperToolbar,    
+    UpperToolbar,
   },
   data () {
     return {

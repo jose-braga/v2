@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import subUtil from '../common/submit-utils'
+//import subUtil from '../common/submit-utils'
 
 export default {
     mounted() {
@@ -71,6 +71,7 @@ export default {
         initialize() {
             for(let ind in this.tiles) {
                 if (this.tiles[ind].text === 'Team') {
+                    /*
                     let this_session = this.$store.state.session;
                     let urlSubmit;
                     for (let ind in this_session.permissionsEndpoints) {
@@ -91,6 +92,7 @@ export default {
                         }
 
                     })
+                    */
                 }
             }
         }
@@ -103,6 +105,13 @@ export default {
                 image: false,
                 link: '/person',
                 isActive: true,
+            },
+            {
+                text: 'On Behalf',
+                icon: 'mdi-account-switch',
+                image: false,
+                link: '/person-on-behalf',
+                isActive: false,
             },
             {
                 text: 'Team',

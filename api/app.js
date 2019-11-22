@@ -6,7 +6,9 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var routesPublicAPI = require('./routes/indexPublic');
-var routesAPI = require('./routes/index');
+var routesAPIPeople = require('./routes/indexPeople');
+var routesAPILabs = require('./routes/indexLabs');
+var routesAPIAuth = require('./routes/indexAuth');
 
 var app = express();
 
@@ -17,6 +19,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use('/api/v2', routesPublicAPI);
-app.use('/api', routesAPI);
+app.use('/api/people', routesAPIPeople);
+app.use('/api/labs', routesAPILabs);
+
+app.use('/api', routesAPIAuth);
 
 module.exports = app;
