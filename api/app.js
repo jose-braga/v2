@@ -18,7 +18,9 @@ app.use(express.json({limit: '10mb'}));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+// Public API routes
 app.use('/api/v2', routesPublicAPI);
+// Interal API routes below
 app.use('/api/people', routesAPIPeople);
 app.use('/api/labs', routesAPILabs);
 

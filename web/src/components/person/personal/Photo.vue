@@ -1,5 +1,5 @@
 <template>
-    <v-card>
+    <v-card  class="mb-4">
         <v-card-title primary-title>
             <div>
                 <h3 class="headline">Website personal photo</h3>
@@ -10,7 +10,7 @@
         </v-card-text>
         <v-form ref="form" enctype="multipart/form-data"
                     @submit.prevent="submitForm">
-            <input type="hidden" 
+            <input type="hidden"
                     name="person_id"
                     :value="ownerPersonID" />
             <v-container>
@@ -19,7 +19,7 @@
                         <p v-if="!hasImage">No image saved.</p>
                         <div v-if="hasImage">
                             <img v-bind:src="imgSrc" />
-                        </div>               
+                        </div>
                         <p v-if="hasImage">To change image click "Browse" below.</p>
                         <input type="file" ref="fileInput"
                             name="image" accept="image/*"
@@ -44,19 +44,19 @@
             </v-container>
             <v-container fluid fill-height>
                 <v-row>
-                    <div v-if="formError">                                
+                    <div v-if="formError">
                         <p class="caption red--text">Please add an image.</p>
                     </div>
                     <v-container>
                         <v-row align="center" justify="end">
                             <div>
-                                <v-btn type="submit" 
+                                <v-btn type="submit"
                                     outlined color="blue">Update</v-btn>
                             </div>
                             <div class="request-status-container">
-                                <v-progress-circular indeterminate 
+                                <v-progress-circular indeterminate
                                         v-show="progress"
-                                        :size="20" :width="2"                                         
+                                        :size="20" :width="2"
                                         color="primary"></v-progress-circular>
                                 <v-icon v-show="success" color="green">mdi-check</v-icon>
                                 <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
@@ -126,7 +126,7 @@ export default {
                         this.hasImage = true;
                         this.imgSrc = result.url;
                         this.data.id = result.id;
-                    }                    
+                    }
                 })
             }
         },
@@ -139,7 +139,7 @@ export default {
                     this.progress = true;
                     const personID = this.$store.state.session.personID;
                     let urlSubmit = 'api/people/' + personID + '/photos/' + 1;
-                    this.cropImage(urlSubmit, personID);                                       
+                    this.cropImage(urlSubmit, personID);
                 }
             }
         },
@@ -177,8 +177,8 @@ export default {
                     }
                     formData.append('person_id', personID);
                     formData.append('file', blob);
-                    
-                    this.$http.put(url, 
+
+                    this.$http.put(url,
                         formData,
                         {
                             headers: {'Authorization': 'Bearer ' + localStorage['v2-token'],

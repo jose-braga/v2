@@ -3,6 +3,7 @@ const responses = require('../utilities/responses');
 const time = require('../utilities/time');
 
 var hasAccessEndpoint = function (reqMethod, reqEndpoint, permissionsEndpoints) {
+    reqEndpoint = reqEndpoint.replace('/api','');
     for (let ind in permissionsEndpoints) {
         let endpointPerm = permissionsEndpoints[ind].endpoint_url;
         let allow_all_subpaths = permissionsEndpoints[ind].allow_all_subpaths;
@@ -51,8 +52,7 @@ module.exports.checkPermissions = function (callback, callbackOptions) {
         permissionsLevel,
         permissionsEndpoints,
     } = req.payload;
-
-    let reqEndpoint = req.path;
+    let reqEndpoint = req.originalUrl;
     let reqMethod = req.method;
     let resourcePersonID;
     if (req.params.personID !== undefined && req.params.personID !== null) {
@@ -60,7 +60,7 @@ module.exports.checkPermissions = function (callback, callbackOptions) {
     }
 
     let reqEndpointParts = reqEndpoint.split('/');
-    reqEndpointParts.splice(0,1); // the string starts by a '/' (always!!?)
+    reqEndpointParts.splice(0,2); // the string starts by '/api' (always!!?)
 
     if (permissionsLevel === 1) {
         // admin can do whatever he wants, no checking is necessary
