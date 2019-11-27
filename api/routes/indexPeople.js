@@ -20,19 +20,20 @@ router.options('*', cors())
 /**
  * Person Routes
  */
-var externalAPI = require('../controllers/people/external_api');
-var nuclearInformation = require('../controllers/people/nuclear_information');
-var personalContacts = require('../controllers/people/personal_contacts');
-var photo = require('../controllers/people/photo');
-var degrees = require('../controllers/people/degrees');
+const externalAPI = require('../controllers/people/external_api');
+const nuclearInformation = require('../controllers/people/nuclear_information');
+const personalContacts = require('../controllers/people/personal_contacts');
+const photo = require('../controllers/people/photo');
+const degrees = require('../controllers/people/degrees');
+const institutionalContacts = require('../controllers/people/institutional_contacts');
 
-// Nuclear information (TODO: improve its RESTfulness (specialluy for nationalities))
 router.get('/:personID/external-api-authorization', cors(corsOptions), externalAPI.getAuthorization);
 router.put('/:personID/external-api-authorization', cors(corsOptions), externalAPI.updateAuthorization);
+// Nuclear information (TODO: improve its RESTfulness (specialluy for nationalities))
 router.get('/:personID/nuclear-info', cors(corsOptions), nuclearInformation.getNuclearInfo);
 router.put('/:personID/nuclear-info', cors(corsOptions), nuclearInformation.updateNuclearInfo);
 router.get('/:personID/nationalities', cors(corsOptions), nuclearInformation.getNationalities);
-// WORK HERE
+// Personal Contacts
 router.get('/:personID/personal-address', cors(corsOptions), personalContacts.getPersonalAddress);
 router.post('/:personID/personal-address', cors(corsOptions), personalContacts.createPersonalAddress);
 router.put('/:personID/personal-address/:addressID', cors(corsOptions), personalContacts.updatePersonalAddress);
@@ -52,6 +53,14 @@ router.get('/:personID/degrees', cors(corsOptions), degrees.getDegrees);
 router.put('/:personID/degrees/:degreeID', cors(corsOptions), degrees.updateDegrees);
 router.delete('/:personID/degrees/:degreeID', cors(corsOptions), degrees.deleteDegrees);
 router.post('/:personID/degrees', cors(corsOptions), degrees.createDegrees);
+
+// Institutional settings
+router.get('/:personID/institutional-phone', cors(corsOptions), institutionalContacts.getInstitutionalPhone);
+router.put('/:personID/institutional-phone/:phoneID', cors(corsOptions), institutionalContacts.updateInstitutionalPhone);
+router.post('/:personID/institutional-phone', cors(corsOptions), institutionalContacts.createInstitutionalPhone);
+router.get('/:personID/institutional-email', cors(corsOptions), institutionalContacts.getInstitutionalEmail);
+router.put('/:personID/institutional-email/:emailID', cors(corsOptions), institutionalContacts.updateInstitutionalEmail);
+router.post('/:personID/institutional-email', cors(corsOptions), institutionalContacts.createInstitutionalEmail);
 
 router.use(function (req, res, next) {
   var err = new Error('Not Found');

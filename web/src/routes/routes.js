@@ -4,11 +4,15 @@ import Person from '../components/person/Person' // this is not lazy-loaded
 import PersonalTab from '../components/person/personal/PersonalTab'// this is not lazy-loaded
 import Group from '../components/group/Group' //to be lazy-loaded in the future
 
-const PersonOnBehalf = () => import('../components/person-on-behalf/personOnBehalf.vue')
 
 const PersonalTabHelp = () => import('../components/person/personal/PersonalTabHelp.vue')
 const AcademicTab = () => import('../components/person/academic/AcademicTab.vue')
 const AcademicTabHelp = () => import('../components/person/academic/AcademicTabHelp.vue')
+const InstitutionalTab = () => import('../components/person/institutional/InstitutionalTab.vue')
+const InstitutionalTabHelp = () => import('../components/person/institutional/InstitutionalTabHelp.vue')
+
+const PersonOnBehalf = () => import('../components/person-on-behalf/personOnBehalf.vue')
+
 const Team = () => import('../components/team/Team.vue')
 const TeamMembersTab = () => import('../components/team/members/MembersTab.vue')
 const TeamMembersTabHelp = () => import('../components/team/members/MembersTabHelp.vue')
@@ -36,6 +40,13 @@ const routes = [
                 components: {
                     default: AcademicTab,
                     help: AcademicTabHelp
+                },
+            },
+            {
+                path: 'institutional',
+                components: {
+                    default: InstitutionalTab,
+                    help: InstitutionalTabHelp
                 },
             },
             { path: '', redirect: 'personal' }

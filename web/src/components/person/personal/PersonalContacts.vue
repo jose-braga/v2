@@ -104,7 +104,7 @@ export default {
     created () {
         this.initialize();
     },
-    methods : {
+    methods: {
         initialize () {
             if (this.$store.state.session.loggedIn) {
                 let personID = this.$store.state.session.personID;
@@ -235,6 +235,6 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 
 </style>

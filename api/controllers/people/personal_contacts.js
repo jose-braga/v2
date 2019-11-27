@@ -1,4 +1,3 @@
-
 const sql = require('../utilities/sql');
 //const responses = require('../utilities/responses');
 const permissions = require('../utilities/permissions');
