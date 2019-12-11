@@ -8,7 +8,7 @@
     <v-container>
         <v-form ref="form"
                 @submit.prevent="submitForm">
-            <v-row>
+            <v-row class="px-2">
                 <v-col cols="12" sm="4">
                     <v-text-field
                         v-model="data.phones.phone"
@@ -176,7 +176,7 @@ export default {
                 email: { email }
             },
         }
-    }
+    },
 }
 </script>
 

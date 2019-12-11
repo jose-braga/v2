@@ -9,7 +9,6 @@ var getCountries = function(req, res, next) {
     sql.makeSQLOperation(req, res, querySQL, places);
     return;
 }
-
 var getDegrees = function (req, res, next) {
     var querySQL = '';
     var places = [];
@@ -18,7 +17,6 @@ var getDegrees = function (req, res, next) {
     sql.makeSQLOperation(req, res, querySQL, places);
     return;
 }
-
 var getPeopleSimple = function (req, res, next) {
     var querySQL = '';
     var places = [];
@@ -28,7 +26,13 @@ var getPeopleSimple = function (req, res, next) {
     sql.makeSQLOperation(req, res, querySQL, places);
     return;
 }
-
+var getPoles = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM institution_city';
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+}
 var getLabPositions = function (req, res, next) {
     var querySQL = '';
     var places = [];
@@ -37,8 +41,14 @@ var getLabPositions = function (req, res, next) {
     sql.makeSQLOperation(req, res, querySQL, places);
     return;
 }
-
-
+var getRoles = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT roles.id AS role_id, roles.name_en, roles.name_pt'
+                        + ' FROM roles';
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+}
 var getSupervisorTypes = function (req, res, next) {
     var querySQL = '';
     var places = [];
@@ -56,14 +66,20 @@ module.exports.listItems = function (req, res, next) {
     if (category === 'degrees') {
         getDegrees(req, res, next);
     }
-    if (category === 'people') {
-        getPeopleSimple(req, res, next);
-    }
     if (category === 'lab-positions') {
         getLabPositions(req, res, next);
     }
+    if (category === 'people') {
+        getPeopleSimple(req, res, next);
+    }
+    if (category === 'poles') {
+        getPoles(req, res, next);
+    }
     if (category === 'supervisor-types') {
         getSupervisorTypes(req, res, next);
+    }
+    if (category === 'roles') {
+        getRoles(req, res, next);
     }
 };
 

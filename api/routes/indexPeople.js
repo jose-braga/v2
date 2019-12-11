@@ -26,6 +26,7 @@ const personalContacts = require('../controllers/people/personal_contacts');
 const photo = require('../controllers/people/photo');
 const degrees = require('../controllers/people/degrees');
 const institutionalContacts = require('../controllers/people/institutional_contacts');
+const institutionalAffiliations = require('../controllers/people/institutional_affiliations');
 
 router.get('/:personID/external-api-authorization', cors(corsOptions), externalAPI.getAuthorization);
 router.put('/:personID/external-api-authorization', cors(corsOptions), externalAPI.updateAuthorization);
@@ -61,6 +62,15 @@ router.post('/:personID/institutional-phone', cors(corsOptions), institutionalCo
 router.get('/:personID/institutional-email', cors(corsOptions), institutionalContacts.getInstitutionalEmail);
 router.put('/:personID/institutional-email/:emailID', cors(corsOptions), institutionalContacts.updateInstitutionalEmail);
 router.post('/:personID/institutional-email', cors(corsOptions), institutionalContacts.createInstitutionalEmail);
+// user can't change his/hers affiliations, only managers can do that
+router.post('/:personID/affiliation-message', cors(corsOptions), institutionalAffiliations.sendChangeMessage);
+router.get('/:personID/poles', cors(corsOptions), institutionalAffiliations.getPoles);
+router.get('/:personID/roles', cors(corsOptions), institutionalAffiliations.getRoles);
+router.get('/:personID/lab-affiliations', cors(corsOptions), institutionalAffiliations.getLabAffiliations);
+router.get('/:personID/technical-affiliations', cors(corsOptions), institutionalAffiliations.getTechnicalAffiliations);
+router.get('/:personID/science-management-affiliations', cors(corsOptions), institutionalAffiliations.getScienceManagementAffiliations);
+router.get('/:personID/administrative-affiliations', cors(corsOptions), institutionalAffiliations.getAdministrativeAffiliations);
+
 
 router.use(function (req, res, next) {
   var err = new Error('Not Found');

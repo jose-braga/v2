@@ -19,8 +19,53 @@ var processResultsDate = function (data) {
     return data;
 };
 
+var sorter = function (data, key, inverse) {
+    if (inverse === undefined) {
+        inverse = true;
+    }
+    if (inverse) {
+        data.sort((a, b) => {
+            if (a[key] === null || a[key] === undefined ) {
+                a['date_sort'] = moment('1000-01-01');
+            } else {
+                a['date_sort'] = moment(a[key]);
+            }
+            if (b[key] === null || b[key] === undefined) {
+                b['date_sort'] = moment('1000-01-01');
+            } else {
+                b['date_sort'] = moment(b[key]);
+            }
+            if (a['date_sort'].isAfter(b['date_sort'])) {
+                return -1;
+            } else {
+                return 1;
+            }
+        });
+    } else {
+        data.sort((a, b) => {
+            if (a[key] === null || a[key] === undefined) {
+                a['date_sort'] = moment('9999-01-01');
+            } else {
+                a['date_sort'] = moment(a[key]);
+            }
+            if (b[key] === null || b[key] === undefined) {
+                b['date_sort'] = moment('9999-01-01');
+            } else {
+                b['date_sort'] = moment(b[key]);
+            }
+            if (a['date_sort'].isAfter(b['date_sort'])) {
+                return 1;
+            } else {
+                return -1;
+            }
+        });
+    }
+    return data;
+};
+
 export default {
     momentToDate,
     moment,
     processResultsDate,
+    sorter,
 }

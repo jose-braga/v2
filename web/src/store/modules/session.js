@@ -9,8 +9,11 @@ const session = {
         loggedIn: false,
         showLogin: false,
         personID: undefined,
+        personName: undefined,
         userID: undefined,
         username: undefined,
+        currentUnits: undefined,
+        currentCity: undefined,
         permissionsLevel: undefined,
         permissionsEndpoints: [],
         permissionsWebAreas: [],
@@ -23,8 +26,11 @@ const session = {
                 let token_json = readLocalStorage(localStorage['v2-token']);
                 if (token_json.exp > Date.now() / 1000) {
                     state.personID = token_json.personID;
+                    state.personName = token_json.personName;
                     state.userID = token_json.userID;
                     state.username = token_json.username;
+                    state.currentUnits = token_json.currentUnits;
+                    state.currentCity = token_json.currentCity;
                     state.permissionsLevel = token_json.permissionsLevel;
                     state.permissionsEndpoints = token_json.permissionsEndpoints;
                     for (let ind in state.permissionsEndpoints) {
@@ -53,8 +59,11 @@ const session = {
             localStorage['v2-token'] = token;
             let token_json = readLocalStorage(token);
             state.personID = token_json.personID;
+            state.personName = token_json.personName;
             state.userID = token_json.userID;
             state.username = token_json.username;
+            state.currentUnits = token_json.currentUnits;
+            state.currentCity = token_json.currentCity;
             state.permissionsLevel = token_json.permissionsLevel;
             state.permissionsEndpoints = token_json.permissionsEndpoints;
             for (let ind in state.permissionsEndpoints) {
@@ -71,8 +80,11 @@ const session = {
             localStorage.removeItem('v2-token');
             state.loggedIn = false;
             state.personID = undefined;
+            state.personName = undefined;
             state.userID = undefined;
             state.username = undefined;
+            state.currentUnits = undefined;
+            state.currentCity = undefined;
             state.permissionsLevel = undefined;
             state.permissionsEndpoints = [];
             state.permissionsWebAreas = [];

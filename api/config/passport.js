@@ -152,7 +152,7 @@ passport.use(
         var query =
             'SELECT users.id AS user_id, users.username, users.password,' +
             ' users.permission_level_id AS permissions_level,' +
-            ' people.id as person_id' +
+            ' people.id as person_id, people.name AS person_name' +
             ' FROM users' +
             ' LEFT JOIN people ON people.user_id = users.id' +
             ' WHERE users.username = ? AND users.deactivated = 0 AND people.status = 1;';
@@ -400,7 +400,7 @@ var getUserAdministrativeOffices = function (req, done, user) {
             } else {
                 user.administrative_offices = [];
                 user.current_administrative_offices = [];
-                return getUserEndpointPermissions(req, done, user);
+                return getCurrentCity(req, done, user);
             }
         });
     });
@@ -428,13 +428,38 @@ var getAdministrativeUnitsInfo = function (req, done, user, administrative_offic
                 return getAdministrativeUnitsInfo(req, done, user, administrative_offices, i + 1);
             } else {
                 user = processNonResearcherUnitsData(user, administrative_offices);
-                return getUserEndpointPermissions(req, done, user);
+                return getCurrentCity(req, done, user);
             }
         });
     });
+};
+var getCurrentCity = function (req, done, user) {
+    // An active user must have a single pole attributed for the current date
+    let person_id = user.person_id;
+    var query =
+        'SELECT people_institution_city.*, institution_city.city'
+        + ' FROM people_institution_city'
+        + ' JOIN institution_city ON institution_city.id = people_institution_city.city_id'
+        + ' WHERE people_institution_city.person_id = ?'
+        + ' AND ((people_institution_city.valid_from <= CURDATE() AND CURDATE() <= people_institution_city.valid_from)'
+        + '     OR (people_institution_city.valid_from IS NULL AND CURDATE() <= people_institution_city.valid_from)'
+        + '     OR (people_institution_city.valid_from <= CURDATE() AND people_institution_city.valid_from IS NULL)'
+        + '     OR (people_institution_city.valid_from IS NULL AND people_institution_city.valid_from IS NULL));';
+    var places = [person_id];
+    pool.getConnection(function (err, connection) {
+        if (err) {
+            return done(err);
+        }
+        connection.query(query, places, function (err, rows) {
+            connection.release();
+            if (err) {
+                return done(err);
+            }
+            user.current_city = rows[0];
+            return getUserEndpointPermissions(req, done, user);
+        });
+    });
 }
-
-// TODO: Think about adding current City
 
 var getUserEndpointPermissions = function (req, done, user) {
     let userID = user.user_id;

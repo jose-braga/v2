@@ -82,7 +82,7 @@ module.exports.checkPermissions = function (callback, callbackOptions) {
         // any user can read its data
         // any user can change its data except for affiliation
         // Assuming that reqEndpointParts.length > 2
-        if (reqEndpointParts[2] !== 'affiliations') {
+        if (reqEndpointParts.length > 2 && !reqEndpointParts[2].includes('affiliations')) {
             return callback(callbackOptions);
         } else if (reqMethod === 'GET') {
             return callback(callbackOptions);

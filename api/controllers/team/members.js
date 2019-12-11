@@ -1,3 +1,5 @@
+// TODO: technical, science and administrative
+
 const sql = require('../utilities/sql');
 const time = require('../utilities/time');
 const responses = require('../utilities/responses');
