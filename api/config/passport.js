@@ -132,7 +132,7 @@ function processNonResearcherUnitsData(user, offices) {
         for (let indUnit in user.current_units) {
             if (used_current_units.indexOf(user.current_units[indUnit]) === -1) {
                 current_units.push(user.current_units[indUnit]);
-                used_current_units.push(user.units[indUnit]);
+                used_current_units.push(user.current_units[indUnit]);
             }
         }
     }
@@ -324,7 +324,7 @@ var getTechnicianUnitsInfo = function (req, done, user, tech_offices, i) {
 var getUserScienceManagerOffices = function (req, done, user) {
     let personID = user.person_id;
     var query =
-        'SELECT science_managers.valid_from, science_managers.valid_until, science_managers.id AS science_managers_id, science_manager_offices.*' +
+        'SELECT science_managers.valid_from, science_managers.valid_until, science_managers.id AS science_manager_id, science_manager_offices.*' +
         ' FROM science_managers' +
         ' JOIN science_manager_offices ON science_manager_offices.id = science_managers.science_manager_office_id' +
         ' WHERE science_managers.person_id = ?;';
@@ -409,9 +409,9 @@ var getAdministrativeUnitsInfo = function (req, done, user, administrative_offic
     let this_administrative_office = administrative_offices[i];
     var query =
         'SELECT units.*' +
-        ' FROM people_administative_units' +
-        ' JOIN units ON units.id = people_administative_units.unit_id' +
-        ' WHERE people_administative_units.administrative_id = ?;';
+        ' FROM people_administrative_units' +
+        ' JOIN units ON units.id = people_administrative_units.unit_id' +
+        ' WHERE people_administrative_units.administrative_id = ?;';
     var places = [this_administrative_office.administrative_id];
     pool.getConnection(function (err, connection) {
         if (err) {

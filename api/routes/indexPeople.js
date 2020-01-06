@@ -20,7 +20,8 @@ router.options('*', cors())
 /**
  * Person Routes
  */
-const externalAPI = require('../controllers/people/external_api');
+const externalAPI = require('../controllers/people/external_api'); //authorization of visibility to external partners
+
 const nuclearInformation = require('../controllers/people/nuclear_information');
 const personalContacts = require('../controllers/people/personal_contacts');
 const photo = require('../controllers/people/photo');

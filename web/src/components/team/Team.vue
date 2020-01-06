@@ -1,5 +1,5 @@
 <template>
-<v-container fluid>
+<div>
     <v-tabs v-if="loggedIn && hasPermissions"
             show-arrows
             @change="tabChanged">
@@ -37,9 +37,7 @@
         </v-col>
     </v-row>
 
-</v-container>
-
-
+</div>
 </template>
 
 <script>

@@ -29,14 +29,18 @@ var compareOriginal = function (original, current, key) {
     }
 };
 
-var getInfoPopulate = function (vm, url, all) {
+var getInfoPopulate = function (vm, url, all, full) {
     return vm.$http.get(
         url, {
             headers: { 'Authorization': 'Bearer ' + localStorage['v2-token'] },
         })
         .then((result) => {
             if (all) {
-                return result.data.result;
+                if (full) {
+                    return result.data;
+                } else {
+                    return result.data.result;
+                }
             } else {
                 if (result.data.result.length > 0) {
                     return result.data.result[0];

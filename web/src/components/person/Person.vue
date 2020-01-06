@@ -13,6 +13,9 @@
         <v-tab to="/person/institutional">
             Institutional
         </v-tab>
+        <v-tab to="/person/productivity">
+            Productivity
+        </v-tab>
        <v-tabs-items>
             <!-- use :max="N" in keep-alive if necessary-->
             <keep-alive>
