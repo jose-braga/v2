@@ -36,6 +36,22 @@
         </v-row>
         <v-row>
             <v-col>
+                <v-expansion-panels>
+                    <v-expansion-panel>
+                        <v-expansion-panel-header>
+                            <div>
+                                <span class="role-name">Responsibles</span>
+                            </div>
+                        </v-expansion-panel-header>
+                        <v-expansion-panel-content>
+                            <Responsibles :person-id="personID"></Responsibles>
+                        </v-expansion-panel-content>
+                    </v-expansion-panel>
+                </v-expansion-panels>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col>
                 <v-expansion-panels multiple :value="data.panelOpen">
                     <v-expansion-panel v-if="data.isScientific">
                         <v-expansion-panel-header>
@@ -134,6 +150,7 @@
 <script>
 import subUtil from '../../../common/submit-utils'
 import time from '../../../common/date-utils'
+const Responsibles = () => import('./Responsibles')
 const ScientificAffiliations = () => import('./ScientificAffiliations')
 const TechnicalAffiliations = () => import('./TechnicalAffiliations')
 const ScienceManagerAffiliations = () => import('./ScienceManagerAffiliations')
@@ -141,6 +158,7 @@ const AdministrativeAffiliations = () => import('./AdministrativeAffiliations')
 
 export default {
     components: {
+        Responsibles,
         ScientificAffiliations,
         TechnicalAffiliations,
         ScienceManagerAffiliations,
@@ -154,6 +172,7 @@ export default {
             dialog: false,
             message: '',
             formError: false,
+            personID: undefined,
             data: {
                 current_pole: {},
                 previous_poles: [],
@@ -177,6 +196,7 @@ export default {
         initialize () {
             if (this.$store.state.session.loggedIn) {
                 let personID = this.$store.state.session.personID;
+                this.personID = personID;
                 subUtil.getInfoPopulate(this, 'api/people/' + personID + '/poles', true)
                 .then( (result) => {
                     // only works if this.data and result have the same keys

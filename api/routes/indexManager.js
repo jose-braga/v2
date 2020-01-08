@@ -21,6 +21,7 @@ const membersAll = require('../controllers/manager/all/members');
 const membersUnit = require('../controllers/manager/unit/members');
 const membersUnitCity = require('../controllers/manager/unit_city/members');
 const membersCity = require('../controllers/manager/city/members');
+const nuclearInformation = require('../controllers/people/nuclear_information');
 
 //router.get('/:userID/units/:unitID/cities/:cityID', cors(corsOptions), membersUnitCity.getUnitCityInfo);
 //router.get('/:userID/cities/:cityID', cors(corsOptions), membersCity.getCityInfo);
@@ -29,10 +30,17 @@ router.get('/:userID/units/:unitID/', cors(corsOptions), membersUnit.getUnitInfo
 
 router.get('/:userID/units/:unitID/cities/:cityID/current-members', cors(corsOptions), membersUnitCity.getMembersList);
 router.get('/:userID/cities/:cityID/current-members', cors(corsOptions), membersCity.getMembersList);
+// routes for manager with access to a single whole unit
 router.get('/:userID/units/:unitID/current-members', cors(corsOptions), membersUnit.getMembersList);
+router.get('/:userID/units/:unitID/past-members', cors(corsOptions), membersUnit.getPastMembersList);
+router.get('/:userID/units/:unitID/members/:personID/nuclear-info', cors(corsOptions), nuclearInformation.getNuclearInfo);
+router.get('/:userID/units/:unitID/members/:personID/nationalities', cors(corsOptions), nuclearInformation.getNationalities);
+router.put('/:userID/units/:unitID/members/:personID/nuclear-info', cors(corsOptions), nuclearInformation.updateNuclearInfo);
+router.put('/:userID/units/:unitID/members/:personID/nationalities', cors(corsOptions), nuclearInformation.changeNationalities);
+
+
 router.get('/:userID/current-members', cors(corsOptions), membersAll.getMembersList);
 
-router.get('/:userID/units/:unitID/past-members', cors(corsOptions), membersUnit.getPastMembersList);
 
 
 router.use(function (req, res, next) {

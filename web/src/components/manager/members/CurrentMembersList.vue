@@ -29,7 +29,12 @@
             >
                 <template v-slot:top>
                     <v-dialog v-model="dialog" max-width="1600px">
-                        <MemberDetails :person-id="memberID"></MemberDetails>
+                        <MemberDetails 
+                            :person-id="memberID"
+                            :person-name="memberName"
+                            :manager-id="managerID"
+                            :endpoint="endpoint">
+                        </MemberDetails>
                     </v-dialog>
                 </template>
                 <template v-slot:item.action="{ item }">
@@ -97,6 +102,9 @@ export default {
             search: '',
             userAction: false, //only to avoid duplicate requests on initial loading
             memberID: undefined,
+            memberName: undefined,
+            managerID: undefined, // Attention: this is a user ID (not a person ID)
+            endpoint: '',
             data: {
                 members: [],
             },
@@ -147,6 +155,7 @@ export default {
             let this_session = this.$store.state.session;
             let foundEndpoint = false;
             if (this_session.loggedIn) {
+                this.managerID = this_session.userID;
                 for (let ind in this_session.permissionsEndpoints) {
                     let decomposedPath = this_session.permissionsEndpoints[ind].decomposedPath;
                     if ( this.segmentType === 'unit'
@@ -158,14 +167,15 @@ export default {
                         && this_session.permissionsEndpoints[ind].method_name === 'GET') {
                         foundEndpoint = true;
                         let urlSubmit;
+                        this.endpoint = this_session.permissionsEndpoints[ind].endpoint_url;
                         if (search !== undefined && search !== '') {
-                            urlSubmit = 'api' + this_session.permissionsEndpoints[ind].endpoint_url 
+                            urlSubmit = 'api' + this.endpoint 
                                 + '/current-members' 
                                 + '?limit=' + this.itemsPerPage 
                                 + '&offset=' + (page - 1) * this.itemsPerPage
                                 + '&q=' + search;
                         } else {
-                            urlSubmit = 'api' + this_session.permissionsEndpoints[ind].endpoint_url 
+                            urlSubmit = 'api' + this.endpoint
                                 + '/current-members' 
                                 + '?limit=' + this.itemsPerPage 
                                 + '&offset=' + (page - 1) * this.itemsPerPage;
@@ -190,6 +200,7 @@ export default {
         editItem (item) {
             this.dialog = true;
             this.memberID = item.person_id;
+            this.memberName = item.name;
         }
     },
 

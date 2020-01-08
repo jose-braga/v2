@@ -28,6 +28,8 @@ const photo = require('../controllers/people/photo');
 const degrees = require('../controllers/people/degrees');
 const institutionalContacts = require('../controllers/people/institutional_contacts');
 const institutionalAffiliations = require('../controllers/people/institutional_affiliations');
+const institutionalResponsibles = require('../controllers/people/institutional_responsibles');
+const professionalSituation = require('../controllers/people/professional_situation');
 
 router.get('/:personID/external-api-authorization', cors(corsOptions), externalAPI.getAuthorization);
 router.put('/:personID/external-api-authorization', cors(corsOptions), externalAPI.updateAuthorization);
@@ -35,6 +37,7 @@ router.put('/:personID/external-api-authorization', cors(corsOptions), externalA
 router.get('/:personID/nuclear-info', cors(corsOptions), nuclearInformation.getNuclearInfo);
 router.put('/:personID/nuclear-info', cors(corsOptions), nuclearInformation.updateNuclearInfo);
 router.get('/:personID/nationalities', cors(corsOptions), nuclearInformation.getNationalities);
+router.put('/:personID/nationalities', cors(corsOptions), nuclearInformation.changeNationalities);
 // Personal Contacts
 router.get('/:personID/personal-address', cors(corsOptions), personalContacts.getPersonalAddress);
 router.post('/:personID/personal-address', cors(corsOptions), personalContacts.createPersonalAddress);
@@ -63,7 +66,7 @@ router.post('/:personID/institutional-phone', cors(corsOptions), institutionalCo
 router.get('/:personID/institutional-email', cors(corsOptions), institutionalContacts.getInstitutionalEmail);
 router.put('/:personID/institutional-email/:emailID', cors(corsOptions), institutionalContacts.updateInstitutionalEmail);
 router.post('/:personID/institutional-email', cors(corsOptions), institutionalContacts.createInstitutionalEmail);
-// user can't change his/hers affiliations, only managers can do that
+// Affiliations: user can't change his/hers affiliations, only managers can do that
 router.post('/:personID/affiliation-message', cors(corsOptions), institutionalAffiliations.sendChangeMessage);
 router.get('/:personID/poles', cors(corsOptions), institutionalAffiliations.getPoles);
 router.get('/:personID/roles', cors(corsOptions), institutionalAffiliations.getRoles);
@@ -71,7 +74,12 @@ router.get('/:personID/lab-affiliations', cors(corsOptions), institutionalAffili
 router.get('/:personID/technical-affiliations', cors(corsOptions), institutionalAffiliations.getTechnicalAffiliations);
 router.get('/:personID/science-management-affiliations', cors(corsOptions), institutionalAffiliations.getScienceManagementAffiliations);
 router.get('/:personID/administrative-affiliations', cors(corsOptions), institutionalAffiliations.getAdministrativeAffiliations);
-
+router.get('/:personID/responsibles', cors(corsOptions), institutionalResponsibles.getResponsibles);
+router.post('/:personID/responsibles', cors(corsOptions), institutionalResponsibles.createResponsibles);
+router.put('/:personID/responsibles/:peopleResponsibleID', cors(corsOptions), institutionalResponsibles.updateResponsibles);
+router.delete('/:personID/responsibles/:peopleResponsibleID', cors(corsOptions), institutionalResponsibles.deleteResponsibles);
+// Professional Situation
+router.get('/:personID/professional-situation', cors(corsOptions), institutionalResponsibles.getResponsibles);
 
 router.use(function (req, res, next) {
   var err = new Error('Not Found');

@@ -1,16 +1,16 @@
 <template>
-        <ul>
-            <li v-for="(pos, j) in data.current_positions" :key="j">
-                <span class="position-name">{{pos.lab_position_name_en}} </span> -
-                <span class="lab-name">{{pos.lab_name}} @ {{pos.group_string}}  @ </span>
-                <span :class="pos.unit_string + ' unit'">{{pos.unit_string}}</span>
-                <br>
-                <span class="date-affiliation">
-                    Dedication: {{pos.dedication}}%
-                    ({{pos.valid_from}} - {{pos.valid_until}})
-                </span>
-            </li>
-        </ul>
+    <ul>
+        <li v-for="(pos, j) in data.current_positions" :key="j">
+            <span class="position-name">{{pos.lab_position_name_en}} </span> -
+            <span class="lab-name">{{pos.lab_name}} @ {{pos.group_string}}  @ </span>
+            <span :class="pos.unit_string + ' unit'">{{pos.unit_string}}</span>
+            <br>
+            <span class="date-affiliation">
+                Dedication: {{pos.dedication}}%
+                ({{pos.valid_from}} - {{pos.valid_until}})
+            </span>
+        </li>
+    </ul>
 </template>
 <script>
 import subUtil from '../../../common/submit-utils'
