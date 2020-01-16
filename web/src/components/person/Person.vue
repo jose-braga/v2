@@ -13,6 +13,9 @@
         <v-tab to="/person/institutional">
             Institutional
         </v-tab>
+        <v-tab to="/person/professional">
+            Professional
+        </v-tab>
         <v-tab to="/person/productivity">
             Productivity
         </v-tab>

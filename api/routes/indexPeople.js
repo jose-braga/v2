@@ -29,7 +29,7 @@ const degrees = require('../controllers/people/degrees');
 const institutionalContacts = require('../controllers/people/institutional_contacts');
 const institutionalAffiliations = require('../controllers/people/institutional_affiliations');
 const institutionalResponsibles = require('../controllers/people/institutional_responsibles');
-const professionalSituation = require('../controllers/people/professional_situation');
+const professionalSituations = require('../controllers/people/professional_situations');
 
 router.get('/:personID/external-api-authorization', cors(corsOptions), externalAPI.getAuthorization);
 router.put('/:personID/external-api-authorization', cors(corsOptions), externalAPI.updateAuthorization);
@@ -78,8 +78,18 @@ router.get('/:personID/responsibles', cors(corsOptions), institutionalResponsibl
 router.post('/:personID/responsibles', cors(corsOptions), institutionalResponsibles.createResponsibles);
 router.put('/:personID/responsibles/:peopleResponsibleID', cors(corsOptions), institutionalResponsibles.updateResponsibles);
 router.delete('/:personID/responsibles/:peopleResponsibleID', cors(corsOptions), institutionalResponsibles.deleteResponsibles);
-// Professional Situation
-router.get('/:personID/professional-situation', cors(corsOptions), institutionalResponsibles.getResponsibles);
+// Professional Situations
+router.get('/:personID/professional-situations', cors(corsOptions), professionalSituations.getProfessionalSituations);
+router.post('/:personID/professional-situations', cors(corsOptions), professionalSituations.createProfessionalSituations);
+router.put('/:personID/professional-situations/:jobID', cors(corsOptions), professionalSituations.updateProfessionalSituations);
+router.delete('/:personID/professional-situations/:jobID', cors(corsOptions), professionalSituations.deleteProfessionalSituations);
+router.post('/:personID/professional-situations/:jobID/fellowships', cors(corsOptions), professionalSituations.createProfessionalSituationsFellowships);
+router.put('/:personID/professional-situations/:jobID/fellowships/:fellowshipID', cors(corsOptions), professionalSituations.updateProfessionalSituationsFellowships);
+router.delete('/:personID/professional-situations/:jobID/fellowships/:fellowshipID', cors(corsOptions), professionalSituations.deleteProfessionalSituationsFellowships);
+router.post('/:personID/professional-situations/:jobID/contracts', cors(corsOptions), professionalSituations.createProfessionalSituationsContracts);
+router.put('/:personID/professional-situations/:jobID/contracts/:contractID', cors(corsOptions), professionalSituations.updateProfessionalSituationsContracts);
+router.delete('/:personID/professional-situations/:jobID/contracts/:contractID', cors(corsOptions), professionalSituations.deleteProfessionalSituationsContracts);
+
 
 router.use(function (req, res, next) {
   var err = new Error('Not Found');

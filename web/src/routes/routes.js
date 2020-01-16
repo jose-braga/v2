@@ -8,8 +8,15 @@ const AcademicTab = () => import('../components/person/academic/AcademicTab.vue'
 const AcademicTabHelp = () => import('../components/person/academic/AcademicTabHelp.vue')
 const InstitutionalTab = () => import('../components/person/institutional/InstitutionalTab.vue')
 const InstitutionalTabHelp = () => import('../components/person/institutional/InstitutionalTabHelp.vue')
+const ProfessionalTab = () => import('../components/person/professional/ProfessionalTab.vue')
+const ProfessionalTabHelp = () => import('../components/person/professional/ProfessionalTabHelp.vue')
 const ProductivityTab = () => import('../components/person/productivity/ProductivityTab.vue')
-const ProductivityTabHelp = () => import('../components/person/productivity/ProductivityTabHelp.vue')
+const PublicationsTab = () => import('../components/person/productivity/PublicationsTab.vue')
+const PublicationsTabHelp = () => import('../components/person/productivity/PublicationsTabHelp.vue')
+const AddPublicationsTab = () => import('../components/person/productivity/AddPublicationsTab.vue')
+const AddPublicationsTabHelp = () => import('../components/person/productivity/AddPublicationsTabHelp.vue')
+const OtherProductivityTab = () => import('../components/person/productivity/OtherProductivityTab.vue')
+const OtherProductivityTabHelp = () => import('../components/person/productivity/OtherProductivityTabHelp.vue')
 
 const PersonOnBehalf = () => import('../components/person-on-behalf/personOnBehalf.vue')
 
@@ -56,11 +63,39 @@ const routes = [
                 },
             },
             {
-                path: 'productivity',
+                path: 'professional',
                 components: {
-                    default: ProductivityTab,
-                    help: ProductivityTabHelp
+                    default: ProfessionalTab,
+                    help: ProfessionalTabHelp
                 },
+            },
+            {
+                path: 'productivity',
+                component: ProductivityTab,
+                children: [
+                    {
+                        path: 'publications',
+                        components: {
+                            default: PublicationsTab,
+                            help: PublicationsTabHelp
+                        }
+                    },
+                    {
+                        path: 'add-publications',
+                        components: {
+                            default: AddPublicationsTab,
+                            help: AddPublicationsTabHelp
+                        }
+                    },
+                    {
+                        path: 'other',
+                        components: {
+                            default: OtherProductivityTab,
+                            help: OtherProductivityTabHelp
+                        }
+                    },
+                    { path: '', redirect: 'publications' }
+                ]
             },
             { path: '', redirect: 'personal' }
         ]

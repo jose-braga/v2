@@ -789,10 +789,10 @@ export default {
         },
     },
     created() {
-        this.initialize();
         this.getDegrees();
         this.getSupervisorTypes();
         this.getPeople();
+        this.initialize();
     },
     methods: {
         initialize() {
@@ -869,11 +869,13 @@ export default {
                         this.progress = false;
                         this.success = true;
                         setTimeout(() => {this.success = false;}, 1500)
+                        this.toDelete = [];
                         this.initialize();
                     }))
                     .catch((error) => {
                         this.progress = false;
                         this.error = true;
+                        this.toDelete = [];
                         this.initialize();
                         setTimeout(() => {this.error = false;}, 6000)
                         // eslint-disable-next-line
@@ -943,11 +945,13 @@ export default {
                         this.progress = false;
                         this.success = true;
                         setTimeout(() => {this.success = false;}, 1500)
+                        this.toDelete = [];
                         this.initialize();
                     }))
                     .catch((error) => {
                         this.progress = false;
                         this.error = true;
+                        this.toDelete = [];
                         this.initialize();
                         setTimeout(() => {this.error = false;}, 6000)
                         // eslint-disable-next-line
