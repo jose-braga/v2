@@ -30,6 +30,7 @@ const institutionalContacts = require('../controllers/people/institutional_conta
 const institutionalAffiliations = require('../controllers/people/institutional_affiliations');
 const institutionalResponsibles = require('../controllers/people/institutional_responsibles');
 const professionalSituations = require('../controllers/people/professional_situations');
+const publicationsList = require('../controllers/people/publications_list');
 
 router.get('/:personID/external-api-authorization', cors(corsOptions), externalAPI.getAuthorization);
 router.put('/:personID/external-api-authorization', cors(corsOptions), externalAPI.updateAuthorization);
@@ -48,17 +49,14 @@ router.put('/:personID/personal-phone/:phoneID', cors(corsOptions), personalCont
 router.get('/:personID/personal-email', cors(corsOptions), personalContacts.getPersonalEmail);
 router.post('/:personID/personal-email', cors(corsOptions), personalContacts.createPersonalEmail);
 router.put('/:personID/personal-email/:emailID', cors(corsOptions), personalContacts.updatePersonalEmail);
-
 // Photo (TODO: improve its RESTfulness)
 router.put('/:personID/photos/:imageType', cors(corsOptions), photo.uploadPhoto);
 router.get('/:personID/photos/:imageType', cors(corsOptions), photo.getPhoto);
-
 //Degrees (degreeID is the id on the degrees_people table)
 router.get('/:personID/degrees', cors(corsOptions), degrees.getDegrees);
 router.put('/:personID/degrees/:degreeID', cors(corsOptions), degrees.updateDegrees);
 router.delete('/:personID/degrees/:degreeID', cors(corsOptions), degrees.deleteDegrees);
 router.post('/:personID/degrees', cors(corsOptions), degrees.createDegrees);
-
 // Institutional settings
 router.get('/:personID/institutional-phone', cors(corsOptions), institutionalContacts.getInstitutionalPhone);
 router.put('/:personID/institutional-phone/:phoneID', cors(corsOptions), institutionalContacts.updateInstitutionalPhone);
@@ -89,6 +87,11 @@ router.delete('/:personID/professional-situations/:jobID/fellowships/:fellowship
 router.post('/:personID/professional-situations/:jobID/contracts', cors(corsOptions), professionalSituations.createProfessionalSituationsContracts);
 router.put('/:personID/professional-situations/:jobID/contracts/:contractID', cors(corsOptions), professionalSituations.updateProfessionalSituationsContracts);
 router.delete('/:personID/professional-situations/:jobID/contracts/:contractID', cors(corsOptions), professionalSituations.deleteProfessionalSituationsContracts);
+//Publications
+router.get('/:personID/publications', cors(corsOptions), publicationsList.getPublications);
+router.put('/:personID/people-publications/:publicationID', cors(corsOptions), publicationsList.updatePersonPublicationAssociation);
+router.delete('/:personID/people-publications/:publicationID', cors(corsOptions), publicationsList.deletePersonPublicationAssociation);
+router.put('/:personID/publications/:publicationID', cors(corsOptions), publicationsList.updatePublication);
 
 
 router.use(function (req, res, next) {

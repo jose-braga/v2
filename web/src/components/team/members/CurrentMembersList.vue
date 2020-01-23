@@ -475,7 +475,7 @@ export default {
         },
         generateSpreadsheet(members, labData) {
             let today = time.moment();
-            let dateFile = time.momentToDate(today, 'Europe/Lisbon', 'YYYY-MM-DDTHHmmSS')
+            let dateFile = time.momentToDate(today, 'Europe/Lisbon', 'YYYY-MM-DDTHHmmss')
             let membersCurated = processForSpreadsheet(members);
 
             let wb = XLSX.utils.book_new();

@@ -172,9 +172,9 @@ export default {
     methods: {
         initialize(mounting) {
             if (this.$store.state.session.loggedIn) {
-                let urlSubmit = 'api' + this.endpoint 
-                                + '/members' 
-                                + '/' + this.personId 
+                let urlSubmit = 'api' + this.endpoint
+                                + '/members'
+                                + '/' + this.personId
                                 + '/nuclear-info';
                 subUtil.getInfoPopulate(this, urlSubmit, false)
                 .then( (result) => {
@@ -187,9 +187,9 @@ export default {
                     return this.data;
                 })
                 .then( () => {
-                    urlSubmit = 'api' + this.endpoint 
-                                + '/members' 
-                                + '/' + this.personId 
+                    urlSubmit = 'api' + this.endpoint
+                                + '/members'
+                                + '/' + this.personId
                                 + '/nationalities';
                     return subUtil.getInfoPopulate(this, urlSubmit, true);
                 })
@@ -211,15 +211,15 @@ export default {
                 if (this.$store.state.session.loggedIn) {
                     this.progress = true;
                     this.$http.all([
-                        submitNuclearInformation(this,  
-                                'api' + this.endpoint 
-                                + '/members' 
-                                + '/' + this.personId 
+                        submitNuclearInformation(this,
+                                'api' + this.endpoint
+                                + '/members'
+                                + '/' + this.personId
                                 + '/nuclear-info'),
-                        submitNationalities(this, 
-                                'api' + this.endpoint 
-                                + '/members' 
-                                + '/' + this.personId 
+                        submitNationalities(this,
+                                'api' + this.endpoint
+                                + '/members'
+                                + '/' + this.personId
                                 + '/nationalities'),
                     ])
                     .then(this.$http.spread( () => {

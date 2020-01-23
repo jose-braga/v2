@@ -296,7 +296,6 @@ export default {
             error: false,
             formError: false,
             situationsCategories : {},
-            teste: [],
             data: {
                 situations: [],
             },

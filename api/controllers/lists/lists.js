@@ -136,7 +136,38 @@ var getFundingAgencies = function (req, res, next) {
     sql.makeSQLOperation(req, res, querySQL, places);
     return;
 };
-
+var getJournalNames = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM journals ORDER BY name;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getAuthorTypes = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM author_types;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getPublicationSources = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM publication_sources;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getPublicationTypes = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM publication_types;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
 
 module.exports.listItems = function (req, res, next) {
     let category = req.params.listCategory;
@@ -172,6 +203,18 @@ module.exports.listItems = function (req, res, next) {
     }
     if (category === 'funding-agencies') {
         getFundingAgencies(req, res, next);
+    }
+    if (category === 'journals') {
+        getJournalNames(req, res, next);
+    }
+    if (category === 'publication-sources') {
+        getPublicationSources(req, res, next);
+    }
+    if (category === 'publication-types') {
+        getPublicationTypes(req, res, next);
+    }
+    if (category === 'author-types') {
+        getAuthorTypes(req, res, next);
     }
 };
 
