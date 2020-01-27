@@ -31,6 +31,7 @@ const institutionalAffiliations = require('../controllers/people/institutional_a
 const institutionalResponsibles = require('../controllers/people/institutional_responsibles');
 const professionalSituations = require('../controllers/people/professional_situations');
 const publicationsList = require('../controllers/people/publications_list');
+const addPublications = require('../controllers/people/add_publications');
 
 router.get('/:personID/external-api-authorization', cors(corsOptions), externalAPI.getAuthorization);
 router.put('/:personID/external-api-authorization', cors(corsOptions), externalAPI.updateAuthorization);
@@ -89,6 +90,7 @@ router.put('/:personID/professional-situations/:jobID/contracts/:contractID', co
 router.delete('/:personID/professional-situations/:jobID/contracts/:contractID', cors(corsOptions), professionalSituations.deleteProfessionalSituationsContracts);
 //Publications
 router.get('/:personID/publications', cors(corsOptions), publicationsList.getPublications);
+router.post('/:personID/people-publications/:publicationID', cors(corsOptions), addPublications.createPersonPublicationAssociation);
 router.put('/:personID/people-publications/:publicationID', cors(corsOptions), publicationsList.updatePersonPublicationAssociation);
 router.delete('/:personID/people-publications/:publicationID', cors(corsOptions), publicationsList.deletePersonPublicationAssociation);
 router.put('/:personID/publications/:publicationID', cors(corsOptions), publicationsList.updatePublication);

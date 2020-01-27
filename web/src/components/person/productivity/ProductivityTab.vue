@@ -37,7 +37,6 @@ export default {
     },
     methods: {
         initialize() {
-            console.log(this.currentTab)
         }
     },
 

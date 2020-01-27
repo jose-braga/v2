@@ -29,7 +29,7 @@ var actionGetPublications = function (options) {
         (resQuery, options) => {
             options.publications = resQuery;
             if (resQuery.length > 0) {
-                return getPublicationsDescriptions(options, 0);
+                return module.exports.getPublicationsDescriptions(options, 0);
             } else {
                 responses.sendJSONResponseOptions({
                     response: res,
@@ -45,7 +45,7 @@ var actionGetPublications = function (options) {
         },
         options);
 };
-var getPublicationsDescriptions = function (options, i) {
+module.exports.getPublicationsDescriptions = function (options, i) {
     let { req, res, next } = options;
     var querySQL = '';
     var places = [];
@@ -89,7 +89,7 @@ var getJournalImpactFactor = function (options, i) {
         (resQuery, options) => {
             options.publications[i].impact_factors = resQuery;
             if (i + 1 < options.publications.length) {
-                getPublicationsDescriptions(options, i + 1);
+                module.exports.getPublicationsDescriptions(options, i + 1);
             } else {
                 responses.sendJSONResponseOptions({
                     response: res,
