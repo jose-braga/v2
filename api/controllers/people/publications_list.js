@@ -4,6 +4,26 @@ const responses = require('../utilities/responses');
 const permissions = require('../utilities/permissions');
 const addPublication = require('./add_publications');
 
+var actionGetAllPublications = function (options) {
+    let { req, res, next } = options;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT publications.authors_raw, publications.title, publications.volume, publications.page_start, publications.page_end,'
+                        + ' publications.doi, publications.wos, publications.pubmed_id,'
+                        + ' publications.publication_date, publications.year, '
+                        + ' publications.journal_id, journals.name AS journal_name, journals.short_name AS journal_short_name,'
+                        + ' journals.publisher, journals.publisher_city, journals.issn, journals.eissn'
+                        + ' FROM publications'
+                        + ' LEFT JOIN journals ON journals.id = publications.journal_id;';
+    return sql.makeSQLOperation(req, res, querySQL, places);
+};
+module.exports.getAllPublications = function (req, res, next) {
+    permissions.checkPermissions(
+        (options) => { actionGetAllPublications(options) },
+        { req, res, next }
+    );
+};
+
 var actionGetPublications = function (options) {
     let { req, res, next } = options;
     let personID = req.params.personID;
@@ -139,7 +159,6 @@ module.exports.updatePersonPublicationAssociation = function (req, res, next) {
     );
 };
 
-
 var actionDeletePersonPublicationAssociation = function (options) {
     let { req, res, next } = options;
     let personID = req.params.personID;
@@ -230,7 +249,9 @@ var actionDeletePreviousPublicationDescription = function (options) {
     places.push(publicationID)
     return sql.makeSQLOperation(req, res, querySQL, places,
         (options) => {
-            if (data.publication_types.length > 0) {
+            if (data.publication_types !== null
+                    && data.publication_types !== undefined
+                    && data.publication_types.length > 0) {
                 return actionInsertNewPublicationDescription(options, 0);
             } else {
                 responses.sendJSONResponseOptions({

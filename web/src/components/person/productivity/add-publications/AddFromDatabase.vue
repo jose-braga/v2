@@ -1,12 +1,11 @@
 <template>
-<v-card>
+<v-card flat>
     <v-card-title primary-title>
-        <div>
-            <h3 class="headline">Add from database</h3>
-        </div>
     </v-card-title>
     <v-card-text>Search database for publications.<br>
-        Search results will show only publications that are <b>not already associated with you</b>.</v-card-text>
+        Search results will show only publications that are
+        <b>not already associated with you</b>.
+    </v-card-text>
     <v-container>
         <v-form ref="form" class="pa-4"
                 @submit.prevent="submitForm">
@@ -197,41 +196,41 @@ export default {
                         });
                     }
                 }
-                console.log(urlCreate)
                 this.$http.all(
-                        urlCreate.map(el =>
-                            this.$http.post(el.url,
-                                { data: el.body, },
-                                { headers:
-                                    {'Authorization': 'Bearer ' + localStorage['v2-token']
-                                },
-                            }))
-                    )
-                    .then(this.$http.spread( () => {
-                        return urlUpdatePublications.map(el =>
-                            this.$http.put(el.url,
-                                { data: el.body, },
-                                { headers:
-                                    {'Authorization': 'Bearer ' + localStorage['v2-token']
-                                },
-                            }));
-                    }))
-                    .then(this.$http.spread( () => {
-                        this.progress = false;
-                        this.success = true;
-                        setTimeout(() => {this.success = false;}, 1500)
-                        this.toDelete = [];
-                        this.searchPublications (this.searchAuthors, this.searchTitle);
-                    }))
-                    .catch((error) => {
-                        this.progress = false;
-                        this.error = true;
-                        this.toDelete = [];
-                        this.searchPublications (this.searchAuthors, this.searchTitle);
-                        setTimeout(() => {this.error = false;}, 6000)
-                        // eslint-disable-next-line
-                        console.log(error)
-                    })
+                    urlCreate.map(el =>
+                        this.$http.post(el.url,
+                            { data: el.body, },
+                            { headers:
+                                {'Authorization': 'Bearer ' + localStorage['v2-token']
+                            },
+                        }))
+                )
+                .then(this.$http.spread( () => {
+                    return this.$http.all(urlUpdatePublications.map(el =>
+                        this.$http.put(el.url,
+                            { data: el.body, },
+                            { headers:
+                                {'Authorization': 'Bearer ' + localStorage['v2-token']},
+                            }
+                        )
+                    ));
+                }))
+                .then(this.$http.spread( () => {
+                    this.progress = false;
+                    this.success = true;
+                    setTimeout(() => {this.success = false;}, 1500)
+                    this.toDelete = [];
+                    this.searchPublications (this.searchAuthors, this.searchTitle);
+                }))
+                .catch((error) => {
+                    this.progress = false;
+                    this.error = true;
+                    this.toDelete = [];
+                    this.searchPublications (this.searchAuthors, this.searchTitle);
+                    setTimeout(() => {this.error = false;}, 6000)
+                    // eslint-disable-next-line
+                    console.log(error)
+                })
 
             }
 

@@ -81,6 +81,7 @@
                 <v-row>
                     <v-col cols="12" md="6">
                         <v-autocomplete
+                            v-if="!publicationDetails.new_journal"
                             v-model="publicationDetails.journal_id"
                             @change="journalChange()"
                             :items="journals" item-value="id" item-text="name_show"
@@ -90,6 +91,15 @@
                             hide-details
                             label="Journal">
                         </v-autocomplete>
+                        <v-checkbox v-if="publicationDetails.isORCID "
+                            v-model="publicationDetails.new_journal"
+                            label="Journal not in list, create new journal"
+                        ></v-checkbox>
+                        <v-text-field v-if="publicationDetails.new_journal"
+                            v-model="publicationDetails.journal_name"
+                            @input="journalNameAdded()"
+                            label="Journal name"
+                        ></v-text-field>
                     </v-col>
                     <v-col cols="12" md="4">
                         <v-text-field
@@ -204,8 +214,13 @@ export default {
         this.initialize();
     },
     updated () {
-        this.$root.$emit('updateSingleAddPublicationDatabase',
+        if (this.publicationDetails.isORCID) {
+            this.$root.$emit('updateSingleAddPublicationDatabaseORCID',
                 this.publicationDetails);
+        } else {
+            this.$root.$emit('updateSingleAddPublicationDatabase',
+                this.publicationDetails);
+        }
     },
     watch: {
         publicationId () {
@@ -226,7 +241,8 @@ export default {
                     + ' / ' + this.publicationDetails.eissn);
             let citations_last_year = {};
             let impact_factor_last_year = {};
-            if (this.publicationDetails.citations.length === 0) {
+            if (this.publicationDetails.isORCID
+                || this.publicationDetails.citations.length === 0) {
                 citations_last_year = { year:'N/A', citations: 'N/A' };
             } else {
                 let maxYear = 0;
@@ -241,7 +257,8 @@ export default {
                 }
             }
             this.$set(this.publicationDetails, 'citations_last_year', citations_last_year);
-            if (this.publicationDetails.impact_factors.length === 0) {
+            if (this.publicationDetails.isORCID
+                || this.publicationDetails.impact_factors.length === 0) {
                 impact_factor_last_year = {year:'N/A', impact_factor: 'N/A'};
             } else {
                 let maxYear = 0;
@@ -296,6 +313,15 @@ export default {
                         + ' / ' + this.journals[ind].eissn);
                     break;
                 }
+            }
+        },
+        journalNameAdded() {
+            if (this.publicationDetails.journal_name !== null
+                && this.publicationDetails.journal_name !== undefined
+                && this.publicationDetails.journal_name !== '') {
+                this.publicationDetails.incomplete = false;
+            } else {
+                this.publicationDetails.incomplete = true;
             }
         },
     },

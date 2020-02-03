@@ -6,6 +6,26 @@ const permissions = require('../utilities/permissions');
 const nodemailer = require('../../config/emailer');
 let transporter = nodemailer.transporter;
 
+var actionGetResearcherIDs = function (options) {
+    let { req, res, next } = options;
+    let personID = req.params.personID;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT *'
+            + ' FROM researchers_info'
+            + ' WHERE person_id = ?';
+    places.push(personID)
+    sql.makeSQLOperation(req, res, querySQL, places);
+};
+module.exports.getResearcherIDs = function (req, res, next) {
+    permissions.checkPermissions(
+        (options) => {
+            actionGetResearcherIDs(options);
+        },
+        { req, res, next }
+    );
+};
+
 var actionGetPoles = function (options) {
     let { req, res, next } = options;
     let personID = req.params.personID;

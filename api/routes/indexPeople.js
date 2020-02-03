@@ -32,6 +32,7 @@ const institutionalResponsibles = require('../controllers/people/institutional_r
 const professionalSituations = require('../controllers/people/professional_situations');
 const publicationsList = require('../controllers/people/publications_list');
 const addPublications = require('../controllers/people/add_publications');
+const addPubORCID = require('../controllers/people/add_pub_ORCID');
 
 router.get('/:personID/external-api-authorization', cors(corsOptions), externalAPI.getAuthorization);
 router.put('/:personID/external-api-authorization', cors(corsOptions), externalAPI.updateAuthorization);
@@ -67,6 +68,7 @@ router.put('/:personID/institutional-email/:emailID', cors(corsOptions), institu
 router.post('/:personID/institutional-email', cors(corsOptions), institutionalContacts.createInstitutionalEmail);
 // Affiliations: user can't change his/hers affiliations, only managers can do that
 router.post('/:personID/affiliation-message', cors(corsOptions), institutionalAffiliations.sendChangeMessage);
+router.get('/:personID/researcher-ids', cors(corsOptions), institutionalAffiliations.getResearcherIDs);
 router.get('/:personID/poles', cors(corsOptions), institutionalAffiliations.getPoles);
 router.get('/:personID/roles', cors(corsOptions), institutionalAffiliations.getRoles);
 router.get('/:personID/lab-affiliations', cors(corsOptions), institutionalAffiliations.getLabAffiliations);
@@ -89,12 +91,15 @@ router.post('/:personID/professional-situations/:jobID/contracts', cors(corsOpti
 router.put('/:personID/professional-situations/:jobID/contracts/:contractID', cors(corsOptions), professionalSituations.updateProfessionalSituationsContracts);
 router.delete('/:personID/professional-situations/:jobID/contracts/:contractID', cors(corsOptions), professionalSituations.deleteProfessionalSituationsContracts);
 //Publications
+router.get('/all-publications', cors(corsOptions), publicationsList.getAllPublications);
 router.get('/:personID/publications', cors(corsOptions), publicationsList.getPublications);
 router.post('/:personID/people-publications/:publicationID', cors(corsOptions), addPublications.createPersonPublicationAssociation);
 router.put('/:personID/people-publications/:publicationID', cors(corsOptions), publicationsList.updatePersonPublicationAssociation);
 router.delete('/:personID/people-publications/:publicationID', cors(corsOptions), publicationsList.deletePersonPublicationAssociation);
 router.put('/:personID/publications/:publicationID', cors(corsOptions), publicationsList.updatePublication);
 
+router.post('/:personID/journals', cors(corsOptions), addPubORCID.createJournal);
+router.post('/:personID/journals/:journalID/publications', cors(corsOptions), addPubORCID.createPublication);
 
 router.use(function (req, res, next) {
   var err = new Error('Not Found');

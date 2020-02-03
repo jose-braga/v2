@@ -6,8 +6,8 @@
         </div>
     </v-card-title>
     <v-card-text>Search database for publications<br>
-        Search results will show only publications that are <b>not associated with you</b>.</v-card-text>
-        <br><br><br><br><br><br><br><br>fdfdfdfdfdfdf<br><br><br><br><br><br><br><br><br>
+        Search results will show only publications that are <b>not associated with you</b>.
+    </v-card-text>
     <v-container>
 
     </v-container>

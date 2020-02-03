@@ -23,7 +23,6 @@ function processQuery(query, prop) {
         remainingStr,
     }
 }
-
 var actionGetPublications = function (options) {
     let { req, res, next } = options;
     let personID = req.params.personID;
@@ -96,7 +95,6 @@ var actionGetPublications = function (options) {
         },
         options);
 };
-
 module.exports.getPublicationsSearchDatabase = function (req, res, next) {
     permissions.checkPermissions(
         (options) => { actionGetPublications(options) },
@@ -104,7 +102,7 @@ module.exports.getPublicationsSearchDatabase = function (req, res, next) {
     );
 };
 
-var actionCreatePersonPublicationAssoaciation = function (options) {
+var actionCreatePersonPublicationAssociation = function (options) {
     let { req, res, next } = options;
     let personID = req.params.personID;
     let publicationID = req.params.publicationID;
@@ -116,10 +114,9 @@ var actionCreatePersonPublicationAssoaciation = function (options) {
     places.push(personID, publicationID)
     return sql.makeSQLOperation(req, res, querySQL, places);
 };
-
 module.exports.createPersonPublicationAssociation = function (req, res, next) {
     permissions.checkPermissions(
-        (options) => { actionCreatePersonPublicationAssoaciation(options) },
+        (options) => { actionCreatePersonPublicationAssociation(options) },
         { req, res, next }
     );
 };
