@@ -11,8 +11,10 @@ var actionGetResearcherIDs = function (options) {
     let personID = req.params.personID;
     var querySQL = '';
     var places = [];
-    querySQL = querySQL + 'SELECT *'
+    querySQL = querySQL + 'SELECT researchers_info.*,'
+            + ' institutional_repositories.short_name AS repository_short_name'
             + ' FROM researchers_info'
+            + ' LEFT JOIN institutional_repositories ON institutional_repositories.id = researchers_info.institutional_repository_id'
             + ' WHERE person_id = ?';
     places.push(personID)
     sql.makeSQLOperation(req, res, querySQL, places);

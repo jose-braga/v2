@@ -33,6 +33,7 @@ const professionalSituations = require('../controllers/people/professional_situa
 const publicationsList = require('../controllers/people/publications_list');
 const addPublications = require('../controllers/people/add_publications');
 const addPubORCID = require('../controllers/people/add_pub_ORCID');
+const addPubRepository = require('../controllers/people/add_pub_repository');
 
 router.get('/:personID/external-api-authorization', cors(corsOptions), externalAPI.getAuthorization);
 router.put('/:personID/external-api-authorization', cors(corsOptions), externalAPI.updateAuthorization);
@@ -93,6 +94,7 @@ router.delete('/:personID/professional-situations/:jobID/contracts/:contractID',
 //Publications
 router.get('/all-publications', cors(corsOptions), publicationsList.getAllPublications);
 router.get('/:personID/publications', cors(corsOptions), publicationsList.getPublications);
+router.get('/:personID/pure-publications', cors(corsOptions), addPubRepository.getPUREPublications);
 router.post('/:personID/people-publications/:publicationID', cors(corsOptions), addPublications.createPersonPublicationAssociation);
 router.put('/:personID/people-publications/:publicationID', cors(corsOptions), publicationsList.updatePersonPublicationAssociation);
 router.delete('/:personID/people-publications/:publicationID', cors(corsOptions), publicationsList.deletePersonPublicationAssociation);

@@ -44,9 +44,9 @@ var actionCreatePublication = function (options) {
     var places = [];
     querySQL = querySQL + 'INSERT INTO publications'
                         + ' (authors_raw, number_authors, title, journal_id,'
-                        + ' volume, page_start, page_end, doi,'
+                        + ' volume, page_start, page_end, doi, wos, pubmed_id,'
                         + ' publication_date, year, publication_source_id, updated)'
-                        + ' VALUES (?,?,?,?,?,?,?,?,?,?,?,?);';
+                        + ' VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?);';
     places.push(
         data.authors_raw,
         data.number_authors,
@@ -56,6 +56,8 @@ var actionCreatePublication = function (options) {
         data.page_start,
         data.page_end,
         data.doi,
+        data.wos,
+        data.pubmed_id,
         data.publication_date,
         data.year,
         data.publication_source_id,

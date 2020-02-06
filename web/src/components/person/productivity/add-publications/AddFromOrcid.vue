@@ -450,7 +450,7 @@ export default {
                 orcid: undefined,
                 publicationsDB: [],
                 publications: [],
-            }
+            },
 
         }
     },
@@ -551,7 +551,6 @@ export default {
                             body: urlCreateJournal[ind].body,
                         });
                     }
-                    console.log(urlCreatePublications)
                     return this.$http.all(
                         urlCreatePublications.map(el =>
                             this.$http.post(el.url,
@@ -576,8 +575,6 @@ export default {
                             body: urlCreatePublications[ind].body,
                         });
                     }
-                    console.log(urlCreatePersonPublications)
-                    console.log(urlUpdatePublications)
                     return this.$http.all(
                         urlCreatePersonPublications.map(el =>
                             this.$http.post(el.url,

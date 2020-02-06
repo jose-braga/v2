@@ -5,7 +5,7 @@
             <v-expansion-panel>
                 <v-expansion-panel-header>
                     <div>
-                        <h3 class="headline">Add from database</h3>
+                        <h3 class="headline">Add from LAQV/UCIBIO database</h3>
                     </div>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
@@ -19,7 +19,7 @@
                     </div>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
-                    <AddFromOrcid id="orcid" class="mt-6"
+                    <AddFromOrcid id="orcid"
                             :current-tab="currentTab"
                     ></AddFromOrcid>
                 </v-expansion-panel-content>
@@ -31,7 +31,9 @@
                     </div>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
-                    <AddFromRepository id="repository" class="mt-6"></AddFromRepository>
+                    <AddFromRepository id="repository"
+                            :current-tab="currentTab"
+                    ></AddFromRepository>
                 </v-expansion-panel-content>
             </v-expansion-panel>
         </v-expansion-panels>

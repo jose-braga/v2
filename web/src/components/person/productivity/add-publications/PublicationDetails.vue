@@ -91,7 +91,7 @@
                             hide-details
                             label="Journal">
                         </v-autocomplete>
-                        <v-checkbox v-if="publicationDetails.isORCID "
+                        <v-checkbox v-if="publicationDetails.isORCID || publicationDetails.isPURE"
                             v-model="publicationDetails.new_journal"
                             label="Journal not in list, create new journal"
                         ></v-checkbox>
@@ -217,6 +217,9 @@ export default {
         if (this.publicationDetails.isORCID) {
             this.$root.$emit('updateSingleAddPublicationDatabaseORCID',
                 this.publicationDetails);
+        } else if (this.publicationDetails.isPURE) {
+            this.$root.$emit('updateSingleAddPublicationDatabasePURE',
+                this.publicationDetails);
         } else {
             this.$root.$emit('updateSingleAddPublicationDatabase',
                 this.publicationDetails);
@@ -241,7 +244,7 @@ export default {
                     + ' / ' + this.publicationDetails.eissn);
             let citations_last_year = {};
             let impact_factor_last_year = {};
-            if (this.publicationDetails.isORCID
+            if (this.publicationDetails.isORCID || this.publicationDetails.isPURE
                 || this.publicationDetails.citations.length === 0) {
                 citations_last_year = { year:'N/A', citations: 'N/A' };
             } else {
@@ -257,7 +260,7 @@ export default {
                 }
             }
             this.$set(this.publicationDetails, 'citations_last_year', citations_last_year);
-            if (this.publicationDetails.isORCID
+            if (this.publicationDetails.isORCID || this.publicationDetails.isPURE
                 || this.publicationDetails.impact_factors.length === 0) {
                 impact_factor_last_year = {year:'N/A', impact_factor: 'N/A'};
             } else {
