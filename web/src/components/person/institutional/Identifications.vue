@@ -45,10 +45,10 @@
             <v-row class="px-2">
                 <v-col cols="12" sm="4">
                     <v-select
-                            v-model="data.researcherIDs.institutional_repository_id"
-                            :items="institutionalRepositories" item-value="id" item-text="name"
-                            label="Repository">
-                        </v-select>
+                        v-model="data.researcherIDs.institutional_repository_id"
+                        :items="institutionalRepositories" item-value="id" item-text="name"
+                        label="Repository">
+                    </v-select>
                 </v-col>
                 <v-col cols="12" sm="4">
                     <v-text-field

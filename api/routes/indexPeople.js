@@ -22,22 +22,23 @@ router.options('*', cors())
  */
 const externalAPI = require('../controllers/people/external_api'); //authorization of visibility to external partners
 
-const nuclearInformation = require('../controllers/people/nuclear_information');
-const personalContacts = require('../controllers/people/personal_contacts');
-const photo = require('../controllers/people/photo');
-const degrees = require('../controllers/people/degrees');
-const institutionalContacts = require('../controllers/people/institutional_contacts');
-const emergencyContacts = require('../controllers/people/emergency_contacts');
-const identifications = require('../controllers/people/identifications');
-const cars = require('../controllers/people/cars');
-const institutionalAffiliations = require('../controllers/people/institutional_affiliations');
-const researchIDs = require('../controllers/people/research_IDs');
-const institutionalResponsibles = require('../controllers/people/institutional_responsibles');
-const professionalSituations = require('../controllers/people/professional_situations');
-const publicationsList = require('../controllers/people/publications_list');
+const academicAffiliations = require('../controllers/people/academic_affiliations');
 const addPublications = require('../controllers/people/add_publications');
 const addPubORCID = require('../controllers/people/add_pub_ORCID');
 const addPubRepository = require('../controllers/people/add_pub_repository');
+const cars = require('../controllers/people/cars');
+const degrees = require('../controllers/people/degrees');
+const emergencyContacts = require('../controllers/people/emergency_contacts');
+const identifications = require('../controllers/people/identifications');
+const institutionalContacts = require('../controllers/people/institutional_contacts');
+const institutionalAffiliations = require('../controllers/people/institutional_affiliations');
+const institutionalResponsibles = require('../controllers/people/institutional_responsibles');
+const nuclearInformation = require('../controllers/people/nuclear_information');
+const personalContacts = require('../controllers/people/personal_contacts');
+const photo = require('../controllers/people/photo');
+const professionalSituations = require('../controllers/people/professional_situations');
+const publicationsList = require('../controllers/people/publications_list');
+const researchIDs = require('../controllers/people/research_IDs');
 
 router.get('/:personID/external-api-authorization', cors(corsOptions), externalAPI.getAuthorization);
 router.put('/:personID/external-api-authorization', cors(corsOptions), externalAPI.updateAuthorization);
@@ -77,7 +78,7 @@ router.get('/:personID/degrees', cors(corsOptions), degrees.getDegrees);
 router.put('/:personID/degrees/:degreeID', cors(corsOptions), degrees.updateDegrees);
 router.delete('/:personID/degrees/:degreeID', cors(corsOptions), degrees.deleteDegrees);
 router.post('/:personID/degrees', cors(corsOptions), degrees.createDegrees);
-// Institutional settings
+// Institutional information
 router.get('/:personID/institutional-phone', cors(corsOptions), institutionalContacts.getInstitutionalPhone);
 router.put('/:personID/institutional-phone/:phoneID', cors(corsOptions), institutionalContacts.updateInstitutionalPhone);
 router.post('/:personID/institutional-phone', cors(corsOptions), institutionalContacts.createInstitutionalPhone);
@@ -87,6 +88,13 @@ router.post('/:personID/institutional-email', cors(corsOptions), institutionalCo
 router.get('/:personID/researcher-ids', cors(corsOptions), researchIDs.getResearcherIDs);
 router.post('/:personID/researcher-ids', cors(corsOptions), researchIDs.createResearcherIDs);
 router.put('/:personID/researcher-ids/:researcherInfoID', cors(corsOptions), researchIDs.updateResearcherIDs);
+
+router.get('/:personID/academic-affiliations', cors(corsOptions), academicAffiliations.getAcademicAffiliations);
+router.post('/:personID/academic-affiliations', cors(corsOptions), academicAffiliations.createAcademicAffiliations);
+router.put('/:personID/academic-affiliations/:affiliationID', cors(corsOptions), academicAffiliations.updateAcademicAffiliations);
+router.delete('/:personID/academic-affiliations/:affiliationID', cors(corsOptions), academicAffiliations.deleteAcademicAffiliations);
+
+
 // Affiliations: user can't change his/hers affiliations, only managers can do that
 router.post('/:personID/affiliation-message', cors(corsOptions), institutionalAffiliations.sendChangeMessage);
 router.get('/:personID/poles', cors(corsOptions), institutionalAffiliations.getPoles);

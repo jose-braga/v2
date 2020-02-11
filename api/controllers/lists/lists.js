@@ -184,6 +184,132 @@ var getCardTypes = function (req, res, next) {
     sql.makeSQLOperation(req, res, querySQL, places);
     return;
 };
+var getDepartments = function (options) {
+    let { req, res, next } = options;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT departments.id, departments.name_en AS department_name_en, departments.name_pt AS department_name_pt,'
+    + ' schools.name_en AS school_name_en, schools.name_pt AS school_name_pt,'
+    + ' schools.shortname_en AS school_shortname_en, schools.shortname_pt AS school_shortname_pt,'
+    + ' universities.name_en AS university_name_en, universities.name_pt AS university_name_pt,'
+    + ' universities.shortname_en AS university_shortname_en, universities.shortname_pt AS university_shortname_pt'
+    + ' FROM departments'
+    + ' JOIN schools ON schools.id = departments.school_id'
+    + ' JOIN universities ON universities.id = schools.university_id;';
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            for (let ind in resQuery) {
+                let department_en = resQuery[ind].department_name_en;
+                let department_pt = resQuery[ind].department_name_pt;
+                let school_en = resQuery[ind].school_name_en;
+                let school_pt = resQuery[ind].school_name_pt;
+                let school_short_en = resQuery[ind].school_shortname_en;
+                let school_short_pt = resQuery[ind].school_shortname_pt;
+                let university_en = resQuery[ind].school_name_en;
+                let university_pt = resQuery[ind].school_name_pt;
+                let university_short_en = resQuery[ind].university_shortname_en;
+                let university_short_pt = resQuery[ind].university_shortname_pt;
+                let str_department_en = '';
+                let str_department_pt = '';
+                let short_str_department_en = '';
+                let short_str_department_pt = '';
+                if (department_en !== null && department_en !== undefined) {
+                    str_department_en = str_department_en + department_en;
+                    if (school_en !== null && school_en !== undefined) {
+                        str_department_en = str_department_en + ', ' + school_en;
+                        if (university_en !== null && university_en !== undefined) {
+                            str_department_en = str_department_en + ', ' + university_en;
+                        }
+                    } else {
+                        str_department_en = str_department_en + ', ' + university_en;
+                    }
+                } else {
+                    if (school_en !== null && school_en !== undefined) {
+                        str_department_en = str_department_en + school_en;
+                        if (university_en !== null && university_en !== undefined) {
+                            str_department_en = str_department_en + ', ' + university_en;
+                        }
+                    } else {
+                        str_department_en = str_department_en + university_en;
+                    }
+                }
+                if (department_pt !== null && department_pt !== undefined) {
+                    str_department_pt = str_department_pt + department_pt;
+                    if (school_pt !== null && school_pt !== undefined) {
+                        str_department_pt = str_department_pt + ', ' + school_pt;
+                        if (university_pt !== null && university_pt !== undefined) {
+                            str_department_pt = str_department_pt + ', ' + university_pt;
+                        }
+                    } else {
+                        str_department_pt = str_department_pt + ', ' + university_pt;
+                    }
+                } else {
+                    if (school_pt !== null && school_pt !== undefined) {
+                        str_department_pt = str_department_pt + school_pt;
+                        if (university_pt !== null && university_pt !== undefined) {
+                            str_department_pt = str_department_pt + ', ' + university_pt;
+                        }
+                    } else {
+                        str_department_pt = str_department_pt + university_pt;
+                    }
+                }
+                if (department_en !== null && department_en !== undefined) {
+                    short_str_department_en = short_str_department_en + department_en;
+                    if (school_short_en !== null && school_short_en !== undefined) {
+                        short_str_department_en = short_str_department_en + ', ' + school_short_en;
+                        if (university_short_en !== null && university_short_en !== undefined) {
+                            short_str_department_en = short_str_department_en + ', ' + university_short_en;
+                        }
+                    } else {
+                        short_str_department_en = short_str_department_en + ', ' + university_short_en;
+                    }
+                } else {
+                    if (school_short_en !== null && school_short_en !== undefined) {
+                        short_str_department_en = short_str_department_en + school_short_en;
+                        if (university_short_en !== null && university_short_en !== undefined) {
+                            short_str_department_en = short_str_department_en + ', ' + university_short_en;
+                        }
+                    } else {
+                        short_str_department_en = short_str_department_en + university_short_en;
+                    }
+                }
+                if (department_pt !== null && department_pt !== undefined) {
+                    short_str_department_pt = short_str_department_pt + department_pt;
+                    if (school_short_pt !== null && school_short_pt !== undefined) {
+                        short_str_department_pt = short_str_department_pt + ', ' + school_short_pt;
+                        if (university_short_pt !== null && university_short_pt !== undefined) {
+                            short_str_department_pt = short_str_department_pt + ', ' + university_short_pt;
+                        }
+                    } else {
+                        short_str_department_pt = short_str_department_pt + ', ' + university_short_pt;
+                    }
+                } else {
+                    if (school_short_pt !== null && school_short_pt !== undefined) {
+                        short_str_department_pt = short_str_department_pt + school_short_pt;
+                        if (university_short_pt !== null && university_short_pt !== undefined) {
+                            short_str_department_pt = short_str_department_pt + ', ' + university_short_pt;
+                        }
+                    } else {
+                        short_str_department_pt = short_str_department_pt + university_short_pt;
+                    }
+                }
+                resQuery[ind].str_department_en = str_department_en;
+                resQuery[ind].str_department_pt = str_department_pt;
+                resQuery[ind].short_str_department_en = short_str_department_en;
+                resQuery[ind].short_str_department_pt = short_str_department_pt;
+            }
+            responses.sendJSONResponseOptions({
+                response: res,
+                status: 200,
+                message: {
+                    "status": "success", "statusCode": 200,
+                    "result": resQuery,
+                }
+            });
+            return;
+        },
+        options);
+};
 
 module.exports.listItems = function (req, res, next) {
     let category = req.params.listCategory;
@@ -237,6 +363,9 @@ module.exports.listItems = function (req, res, next) {
     }
     if (category === 'card-types') {
         getCardTypes(req, res, next);
+    }
+    if (category === 'departments') {
+        getDepartments(req, res, next);
     }
 };
 

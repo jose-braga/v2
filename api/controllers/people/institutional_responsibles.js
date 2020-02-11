@@ -1,6 +1,4 @@
 const sql = require('../utilities/sql');
-const time = require('../utilities/time');
-const responses = require('../utilities/responses');
 const permissions = require('../utilities/permissions');
 
 /**
@@ -24,8 +22,8 @@ module.exports.getResponsibles = function (req, res, next) {
         (options) => { actionGetResponsibles(options) },
         { req, res, next }
         );
-    };
-    
+};
+
 
 /**
  * For changing responsibles data

@@ -5,7 +5,6 @@ const permissions = require('../utilities/permissions');
 const nodemailer = require('../../config/emailer');
 let transporter = nodemailer.transporter;
 
-
 var actionGetCars = function (options) {
     let { req, res, next } = options;
     let personID = req.params.personID;
@@ -83,7 +82,6 @@ module.exports.deleteCar = function (req, res, next) {
         { req, res, next }
     );
 };
-
 
 var getRecipientsGroups = function (options, email_type_id, is_local) {
     let { req, res, next } = options;
