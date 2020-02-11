@@ -113,7 +113,7 @@ export default {
                     // only works if this.data and result have the same keys
                     Object.keys(result).forEach(key => {
                         let value = result[key];
-                        this.data.personal_addresses[key] = value;
+                        this.$set(this.data.personal_addresses, key, value);
                     });
                 })
                 subUtil.getInfoPopulate(this, 'api/people/' + personID + '/personal-phone', false)
@@ -121,7 +121,7 @@ export default {
                     // only works if this.data and result have the same keys
                     Object.keys(result).forEach(key => {
                         let value = result[key];
-                        this.data.personal_phones[key] = value;
+                        this.$set(this.data.personal_phones, key, value);
                     });
                 })
                 subUtil.getInfoPopulate(this, 'api/people/' + personID + '/personal-email', false)
@@ -129,7 +129,7 @@ export default {
                     // only works if this.data and result have the same keys
                     Object.keys(result).forEach(key => {
                         let value = result[key];
-                        this.data.personal_emails[key] = value;
+                        this.$set(this.data.personal_emails, key, value);
                     });
                 })
 

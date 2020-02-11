@@ -5,6 +5,13 @@
             <span class="lab-name">{{pos.lab_name}} @ {{pos.group_string}}  @ </span>
             <span :class="pos.unit_string + ' unit'">{{pos.unit_string}}</span>
             <br>
+            <span v-if="pos.integrated || pos.pluriannual || pos.nuclearCV"
+                    class="unit-situation">
+                <span v-if="pos.integrated">Integrated, </span>
+                <span v-if="pos.pluriannual">Pluriannual, </span>
+                <span v-if="pos.nuclearCV">Nuclear CV,</span>
+                <br>
+            </span>
             <span class="date-affiliation">
                 Dedication: {{pos.dedication}}%
                 ({{pos.valid_from}} - {{pos.valid_until}})
@@ -78,6 +85,12 @@ li {
 
 .lab-name {
     color:#777777;
+}
+
+.unit-situation {
+    color:midnightblue;
+    font-size: 0.8rem;
+    font-weight: 500;
 }
 
 .date-affiliation {

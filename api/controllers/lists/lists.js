@@ -168,6 +168,22 @@ var getPublicationTypes = function (req, res, next) {
     sql.makeSQLOperation(req, res, querySQL, places);
     return;
 };
+var getInstitutionalRepositories = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM institutional_repositories;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getCardTypes = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM card_types;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
 
 module.exports.listItems = function (req, res, next) {
     let category = req.params.listCategory;
@@ -215,6 +231,12 @@ module.exports.listItems = function (req, res, next) {
     }
     if (category === 'author-types') {
         getAuthorTypes(req, res, next);
+    }
+    if (category === 'institutional-repositories') {
+        getInstitutionalRepositories(req, res, next);
+    }
+    if (category === 'card-types') {
+        getCardTypes(req, res, next);
     }
 };
 

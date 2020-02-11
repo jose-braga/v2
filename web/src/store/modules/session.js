@@ -1,7 +1,16 @@
 import router from '../../routes/routes'
 
+function b64DecodeUnicode(str) {
+    // Going backwards: from bytestream, to percent-encoding, to original string.
+    return decodeURIComponent(atob(str).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+}
+//window.atob(token.split('.')[1])
 var readLocalStorage = function (token) {
-    return JSON.parse(window.atob(token.split('.')[1]));
+    return JSON.parse(
+        b64DecodeUnicode(token.split('.')[1])
+    );
 };
 
 const session = {

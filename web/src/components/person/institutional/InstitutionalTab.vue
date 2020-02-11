@@ -4,6 +4,7 @@
             <Roles></Roles>
         </v-col>
         <v-col cols="12" md="6">
+            <Identifications></Identifications>
             <InstitutionalContacts></InstitutionalContacts>
             <AcademicAffiliations></AcademicAffiliations>
         </v-col>
@@ -12,14 +13,16 @@
 
 <script>
 
-const InstitutionalContacts = () => import('./InstitutionalContacts')
 const AcademicAffiliations = () => import('./AcademicAffiliations')
+const Identifications = () => import('./Identifications')
+const InstitutionalContacts = () => import('./InstitutionalContacts')
 const Roles = () => import('./roles/Roles')
 
 export default {
     components: {
-        InstitutionalContacts,
         AcademicAffiliations,
+        Identifications,
+        InstitutionalContacts,
         Roles,
     }
 }

@@ -23,6 +23,7 @@
                         <h3>Emergency Contacts</h3>
                     </v-expansion-panel-header>
                     <v-expansion-panel-content>
+                        <EmergencyContacts></EmergencyContacts>
                     </v-expansion-panel-content>
                 </v-expansion-panel>
                 <v-expansion-panel>
@@ -30,13 +31,15 @@
                         <h3>Identifications</h3>
                     </v-expansion-panel-header>
                     <v-expansion-panel-content>
+                        <Identifications></Identifications>
                     </v-expansion-panel-content>
                 </v-expansion-panel>
                 <v-expansion-panel>
                     <v-expansion-panel-header>
-                        <h3>Cars</h3>
+                        <h3>Cars (FCT NOVA only)</h3>
                     </v-expansion-panel-header>
                     <v-expansion-panel-content>
+                        <Cars></Cars>
                     </v-expansion-panel-content>
                 </v-expansion-panel>
             </v-expansion-panels>
@@ -49,10 +52,16 @@ import Authorization from './Authorization'
 import NuclearInformation from './NuclearInformation'
 import Photo from './Photo'
 const PersonalContacts = () => import('./PersonalContacts')
+const EmergencyContacts = () => import('./EmergencyContacts')
+const Identifications = () => import('./Identifications')
+const Cars = () => import('./Cars')
 
 export default {
     components: {
         Authorization,
+        EmergencyContacts,
+        Cars,
+        Identifications,
         NuclearInformation,
         Photo,
         PersonalContacts,

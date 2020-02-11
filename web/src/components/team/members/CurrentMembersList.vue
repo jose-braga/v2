@@ -395,7 +395,7 @@ export default {
         submitForm (member) {
             let this_session = this.$store.state.session;
             if (this_session.loggedIn) {
-                member.most_recent_data.changed_by = this_session.personID;
+                member.most_recent_data.changed_by = this_session.userID;
                 member.progress = true;
                 let memberID = member.person_id;
                 let reqUpdate = '/labs/' + this.labId
@@ -432,7 +432,7 @@ export default {
                                 this_session.permissionsEndpoints[ind].endpoint_url,
                                 this_session.permissionsEndpoints[ind].method_name)
                         && Object.keys(member.newer_data).length > 0) {
-                        member.newer_data.changed_by = this_session.personID;
+                        member.newer_data.changed_by = this_session.userID;
                         requests.push(this.$http.post(urlCreate,
                             {
                                 data: member.newer_data

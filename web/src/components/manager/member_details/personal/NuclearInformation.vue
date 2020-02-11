@@ -181,7 +181,7 @@ export default {
                     // only works if this.data and result have the same keys
                     Object.keys(result).forEach(key => {
                         let value = result[key];
-                        this.data[key] = value;
+                        this.$set(this.data, key, value);
                     });
                     this.data.birth_date = time.processResultsDate(this.data.birth_date);
                     return this.data;

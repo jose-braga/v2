@@ -27,7 +27,11 @@ const personalContacts = require('../controllers/people/personal_contacts');
 const photo = require('../controllers/people/photo');
 const degrees = require('../controllers/people/degrees');
 const institutionalContacts = require('../controllers/people/institutional_contacts');
+const emergencyContacts = require('../controllers/people/emergency_contacts');
+const identifications = require('../controllers/people/identifications');
+const cars = require('../controllers/people/cars');
 const institutionalAffiliations = require('../controllers/people/institutional_affiliations');
+const researchIDs = require('../controllers/people/research_IDs');
 const institutionalResponsibles = require('../controllers/people/institutional_responsibles');
 const professionalSituations = require('../controllers/people/professional_situations');
 const publicationsList = require('../controllers/people/publications_list');
@@ -52,6 +56,19 @@ router.put('/:personID/personal-phone/:phoneID', cors(corsOptions), personalCont
 router.get('/:personID/personal-email', cors(corsOptions), personalContacts.getPersonalEmail);
 router.post('/:personID/personal-email', cors(corsOptions), personalContacts.createPersonalEmail);
 router.put('/:personID/personal-email/:emailID', cors(corsOptions), personalContacts.updatePersonalEmail);
+router.get('/:personID/emergency-contacts', cors(corsOptions), emergencyContacts.getEmergencyContacts);
+router.post('/:personID/emergency-contacts', cors(corsOptions), emergencyContacts.createEmergencyContact);
+router.put('/:personID/emergency-contacts/:contactID', cors(corsOptions), emergencyContacts.updateEmergencyContact);
+router.delete('/:personID/emergency-contacts/:contactID', cors(corsOptions), emergencyContacts.deleteEmergencyContact);
+router.get('/:personID/identifications', cors(corsOptions), identifications.getIdentifications);
+router.post('/:personID/identifications', cors(corsOptions), identifications.createIdentification);
+router.put('/:personID/identifications/:identificationID', cors(corsOptions), identifications.updateIdentification);
+router.delete('/:personID/identifications/:identificationID', cors(corsOptions), identifications.deleteIdentification);
+router.get('/:personID/cars', cors(corsOptions), cars.getCars);
+router.post('/:personID/cars', cors(corsOptions), cars.createCar);
+router.put('/:personID/cars/:carID', cors(corsOptions), cars.updateCar);
+router.delete('/:personID/cars/:carID', cors(corsOptions), cars.deleteCar);
+router.post('/:personID/cars-message', cors(corsOptions), cars.sendChangeMessage);
 // Photo (TODO: improve its RESTfulness)
 router.put('/:personID/photos/:imageType', cors(corsOptions), photo.uploadPhoto);
 router.get('/:personID/photos/:imageType', cors(corsOptions), photo.getPhoto);
@@ -67,9 +84,11 @@ router.post('/:personID/institutional-phone', cors(corsOptions), institutionalCo
 router.get('/:personID/institutional-email', cors(corsOptions), institutionalContacts.getInstitutionalEmail);
 router.put('/:personID/institutional-email/:emailID', cors(corsOptions), institutionalContacts.updateInstitutionalEmail);
 router.post('/:personID/institutional-email', cors(corsOptions), institutionalContacts.createInstitutionalEmail);
+router.get('/:personID/researcher-ids', cors(corsOptions), researchIDs.getResearcherIDs);
+router.post('/:personID/researcher-ids', cors(corsOptions), researchIDs.createResearcherIDs);
+router.put('/:personID/researcher-ids/:researcherInfoID', cors(corsOptions), researchIDs.updateResearcherIDs);
 // Affiliations: user can't change his/hers affiliations, only managers can do that
 router.post('/:personID/affiliation-message', cors(corsOptions), institutionalAffiliations.sendChangeMessage);
-router.get('/:personID/researcher-ids', cors(corsOptions), institutionalAffiliations.getResearcherIDs);
 router.get('/:personID/poles', cors(corsOptions), institutionalAffiliations.getPoles);
 router.get('/:personID/roles', cors(corsOptions), institutionalAffiliations.getRoles);
 router.get('/:personID/lab-affiliations', cors(corsOptions), institutionalAffiliations.getLabAffiliations);

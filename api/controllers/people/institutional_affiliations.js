@@ -6,28 +6,6 @@ const permissions = require('../utilities/permissions');
 const nodemailer = require('../../config/emailer');
 let transporter = nodemailer.transporter;
 
-var actionGetResearcherIDs = function (options) {
-    let { req, res, next } = options;
-    let personID = req.params.personID;
-    var querySQL = '';
-    var places = [];
-    querySQL = querySQL + 'SELECT researchers_info.*,'
-            + ' institutional_repositories.short_name AS repository_short_name'
-            + ' FROM researchers_info'
-            + ' LEFT JOIN institutional_repositories ON institutional_repositories.id = researchers_info.institutional_repository_id'
-            + ' WHERE person_id = ?';
-    places.push(personID)
-    sql.makeSQLOperation(req, res, querySQL, places);
-};
-module.exports.getResearcherIDs = function (req, res, next) {
-    permissions.checkPermissions(
-        (options) => {
-            actionGetResearcherIDs(options);
-        },
-        { req, res, next }
-    );
-};
-
 var actionGetPoles = function (options) {
     let { req, res, next } = options;
     let personID = req.params.personID;

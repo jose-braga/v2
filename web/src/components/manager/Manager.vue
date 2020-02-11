@@ -18,7 +18,7 @@
                     :unit-id="unitID"
                     :city-id="cityID"
                     :unit-data="currentUnit"
-                    :city-data="currentCity"                    
+                    :city-data="currentCity"
                     ></router-view>
             </keep-alive>
             <v-dialog v-model="showHelp" content-class="help">
