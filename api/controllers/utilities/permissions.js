@@ -97,7 +97,9 @@ module.exports.checkPermissions = function (callback, callbackOptions) {
     } else if (reqEndpointParts[0] === 'documents') {
         // TODO: for documents permissions
 
-    } else if (hasAccessEndpoint(reqMethod, reqEndpoint, permissionsEndpoints)){
+    } else if (hasAccessEndpoint(reqMethod, reqEndpoint, permissionsEndpoints)
+                && reqEndpointParts[2] !== 'external-api-authorization') {
+        // a user on behalf of another cannot change authorization for that user
         return callback(callbackOptions);
 
         /*

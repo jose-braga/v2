@@ -40,6 +40,10 @@ const professionalSituations = require('../controllers/people/professional_situa
 const publicationsList = require('../controllers/people/publications_list');
 const researchIDs = require('../controllers/people/research_IDs');
 
+//remove lines below???
+//var routesAPIUserOnBehalf = require('./routes/indexUserOnBehalf');
+//router.use('/:personID/users-on-behalf', routesAPIUserOnBehalf)
+
 router.get('/:personID/external-api-authorization', cors(corsOptions), externalAPI.getAuthorization);
 router.put('/:personID/external-api-authorization', cors(corsOptions), externalAPI.updateAuthorization);
 // Nuclear information (TODO: improve its RESTfulness (specialluy for nationalities))

@@ -19,6 +19,9 @@ const OtherProductivityTab = () => import('../components/person/productivity/Oth
 const OtherProductivityTabHelp = () => import('../components/person/productivity/OtherProductivityTabHelp.vue')
 
 const PersonOnBehalf = () => import('../components/person-on-behalf/personOnBehalf.vue')
+const OtherPersonTab = () => import('../components/person-on-behalf/PersonTab.vue')
+const OtherPersonTabHelp = () => import('../components/person-on-behalf/PersonTabHelp.vue')
+const OtherPersonPersonalTab = () => import('../components/person-on-behalf/personal/PersonalTab.vue')
 
 const Team = () => import('../components/team/Team.vue')
 const TeamMembersTab = () => import('../components/team/members/MembersTab.vue')
@@ -103,6 +106,22 @@ const routes = [
     {
         path: '/person-on-behalf',
         component: PersonOnBehalf,
+        children: [
+            {
+                path: ':personName',
+                components: {
+                    default: OtherPersonTab,
+                    help: OtherPersonTabHelp
+                },
+                children: [
+                    {
+                        path: 'personal',
+                        component: OtherPersonPersonalTab
+                    },
+                    { path: '', redirect: 'personal' }
+                ],
+            },
+        ]
     },
     {
         path: '/team',
