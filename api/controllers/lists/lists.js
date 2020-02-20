@@ -21,7 +21,7 @@ var getDegrees = function (req, res, next) {
 var getPeopleSimple = function (req, res, next) {
     var querySQL = '';
     var places = [];
-    querySQL = querySQL + 'SELECT id, colloquial_name FROM people'
+    querySQL = querySQL + 'SELECT id, user_id, colloquial_name FROM people'
                         + ' WHERE status = 1;';
     //places.push()
     sql.makeSQLOperation(req, res, querySQL, places);

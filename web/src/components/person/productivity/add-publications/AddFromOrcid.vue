@@ -114,7 +114,7 @@ import PublicationDetails from './PublicationDetails'
 function filterORCIDData(works) {
     // filter out any works which are not printed/digital publications
     let publicationsFiltered = [];
-    if (works.hasOwnProperty('group')
+    if (Object.prototype.hasOwnProperty.call(works, 'group')
             && works.group.length > 0) {
         for (let ind in works.group) {
             let publication = works.group[ind];
@@ -130,10 +130,10 @@ function filterORCIDData(works) {
             // (cont) ResearcherID, Universidade Nova de Lisboa
             // 3. All others that have BIBTEK citations (only after getting details)
             // 4. All others that have no BIBTEK citations (only after getting details)
-            if (publication.hasOwnProperty('work-summary')
+            if (Object.prototype.hasOwnProperty.call(publication, 'work-summary')
                     && publication['work-summary'].length > 0) {
                 for (let indSum in publication['work-summary']) {
-                    if (publication['work-summary'][indSum].hasOwnProperty('type')) {
+                    if (Object.prototype.hasOwnProperty.call(publication['work-summary'][indSum],'type')) {
                         if (publication['work-summary'][indSum].type !== 'LECTURE_SPEECH'
                             && publication['work-summary'][indSum].type !== 'CONFERENCE_POSTER'
                             && publication['work-summary'][indSum].type !== 'CONFERENCE_PAPER'
@@ -148,9 +148,9 @@ function filterORCIDData(works) {
                     } else {
                         typeIsNull === true;
                     }
-                    if (publication['work-summary'][indSum].hasOwnProperty('put-code')) {
-                        if (publication['work-summary'][indSum].hasOwnProperty('source')) {
-                            if (publication['work-summary'][indSum].source.hasOwnProperty('source-name')) {
+                    if (Object.prototype.hasOwnProperty.call(publication['work-summary'][indSum],'put-code')) {
+                        if (Object.prototype.hasOwnProperty.call(publication['work-summary'][indSum],'source')) {
+                            if (Object.prototype.hasOwnProperty.call(publication['work-summary'][indSum].source,'source-name')) {
                                 if (publication['work-summary'][indSum].source['source-name'].value === 'CIÊNCIAVITAE') {
                                     thisClassification = 1;
                                 } else if (publication['work-summary'][indSum].source['source-name'].value === 'Crossref Metadata Search'
@@ -175,16 +175,16 @@ function filterORCIDData(works) {
                         }
                     }
                     let title = null;
-                    if (publication['work-summary'][indSum].hasOwnProperty('title')) {
-                        if (publication['work-summary'][indSum].title.hasOwnProperty('title')) {
+                    if (Object.prototype.hasOwnProperty.call(publication['work-summary'][indSum],'title')) {
+                        if (Object.prototype.hasOwnProperty.call(publication['work-summary'][indSum].title,'title')) {
                             title = publication['work-summary'][indSum].title.title.value.trim();
                         }
                     }
                     publication.title = title;
                     let doi = null;
-                    if (publication['work-summary'][indSum].hasOwnProperty('external-ids')
+                    if (Object.prototype.hasOwnProperty.call(publication['work-summary'][indSum],'external-ids')
                             && publication['work-summary'][indSum]['external-ids'] !== null) {
-                        if (publication['work-summary'][indSum]['external-ids'].hasOwnProperty('external-id')) {
+                        if (Object.prototype.hasOwnProperty.call(publication['work-summary'][indSum]['external-ids'],'external-id')) {
                             let extId = publication['work-summary'][indSum]['external-ids']['external-id'];
                             for (let indId in extId) {
                                 if (extId[indId]['external-id-type'] === 'doi') {
@@ -257,9 +257,9 @@ function processDetails(pub, response) {
     pub.publication_source_id = 2;
     let details = response.data;
     let journal = null;
-    if (details.hasOwnProperty('journal-title')) {
+    if (Object.prototype.hasOwnProperty.call(details,'journal-title')) {
         if (details['journal-title'] !== null
-                && details['journal-title'].hasOwnProperty('value')) {
+                && Object.prototype.hasOwnProperty.call(details['journal-title'],'value')) {
             journal = details['journal-title']['value'];
         }
     }
@@ -270,9 +270,9 @@ function processDetails(pub, response) {
     let year = null;
     let month = null;
     let day = null;
-    if (details.hasOwnProperty('publication-date')) {
+    if (Object.prototype.hasOwnProperty.call(details,'publication-date')) {
         if (details['publication-date'] !== null
-                && details['publication-date'].hasOwnProperty('year')
+                && Object.prototype.hasOwnProperty.call(details['publication-date'],'year')
                 && details['publication-date'].year !== null) {
             year = details['publication-date'].year.value;
             if (year !== null && year !== undefined) {
@@ -280,7 +280,7 @@ function processDetails(pub, response) {
             }
         }
         if (details['publication-date'] !== null
-                && details['publication-date'].hasOwnProperty('month')
+                && Object.prototype.hasOwnProperty.call(details['publication-date'],'month')
                 && details['publication-date'].month !== null) {
             month = details['publication-date'].month.value;
             if (month !== null && month !== undefined) {
@@ -288,7 +288,7 @@ function processDetails(pub, response) {
             }
         }
         if (details['publication-date'] !== null
-                && details['publication-date'].hasOwnProperty('day')
+                && Object.prototype.hasOwnProperty.call(details['publication-date'],'day')
                 && details['publication-date'].day !== null) {
             day = details['publication-date'].day.value;
             if (day !== null && day !== undefined) {
@@ -297,12 +297,12 @@ function processDetails(pub, response) {
         }
     }
     let contributors = [];
-    if (details.hasOwnProperty('contributors')) {
-        if (details['contributors'] !== null && details['contributors'].hasOwnProperty('contributor')) {
+    if (Object.prototype.hasOwnProperty.call(details,'contributors')) {
+        if (details['contributors'] !== null && Object.prototype.hasOwnProperty.call(details['contributors'],'contributor')) {
             for (let ind in details.contributors.contributor) {
-                if (details.contributors.contributor[ind].hasOwnProperty('credit-name')) {
+                if (Object.prototype.hasOwnProperty.call(details.contributors.contributor[ind],'credit-name')) {
                     if (details.contributors.contributor[ind]['credit-name'] !== null
-                        && details.contributors.contributor[ind]['credit-name'].hasOwnProperty('value')) {
+                        && Object.prototype.hasOwnProperty.call(details.contributors.contributor[ind]['credit-name'],'value')) {
                         if (details.contributors.contributor[ind]['credit-name'].value !== null) {
                             contributors.push(details.contributors.contributor[ind]['credit-name'].value);
                         }
@@ -315,9 +315,9 @@ function processDetails(pub, response) {
     let number = null; //this is used by some journals
     let pages = null;
     let authors = null;
-    if (details.hasOwnProperty('citation')) {
+    if (Object.prototype.hasOwnProperty.call(details,'citation')) {
         //from this we can get authors, volume, pages
-        if (details.citation !== null && details.citation.hasOwnProperty('citation-type')) {
+        if (details.citation !== null && Object.prototype.hasOwnProperty.call(details.citation,'citation-type')) {
             if (details.citation['citation-type'] === 'BIBTEX') {
                 if (details.citation['citation-value'] !== null) {
                     let vol = details.citation['citation-value'].match(/volume = {(.*?)}/);

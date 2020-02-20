@@ -21,7 +21,7 @@ router.options('*', cors())
  * Person Routes
  */
 const externalAPI = require('../controllers/people/external_api'); //authorization of visibility to external partners
-
+const informationEditors = require('../controllers/people/information_editors');
 const academicAffiliations = require('../controllers/people/academic_affiliations');
 const addPublications = require('../controllers/people/add_publications');
 const addPubORCID = require('../controllers/people/add_pub_ORCID');
@@ -46,6 +46,12 @@ const researchIDs = require('../controllers/people/research_IDs');
 
 router.get('/:personID/external-api-authorization', cors(corsOptions), externalAPI.getAuthorization);
 router.put('/:personID/external-api-authorization', cors(corsOptions), externalAPI.updateAuthorization);
+//Editors of your data
+router.get('/:personID/information-editors', cors(corsOptions), informationEditors.getEditors);
+router.post('/:personID/information-editors', cors(corsOptions), informationEditors.createEditor);
+router.put('/:personID/information-editors/:personID', cors(corsOptions), informationEditors.updateEditor);
+router.delete('/:personID/information-editors/:personID', cors(corsOptions), informationEditors.deleteEditor);
+
 // Nuclear information (TODO: improve its RESTfulness (specialluy for nationalities))
 router.get('/:personID/nuclear-info', cors(corsOptions), nuclearInformation.getNuclearInfo);
 router.put('/:personID/nuclear-info', cors(corsOptions), nuclearInformation.updateNuclearInfo);

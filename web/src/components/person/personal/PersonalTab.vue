@@ -42,6 +42,14 @@
                         <Cars></Cars>
                     </v-expansion-panel-content>
                 </v-expansion-panel>
+                <v-expansion-panel>
+                    <v-expansion-panel-header>
+                        <h3>Editors of your data</h3>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                        <DataEditors></DataEditors>
+                    </v-expansion-panel-content>
+                </v-expansion-panel>
             </v-expansion-panels>
         </v-col>
     </v-row>
@@ -55,6 +63,7 @@ const PersonalContacts = () => import('./PersonalContacts')
 const EmergencyContacts = () => import('./EmergencyContacts')
 const Identifications = () => import('./Identifications')
 const Cars = () => import('./Cars')
+const DataEditors = () => import('./DataEditors')
 
 export default {
     components: {
@@ -65,6 +74,7 @@ export default {
         NuclearInformation,
         Photo,
         PersonalContacts,
+        DataEditors,
     },
     data () {
         return {

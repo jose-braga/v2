@@ -197,7 +197,7 @@ var actionAddPeopleHistory = function (options) {
                 "status": "success", "statusCode": 200, "count": 0,
                 "result": "OK - Created people history entry!"
             }
-        })
+        });
 };
 
 var actionUpdateNuclearInfo = function(options) {

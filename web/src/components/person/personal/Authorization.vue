@@ -6,13 +6,36 @@
             </div>
         </v-card-title>
         <v-container>
-            <v-row>
-                <v-col cols="12" md="8">
-                    <b>The following data is visible to external partners:</b>
-                    <span  class="small-text"> Full name, Colloquial name, Photo URL, Academic degrees & academic jobs,
-                                Lab and group affiliations within LAQV or UCIBIO, Institutional contacts: Email,
-                                Phone and Internal Phone extension, Institutional personal webpage & CV, ORCID & Researcher ID and Publications
-                    </span>
+            <v-row align="center">
+                <v-col cols="12" md="8" class="small-text">
+                    <b>In accordance with the General Data Protection Regulation
+                        (EU) 2016/679, in force since 25 May, 2018, I have been
+                        informed that:</b>
+                    <ul class="small-text">
+                        <li>All data provided through the platform https://laqv-ucibio.info/
+                            can be used to:<br>
+                            (1) the internal management of the research team
+                            and<br>
+                            (2) dissemination of the activities of the institution.<br>
+                            For the second purpose, only the Full name, Colloquial name,
+                            Photo URL, Academic degrees & academic jobs, Lab and
+                            group affiliations within LAQV or UCIBIO, Institutional
+                            contacts: Email, Phone and Internal Phone extension,
+                            Institutional personal webpage & CV, ORCID, Researcher ID,
+                            Ciência ID, and Publications will be used.
+                        </li>
+                        <li>I have the right to request, at any time, the access to my
+                            personal data, as well as the rectification or erasure of
+                            data collected for dissemination purposes, by sending an
+                            email to josebraga@fct.unl.pt.
+                        </li>
+                        <li>The Research Units have taken technical and organizational
+                            measures necessary to ensure the protection of my personal
+                            data;
+                        </li>
+                        <li>By saying YES, I consent the use of my personal data
+                            for the above-mentioned purposes</li>
+                    </ul>
                 </v-col>
                 <v-col cols="12" md="4">
                     <v-row justify="center" align="center">
