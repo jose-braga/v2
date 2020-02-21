@@ -119,6 +119,7 @@ var submitNationalities = function (vm, urlSubmit) {
         {
             headers: {'Authorization': 'Bearer ' + localStorage['v2-token']},
         });
+
 };
 
 export default {
@@ -155,7 +156,7 @@ export default {
     },
     watch: {
         otherPersonId () {
-            this.initialize();
+            this.initialize(true);
         },
         searchCountries () {
              if (this.data.countries.length > 0) return;
@@ -194,7 +195,7 @@ export default {
                 .then( (result) => {
                     this.data.countries = result;
                     if (mounting) {
-                        this.original.countries = result;
+                        this.$set(this.original, 'countries', result);
                     }
                 });
             } else {

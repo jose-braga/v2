@@ -22,7 +22,8 @@
                         </div>
                         <p v-if="hasImage">To change image click "Browse" below.</p>
                         <input type="file" ref="fileInput"
-                            name="image" accept="image/*"
+                            name="image"
+                            accept="image/*"
                             style="font-size: 1.2em; padding: 10px 0;"
                             @change="setImage" />
                         <vue-cropper v-if="hasNewImage"
@@ -98,7 +99,7 @@ export default {
             },
             data: {
                 id: undefined,
-                file: undefined,
+                file: {},
             }
         }
     },
@@ -124,7 +125,11 @@ export default {
     },
     methods: {
         initialize: function () {
-            if (this.$store.state.session.loggedIn) {
+            this.data = {
+                id: undefined,
+                file: {},
+            };
+
                 let imageType = 1;
                 let urlSubmit = 'api/people/' + this.otherPersonId + '/photos/' + imageType;
                 subUtil.getInfoPopulate(this, urlSubmit, false)
@@ -135,7 +140,9 @@ export default {
                         this.data.id = result.id;
                     }
                 })
-            }
+                .catch((error) => console.log(error));
+
+
         },
         submitForm: function () {
             if (!this.hasNewImage) {
@@ -145,9 +152,10 @@ export default {
                 if (this.$store.state.session.loggedIn) {
                     this.progress = true;
                     let urlSubmit = 'api/people/' + this.otherPersonId + '/photos/' + 1;
-                    this.cropImage(urlSubmit, this.otherPersonId);
+                    return this.cropImage(urlSubmit, this.otherPersonId);
                 }
             }
+            return false
         },
         setImage(e) {
             this.hasNewImage = true;
@@ -171,7 +179,7 @@ export default {
         },
         cropImage(url, personID) {
             // get image data for post processing, e.g. upload or setting image src
-            this.$refs.cropper
+            return this.$refs.cropper
                 .getCroppedCanvas({
                     width: this.cropStyle.width,
                     height: this.cropStyle.height})
@@ -183,29 +191,42 @@ export default {
                     }
                     formData.append('person_id', personID);
                     formData.append('file', blob);
+                    for (var pair of formData.entries()) {
+                        console.log(pair[0]+ ', ' + pair[1]);
+                    }
+                    alert('')
 
                     this.$http.put(url,
                         formData,
                         {
-                            headers: {'Authorization': 'Bearer ' + localStorage['v2-token'],
-                                      'Content-Type': 'multipart/form-data' },
-                        })
-                        .then(() => {
-                            this.progress = false;
-                            this.success = true;
-                            setTimeout(() => {this.success = false;}, 1500)
-                            this.hasNewImage = false;
-                            this.$refs.fileInput.value = '';
-                            this.initialize();
-                        })
-                        .catch((error) => {
-                            this.progress = false;
-                            this.error = true;
-                            setTimeout(() => {this.error = false;}, 6000)
-                            // eslint-disable-next-line
-                            console.log(error)
-                        });
+                            headers: {
+                                'Authorization': 'Bearer ' + localStorage['v2-token'],
+                                'Content-Type': 'multipart/form-data'
+                            },
+                    })
+                    .then(() => {
+                        alert('1')
+                        this.progress = false;
+                        this.success = true;
+                        setTimeout(() => {this.success = false;}, 1500)
+                        this.hasNewImage = false;
+                        this.$refs.fileInput.value = '';
+                        this. newImgSrc = '';
+                        this. imgSrc = '';
+                        this.initialize();
+                    })
+                    .catch((error) => {
+                        alert('2')
+                        this.progress = false;
+                        this.error = true;
+                        setTimeout(() => {this.error = false;}, 6000)
+                        // eslint-disable-next-line
+                        console.log(error)
+                        return false;
+                    });
+                    
                 }, this.data.file.type, 1);
+
         },
     },
 }

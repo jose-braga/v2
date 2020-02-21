@@ -18,12 +18,12 @@ var storage = multer.diskStorage({ //multers disk storage settings
                         callback(null, tempDirectory);
                     })
                     .catch((err) => {
-                        console.log(err);
+                        console.log('1 - ', err);
                         callback(null, tempDirectory);
                     });
             })
             .catch((err) => {
-                console.log(err);
+                console.log('2 - ', err);
                 callback(null, tempDirectory);
             });
     },
@@ -51,23 +51,26 @@ module.exports.getPhoto = function (req, res, next) {
     permissions.checkPermissions(
         (options) => { actionGetPhoto(options) },
         { req, res, next }
-    );    
+    );
 };
 
 var updatePhoto = function (options) {
+    console.log('heeree')
     let { req, res, next, personID, imageType } = options;
     var querySQL = '';
     var places = [];
     // TODO: Check if line below holds in production
     let url = process.env.PATH_PREFIX + '/' + req.file.path;
     querySQL = querySQL + 'UPDATE personal_photo'
-                        + ' SET photo_type_id = ?,' 
+                        + ' SET photo_type_id = ?,'
                         + ' url = ?'
                         + ' WHERE person_id = ?;';
     places.push(
         imageType,
         url,
         personID);
+    console.log(time.momentToDate(time.moment(), undefined, 'YYYYMMDD_HHmmss'), '--', querySQL)
+    console.log(time.momentToDate(time.moment(), undefined, 'YYYYMMDD_HHmmss'), ' --', places.toString())
     return sql.makeSQLOperation(req, res, querySQL, places,
         (options) => { responses.sendJSONResponseOptions(options) },
         {
@@ -83,7 +86,7 @@ var updatePhoto = function (options) {
 var createPhoto = function (options) {
     let { req, res, next, personID, imageType } = options;
     var querySQL = '';
-    var places = [];    
+    var places = [];
     // TODO: Check if this holds in production
     let url = process.env.PATH_PREFIX + '/' + req.file.path;
     querySQL = querySQL + 'INSERT INTO personal_photo'
@@ -120,8 +123,10 @@ var actionUploadPhoto = function (options) {
             return;
         }
         if (req.body.id === undefined) {
+            console.log('create')
             return createPhoto(options);
         } else {
+            console.log('update')
             return updatePhoto(options);
         }
     });
