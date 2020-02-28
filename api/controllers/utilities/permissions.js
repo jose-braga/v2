@@ -79,6 +79,7 @@ module.exports.checkPermissions = function (callback, callbackOptions) {
         }
     } else if (personID === resourcePersonID && resourcePersonID !== undefined
                 && reqEndpointParts[0] === 'people') {
+        console.log('-------------',1)
         // any user can read its data
         // any user can change its data except for affiliation
         // Assuming that reqEndpointParts.length > 2
@@ -99,6 +100,7 @@ module.exports.checkPermissions = function (callback, callbackOptions) {
 
     } else if (hasAccessEndpoint(reqMethod, reqEndpoint, permissionsEndpoints)
                 && reqEndpointParts[2] !== 'external-api-authorization') {
+                    console.log('-------------',2)
         // a user on behalf of another cannot change authorization for that user
         return callback(callbackOptions);
 
@@ -110,6 +112,7 @@ module.exports.checkPermissions = function (callback, callbackOptions) {
         }
         */
     } else {
+        console.log('-------------',3)
         responses.sendJSONResponse(res, 403, {
             "status": "error",
             "statusCode": 403,

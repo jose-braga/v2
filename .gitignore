@@ -83,4 +83,4 @@ web/public/images/people/
 web/public/documents/
 
 # ignore test files
-test*.js
+test*.*

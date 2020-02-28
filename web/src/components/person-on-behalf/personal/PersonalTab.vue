@@ -10,6 +10,8 @@
             <Photo
                 :other-person-id="otherPersonId"
                 :current-person="currentPerson"
+                :active-tab="activeTab"
+                :root-tab="rootTab"
             ></Photo>
 
             <v-expansion-panels multiple v-model="openPanel">
@@ -85,6 +87,8 @@ export default {
     props: {
         otherPersonId: Number,
         currentPerson: Object,
+        activeTab: String,
+        rootTab: String,
     },
     data () {
         return {

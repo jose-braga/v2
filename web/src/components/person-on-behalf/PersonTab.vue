@@ -22,6 +22,8 @@
             <router-view
                     :other-person-id="otherPersonId"
                     :current-person="currentPerson"
+                    :active-tab="activeTab"
+                    :root-tab="rootTab"
             ></router-view>
         </keep-alive>
     </v-tabs-items>
@@ -33,18 +35,25 @@ export default {
     props: {
         otherPersonId: Number,
         currentPerson: Object,
+        rootTab: String,
     },
     data () {
         return {
-            activeTab: 0,
+            activeTab: this.rootTab + '/personal',
         }
+    },
+    watch: {
+        rootTab () {
+            this.activeTab = this.rootTab + '/personal';
+
+        },
+
     },
     methods: {
         tabChanged: function(tab) {
             this.activeTab = tab;
         }
-    }
-
+    },
 }
 </script>
 

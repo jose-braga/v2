@@ -16,7 +16,8 @@
                         v-model="editor.user_id"
                         :loading="loadingPeople"
                         :items="people" item-value="user_id" item-text="colloquial_name"
-                        :search-input.sync="editor.editor_search"
+                        :search-input="editor.editor_search"
+                        :disabled="editor.id !== 'new'"
                         cache-items
                         flat
                         hide-no-data
@@ -77,21 +78,23 @@ export default {
     },
     mounted () {
         this.getPeople();
-        this.initialize();
+        this.initialize(true);
     },
     methods: {
-        initialize () {
+        initialize (mounting) {
             if (this.$store.state.session.loggedIn) {
                 let personID = this.$store.state.session.personID;
                 subUtil.getInfoPopulate(this, 'api/people/' + personID + '/information-editors', true)
                 .then( (result) => {
                     // only works if this.data and result have the same keys
                     for (let ind in result) {
-                        this.$set(this.data.editors, ind, {});
-                        Object.keys(result[ind]).forEach(key => {
-                            let value = result[ind][key];
-                            this.$set(this.data.editors[ind], key, value);
-                        });
+                        if (mounting) {
+                            this.$set(this.data.editors, ind, {});
+                            Object.keys(result[ind]).forEach(key => {
+                                let value = result[ind][key];
+                                this.$set(this.data.editors[ind], key, value);
+                            });
+                        }
                     }
                 })
             } else {
@@ -103,65 +106,51 @@ export default {
                 this.progress = true;
                 let urlCreate = [];
                 let urlDelete = [];
-                let urlUpdate = [];
                 let personID = this.$store.state.session.personID;
-                let identifications = this.data.identifications;
-                for (let ind in identifications) {
-                    if (identifications[ind].id === 'new') {
-                        identifications[ind].person_id = personID;
+                let editors = this.data.editors;
+                for (let ind in editors) {
+                    if (editors[ind].id === 'new') {
                         urlCreate.push({
-                                url: 'api/people/' + personID + '/identifications',
-                                body: identifications[ind],
-                            });
-
-                    } else {
-                        urlUpdate.push({
-                                url: 'api/people/' + personID
-                                        + '/identifications/' + identifications[ind].id,
-                                body: identifications[ind],
-                            });
+                            url: 'api/people/' + personID + '/information-editors',
+                            body: editors[ind],
+                        });
                     }
                 }
                 for (let ind in this.toDelete) {
                     urlDelete.push('api/people/' + personID
-                                + '/identifications/' + this.toDelete[ind].id);
+                                + '/information-editors/' + this.toDelete[ind].user_id);
                 }
                 this.$http.all(
-                    urlUpdate.map(el =>
-                        this.$http.put(el.url,
+                    urlCreate.map(el =>
+                        this.$http.post(el.url,
                             { data: el.body, },
                             { headers:
-                                {'Authorization': 'Bearer ' + localStorage['v2-token']
-                            },
-                        }))
-                    .concat(
-                        urlCreate.map(el =>
-                            this.$http.post(el.url,
-                                { data: el.body, },
-                                { headers:
-                                    {'Authorization': 'Bearer ' + localStorage['v2-token']
-                                },
-                            })))
+                                {'Authorization': 'Bearer ' + localStorage['v2-token'] },
+                            }
+                        )
+                    )
                     .concat(
                         urlDelete.map(el =>
                             this.$http.delete(el,
                                 { headers:
-                                    {'Authorization': 'Bearer ' + localStorage['v2-token']
-                                },
-                            })))
+                                    {'Authorization': 'Bearer ' + localStorage['v2-token'] },
+                                }
+                            )
+                        )
+                    )
                 )
                 .then(this.$http.spread( () => {
                     this.progress = false;
                     this.success = true;
                     setTimeout(() => {this.success = false;}, 1500)
                     this.toDelete = [];
-                    this.initialize();
+                    this.initialize(true);
                 }))
                 .catch((error) => {
                     this.progress = false;
                     this.error = true;
                     this.toDelete = [];
-                    this.initialize();
+                    this.initialize(true);
                     setTimeout(() => {this.error = false;}, 6000)
                     // eslint-disable-next-line
                     console.log(error)

@@ -49,8 +49,7 @@ router.put('/:personID/external-api-authorization', cors(corsOptions), externalA
 //Editors of your data
 router.get('/:personID/information-editors', cors(corsOptions), informationEditors.getEditors);
 router.post('/:personID/information-editors', cors(corsOptions), informationEditors.createEditor);
-router.put('/:personID/information-editors/:personID', cors(corsOptions), informationEditors.updateEditor);
-router.delete('/:personID/information-editors/:personID', cors(corsOptions), informationEditors.deleteEditor);
+router.delete('/:personID/information-editors/:editorUserID', cors(corsOptions), informationEditors.deleteEditor);
 
 // Nuclear information (TODO: improve its RESTfulness (specialluy for nationalities))
 router.get('/:personID/nuclear-info', cors(corsOptions), nuclearInformation.getNuclearInfo);
@@ -81,8 +80,8 @@ router.put('/:personID/cars/:carID', cors(corsOptions), cars.updateCar);
 router.delete('/:personID/cars/:carID', cors(corsOptions), cars.deleteCar);
 router.post('/:personID/cars-message', cors(corsOptions), cars.sendChangeMessage);
 // Photo (TODO: improve its RESTfulness)
-router.put('/:personID/photos/:imageType', cors(corsOptions), photo.uploadPhoto);
 router.get('/:personID/photos/:imageType', cors(corsOptions), photo.getPhoto);
+router.put('/:personID/photos/:imageType', cors(corsOptions), photo.uploadPhoto);
 //Degrees (degreeID is the id on the degrees_people table)
 router.get('/:personID/degrees', cors(corsOptions), degrees.getDegrees);
 router.put('/:personID/degrees/:degreeID', cors(corsOptions), degrees.updateDegrees);

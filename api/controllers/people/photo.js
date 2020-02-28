@@ -55,7 +55,6 @@ module.exports.getPhoto = function (req, res, next) {
 };
 
 var updatePhoto = function (options) {
-    console.log('heeree')
     let { req, res, next, personID, imageType } = options;
     var querySQL = '';
     var places = [];

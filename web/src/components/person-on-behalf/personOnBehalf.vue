@@ -1,6 +1,6 @@
 <template>
 <div>
-    <v-tabs v-if="loggedIn && hasPermissions"
+    <v-tabs v-if="loggedIn && hasPermissions && data.myPeople.length > 0"
             show-arrows
             @change="tabChanged">
         <v-tab v-for="(person, i) in peopleData"
@@ -11,9 +11,10 @@
        <v-tabs-items>
             <!-- use :max="N" in keep-alive if necessary-->
             <keep-alive>
-                <router-view v-if="currentPerson && data.myPeople.length > 0"
+                <router-view v-if="currentPerson && otherPersonID && data.myPeople.length > 0"
                     :other-person-id="otherPersonID"
                     :current-person="currentPerson"
+                    :root-tab="rootTab"
                 ></router-view>
             </keep-alive>
             <v-dialog v-model="showHelp" content-class="help">
@@ -21,6 +22,10 @@
             </v-dialog>
         </v-tabs-items>
     </v-tabs>
+    <div v-if="loggedIn && hasPermissions && data.myPeople.length === 0"
+             class="ma-2">
+        No one assigned you as an editor of their data.
+    </div>
     <v-row>
         <v-col v-if="!loggedIn">
             <div>Please login first (
@@ -42,12 +47,11 @@
 import subUtil from '../common/submit-utils'
 
 export default {
-
-
     data () {
         return {
-            otherPersonID: undefined,
-            currentPerson: undefined,
+            otherPersonID: 0,
+            currentPerson: {},
+            rootTab: '0',
             data: {
                 myPeople: [],
             },
@@ -122,15 +126,17 @@ export default {
                 )
                 .then(this.$http.spread( (...people) => {
                     people.sort(function(a,b) {
-                        if (a.colloquial_name < b.colloquial_name) return -1;
-                        if (a.colloquial_name > b.colloquial_name) return 1;
+                        if (a.colloquial_name.toLowerCase()
+                                < b.colloquial_name.toLowerCase()) return -1;
+                        if (a.colloquial_name.toLowerCase()
+                                > b.colloquial_name.toLowerCase()) return 1;
                         return 0;
                     })
                     let firstPerson = true;
                     for (let ind in people) {
                         this.$set(people[ind], 'link', '/person-on-behalf/'
                                     + people[ind].colloquial_name.toLowerCase().replace(/\s/g,'-'));
-                        this.data.myPeople.push(people[ind]);
+                        this.$set(this.data.myPeople, ind, people[ind]);
                         if (firstPerson) {
                             firstPerson = false;
                             //this.activeTab = result.link;
@@ -140,6 +146,7 @@ export default {
                         }
                     }
 
+
                 }))
             }
         },
@@ -148,11 +155,11 @@ export default {
                 if (this.data.myPeople[ind].link === tab) {
                     this.otherPersonID = this.data.myPeople[ind].id;
                     this.currentPerson = this.data.myPeople[ind];
+                    this.rootTab = tab;
                 }
             }
         },
-
-    }
+    },
 }
 
 </script>

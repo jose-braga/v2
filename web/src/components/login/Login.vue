@@ -136,7 +136,7 @@ export default {
                     {
                         username: this.data.username,
                         password: this.data.password,
-                    },{})
+                    }, {})
                     .then((result) => {
                         // the user is logged in
                         if (!this.showChangePassword) {
