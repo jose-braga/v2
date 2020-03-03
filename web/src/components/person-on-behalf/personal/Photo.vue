@@ -7,7 +7,7 @@
         </v-card-title>
         <v-card-text>
         </v-card-text>
-        <v-form ref="form" >
+        <v-form ref="form" @submit.native.prevent :key="objectUrl">
             <v-container>
                 <v-row>
                     <v-col>
@@ -58,7 +58,7 @@
                     <v-container>
                         <v-row align="center" justify="end">
                             <div>
-                                <v-btn type="button"  @click.prevent="submitForm()"
+                                <v-btn type="button"  @click="submitForm()"
                                     outlined color="blue">Update</v-btn>
                             </div>
                             <div class="request-status-container">
@@ -153,7 +153,7 @@ export default {
                     this.selectedFile = null;
                 }
             })
-            .catch((error) => console.log(error));
+            //.catch((error) => console.log(error));
         },
         submitForm: function () {
             this.submitting = true;
@@ -193,6 +193,7 @@ export default {
                                     this.progress = false;
                                     this.success = true;
                                     setTimeout(() => {this.success = false;}, 1500)
+                                    this.resetCropper();
                                     this.initialize();
                             })
                             .catch((error) => {
