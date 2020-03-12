@@ -34,60 +34,62 @@
                 </v-col>
             </v-row>
             <v-data-table
-                    item-key="id"
-                    :headers="headers"
-                    :footer-props="footerProps"
-                    :items="data.publications"
-                    :items-per-page="10"
-                    :custom-sort="customSort"
-                    :sort-by="['year', 'title_show']"
-                    :sort-desc="[true, false]"
-                    multi-sort
-                    v-resize="onResize"
-                >
-                    <template v-slot:top>
-                        <v-dialog v-model="dialog" max-width="1600px">
-                            <PublicationDetails
-                                :publication-id="editedItem.publication_id"
-                                :publication-data="editedItem"
-                            >
-                            </PublicationDetails>
-                        </v-dialog>
-                    </template>
+                item-key="id"
+                :headers="headers"
+                :footer-props="footerProps"
+                :items="data.publications"
+                :items-per-page="10"
+                :custom-sort="customSort"
+                :sort-by="['year', 'title_show']"
+                :sort-desc="[true, false]"
+                multi-sort
+                v-resize="onResize"
+            >
+                <template v-slot:top>
+                    <v-dialog v-model="dialog" max-width="1600px">
+                        <PublicationDetails
+                            :publication-id="editedItem.publication_id"
+                            :publication-data="editedItem"
+                        >
+                        </PublicationDetails>
+                    </v-dialog>
+                </template>
 
-                    <template v-slot:item.associate="{ item }">
-                        <v-checkbox
-                            v-model="item.to_associate"
-                        ></v-checkbox>
-                    </template>
-                    <template v-slot:item.action="{ item }">
-                        <v-row class="pr-2">
-                            <v-col cols="6">
-                                <v-tooltip bottom>
-                                    <template v-slot:activator="{ on }">
-                                        <v-icon v-on="on"
-                                            @click="editItem(item)">mdi-pencil</v-icon>
-                                    </template>
-                                    <span>View & edit details</span>
-                                </v-tooltip>
-                            </v-col>
-                        </v-row>
-                    </template>
-                </v-data-table>
-                <v-row align-content="center" justify="end" class="pt-6">
-                    <div>
+                <template v-slot:item.associate="{ item }">
+                    <v-checkbox
+                        v-model="item.to_associate"
+                    ></v-checkbox>
+                </template>
+                <template v-slot:item.action="{ item }">
+                    <v-row class="pr-2">
+                        <v-col cols="6">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                    <v-icon v-on="on"
+                                        @click="editItem(item)">mdi-pencil</v-icon>
+                                </template>
+                                <span>View & edit details</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                </template>
+            </v-data-table>
+            <v-row align-content="center" justify="end" class="mt-4">
+                <v-col cols="2" align-self="end">
+                    <v-row justify="end">
                         <v-btn type="submit"
-                            outlined color="blue">Add to your publications</v-btn>
-                    </div>
-                    <div class="request-status-container">
-                        <v-progress-circular indeterminate
-                                v-show="progress"
-                                :size="20" :width="2"
-                                color="primary"></v-progress-circular>
-                        <v-icon v-show="success" color="green">mdi-check</v-icon>
-                        <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
-                    </div>
-                </v-row>
+                        outlined color="blue">Add to your publications</v-btn>
+                    </v-row>
+                </v-col>
+                <v-col cols="1">
+                    <v-progress-circular indeterminate
+                            v-show="progress"
+                            :size="20" :width="2"
+                            color="primary"></v-progress-circular>
+                    <v-icon v-show="success" color="green">mdi-check</v-icon>
+                    <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
+                </v-col>
+            </v-row>
         </v-form>
     </v-container>
 </v-card>

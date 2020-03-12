@@ -7,7 +7,8 @@
         <b>not part of the LAQV/UCIBIO database</b>.<br>
         It is advisable to check individual publication info before submitting (e.g. possible mismatches in journal info).<br>
         Items tagged <v-icon color="red">mdi-alert-circle-outline</v-icon> are missing
-        crucial data.
+        crucial data.<br>
+        Should a warning about a slow script appear, you can safely choose "Wait".
     </v-card-text>
     <v-container>
         <v-form ref="form" class="pa-4"
@@ -82,22 +83,24 @@
                     {{ messageErrorBeforeSubmit }}
                 </p>
             </v-row>
-            <v-row  v-if="finishedGetORCID"
+            <v-row v-if="finishedGetORCID"
                     align-content="center"
                     justify="end"
                     class="pt-6">
-                <div>
-                    <v-btn type="submit"
+                <v-col cols="2" align-self="end">
+                    <v-row justify="end">
+                        <v-btn type="submit"
                         outlined color="blue">Add to your publications</v-btn>
-                </div>
-                <div class="request-status-container">
+                    </v-row>
+                </v-col>
+                <v-col cols="1">
                     <v-progress-circular indeterminate
                             v-show="progress"
                             :size="20" :width="2"
                             color="primary"></v-progress-circular>
                     <v-icon v-show="success" color="green">mdi-check</v-icon>
                     <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
-                </div>
+                </v-col>
             </v-row>
         </v-form>
     </v-container>

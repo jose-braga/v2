@@ -5,7 +5,7 @@
             <h3 class="headline">Scientific Identifications</h3>
         </div>
     </v-card-title>
-    <v-container>
+    <v-card-text class="px-4">
         <v-form ref="form"
                 @submit.prevent="submitForm">
             <v-row class="px-2">
@@ -57,25 +57,24 @@
                     </v-text-field>
                 </v-col>
             </v-row>
-            <v-row>
-                <v-row align-content="center" justify="end">
-                    <div>
+            <v-row align-content="center" justify="end">
+                <v-col cols="2" align-self="end">
+                    <v-row justify="end">
                         <v-btn type="submit"
-                            outlined color="blue">Update</v-btn>
-                    </div>
-                    <div class="request-status-container">
-                        <v-progress-circular indeterminate
-                                v-show="progress"
-                                :size="20" :width="2"
-                                color="primary"></v-progress-circular>
-                        <v-icon v-show="success" color="green">mdi-check</v-icon>
-                        <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
-                    </div>
-                </v-row>
+                        outlined color="blue">Update</v-btn>
+                    </v-row>
+                </v-col>
+                <v-col cols="1">
+                    <v-progress-circular indeterminate
+                            v-show="progress"
+                            :size="20" :width="2"
+                            color="primary"></v-progress-circular>
+                    <v-icon v-show="success" color="green">mdi-check</v-icon>
+                    <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
+                </v-col>
             </v-row>
-
         </v-form>
-    </v-container>
+    </v-card-text>
 </v-card>
 </template>
 

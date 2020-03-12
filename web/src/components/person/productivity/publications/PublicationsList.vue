@@ -10,28 +10,30 @@
         <v-form ref="form" class="pa-4"
                 @submit.prevent="submitForm">
             <v-row class="mb-2" align="center">
-                    <span class="blue--text show-clickable" @click="changeTab()">Click to add more publications</span>
-                    <v-btn text icon large
-                            @click="changeTab()"
-                            color="blue"
-                            class="ml-1"
-                    >
-                        <v-icon>mdi-page-next</v-icon>
-                    </v-btn>
+                <span class="blue--text show-clickable" @click="changeTab()">Click to add more publications</span>
+                <v-btn text icon large
+                        @click="changeTab()"
+                        color="blue"
+                        class="ml-1"
+                >
+                    <v-icon>mdi-page-next</v-icon>
+                </v-btn>
             </v-row>
-            <v-row align-content="center" justify="end" class="pb-3">
-                <div>
-                    <v-btn type="submit"
+            <v-row align-content="center" justify="end">
+                <v-col cols="2" align-self="end">
+                    <v-row justify="end">
+                        <v-btn type="submit"
                         outlined color="blue">Save</v-btn>
-                </div>
-                <div class="request-status-container">
+                    </v-row>
+                </v-col>
+                <v-col cols="1">
                     <v-progress-circular indeterminate
                             v-show="progress"
                             :size="20" :width="2"
                             color="primary"></v-progress-circular>
                     <v-icon v-show="success" color="green">mdi-check</v-icon>
                     <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
-                </div>
+                </v-col>
             </v-row>
             <v-text-field
                 v-model="search"
@@ -117,19 +119,21 @@
                     </v-row>
                 </template>
             </v-data-table>
-            <v-row align-content="center" justify="end" class="pt-6">
-                <div>
-                    <v-btn type="submit"
+            <v-row align-content="center" justify="end" class="mt-4">
+                <v-col cols="2" align-self="end">
+                    <v-row justify="end">
+                        <v-btn type="submit"
                         outlined color="blue">Save</v-btn>
-                </div>
-                <div class="request-status-container">
+                    </v-row>
+                </v-col>
+                <v-col cols="1">
                     <v-progress-circular indeterminate
                             v-show="progress"
                             :size="20" :width="2"
                             color="primary"></v-progress-circular>
                     <v-icon v-show="success" color="green">mdi-check</v-icon>
                     <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
-                </div>
+                </v-col>
             </v-row>
             <v-row justify="center" align="center" class="mt-1">
                 <v-col cols="12" align="center">

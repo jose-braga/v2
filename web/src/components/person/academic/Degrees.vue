@@ -8,8 +8,7 @@
                         <h3 class="headline">Finished Degrees</h3>
                     </div>
                 </v-card-title>
-                <v-card-text></v-card-text>
-                <v-container v-if="$v.data.finished.$each.$iter">
+                <v-card-text v-if="$v.data.finished.$each.$iter">
                     <div v-if="$v.data.finished.$model.length === 0">
                         No finished degrees
                     </div>
@@ -311,36 +310,39 @@
                                 </v-expansion-panel-content>
                             </v-expansion-panel>
                         </v-expansion-panels>
-                        <v-col>
-                            <v-btn outlined @click="addItem(data.finished, 'degree', 'degreesPanel')">Add a degree</v-btn>
+                        <v-col class="mt-4">
+                            <v-btn outlined
+                                @click="addItem(data.finished, 'degree', 'degreesPanel')"
+                            >
+                                Add a degree
+                            </v-btn>
                         </v-col>
-                        <v-row>
-                            <v-col v-if="formError">
-                                <div v-if="formError">
+                        <v-row align-content="center" justify="end">
+                            <v-col cols="3" v-if="formError">
+                                <v-row justify="end">
                                     <p class="caption red--text">Unable to submit form.</p>
-                                </div>
+                                </v-row>
                             </v-col>
-
-                            <v-row align="center" justify="end">
-                                <div>
+                            <v-col cols="2" align-self="end">
+                                <v-row justify="end">
                                     <v-btn type="submit"
-                                        outlined color="blue">Save</v-btn>
-                                </div>
-                                <div class="request-status-container">
-                                    <v-progress-circular indeterminate
-                                            v-show="progress"
-                                            :size="20" :width="2"
-                                            color="primary"></v-progress-circular>
-                                    <v-icon v-show="success" color="green">mdi-check</v-icon>
-                                    <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
-                                </div>
-                            </v-row>
+                                    outlined color="blue">Save</v-btn>
+                                </v-row>
+                            </v-col>
+                            <v-col cols="1">
+                                <v-progress-circular indeterminate
+                                        v-show="progress"
+                                        :size="20" :width="2"
+                                        color="primary"></v-progress-circular>
+                                <v-icon v-show="success" color="green">mdi-check</v-icon>
+                                <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
+                            </v-col>
                         </v-row>
-                        <div v-if="$v.$invalid">
+                        <v-row v-if="$v.$invalid">
                             <p class="caption red--text">At least one field is invalid.</p>
-                        </div>
+                        </v-row>
                     </v-form>
-                </v-container>
+                </v-card-text>
             </v-card>
         </v-col>
         <v-col cols="12" md="6" v-if="degrees && supervisorTypes">
@@ -350,8 +352,7 @@
                         <h3 class="headline">Ongoing Degrees</h3>
                     </div>
                 </v-card-title>
-                <v-card-text></v-card-text>
-                <v-container>
+                <v-card-text>
                     <div v-if="$v.data.ongoing.$model.length === 0">
                         No ongoing degrees
                     </div>
@@ -667,32 +668,34 @@
                             </v-expansion-panel>
                         </v-expansion-panels>
                         <v-col>
-                            <v-btn outlined @click="addItem(data.ongoing, 'degree', 'ongoingDegreesPanel')">Add a degree</v-btn>
+                            <v-btn class="mt-4" outlined @click="addItem(data.ongoing, 'degree', 'ongoingDegreesPanel')">Add a degree</v-btn>
                         </v-col>
-                        <v-row>
-                            <div v-if="ongoingFormError">
-                                <p class="caption red--text">Unable to submit form.</p>
-                            </div>
-                            <v-row align="center" justify="end">
-                                <div>
+                        <v-row align-content="center" justify="end">
+                            <v-col cols="3" v-if="ongoingFormError">
+                                <v-row justify="end">
+                                    <p class="caption red--text">Unable to submit form.</p>
+                                </v-row>
+                            </v-col>
+                            <v-col cols="2" align-self="end">
+                                <v-row justify="end">
                                     <v-btn type="submit"
-                                        outlined color="blue">Save</v-btn>
-                                </div>
-                                <div class="request-status-container">
-                                    <v-progress-circular indeterminate
-                                            v-show="progress"
-                                            :size="20" :width="2"
-                                            color="primary"></v-progress-circular>
-                                    <v-icon v-show="success" color="green">mdi-check</v-icon>
-                                    <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
-                                </div>
-                            </v-row>
+                                    outlined color="blue">Save</v-btn>
+                                </v-row>
+                            </v-col>
+                            <v-col cols="1">
+                                <v-progress-circular indeterminate
+                                        v-show="progress"
+                                        :size="20" :width="2"
+                                        color="primary"></v-progress-circular>
+                                <v-icon v-show="success" color="green">mdi-check</v-icon>
+                                <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
+                            </v-col>
                         </v-row>
                         <div v-if="$v.$invalid">
                             <p class="caption red--text">At least one field is invalid.</p>
                         </div>
                     </v-form>
-                </v-container>
+                </v-card-text>
             </v-card>
         </v-col>
     </v-row>

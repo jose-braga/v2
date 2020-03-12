@@ -9,7 +9,7 @@
             </v-btn>
         </v-col>
     </v-row>
-    <v-row 
+    <v-row
         v-for="(v,i) in data.responsibles"
         :key="i">
         <v-col cols="12" sm="5">
@@ -63,20 +63,21 @@
             </v-btn>
         </v-col>
     </v-row>
-    <v-row align="center" justify="end">
-        <div>
-            <v-btn type="submit" outlined color="blue">
-                Save
-            </v-btn>
-        </div>     
-        <div class="request-status-container">
+    <v-row align-content="center" justify="end">
+        <v-col cols="2" align-self="end">
+            <v-row justify="end">
+                <v-btn type="submit"
+                outlined color="blue">Save</v-btn>
+            </v-row>
+        </v-col>
+        <v-col cols="1">
             <v-progress-circular indeterminate
                     v-show="progress"
                     :size="20" :width="2"
                     color="primary"></v-progress-circular>
             <v-icon v-show="success" color="green">mdi-check</v-icon>
             <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
-        </div>
+        </v-col>
     </v-row>
 </v-form>
 </template>
@@ -210,12 +211,12 @@ export default {
         },
         addItem(list) {
             list.push({
-                id: 'new', 
+                id: 'new',
                 person_id: this.personId,
                 responsible_id: null,
-                valid_from: null, 
+                valid_from: null,
                 valid_until: null,
-                show_date_start: false, 
+                show_date_start: false,
                 show_date_end: false
             });
         },

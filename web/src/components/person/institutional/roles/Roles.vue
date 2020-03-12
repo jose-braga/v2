@@ -5,8 +5,7 @@
             <h3 class="headline">Research Units Affiliations</h3>
         </div>
     </v-card-title>
-    <v-card-text></v-card-text>
-    <v-container>
+    <v-card-text>
         <v-row>
             <v-col cols="12" md="4">
                 <v-select v-model="data.current_pole.city_id"
@@ -142,7 +141,7 @@
                 </v-card>
             </v-dialog>
         </v-row>
-    </v-container>
+    </v-card-text>
 </v-card>
 
 </template>
