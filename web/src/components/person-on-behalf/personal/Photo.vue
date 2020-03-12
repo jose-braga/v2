@@ -8,7 +8,7 @@
         <v-card-text>
         </v-card-text>
         <v-form ref="form" @submit.native.prevent :key="objectUrl">
-            <v-container>
+            <v-container class="px-6">
                 <v-row>
                     <v-col>
                         <p v-if="!hasImage">No image saved.</p>
@@ -49,28 +49,26 @@
                         </v-row>
                     </v-col>
                 </v-row>
-            </v-container>
-            <v-container fluid fill-height>
-                <v-row>
-                    <div v-if="formError">
-                        <p class="caption red--text">Please add an image.</p>
-                    </div>
-                    <v-container>
-                        <v-row align="center" justify="end">
-                            <div>
-                                <v-btn type="button"  @click="submitForm()"
-                                    outlined color="blue">Update</v-btn>
-                            </div>
-                            <div class="request-status-container">
-                                <v-progress-circular indeterminate
-                                        v-show="progress"
-                                        :size="20" :width="2"
-                                        color="primary"></v-progress-circular>
-                                <v-icon v-show="success" color="green">mdi-check</v-icon>
-                                <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
-                            </div>
+                <v-row align-content="center" justify="end">
+                    <v-col cols="3" v-if="formError">
+                        <v-row justify="end">
+                            <p class="caption red--text">Please add an image.</p>
                         </v-row>
-                    </v-container>
+                    </v-col>
+                    <v-col cols="2" align-self="end">
+                        <v-row justify="end">
+                            <v-btn type="button" @click="submitForm()"
+                            outlined color="blue">Update</v-btn>
+                        </v-row>
+                    </v-col>
+                    <v-col cols="1">
+                        <v-progress-circular indeterminate
+                                v-show="progress"
+                                :size="20" :width="2"
+                                color="primary"></v-progress-circular>
+                        <v-icon v-show="success" color="green">mdi-check</v-icon>
+                        <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
+                    </v-col>
                 </v-row>
             </v-container>
         </v-form>
