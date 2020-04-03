@@ -310,7 +310,54 @@ var getDepartments = function (options) {
         },
         options);
 };
-
+var getRequestMethods = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM endpoint_methods;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getResourceTypes = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM resource_types;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getLabs = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM labs;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getGroups = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM `groups`;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getUnits = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM units;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getInstitutionCities = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM institution_city;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
 module.exports.listItems = function (req, res, next) {
     let category = req.params.listCategory;
     if (category === 'countries') {
@@ -367,5 +414,24 @@ module.exports.listItems = function (req, res, next) {
     if (category === 'departments') {
         getDepartments(req, res, next);
     }
+    if (category === 'request-methods') {
+        getRequestMethods(req, res, next);
+    }
+    if (category === 'resource-types') {
+        getResourceTypes(req, res, next);
+    }
+    if (category === 'labs') {
+        getLabs(req, res, next);
+    }
+    if (category === 'groups') {
+        getGroups(req, res, next);
+    }
+    if (category === 'units') {
+        getUnits(req, res, next);
+    }
+    if (category === 'institution-cities') {
+        getInstitutionCities(req, res, next);
+    }
+
 };
 

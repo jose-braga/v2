@@ -94,11 +94,12 @@ var createWebAreaPermission = function (options) {
     var places = [];
     querySQL = querySQL + 'INSERT INTO permissions_web_app_areas'
                         + ' (user_id, app_area_id)'
-                        + ' SELECT * FROM (SELECT ?, ?) AS tmp'
+                        + ' SELECT * FROM (SELECT ? AS user_id, ? AS app_area_id) AS tmp'
                         + ' WHERE NOT EXISTS ('
                           + ' SELECT * FROM permissions_web_app_areas'
-                          + ' WHERE user_id = ? AND app_area_id = ?'
+                          + ' WHERE user_id <=> ? AND app_area_id <=> ?'
                         + ');';
+    // 10 is the ID if the On behalf area
     places.push(data.user_id, 10, data.user_id, 10);
     return sql.makeSQLOperation(req, res, querySQL, places,
         (options) => {
