@@ -326,6 +326,14 @@ var getResourceTypes = function (req, res, next) {
     sql.makeSQLOperation(req, res, querySQL, places);
     return;
 };
+var getAppAreas = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM web_app_areas;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
 var getLabs = function (req, res, next) {
     var querySQL = '';
     var places = [];
@@ -419,6 +427,9 @@ module.exports.listItems = function (req, res, next) {
     }
     if (category === 'resource-types') {
         getResourceTypes(req, res, next);
+    }
+    if (category === 'app-areas') {
+        getAppAreas(req, res, next);
     }
     if (category === 'labs') {
         getLabs(req, res, next);
