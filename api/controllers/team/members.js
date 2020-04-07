@@ -5,6 +5,121 @@ const time = require('../utilities/time');
 const responses = require('../utilities/responses');
 const permissions = require('../utilities/permissions');
 
+var actionSearchAllPeople = function (options) {
+    let { req, res, next } = options;
+    let name;
+    let limit = 10;
+    if (req.query.limit !== undefined) {
+        limit = parseInt(req.query.limit, 10);
+    }
+    options.pageSize = limit;
+    let offset = 0;
+    if (req.query.offset !== undefined) {
+        offset = parseInt(req.query.offset, 10);
+    }
+    options.offset = offset;
+    if (req.query.hasOwnProperty('q') && req.query.q !== '') {
+        name = '%' + req.query.q.replace(/\s/gi,'%') + '%';
+    } else {
+        name = '';
+    }
+    options.search = name;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT people.id AS person_id, people.name, people.colloquial_name,'
+                        + ' lab_positions.name_en AS lab_position_name,'
+                        + ' labs.name AS lab_name, people_labs.valid_from, people_labs.valid_until'
+                        + ' FROM people'
+                        + ' LEFT JOIN people_labs ON people_labs.person_id = people.id'
+                        + ' LEFT JOIN labs ON labs.id = people_labs.lab_id'
+                        + ' LEFT JOIN lab_positions ON lab_positions.id = people_labs.lab_position_id'
+                        + ' WHERE people.name LIKE ?'
+                        + ' ORDER BY people.name ASC'
+                        + ' LIMIT ?, ?;'
+                        ;
+    places.push(name, offset, limit)
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            if (resQuery.length > 0) {
+                actionCountTotal(resQuery, options)
+            } else {
+                responses.sendJSONResponseOptions({
+                    response: res,
+                    status: 200,
+                    message: {
+                        "status": "success", "statusCode": 200,
+                        "count": -1,
+                        "pageSize": options.pageSize,
+                        "offset": options.offset,
+                        "pageCount": 0,
+                        "result": []
+                    }
+                });
+                return;
+            }
+        },
+        options);
+};
+var actionCountTotal = function (people, options) {
+    let { req, res, next } = options;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'SELECT COUNT(*) AS total_number'
+        + ' FROM (SELECT people.id AS person_id, people.name, people.colloquial_name,'
+        + ' lab_positions.name_en AS lab_position_name,'
+        + ' labs.name AS lab_name, people_labs.valid_from, people_labs.valid_until'
+        + ' FROM people'
+        + ' LEFT JOIN people_labs ON people_labs.person_id = people.id'
+        + ' LEFT JOIN labs ON labs.id = people_labs.lab_id'
+        + ' LEFT JOIN lab_positions ON lab_positions.id = people_labs.lab_position_id'
+        + ' WHERE people.name LIKE ?)'
+        + ' AS search_people';
+    places.push(options.search);
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            if (resQuery.length === 1) {
+                options.totalSearch = resQuery[0].total_number;
+                responses.sendJSONResponseOptions({
+                    response: res,
+                    status: 200,
+                    message: {
+                        "status": "success", "statusCode": 200,
+                        "count": options.totalSearch,
+                        "pageSize": options.pageSize,
+                        "offset": options.offset,
+                        "pageCount": people.length,
+                        "result": people
+                    }
+                });
+                return;
+            } else {
+                responses.sendJSONResponseOptions({
+                    response: res,
+                    status: 200,
+                    message: {
+                        "status": "success", "statusCode": 200,
+                        "count": -1,
+                        "pageSize": options.pageSize,
+                        "offset": options.offset,
+                        "pageCount": 0,
+                        "result": []
+                    }
+                });
+                return;
+            }
+        },
+        options);
+
+}
+
+module.exports.searchAllPeople = function (req, res, next) {
+    permissions.checkPermissions(
+        (options) => { actionSearchAllPeople(options) },
+        { req, res, next }
+    );
+};
+
 var actionGetMemberDetails = function (members, options) {
     if (members.length > 0) {
         return getMembersLabPositions(members, options, 0);

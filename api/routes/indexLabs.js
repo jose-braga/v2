@@ -23,6 +23,7 @@ router.options('*', cors())
 var members = require('../controllers/team/members');
 
 router.get('/:labID', cors(corsOptions), members.getLabInfo);
+router.get('/:labID/people', cors(corsOptions), members.searchAllPeople);
 router.get('/:labID/members-affiliation', cors(corsOptions), members.getLabMembersAffiliations); // get team members, regardless of group to belongs now or belonged in the past
 router.delete('/:labID/members-affiliation/:memberID', cors(corsOptions), members.deleteLabMember); //remove this member from team
 router.post('/:labID/members-affiliation/:memberID/position', cors(corsOptions), members.createLabMemberPosition); // add new position to this member

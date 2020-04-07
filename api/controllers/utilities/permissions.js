@@ -4,6 +4,8 @@ const time = require('../utilities/time');
 
 var hasAccessEndpoint = function (reqMethod, reqEndpoint, permissionsEndpoints) {
     reqEndpoint = reqEndpoint.replace('/api','');
+    // remove the query part from the request path
+    let reqEndpointFinal = reqEndpoint.split('?')[0];
     for (let ind in permissionsEndpoints) {
         let endpointPerm = permissionsEndpoints[ind].endpoint_url;
         let allow_all_subpaths = permissionsEndpoints[ind].allow_all_subpaths;
@@ -12,7 +14,12 @@ var hasAccessEndpoint = function (reqMethod, reqEndpoint, permissionsEndpoints) 
             let endpointRegex = new RegExp('^' + endpointPerm + '$')
             // the request endpoint must match
             // the endpoints in the permissions and its method
-            if (endpointRegex.test(reqEndpoint)
+            console.log('----------------------------------')
+            console.log(endpointRegex)
+            console.log(reqEndpointFinal)
+            console.log(endpointRegex.test(reqEndpointFinal))
+            console.log('----------------------------------')
+            if (endpointRegex.test(reqEndpointFinal)
                 && permissionsEndpoints[ind].method_name === reqMethod) {
                 return true;
             }
@@ -20,12 +27,11 @@ var hasAccessEndpoint = function (reqMethod, reqEndpoint, permissionsEndpoints) 
             let endpointRegex = new RegExp('^' + endpointPerm)
             // the request endpoint must match
             // the endpoints in the permissions and its method
-            if (endpointRegex.test(reqEndpoint)
+            if (endpointRegex.test(reqEndpointFinal)
                 && permissionsEndpoints[ind].method_name === reqMethod) {
                 return true;
             }
         }
-
     }
     return false;
 };
@@ -73,13 +79,13 @@ module.exports.checkPermissions = function (callback, callbackOptions) {
             responses.sendJSONResponse(res, 403, {
                 "status": "error",
                 "statusCode": 403,
-                "error": "User is not authorized to this operation."
+                "error": "User is not authorized to this operation (3)."
             });
             return;
         }
     } else if (personID === resourcePersonID && resourcePersonID !== undefined
                 && reqEndpointParts[0] === 'people') {
-        
+
         // any user can read its data
         // any user can change its data except for affiliation
         // Assuming that reqEndpointParts.length > 2
@@ -91,7 +97,7 @@ module.exports.checkPermissions = function (callback, callbackOptions) {
             responses.sendJSONResponse(res, 403, {
                 "status": "error",
                 "statusCode": 403,
-                "error": "User is not authorized to this operation."
+                "error": "User is not authorized to this operation (2)."
             });
             return;
         }
@@ -116,7 +122,7 @@ module.exports.checkPermissions = function (callback, callbackOptions) {
         responses.sendJSONResponse(res, 403, {
             "status": "error",
             "statusCode": 403,
-            "error": "User is not authorized to this operation."
+            "error": "User is not authorized to this operation (1)."
         });
         return;
     }
