@@ -423,6 +423,7 @@ var actionUpdatePermissions = function (options) {
 module.exports.updatePermissions = function (req, res, next) {
     permissions.checkPermissions(
         (options) => {
+            options.i = 0;
             options.masterAction = 'update';
             getUserID(options, checkPermissionExists)
         },

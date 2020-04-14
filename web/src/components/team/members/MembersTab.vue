@@ -6,6 +6,7 @@
                 :lab-id="labId"
                 :lab-data="labData"
                 :lab-positions="labPositions"
+                :my-labs="myLabs"
             ></CurrentMembers>
         </v-col>
         <v-col cols="12">
@@ -13,6 +14,7 @@
                 :lab-id="labId"
                 :lab-data="labData"
                 :lab-positions="labPositions"
+                :my-labs="myLabs"
             ></PastMembers>
         </v-col>
     </v-row>
@@ -33,6 +35,7 @@ export default {
         labId: Number,
         labData: Object,
         labPositions: Array,
+        myLabs: Array,
     },
     data() {
         return {

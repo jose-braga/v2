@@ -14,10 +14,12 @@
        <v-tabs-items>
             <!-- use :max="N" in keep-alive if necessary-->
             <keep-alive>
-                <router-view v-if="data.labPositions && currentLab"
+                <router-view v-if="data.labPositions && currentLab && data.myLabsManagement"
                     :lab-id="labID"
                     :lab-data="currentLab"
-                    :lab-positions="data.labPositions"></router-view>
+                    :lab-positions="data.labPositions"
+                    :my-labs="data.myLabsManagement">
+                </router-view>
             </keep-alive>
             <v-dialog v-model="showHelp" content-class="help">
                 <router-view name="help"></router-view>
@@ -51,6 +53,7 @@ export default {
             currentLab: undefined,
             data: {
                 myLabs: [],
+                myLabsManagement: [],
                 //myLabsMembers: [],
                 labPositions: undefined,
             },
@@ -124,6 +127,18 @@ export default {
                         subUtil.getInfoPopulate(this, urlSubmit, true)
                         .then( (result) => {
                             this.data.labPositions = result;
+                        });
+                    }
+                    // to know which labs a user manages
+                    if (decomposedPath[0] === 'labs'
+                        && decomposedPath.length === 5
+                        && decomposedPath[2] === 'members-affiliation'
+                        && decomposedPath[4] === 'position'
+                        && this_session.permissionsEndpoints[ind].method_name === 'POST') {
+                        let urlSubmit = 'api' + '/labs/' + decomposedPath[1];
+                        subUtil.getInfoPopulate(this, urlSubmit, true)
+                        .then( (result) => {
+                            this.data.myLabsManagement.push(result);
                         });
                     }
                 }

@@ -4,6 +4,14 @@ const sql = require('../utilities/sql');
 const time = require('../utilities/time');
 const responses = require('../utilities/responses');
 const permissions = require('../utilities/permissions');
+const jwtUtil = require('../../config/jwt_utilities')
+const nodemailer = require('../../config/emailer');
+let transporter = nodemailer.transporter;
+
+var make_password = function(n, a) {
+    let index = (Math.random() * (a.length - 1)).toFixed(0);
+    return n > 0 ? a[index] + make_password(n - 1, a) : '';
+};
 
 var actionSearchAllPeople = function (options) {
     let { req, res, next } = options;
@@ -417,6 +425,38 @@ var actionGetGroupsUnits = function (labs, options, i) {
 module.exports.getLabInfo = function (req, res, next) {
     permissions.checkPermissions(
         (options) => { actionGetLabInfo(options) },
+        { req, res, next }
+    );
+};
+
+var actionPreRegister = function (req, res, next) {
+    let { req, res, next } = options;
+    let now = time.momentToDate(time.moment(), undefined, 'YYYY-MM-DD HH:mm:ss');
+    let password = make_password(30,'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+    let hashedPassword = jwtUtil.hashPassword(password)
+    let labID = req.params.labID;
+    let person = req.body.data;
+    querySQL = 'INSERT INTO users'
+        + ' (username, password, created, deactivated, permission_level_id)'
+        + ' VALUES (?, ?, ?, ?, ?);';
+    places.push(
+        person.username,
+        hashedPassword,
+        now,
+        0,
+        5
+    )
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            actionAddLabMemberPositionHistory(resQuery, options)
+        },
+        options);
+
+}
+
+module.exports.preRegister = function (req, res, next) {
+    permissions.checkPermissions(
+        (options) => { actionPreRegister(options) },
         { req, res, next }
     );
 };

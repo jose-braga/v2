@@ -1,14 +1,15 @@
 <template>
 <v-container>
     <v-row>
-        <v-col cols="12">
+        <v-col cols="12" md="6">
             <SearchPeople></SearchPeople>
         </v-col>
-        <v-col cols="12">
+        <v-col cols="12" md="6">
             <UserPreRegistration
                 :lab-id="labId"
                 :lab-data="labData"
                 :lab-positions="labPositions"
+                :my-labs="myLabs"
             ></UserPreRegistration>
         </v-col>
     </v-row>
@@ -30,6 +31,7 @@ export default {
         labId: Number,
         labData: Object,
         labPositions: Array,
+        myLabs: Array,
     },
     data() {
         return {

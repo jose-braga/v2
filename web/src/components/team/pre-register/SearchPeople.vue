@@ -67,7 +67,7 @@ export default {
         return {
             search: '',
             page: 1,
-            itemsPerPage: 10,
+            itemsPerPage: 5,
             totalPages: 1,
             data: {
                 total: 0,

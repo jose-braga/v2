@@ -315,6 +315,7 @@ export default {
         labId: Number,
         labData: Object,
         labPositions: Array,
+        myLabs: Array,
     },
     data() {
         return {
