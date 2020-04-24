@@ -22,7 +22,7 @@
                     <p class="caption red--text">Maximum characters: 8.</p>
                 </div>
                 <div v-if="!$v.data.personal_addresses.postal_code.postalCodeValidate">
-                    <p class="caption red--text">Non-valid postal code.</p>
+                    <p class="caption red--text">Invalid postal code.</p>
                 </div>
             </v-col>
             <v-col cols="12" sm="4">

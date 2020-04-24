@@ -5,6 +5,7 @@
             <SearchPeople></SearchPeople>
         </v-col>
         <v-col cols="12" md="6">
+            <!-- Add tabs for facilities/science management/administrative -->
             <UserPreRegistration
                 :lab-id="labId"
                 :lab-data="labData"

@@ -35,6 +35,9 @@ const Manager = () => import('../components/manager/Manager.vue')
 const ManagerMembersTab = () => import('../components/manager/members/MembersTab.vue')
 const ManagerMembersTabHelp = () => import('../components/manager/members/MembersTabHelp.vue')
 
+const PreRegisterForm = () => import('../components/pre-register/PreRegister.vue')
+const PreRegisterFormHelp = () => import('../components/pre-register/PreRegisterHelp.vue')
+
 const routes = [
     {
         path: '/',
@@ -179,6 +182,13 @@ const routes = [
             },
             //{ path: '', redirect: 'members' }
         ],
+    },
+    {
+        path: '/pre-register/:username/:password',
+        components: {
+            default: PreRegisterForm,
+            help: PreRegisterFormHelp,
+        },
     },
     { path: '*', redirect: '/' } // this redirect should be in the end always
 ]

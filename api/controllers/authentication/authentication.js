@@ -27,8 +27,33 @@ module.exports.login = function (req, res, next) {
     })(req, res);
 };
 
+module.exports.preRegistrationLogin = function (req, res, next) {
+    if (!req.body.username || !req.body.password) {
+        responses.sendJSONResponse(res, 400, {
+            "message": "All fields required"
+        });
+        return;
+    }
+    passport.authenticate('local-prereg', function (err, user, info) {
+        if (err) {
+            responses.sendJSONResponse(res, 404, err);
+            return;
+        }
+        if (user) {
+            var token = jwtUtils.generateJWT(user);
+            responses.sendJSONResponse(res, 200, {
+                "token": token,
+                "person_id": user.person_id,
+                "user_id": user.user_id,
+            });
+        } else {
+            responses.sendJSONResponse(res, 401, info);
+        }
+    })(req, res);
+};
+
 module.exports.changePassword = function (req, res, next) {
-    if (!req.body.username || !req.body.password 
+    if (!req.body.username || !req.body.password
         || !req.body.newPassword || !req.body.newPasswordConfirm) {
         responses.sendJSONResponse(res, 400, {
             "message": "All fields required."
@@ -65,5 +90,5 @@ module.exports.changePassword = function (req, res, next) {
             "message": "User is not authorized to change others passwords."
         });
         return;
-    }    
+    }
 };

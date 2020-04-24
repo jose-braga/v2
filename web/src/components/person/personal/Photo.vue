@@ -82,6 +82,8 @@ import 'cropperjs/dist/cropper.css'
 import {debounce} from 'lodash'
 import subUtil from '../../common/submit-utils'
 
+
+
 export default {
     components: {
     },
@@ -99,10 +101,18 @@ export default {
             formError: false,
             hasImage: false,
             imgSrc: '',
-            cropStyle: {
-                width: 196,
-                height: 196,
-            },
+            cropStyle: [
+                {
+                    width: 196,
+                    height: 196,
+                    imageType: 1 // this should exist always
+                },
+                {
+                    width: 600,
+                    height: 600,
+                    imageType: 2
+                },
+            ],
             data: {
                 id: undefined,
             }
@@ -128,7 +138,7 @@ export default {
                 let urlSubmit = 'api/people/' + personID + '/photos/' + imageType;
                 subUtil.getInfoPopulate(this, urlSubmit, false)
                 .then( (result) => {
-                    if (result !== undefined) {
+                    if (result !== undefined ) {
                         this.hasImage = true;
                         this.imgSrc = result.url;
                         this.data.id = result.id;
@@ -149,51 +159,53 @@ export default {
             } else {
                 if (this.$store.state.session.loggedIn) {
                     this.progress = true;
-                    let personID = this.$store.state.session.personID;
-                    let urlSubmit = 'api/people/' + personID + '/photos/' + 1;
-                    const canvas = this.cropper
-                        .getCroppedCanvas({
-                            width: this.cropStyle.width,
-                            height: this.cropStyle.height
-                        })
-                    canvas.toBlob((blob) => {
-                        const formData = new FormData()
-
-                        this.$nextTick(function () {
-                            formData.append('file_name', this.selectedFile.name);
-                            if (this.data.id !== undefined) {
-                                formData.append('id', this.data.id);
-                            }
-                            formData.append('person_id', personID);
-                            formData.append('file', blob);
-
-                            this.$http.put(urlSubmit,
-                                formData,
-                                {
-                                    headers: {
-                                        'Authorization': 'Bearer ' + localStorage['v2-token'],
-                                        'Content-Type': 'multipart/form-data'
-                                    },
-                                }
-                            )
-                            .then(() => {
-                                    this.progress = false;
-                                    this.success = true;
-                                    setTimeout(() => {this.success = false;}, 1500)
-                                    this.resetCropper();
-                                    this.initialize();
-                            })
-                            .catch((error) => {
-                                this.progress = false;
-                                this.error = true;
-                                setTimeout(() => {this.error = false;}, 6000)
-                                // eslint-disable-next-line
-                                console.log(error)
-                            });
-                        })
-                    }, 'image/png', 1);
+                    this.uploadThisImage(0);
                 }
             }
+        },
+        uploadThisImage(i) {
+            let personID = this.$store.state.session.personID;
+            let urlSubmit = 'api/people/' + personID
+                            + '/photos/' + this.cropStyle[i].imageType;
+            const canvas = this.cropper
+                .getCroppedCanvas({
+                    width: this.cropStyle[i].width,
+                    height: this.cropStyle[i].height
+                })
+            canvas.toBlob((blob) => {
+                const formData = new FormData()
+                formData.append('file_name', this.selectedFile.name);
+                formData.append('file', blob);
+
+                this.$http.put(urlSubmit,
+                    formData,
+                    {
+                        headers: {
+                            'Authorization': 'Bearer ' + localStorage['v2-token'],
+                            'Content-Type': 'multipart/form-data'
+                        },
+                    }
+                )
+                .then(() => {
+                    if (i + 1 < this.cropStyle.length) {
+                        this.uploadThisImage(i + 1);
+                    } else {
+                        this.progress = false;
+                        this.success = true;
+                        setTimeout(() => {this.success = false;}, 1500)
+                        this.resetCropper();
+                        this.initialize();
+                    }
+                })
+                .catch((error) => {
+                    this.progress = false;
+                    this.error = true;
+                    setTimeout(() => {this.error = false;}, 6000)
+                    // eslint-disable-next-line
+                    console.log(error)
+                });
+            }, 'image/png', 1);
+
         },
 
         resetCropper () {

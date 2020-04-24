@@ -237,7 +237,6 @@ export default {
             if (this.$store.state.session.loggedIn) {
                 this.progressEmail = true;
                 const personID = this.$store.state.session.personID;
-                console.log(this.$store.state.session.personName)
                 this.$http.post('api/people/' + personID + '/cars-message',
                     {
                         data: {

@@ -429,13 +429,15 @@ module.exports.getLabInfo = function (req, res, next) {
     );
 };
 
-var actionPreRegister = function (req, res, next) {
+var actionAddUser = function (options) {
     let { req, res, next } = options;
     let now = time.momentToDate(time.moment(), undefined, 'YYYY-MM-DD HH:mm:ss');
+    options.now = now;
     let password = make_password(30,'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-    let hashedPassword = jwtUtil.hashPassword(password)
-    let labID = req.params.labID;
+    let hashedPassword = jwtUtil.hashPassword(password);
+    options.password = password;
     let person = req.body.data;
+    let places = [];
     querySQL = 'INSERT INTO users'
         + ' (username, password, created, deactivated, permission_level_id)'
         + ' VALUES (?, ?, ?, ?, ?);';
@@ -445,18 +447,271 @@ var actionPreRegister = function (req, res, next) {
         now,
         0,
         5
-    )
+    );
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
-            actionAddLabMemberPositionHistory(resQuery, options)
+            options.userID = resQuery.insertId;
+            actionAddPerson(options);
+        },
+        options);
+};
+var actionAddPerson = function (options) {
+    let { req, res, next } = options;
+    let person = req.body.data;
+    let places = [];
+    querySQL = 'INSERT INTO people'
+        + ' (user_id, active_from, status, visible_public)'
+        + ' VALUES (?, ?, ?, ?);';
+    places.push(
+        options.userID,
+        person.valid_from,
+        2,
+        0
+    );
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            options.personID = resQuery.insertId;
+            actionAddPersonHistory(options);
+        },
+        options);
+};
+var actionAddPersonHistory = function (options) {
+    let { req, res, next } = options;
+    let person = req.body.data;
+    let places = [];
+    querySQL = 'INSERT INTO people_history'
+        + ' (person_id, user_id, active_from, status, visible_public, created, operation, changed_by)'
+        + ' VALUES (?, ?, ?, ?, ?, ?, ?, ?);';
+    places.push(
+        options.personID,
+        options.userID,
+        person.valid_from,
+        2,
+        0,
+        options.now,
+        'C',
+        person.changedBy
+    );
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            actionAddPersonPole(options);
+        },
+        options);
+};
+var actionAddPersonPole = function (options) {
+    let { req, res, next } = options;
+    let person = req.body.data;
+    let places = [];
+    querySQL = 'INSERT INTO people_institution_city'
+        + ' (person_id, city_id, valid_from)'
+        + ' VALUES (?, ?, ?);';
+    places.push(
+        options.personID,
+        person.city_id,
+        person.valid_from
+    );
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            actionAddPersonRole(options);
+        },
+        options);
+};
+var actionAddPersonRole = function (options) {
+    let { req, res, next } = options;
+    let places = [];
+    querySQL = 'INSERT INTO people_roles'
+        + ' (person_id, role_id)'
+        + ' VALUES (?, ?);';
+    places.push(
+        options.personID,
+        1
+    );
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            actionAddPersonLab(options);
+        },
+        options);
+};
+var actionAddPersonLab = function (options) {
+    let { req, res, next } = options;
+    let labID = req.params.labID;
+    let person = req.body.data;
+    let places = [];
+    querySQL = 'INSERT INTO people_labs'
+        + ' (person_id, lab_id, lab_position_id, dedication, valid_from, valid_until)'
+        + ' VALUES (?, ?, ?, ?, ?, ?);';
+    places.push(
+        options.personID,
+        labID,
+        person.lab_position_id,
+        person.dedication,
+        person.valid_from,
+        person.valid_until
+    );
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            options.peopleLabsID = resQuery.insertId;
+            actionAddPersonLabHistory(options);
+        },
+        options);
+};
+var actionAddPersonLabHistory = function (options) {
+    let { req, res, next } = options;
+    let labID = req.params.labID;
+    let person = req.body.data;
+    let places = [];
+    querySQL = 'INSERT INTO people_labs_history'
+        + ' (people_labs_id, person_id, lab_id, lab_position_id, dedication, valid_from, valid_until, created, operation, changed_by)'
+        + ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+    places.push(
+        options.peopleLabsID,
+        options.personID,
+        labID,
+        person.lab_position_id,
+        person.dedication,
+        person.valid_from,
+        person.valid_until,
+        options.now,
+        'C',
+        options.changedBy
+    );
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            actionAddPersonEmailAddress(options);
+        },
+        options);
+};
+var actionAddPersonEmailAddress = function (options) {
+    let { req, res, next } = options;
+    let person = req.body.data;
+    let places = [];
+    querySQL = 'INSERT INTO personal_emails'
+        + ' (person_id, email)'
+        + ' VALUES (?, ?);';
+    places.push(
+        options.personID,
+        person.email
+    );
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            getRecipientsGroupsPreReg(options, 11);
         },
         options);
 
-}
+};
+// an email is sent to the user being pre-registered
+// and a copy is saved in the database
+var getRecipientsGroupsPreReg = function (options, email_type_id) {
+    let { req, res, next } = options;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT recipient_groups.*, emails.person_id, emails.email'
+        + ' FROM recipient_groups'
+        + ' LEFT JOIN people_recipient_groups ON people_recipient_groups.recipient_group_id = recipient_groups.id'
+        + ' LEFT JOIN emails ON emails.person_id = people_recipient_groups.person_id'
+        + ' WHERE recipient_groups.city_id IS NULL'
+        + ' AND recipient_groups.any_cities = 1'
+        + ' AND recipient_groups.email_type_id = ?;';
+    places.push(email_type_id);
+
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            actionSendUserMessage(options, resQuery)
+            .catch((e) => {
+                console.log(e);
+                return writeMessageDB(options, e);
+            }); // even if the email fails it writes the message to the DB
+        },
+        options);
+};
+
+async function actionSendUserMessage(options, recipientEmails) {
+    let { req, res, next } = options;
+    let person = req.body.data;
+    let username = person.username.replace(' ','%20');
+    options.recipientGroup = recipientEmails[0].id;
+    let recipients = '';
+    recipients = recipients + person.email;
+    let mailOptions;
+    let subjectText = 'LAQV/UCIBIO Data Management - User Registration: ' + person.username;
+    let emailBody = 'Hi,\n\n'
+        + 'You were pre-registered on ' + process.env.PATH_PREFIX  + '.\n\n'
+        + 'Please click on the following link to continue pre-registration:\n\n'
+        +  process.env.PATH_PREFIX +'/pre-register/'
+        +  username + '/'
+        +  options.password + '\n\n'
+        + 'Follow instructions and after filling all required information,'
+        + ' press "Submit" button and wait for validation by a manager.\n'
+        + 'Upon validation you will be notified, and then you can login to:\n\n'
+        +  process.env.PATH_PREFIX + '\n\n'
+        + 'Best regards,\nAdmin';
+    let emailBodyHtml = '<p>Hi,</p><br>'
+        + '<p>You were pre-registered on ' + process.env.PATH_PREFIX + '.</p>'
+        + '<p>Please click on the following link to continue pre-registration:</p><br>'
+        +  '<p>' + process.env.PATH_PREFIX +'/pre-register/'
+        +  username + '/'
+        +  options.password + '</p><br>'
+        + '<p>Follow instructions and after filling all required information,'
+        + ' press "Submit" button and wait for validation by a manager.</p>'
+        + '<p>Upon validation you will be notified, and then you can login to:</p>'
+        +  '<p>' + process.env.PATH_PREFIX + '</p>'
+        + '<p>Best regards,</p>'
+        + '<p>Admin</p>';
+    console.log(emailBodyHtml)
+    options.subjectText = subjectText;
+    options.emailBody = emailBody;
+    if (process.env.NODE_ENV === 'production') {
+        mailOptions = {
+            from: '"Admin" <admin@laqv-ucibio.info>', // sender address
+            to: recipients, // list of receivers (comma-separated)
+            subject: subjectText, // Subject line
+            text: emailBody,
+            html: emailBodyHtml,
+        };
+        // send mail with defined transport object
+        let info = await transporter.sendMail(mailOptions);
+        console.log('Message %s sent: %s', info.messageId, info.response);
+        return writeMessageDB(options);
+
+    } else {
+        // just for testing purposes
+        mailOptions = {
+            from: '"Admin" <admin@laqv-ucibio.info>', // sender address
+            to: recipients, // list of receivers (comma-separated)
+            subject: 'TESTING: ' + subjectText, // Subject line
+            text: emailBody,
+            html: emailBodyHtml,
+        };
+        console.log(mailOptions.from)
+        // send mail with defined transport object
+        let info = await transporter.sendMail(mailOptions);
+        console.log('Message %s sent: %s', info.messageId, info.response);
+        return writeMessageDB(options);
+    }
+};
+var writeMessageDB = function (options, error) {
+    let { req, res, next, recipientGroup, subjectText, emailBody } = options;
+    if (error) {
+        responses.sendJSONResponseOptions({
+            response: res,
+            status: 500,
+            message: { "message": "Error sending email", "error": error.message }
+        });
+        return;
+    }
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'INSERT INTO email_messages'
+        + ' (sender_id, recipient_group_id, subject, message_text, date, solved)'
+        + ' VALUES (?,?,?,?,?,?);';
+    places.push(options.personID, recipientGroup, subjectText, emailBody, options.now, 0);
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
 
 module.exports.preRegister = function (req, res, next) {
     permissions.checkPermissions(
-        (options) => { actionPreRegister(options) },
+        (options) => { actionAddUser(options) },
         { req, res, next }
     );
 };

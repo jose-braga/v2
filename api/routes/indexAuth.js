@@ -11,6 +11,7 @@ router.options('*', cors())
 var authentication = require('../controllers/authentication/authentication');
 // authentication routes
 router.post('/login', cors(corsOptions), authentication.login);
+router.post('/pre-registration-login', cors(corsOptions), authentication.preRegistrationLogin);
 router.put('/change-password/:userID', cors(corsOptions), authentication.changePassword);
 
 router.use(function (req, res, next) {

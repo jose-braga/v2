@@ -3,7 +3,6 @@ var jwt = require('express-jwt');
 var cors = require('cors')
 var router = express.Router();
 
-
 var auth = jwt({
   secret: process.env.JWT_SECRET,
   requestProperty: 'payload'
@@ -39,10 +38,13 @@ const photo = require('../controllers/people/photo');
 const professionalSituations = require('../controllers/people/professional_situations');
 const publicationsList = require('../controllers/people/publications_list');
 const researchIDs = require('../controllers/people/research_IDs');
+const users = require('../controllers/people/users');
 
 //remove lines below???
 //var routesAPIUserOnBehalf = require('./routes/indexUserOnBehalf');
 //router.use('/:personID/users-on-behalf', routesAPIUserOnBehalf)
+
+router.get('/:personID/users/:username', cors(corsOptions), users.checkUserExistence);
 
 router.get('/:personID/external-api-authorization', cors(corsOptions), externalAPI.getAuthorization);
 router.put('/:personID/external-api-authorization', cors(corsOptions), externalAPI.updateAuthorization);

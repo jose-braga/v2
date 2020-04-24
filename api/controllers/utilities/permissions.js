@@ -14,11 +14,6 @@ var hasAccessEndpoint = function (reqMethod, reqEndpoint, permissionsEndpoints) 
             let endpointRegex = new RegExp('^' + endpointPerm + '$')
             // the request endpoint must match
             // the endpoints in the permissions and its method
-            console.log('----------------------------------')
-            console.log(endpointRegex)
-            console.log(reqEndpointFinal)
-            console.log(endpointRegex.test(reqEndpointFinal))
-            console.log('----------------------------------')
             if (endpointRegex.test(reqEndpointFinal)
                 && permissionsEndpoints[ind].method_name === reqMethod) {
                 return true;
@@ -66,7 +61,11 @@ module.exports.checkPermissions = function (callback, callbackOptions) {
     }
 
     let reqEndpointParts = reqEndpoint.split('/');
-    reqEndpointParts.splice(0,2); // the string starts by '/api' (always!!?)
+    if (reqEndpointParts[1] === 'api' && reqEndpointParts[2] === 'pre-register') {
+        reqEndpointParts.splice(0,3);
+    } else {
+        reqEndpointParts.splice(0,2); // the string starts by '/api' (always!!?)
+    }
 
     if (permissionsLevel === 1) {
         // admin can do whatever he wants, no checking is necessary
@@ -85,7 +84,6 @@ module.exports.checkPermissions = function (callback, callbackOptions) {
         }
     } else if (personID === resourcePersonID && resourcePersonID !== undefined
                 && reqEndpointParts[0] === 'people') {
-
         // any user can read its data
         // any user can change its data except for affiliation
         // Assuming that reqEndpointParts.length > 2

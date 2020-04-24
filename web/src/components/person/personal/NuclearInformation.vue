@@ -20,7 +20,7 @@
                     <p class="caption red--text">Maximum characters: 100.</p>
                 </div>
                 <v-text-field
-                    v-model="data.colloquial_name"
+                    v-model="$v.data.colloquial_name.$model"
                     label="Colloquial Name (minimum: name and surname)">
                 </v-text-field>
                 <div v-if="!$v.data.colloquial_name.required">

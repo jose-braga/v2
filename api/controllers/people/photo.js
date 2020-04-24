@@ -54,6 +54,31 @@ module.exports.getPhoto = function (req, res, next) {
     );
 };
 
+var actionCheckPreviousPhotoExists = function (options) {
+    let { req, res, next } = options;
+    let personID = req.params.personID;
+    let imageType = req.params.imageType;
+    console.log(personID)
+    console.log(imageType)
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM personal_photo'
+                        + ' WHERE person_id = ? AND photo_type_id = ?;';
+    places.push(personID, imageType);
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            console.log(resQuery)
+            if (resQuery.length === 1) {
+                options.photoID = resQuery[0].id;
+                return updatePhoto(options);
+            } else {
+                return createPhoto(options);
+            }
+        },
+        options
+    );
+};
+
 var updatePhoto = function (options) {
     let { req, res, next, personID, imageType } = options;
     var querySQL = '';
@@ -61,15 +86,11 @@ var updatePhoto = function (options) {
     // TODO: Check if line below holds in production
     let url = process.env.PATH_PREFIX + '/' + req.file.path;
     querySQL = querySQL + 'UPDATE personal_photo'
-                        + ' SET photo_type_id = ?,'
-                        + ' url = ?'
-                        + ' WHERE person_id = ?;';
+                        + ' SET url = ?'
+                        + ' WHERE id = ?;';
     places.push(
-        imageType,
         url,
-        personID);
-    console.log(time.momentToDate(time.moment(), undefined, 'YYYYMMDD_HHmmss'), '--', querySQL)
-    console.log(time.momentToDate(time.moment(), undefined, 'YYYYMMDD_HHmmss'), ' --', places.toString())
+        options.photoID);
     return sql.makeSQLOperation(req, res, querySQL, places,
         (options) => { responses.sendJSONResponseOptions(options) },
         {
@@ -121,13 +142,7 @@ var actionUploadPhoto = function (options) {
             responses.sendJSONResponse(res, 500, { "status": "error", "statusCode": 500, "error": err.stack });
             return;
         }
-        if (req.body.id === undefined) {
-            console.log('create')
-            return createPhoto(options);
-        } else {
-            console.log('update')
-            return updatePhoto(options);
-        }
+        return actionCheckPreviousPhotoExists(options);
     });
 };
 
