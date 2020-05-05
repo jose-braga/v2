@@ -12,7 +12,6 @@ var actionCheckUserExistence = function (options) {
     places.push(username)
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
-            console.log(resQuery)
             let validUsername;
             if (resQuery.length > 0) {
                 validUsername = false;

@@ -2,7 +2,7 @@
 <v-card class="mb-4">
     <v-card-title primary-title>
         <div>
-            <h3 class="headline">Personal Contacts</h3>
+            <h3 class="headline">Institutional Contacts</h3>
         </div>
     </v-card-title>
     <v-card-text></v-card-text>
@@ -12,7 +12,7 @@
                 <v-text-field
                     v-model="data.phones.phone"
                     @input="addValue"
-                    label="Personal Phone">
+                    label="Institutional Phone">
                 </v-text-field>
             </v-col>
             <v-col cols="12" sm="4">
@@ -44,7 +44,7 @@
         </v-row>
         <v-row v-if="data.emails.requestEmail" justify="end">
             <span class="small-text">A PDF file will be generated on submission.<br>
-            Be sure to fill in department data<br>
+            Be sure to fill in department data on "Academic Affiliations".<br>
             Please, print, sign and deliver it to your department's secretariat.</span>
         </v-row>
     </v-container>

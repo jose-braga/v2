@@ -12,7 +12,7 @@
                 <v-col cols="12" sm="4">
                     <v-text-field
                         v-model="data.phones.phone"
-                        label="Personal Phone">
+                        label="Institutional Phone">
                     </v-text-field>
                 </v-col>
                 <v-col cols="12" sm="4">

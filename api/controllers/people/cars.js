@@ -160,14 +160,6 @@ async function actionSendChangeMessage(options, recipientEmails) {
     }
 };
 var writeMessageDB = function (options, error) {
-    if (error) {
-        responses.sendJSONResponseOptions({
-            response: res,
-            status: 500,
-            message: { "message": "Error sending email", "error": error.message }
-        });
-        return;
-    }
     let today = time.moment();
     let now = time.momentToDate(today, 'Europe/Lisbon', 'YYYY-MM-DD HH:mm:ss')
     let { req, res, next, recipientGroup, subjectText, emailBody } = options;
@@ -178,7 +170,28 @@ var writeMessageDB = function (options, error) {
         + ' (sender_id, recipient_group_id, subject, message_text, date, solved)'
         + ' VALUES (?,?,?,?,?,?);';
     places.push(personID, recipientGroup, subjectText, emailBody, now, 0);
-    sql.makeSQLOperation(req, res, querySQL, places);
+    sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            if (error) {
+                responses.sendJSONResponseOptions({
+                    response: res,
+                    status: 500,
+                    message: { "message": "Error sending email, but database OK!", "error": error.message }
+                });
+            } else {
+                responses.sendJSONResponseOptions({
+                    response: res,
+                    status: 200,
+                    message: {
+                        "status": "success",
+                        "statusCode": 200,
+                        "message": "Done!",
+                    }
+                });
+            }
+            return;
+        },
+        options);
     return;
 };
 module.exports.sendChangeMessage = function (req, res, next) {

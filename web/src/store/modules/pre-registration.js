@@ -8,7 +8,16 @@ const preregistration = {
         addPersonData(state, payload) {
             Object.keys(payload).forEach(key => {
                 let value = payload[key];
-                state.person[key] = value;
+                if (value === null) {
+                    state.person[key] = value;
+                } else if (key === 'cropper') {
+                    state.person[key] = value;
+                } else if (typeof value === 'object' ) {
+                    state.person[key] = JSON.parse(JSON.stringify(value));
+                } else {
+                    state.person[key] = value;
+                }
+
             });
         },
     },

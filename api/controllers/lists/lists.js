@@ -298,7 +298,45 @@ var getDepartments = function (options) {
                 resQuery[ind].short_str_department_en = short_str_department_en;
                 resQuery[ind].short_str_department_pt = short_str_department_pt;
             }
-            responses.sendJSONResponseOptions({
+            options.i = 0;
+            options.departments = resQuery;
+            return getDepartmentLeaders(options);
+        },
+        options);
+};
+var getDepartmentLeaders = function (options) {
+    let { req, res, next, i } = options;
+    let department = options.departments[i];
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT leaders_departments.*, people.name'
+    + ' FROM leaders_departments'
+    + ' JOIN people ON people.id = leaders_departments.person_id'
+    + ' WHERE leaders_departments.department_id = ?;';
+    places.push(department.id)
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            options.departments[i].leaders = resQuery;
+            if ( i + 1 < options.departments.length) {
+                options.i = i + 1;
+                return getDepartmentLeaders(options);
+            } else {
+                responses.sendJSONResponseOptions({
+                    response: res,
+                    status: 200,
+                    message: {
+                        "status": "success",
+                        "statusCode": 200,
+                        "result": options.departments,
+                    }
+                });
+                return;
+            }
+        },
+        options);
+};
+/*
+responses.sendJSONResponseOptions({
                 response: res,
                 status: 200,
                 message: {
@@ -307,9 +345,10 @@ var getDepartments = function (options) {
                 }
             });
             return;
-        },
-        options);
-};
+
+*/
+
+
 var getRequestMethods = function (req, res, next) {
     var querySQL = '';
     var places = [];

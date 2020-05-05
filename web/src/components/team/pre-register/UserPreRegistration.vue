@@ -20,7 +20,7 @@
                     <v-text-field
                         v-model="$v.data.person.username.$model"
                         :error="$v.data.person.username.$error"
-                        label="Username">
+                        label="Username*">
                     </v-text-field>
                     <div v-if="$v.data.person.username.$error">
                         <div v-if="!$v.data.person.username.required">
@@ -35,7 +35,7 @@
                     <v-text-field
                         v-model="$v.data.person.email.$model"
                         :error="$v.data.person.email.$error"
-                        label="Personal email">
+                        label="Personal email*">
                     </v-text-field>
                     <div v-if="$v.data.person.email.$error">
                         <div v-if="!$v.data.person.email.required">
@@ -53,10 +53,12 @@
                         :items="myLabs"
                         item-value="id" item-text="name"
                         :error="$v.data.person.lab_id.$error"
-                        label="Lab">
+                        label="Lab*">
                     </v-select>
-                    <div v-if="!$v.data.person.lab_id.required">
-                        <p class="caption red--text">Lab is required.</p>
+                    <div v-if="$v.data.person.lab_id.$error">
+                        <div v-if="!$v.data.person.lab_id.required">
+                            <p class="caption red--text">Lab is required.</p>
+                        </div>
                     </div>
                 </v-col>
                 <v-col cols="12" md="6">
@@ -64,10 +66,12 @@
                         :items="labPositions"
                         item-value="id" item-text="name_en"
                         :error="$v.data.person.lab_position_id.$error"
-                        label="Position">
+                        label="Position*">
                     </v-select>
-                    <div v-if="!$v.data.person.lab_position_id.required">
-                        <p class="caption red--text">Position is required.</p>
+                    <div v-if="$v.data.person.lab_position_id.$error">
+                        <div v-if="!$v.data.person.lab_position_id.required">
+                            <p class="caption red--text">Position is required.</p>
+                        </div>
                     </div>
                 </v-col>
             </v-row>
@@ -90,10 +94,12 @@
                 <v-col cols="12" md="6">
                     <v-select v-model="$v.data.person.city_id.$model"
                         :items="poles" item-value="id" item-text="city"
-                        label="Institution Pole">
+                        label="Institution Pole*">
                     </v-select>
-                    <div v-if="!$v.data.person.city_id.required">
-                        <p class="caption red--text">Pole is required.</p>
+                    <div v-if="$v.data.person.city_id.$error">
+                        <div v-if="!$v.data.person.city_id.required">
+                            <p class="caption red--text">Pole is required.</p>
+                        </div>
                     </div>
                 </v-col>
             </v-row>
@@ -106,7 +112,7 @@
                         offset-y min-width="290px">
                         <template v-slot:activator="{ on }">
                             <v-text-field v-model="$v.data.person.valid_from.$model"
-                                label="Start" v-on="on">
+                                label="Start*" v-on="on">
                             </v-text-field>
                         </template>
                         <v-date-picker v-model="$v.data.person.valid_from.$model"
@@ -207,6 +213,7 @@ export default {
                 this.formError = true;
                 setTimeout(() => {this.formError = false;}, 3000)
             } else {
+                this.progress = true;
                 let urlCreate = [];
                 if (this.$store.state.session.loggedIn) {
                     this.data.person.changedBy = this.$store.state.session.userID;
@@ -227,8 +234,19 @@ export default {
                     .then(this.$http.spread( () => {
                         this.progress = false;
                         this.success = true;
-                        setTimeout(() => {this.success = false;}, 1500)
-                        this.$refs.form.reset();
+                        setTimeout(() => {
+                            this.success = false;
+                            //this.$refs.form.reset();
+                        }, 1500);
+                        this.data.person = {
+                            username: '',
+                            email: '',
+                            lab_id: null,
+                            lab_position_id: null,
+                            dedication: null,
+                            city_id: null,
+                            valid_from: null,
+                        };
                     }))
                     .catch((error) => {
                         this.progress = false;
@@ -261,7 +279,7 @@ export default {
                 username: {
                     required,
                     isUnique (value) {
-                        if (this.$store.state.session.loggedIn) {
+                        if (this.$store.state.session.loggedIn && value !== undefined) {
                             if (value.length > 0) {
                                 let urlSubmit = 'api/people/' + this.$store.state.session.personID
                                     + '/users/' + value;

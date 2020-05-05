@@ -13,11 +13,11 @@
                 </v-row>
             </v-toolbar-title>
         </v-app-bar>
-        {{$store.state.preregistration.person}}
         <div v-if="loggedIn" class="px-4">
             <v-row justify="center">
-                <span class="highlight-text mt-2">Items with an asterisk (*) are required.<br>
-                                                Press "Submit" at the bottom when finished!
+                <span class="highlight-text mt-2">
+                    Items with an asterisk (*) are <b>required</b>.
+                    Press <b>"Submit"</b> at the bottom when finished!
                 </span>
             </v-row>
             <v-row>
@@ -29,12 +29,21 @@
                         :person-id="personID"
                         :token="token"
                     ></PersonalContacts>
+                    <PersonalIdentifications ref="personalIdentifications"></PersonalIdentifications>
                     <InstitutionalContacts ref="institutionalContacts"></InstitutionalContacts>
+                    <ProfessionalSituations ref="professionalSituations"></ProfessionalSituations>
+                    <Comments ref="comments"></Comments>
                 </v-col>
                 <v-col cols="12" md="6">
                     <Authorization ref="authorization"></Authorization>
                     <Photo ref="photo"></Photo>
-                    <Labs></Labs>
+                    <Labs v-if="personID"
+                        :person-id="personID"
+                        :token="token"
+                    ></Labs>
+                    <Responsibles ref="responsibles"></Responsibles>
+                    <AcademicAffiliations ref="academicAffiliations"></AcademicAffiliations>
+                    <ScientificIdentifications ref="scientificIdentifications"></ScientificIdentifications>
                 </v-col>
             </v-row>
             <v-row align-content="center" justify="center">
@@ -45,8 +54,9 @@
                 </v-col>
                 <v-col cols="2" align-self="end">
                     <v-row justify="end">
-                        <v-btn @click="submitForms"
-                        outlined color="blue">Submit</v-btn>
+                        <v-btn @click="confirmForm" large
+                        class="white--text"
+                        color="blue">Submit</v-btn>
                     </v-row>
                 </v-col>
                 <v-col cols="1">
@@ -75,12 +85,18 @@ import Photo from './Photo'
 import PersonalContacts from './PersonalContacts'
 import InstitutionalContacts from './InstitutionalContacts'
 import Labs from './Labs'
+import Responsibles from './Responsibles'
+import AcademicAffiliations from './AcademicAffiliations'
+import ScientificIdentifications from './ScientificIdentifications'
+import PersonalIdentifications from './PersonalIdentifications'
+import ProfessionalSituations from './ProfessionalSituations'
+import Comments from './Comments'
 
-import { PDFDocument, PDFName, PDFBool,
-PDFString, PDFNumber
-} from 'pdf-lib'
+import { PDFDocument, PDFName, PDFBool, PDFString, PDFNumber } from 'pdf-lib'
 //, StandardFonts
+import subUtil from '../common/submit-utils'
 import download from 'downloadjs'
+import time from '../common/date-utils'
 
 export default {
     components: {
@@ -91,6 +107,12 @@ export default {
         PersonalContacts,
         InstitutionalContacts,
         Labs,
+        Responsibles,
+        AcademicAffiliations,
+        ScientificIdentifications,
+        PersonalIdentifications,
+        ProfessionalSituations,
+        Comments,
     },
     data() {
         return {
@@ -102,10 +124,25 @@ export default {
             token: '',
             personID: null,
             userID: null,
+            cropStyle: [
+                {
+                    width: 196,
+                    height: 196,
+                    imageType: 1 // this should exist always
+                },
+                {
+                    width: 600,
+                    height: 600,
+                    imageType: 2
+                },
+            ],
+            departments: [],
         }
     },
     created() {
         this.checkLogin();
+        this.getDepartments();
+
     },
     mounted() {},
     methods: {
@@ -131,6 +168,118 @@ export default {
                 console.log(error)
             });
         },
+        confirmForm() {
+            let person = this.$store.state.preregistration.person;
+            this.fillPDF(person);
+            /*
+            let proceed = true;
+            let person = this.$store.state.preregistration.person;
+            if (person.visible_public !== true) {
+                proceed = confirm('You won\'t appear as a member'
+                        + ' of the Research Units in their websites'
+                        + ' unless you authorize that some data is made available'
+                        + ' for the purposes stated in "Data visibility authorization".'
+                        + ' \n\nIs this really what you want?');
+            }
+            if (proceed) {
+                let person = this.$store.state.preregistration.person;
+                // only after submitting all information is the PDF generated
+                //console.log(person)
+                let affiliationFCT = false;
+                for (let ind in person.academicAffiliations) {
+                    if (person.academicAffiliations[ind].department_id <= 4) {
+                        affiliationFCT = true;
+                        break;
+                    }
+                }
+                if ( this.$refs.password.$v.$invalid
+                    || this.$refs.nuclearInfo.$v.$invalid
+                    || this.$refs.personalContacts.$v.$invalid
+                    || this.$refs.institutionalContacts.$v.$invalid
+                    || (person.emails !== undefined
+                        && person.emails.requestEmail
+                        && !affiliationFCT)
+                    ) {
+                    this.formError = true;
+                    setTimeout(() => {
+                        this.formError = false;
+                        this.progress = false;
+                    }, 3000);
+                } else if (this.$refs.photo.selectedFile) {
+                    this.progress = true;
+                    this.uploadThisImage(0);
+                } else {
+                    this.progress = true;
+                    this.submitForms();
+                }
+            }
+            */
+        },
+        uploadThisImage(i) {
+            let urlSubmit = 'api/people/' + this.personID
+                        + '/photos/' + this.cropStyle[i].imageType;
+            const canvas = this.$store.state.preregistration.person.cropper
+                .getCroppedCanvas({
+                    width: this.cropStyle[i].width,
+                    height: this.cropStyle[i].height
+                });
+            canvas.toBlob((blob) => {
+                const formData = new FormData()
+                formData.append('file_name', this.$refs.photo.selectedFile.name);
+                formData.append('file', blob);
+
+                this.$http.put(urlSubmit,
+                    formData,
+                    {
+                        headers: {
+                            'Authorization': 'Bearer ' + this.token,
+                            'Content-Type': 'multipart/form-data'
+                        },
+                    }
+                )
+                .then(() => {
+                    if (i + 1 < this.cropStyle.length) {
+                        this.uploadThisImage(i + 1);
+                    } else {
+                        this.submitForms();
+                    }
+                })
+                .catch((error) => {
+                    this.progress = false;
+                    this.error = true;
+                    setTimeout(() => {this.error = false;}, 6000)
+                    // eslint-disable-next-line
+                    console.log(error)
+                });
+            }, 'image/png', 1);
+        },
+        async submitForms() {
+            let person = this.$store.state.preregistration.person;
+            delete person.cropper;
+            let urlSubmit = 'api/pre-register/people/' + this.personID;
+            person.userID = this.userID;
+            this.$http.put(urlSubmit,
+                { data: person, },
+                {
+                    headers: {'Authorization': 'Bearer ' + this.token },
+                }
+            )
+            .then( () => {
+                this.progress = false;
+                this.success = true;
+                setTimeout(() => {this.success = false;}, 1500)
+                if (person.emails !== undefined && person.emails.requestEmail) {
+                    this.fillPDF(person);
+                }
+            })
+            .catch((error) => {
+                this.progress = false;
+                this.error = true;
+                setTimeout(() => {this.error = false;}, 6000)
+                // eslint-disable-next-line
+                console.log(error)
+            })
+        },
         async fillPDF (person) {
             // adapted from https://github.com/Hopding/pdf-lib/issues/185#issuecomment-529146128
             let url = 'images/forms/correio_electronico_funcionario_v2.pdf';
@@ -150,24 +299,41 @@ export default {
                 acroForm.get( PDFName.of( 'Fields' ))
             );
             const fields = fieldRefs.array.map( ref => acroForm.context.lookup( ref ));
+            let department;
+            for (let ind in this.departments) {
+                if (this.departments[ind].id === person.academicAffiliations[0].department_id) {
+                    department = this.departments[ind];
+                }
+            }
+            let date = time.moment();
+
             let data = {
                 'Nome completo': person.name,
                 'Novo utilizador não dispõe de identificador CLIP': 'On',
+                'Endereço de correio eletrónico': person.personal_emails.email,
+                'Endereço de correio eletrónico alternativo sugerido': person.emails.email.split('@')[0],
+                'Departamento ou Divisão': department.department_name_pt,
+                'Nome completo_2': department.leaders[0].name,
+                'Identificador CLIP_2': department.leaders[0].clip_id,
+                'Função': department.leaders[0].position_name_pt,
+                'dia3': date.date().toString(),
+                'mes3': (date.month() + 1).toString(),
+                'undefined_5': date.year().toString(),
+            }
+            if (person.phones !== undefined) {
+                data['Telefone'] = person.phones.phone;
             }
             fields.forEach( field => {
                 const name = field.get( PDFName.of( 'T' ));
                 if ( name ) {
-                    const newValue = data[ name.value ];
                     //console.log(name)
                     //console.log(field)
-
-
+                    const newValue = data[ name.value ];
                     if (newValue
                         && name.value === 'Novo utilizador não dispõe de identificador CLIP') {
-                        field.set( PDFName.of( 'V' ), PDFString.of( newValue ));
+                        field.set( PDFName.of( 'V' ), PDFName.of( newValue ));
                         field.set( PDFName.of( 'Ff' ), PDFNumber.of( 1 ));
-                        field.set( PDFName.of( 'AS' ), PDFString.of( newValue ));
-
+                        field.set( PDFName.of( 'AS' ), PDFName.of( newValue ));
                     } else if ( newValue ) {
                         field.set( PDFName.of( 'V' ), PDFString.of( newValue ));
                         field.set( PDFName.of( 'Ff' ), PDFNumber.of( 1 ));
@@ -178,35 +344,14 @@ export default {
             download(filledPDF, "filled_correio_electronico_funcionario_v2.pdf",
                 "application/pdf");
         },
-        async submitForms() {
-            let proceed = true;
-            let person = this.$store.state.preregistration.person;
-            //console.log(person)
-            //this.fillPDF(person);
-            //console.log(proceed)
-            if (person.visible_public !== true) {
-                proceed = confirm('You won\'t appear as a member'
-                        + ' of the Research Units in their websites'
-                        + ' unless you authorize that some data is made available'
-                        + ' for the purposes stated in "Data visibility authorization".'
-                        + ' \n\nIs this really what you want?');
-            }
-            if ( proceed === true
-                && (this.$refs.password.$v.$invalid
-                || this.$refs.nuclearInfo.$v.$invalid
-                || this.$refs.personalContacts.$v.$invalid
-                || this.$refs.institutionalContacts.$v.$invalid
-                )) {
-                this.formError = true;
-                setTimeout(() => {this.formError = false;}, 3000);
-            } else if (proceed === true) {
-                console.log('all is fine')
-                // put this inside .then after the request succeeded
-                if (person.emails.requestEmail) {
-                    this.fillPDF(person);
-                }
+        getDepartments () {
+            let vm = this;
+            if (this.$store.state.session.loggedIn) {
+                const urlSubmit = 'api/v2/' + 'departments';
+                return subUtil.getPublicInfo(vm, urlSubmit, 'departments');
             }
         },
+
     },
 }
 </script>

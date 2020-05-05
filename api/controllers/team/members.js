@@ -41,7 +41,7 @@ var actionSearchAllPeople = function (options) {
                         + ' LEFT JOIN people_labs ON people_labs.person_id = people.id'
                         + ' LEFT JOIN labs ON labs.id = people_labs.lab_id'
                         + ' LEFT JOIN lab_positions ON lab_positions.id = people_labs.lab_position_id'
-                        + ' WHERE people.name LIKE ?'
+                        + ' WHERE people.name LIKE ? AND people.status = 1'
                         + ' ORDER BY people.name ASC'
                         + ' LIMIT ?, ?;'
                         ;
@@ -201,8 +201,8 @@ var actionGetLabMembers = function (options) {
     querySQL = querySQL + 'SELECT DISTINCT people.id AS person_id, people.name, people.colloquial_name '
                         + ' FROM people'
                         + ' JOIN people_labs ON people_labs.person_id = people.id'
-                        + ' WHERE people_labs.lab_id = ?;';
-    places.push(labID)
+                        + ' WHERE people_labs.lab_id = ? AND people.status = ?;';
+    places.push(labID, 1)
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             actionGetMemberDetails(resQuery, options)
@@ -657,7 +657,6 @@ async function actionSendUserMessage(options, recipientEmails) {
         +  '<p>' + process.env.PATH_PREFIX + '</p>'
         + '<p>Best regards,</p>'
         + '<p>Admin</p>';
-    console.log(emailBodyHtml)
     options.subjectText = subjectText;
     options.emailBody = emailBody;
     if (process.env.NODE_ENV === 'production') {
@@ -682,7 +681,6 @@ async function actionSendUserMessage(options, recipientEmails) {
             text: emailBody,
             html: emailBodyHtml,
         };
-        console.log(mailOptions.from)
         // send mail with defined transport object
         let info = await transporter.sendMail(mailOptions);
         console.log('Message %s sent: %s', info.messageId, info.response);
@@ -691,21 +689,34 @@ async function actionSendUserMessage(options, recipientEmails) {
 };
 var writeMessageDB = function (options, error) {
     let { req, res, next, recipientGroup, subjectText, emailBody } = options;
-    if (error) {
-        responses.sendJSONResponseOptions({
-            response: res,
-            status: 500,
-            message: { "message": "Error sending email", "error": error.message }
-        });
-        return;
-    }
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'INSERT INTO email_messages'
         + ' (sender_id, recipient_group_id, subject, message_text, date, solved)'
         + ' VALUES (?,?,?,?,?,?);';
     places.push(options.personID, recipientGroup, subjectText, emailBody, options.now, 0);
-    sql.makeSQLOperation(req, res, querySQL, places);
+    sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            if (error) {
+                responses.sendJSONResponseOptions({
+                    response: res,
+                    status: 500,
+                    message: { "message": "Error sending email, but database OK!", "error": error.message }
+                });
+            } else {
+                responses.sendJSONResponseOptions({
+                    response: res,
+                    status: 200,
+                    message: {
+                        "status": "success",
+                        "statusCode": 200,
+                        "message": "Done!",
+                    }
+                });
+            }
+            return;
+        },
+        options);
     return;
 };
 

@@ -91,6 +91,8 @@ module.exports.checkPermissions = function (callback, callbackOptions) {
             return callback(callbackOptions);
         } else if (reqMethod === 'GET') {
             return callback(callbackOptions);
+        } else if (reqEndpoint.includes('pre-register')) {
+            return callback(callbackOptions);
         } else {
             responses.sendJSONResponse(res, 403, {
                 "status": "error",

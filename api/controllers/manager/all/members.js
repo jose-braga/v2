@@ -12,8 +12,8 @@ var actionGetMembersList = function (options) {
     querySQL = querySQL + 'SELECT DISTINCT people.id AS person_id, people.name, people.colloquial_name '
         + ' FROM people'
         + ' JOIN people_labs ON people_labs.person_id = people.id'
-        + ' WHERE people_labs.lab_id = ?;';
-    places.push(labID)
+        + ' WHERE people_labs.lab_id = ? AND people.status = ?;';
+    places.push(labID, 1)
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             actionGetMemberDetails(resQuery, options)

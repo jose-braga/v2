@@ -18,12 +18,12 @@ var storage = multer.diskStorage({ //multers disk storage settings
                         callback(null, tempDirectory);
                     })
                     .catch((err) => {
-                        console.log('1 - ', err);
+                        console.log('File write error 1 - ', err);
                         callback(null, tempDirectory);
                     });
             })
             .catch((err) => {
-                console.log('2 - ', err);
+                console.log('File write error 2 - ', err);
                 callback(null, tempDirectory);
             });
     },
@@ -58,8 +58,6 @@ var actionCheckPreviousPhotoExists = function (options) {
     let { req, res, next } = options;
     let personID = req.params.personID;
     let imageType = req.params.imageType;
-    console.log(personID)
-    console.log(imageType)
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'SELECT * FROM personal_photo'
@@ -67,7 +65,6 @@ var actionCheckPreviousPhotoExists = function (options) {
     places.push(personID, imageType);
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
-            console.log(resQuery)
             if (resQuery.length === 1) {
                 options.photoID = resQuery[0].id;
                 return updatePhoto(options);

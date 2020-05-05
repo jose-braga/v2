@@ -379,7 +379,6 @@ var updateJobCategorySituationID = function (options) {
 var actionCreateProfessionalSituationsFellowships = function (options) {
     let { req, res, next} = options;
     let data = req.body.data;
-    console.log(data)
     if (data.start === '') data.start = null;
     if (data.end === '') data.end = null;
     if (data.maximum_extension === '') data.maximum_extension = null;
