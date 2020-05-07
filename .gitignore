@@ -3,6 +3,7 @@
 
 # VS Code settings
 .vscode
+./*.code-workspace
 
 # Logs
 logs
@@ -78,7 +79,7 @@ database/
 api/images/people/
 v2.code-workspace
 
-#user input images
+#user input images and documents
 web/public/images/people/
 web/public/documents/
 
