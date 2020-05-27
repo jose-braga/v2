@@ -3,40 +3,42 @@ import VueRouter from 'vue-router'
 import Person from '../components/person/Person' // this is not lazy-loaded
 import PersonalTab from '../components/person/personal/PersonalTab'// this is not lazy-loaded
 
-const PersonalTabHelp = () => import('../components/person/personal/PersonalTabHelp.vue')
-const AcademicTab = () => import('../components/person/academic/AcademicTab.vue')
-const AcademicTabHelp = () => import('../components/person/academic/AcademicTabHelp.vue')
-const InstitutionalTab = () => import('../components/person/institutional/InstitutionalTab.vue')
-const InstitutionalTabHelp = () => import('../components/person/institutional/InstitutionalTabHelp.vue')
-const ProfessionalTab = () => import('../components/person/professional/ProfessionalTab.vue')
-const ProfessionalTabHelp = () => import('../components/person/professional/ProfessionalTabHelp.vue')
-const ProductivityTab = () => import('../components/person/productivity/ProductivityTab.vue')
-const PublicationsTab = () => import('../components/person/productivity/PublicationsTab.vue')
-const PublicationsTabHelp = () => import('../components/person/productivity/PublicationsTabHelp.vue')
-const AddPublicationsTab = () => import('../components/person/productivity/AddPublicationsTab.vue')
-const AddPublicationsTabHelp = () => import('../components/person/productivity/AddPublicationsTabHelp.vue')
-const OtherProductivityTab = () => import('../components/person/productivity/OtherProductivityTab.vue')
-const OtherProductivityTabHelp = () => import('../components/person/productivity/OtherProductivityTabHelp.vue')
+const PersonalTabHelp = () => import(/* webpackChunkName: "personal-tab-help" */ '../components/person/personal/PersonalTabHelp.vue')
+const AcademicTab = () => import(/* webpackChunkName: "academic-tab" */ '../components/person/academic/AcademicTab.vue')
+const AcademicTabHelp = () => import(/* webpackChunkName: "academic-tab-help" */ '../components/person/academic/AcademicTabHelp.vue')
+const InstitutionalTab = () => import(/* webpackChunkName: "institutional-tab" */ '../components/person/institutional/InstitutionalTab.vue')
+const InstitutionalTabHelp = () => import(/* webpackChunkName: "institutional-tab-help" */ '../components/person/institutional/InstitutionalTabHelp.vue')
+const ProfessionalTab = () => import(/* webpackChunkName: "professional-tab" */ '../components/person/professional/ProfessionalTab.vue')
+const ProfessionalTabHelp = () => import(/* webpackChunkName: "professional-tab-help" */ '../components/person/professional/ProfessionalTabHelp.vue')
+const ProductivityTab = () => import(/* webpackChunkName: "productivity-tab" */ '../components/person/productivity/ProductivityTab.vue')
+const PublicationsTab = () => import(/* webpackChunkName: "publications-tab" */ '../components/person/productivity/PublicationsTab.vue')
+const PublicationsTabHelp = () => import(/* webpackChunkName: "publications-tab-help" */ '../components/person/productivity/PublicationsTabHelp.vue')
+const AddPublicationsTab = () => import(/* webpackChunkName: "add-publications-tab" */ '../components/person/productivity/AddPublicationsTab.vue')
+const AddPublicationsTabHelp = () => import(/* webpackChunkName: "add-publication-tab-help" */ '../components/person/productivity/AddPublicationsTabHelp.vue')
+const OtherProductivityTab = () => import(/* webpackChunkName: "other-productivity-tab" */ '../components/person/productivity/OtherProductivityTab.vue')
+const OtherProductivityTabHelp = () => import(/* webpackChunkName: "other-productivity-tab-help" */ '../components/person/productivity/OtherProductivityTabHelp.vue')
 
-const PersonOnBehalf = () => import('../components/person-on-behalf/personOnBehalf.vue')
-const OtherPersonTab = () => import('../components/person-on-behalf/PersonTab.vue')
-const OtherPersonTabHelp = () => import('../components/person-on-behalf/PersonTabHelp.vue')
-const OtherPersonPersonalTab = () => import('../components/person-on-behalf/personal/PersonalTab.vue')
+const PersonOnBehalf = () => import(/* webpackChunkName: "person-on-behalf" */ '../components/person-on-behalf/personOnBehalf.vue')
+const OtherPersonTab = () => import(/* webpackChunkName: "person-on-behalf-tab" */ '../components/person-on-behalf/PersonTab.vue')
+const OtherPersonTabHelp = () => import(/* webpackChunkName: "person-on-behalf-tab-help" */ '../components/person-on-behalf/PersonTabHelp.vue')
+const OtherPersonPersonalTab = () => import(/* webpackChunkName: "person-on-behalf-personal" */ '../components/person-on-behalf/personal/PersonalTab.vue')
+const OtherPersonAcademicTab = () => import(/* webpackChunkName: "person-on-behalf-academic" */ '../components/person-on-behalf/academic/AcademicTab.vue')
+const OtherPersonInstitutionalTab = () => import(/* webpackChunkName: "person-on-behalf-institutional" */ '../components/person-on-behalf/institutional/InstitutionalTab.vue')
 
-const Team = () => import('../components/team/Team.vue')
-const TeamMembersTab = () => import('../components/team/members/MembersTab.vue')
-const TeamMembersTabHelp = () => import('../components/team/members/MembersTabHelp.vue')
-const PreRegisterTab = () => import('../components/team/pre-register/PreRegisterTab.vue')
-const PreRegisterTabHelp = () => import('../components/team/pre-register/PreRegisterTabHelp.vue')
+const Team = () => import(/* webpackChunkName: "team" */ '../components/team/Team.vue')
+const TeamMembersTab = () => import(/* webpackChunkName: "team-members-tab" */ '../components/team/members/MembersTab.vue')
+const TeamMembersTabHelp = () => import(/* webpackChunkName: "team-members-tab-help" */ '../components/team/members/MembersTabHelp.vue')
+const PreRegisterTab = () => import(/* webpackChunkName: "pre-register" */ '../components/team/pre-register/PreRegisterTab.vue')
+const PreRegisterTabHelp = () => import(/* webpackChunkName: "pre-register-tab-help" */ '../components/team/pre-register/PreRegisterTabHelp.vue')
 
-const Group = () => import('../components/group/Group.vue')
+const Group = () => import(/* webpackChunkName: "group" */ '../components/group/Group.vue')
 
-const Manager = () => import('../components/manager/Manager.vue')
-const ManagerMembersTab = () => import('../components/manager/members/MembersTab.vue')
-const ManagerMembersTabHelp = () => import('../components/manager/members/MembersTabHelp.vue')
+const Manager = () => import(/* webpackChunkName: "manager" */ '../components/manager/Manager.vue')
+const ManagerMembersTab = () => import(/* webpackChunkName: "manager-members-tab" */ '../components/manager/members/MembersTab.vue')
+const ManagerMembersTabHelp = () => import(/* webpackChunkName: "manager-members-tab-help" */ '../components/manager/members/MembersTabHelp.vue')
 
-const PreRegisterForm = () => import('../components/pre-register/PreRegister.vue')
-const PreRegisterFormHelp = () => import('../components/pre-register/PreRegisterHelp.vue')
+const PreRegisterForm = () => import(/* webpackChunkName: "pre-register-form" */ '../components/pre-register/PreRegister.vue')
+const PreRegisterFormHelp = () => import(/* webpackChunkName: "pre-register-form-help" */ '../components/pre-register/PreRegisterHelp.vue')
 
 const routes = [
     {
@@ -111,7 +113,7 @@ const routes = [
         component: PersonOnBehalf,
         children: [
             {
-                path: ':personName',
+                path: ':id',
                 components: {
                     default: OtherPersonTab,
                     help: OtherPersonTabHelp
@@ -121,7 +123,15 @@ const routes = [
                         path: 'personal',
                         component: OtherPersonPersonalTab
                     },
-                    { path: '', redirect: 'personal' }
+                    {
+                        path: 'academic',
+                        component: OtherPersonAcademicTab
+                    },
+                    {
+                        path: 'institutional',
+                        component: OtherPersonInstitutionalTab
+                    },
+                    //{ path: '', redirect: 'personal' }
                 ],
             },
         ]

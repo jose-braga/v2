@@ -10,10 +10,7 @@
             <Photo
                 :other-person-id="otherPersonId"
                 :current-person="currentPerson"
-                :active-tab="activeTab"
-                :root-tab="rootTab"
             ></Photo>
-
             <v-expansion-panels multiple v-model="openPanel">
                 <v-expansion-panel>
                     <v-expansion-panel-header>
@@ -85,14 +82,18 @@ export default {
         Cars,
     },
     props: {
-        otherPersonId: Number,
-        currentPerson: Object,
-        activeTab: String,
-        rootTab: String,
+    },
+    created () {
+    },
+    computed: {
+        otherPersonId() {
+            return parseInt(this.$route.params.id, 10);
+        },
     },
     data () {
         return {
             openPanel: [],
+            currentPerson: {},
         }
     },
 

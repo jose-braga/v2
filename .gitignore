@@ -76,6 +76,7 @@ Dockerfile.prod
 # ignore some directories and files
 temp/
 database/
+prod_settings/
 api/images/people/
 v2.code-workspace
 

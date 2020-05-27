@@ -2,19 +2,18 @@
 <div>
     <v-tabs v-if="loggedIn && hasPermissions && data.myPeople.length > 0"
             show-arrows
-            @change="tabChanged">
+        @change="tabChanged"
+    >
         <v-tab v-for="(person, i) in peopleData"
             :key="i"
-            :to="person.link">
+            :to="person.link"
+            :disabled="person.disabled">
             {{person.colloquial_name}}
         </v-tab>
        <v-tabs-items>
             <!-- use :max="N" in keep-alive if necessary-->
             <keep-alive>
-                <router-view v-if="currentPerson && otherPersonID && data.myPeople.length > 0"
-                    :other-person-id="otherPersonID"
-                    :current-person="currentPerson"
-                    :root-tab="rootTab"
+                <router-view v-if="data.myPeople.length > 0"
                 ></router-view>
             </keep-alive>
             <v-dialog v-model="showHelp" content-class="help">
@@ -91,13 +90,13 @@ export default {
             let peopleData = this.data.myPeople;
             for (let ind in peopleData) {
                 this.$set(peopleData[ind], 'link', '/person-on-behalf/'
-                + peopleData[ind].colloquial_name.toLowerCase().replace(/\s/g,'-'));
+                + peopleData[ind].id);
+                this.$set(peopleData[ind], 'disabled', false);
             }
             return peopleData;
         },
     },
     created() {
-
         this.$root.$on('updateNuclearInformation', () => {
             // your code goes here
             this.initialize();
@@ -135,7 +134,7 @@ export default {
                     let firstPerson = true;
                     for (let ind in people) {
                         this.$set(people[ind], 'link', '/person-on-behalf/'
-                                    + people[ind].colloquial_name.toLowerCase().replace(/\s/g,'-'));
+                                    + people[ind].id);
                         this.$set(this.data.myPeople, ind, people[ind]);
                         if (firstPerson) {
                             firstPerson = false;
@@ -145,19 +144,19 @@ export default {
                             }
                         }
                     }
-
-
                 }))
             }
         },
+
         tabChanged: function(tab) {
-            for (let ind in this.data.myPeople) {
+            for (let ind in this.peopleData) {
                 if (this.data.myPeople[ind].link === tab) {
-                    this.otherPersonID = this.data.myPeople[ind].id;
-                    this.currentPerson = this.data.myPeople[ind];
-                    this.rootTab = tab;
+                    this.peopleData[ind].disabled = true;
+                } else {
+                    this.peopleData[ind].disabled = false;
                 }
             }
+
         },
     },
 }

@@ -59,11 +59,11 @@
 import Authorization from './Authorization'
 import NuclearInformation from './NuclearInformation'
 import Photo from './Photo'
-const PersonalContacts = () => import('./PersonalContacts')
-const EmergencyContacts = () => import('./EmergencyContacts')
-const Identifications = () => import('./Identifications')
-const Cars = () => import('./Cars')
-const DataEditors = () => import('./DataEditors')
+const PersonalContacts = () => import(/* webpackChunkName: "person-personal-personal-contacts" */ './PersonalContacts')
+const EmergencyContacts = () => import(/* webpackChunkName: "person-personal-emergency-contacts" */ './EmergencyContacts')
+const Identifications = () => import(/* webpackChunkName: "person-personal-identifications" */ './Identifications')
+const Cars = () => import(/* webpackChunkName: "person-personal-cars" */ './Cars')
+const DataEditors = () => import(/* webpackChunkName: "person-personal-data-editors" */ './DataEditors')
 
 export default {
     components: {

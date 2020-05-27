@@ -51,9 +51,9 @@
 
 <script>
 
-const NuclearInformation = () => import('./personal/NuclearInformation')
-const AppAreaPermissions = () => import('./permissions/AppAreaPermissions')
-const Permissions = () => import('./permissions/Permissions')
+const NuclearInformation = () => import(/* webpackChunkName: "team-nuclear-information" */ './personal/NuclearInformation')
+const AppAreaPermissions = () => import(/* webpackChunkName: "team-app-area-permissions" */ './permissions/AppAreaPermissions')
+const Permissions = () => import(/* webpackChunkName: "team-permissions" */ './permissions/Permissions')
 
 export default {
     components: {

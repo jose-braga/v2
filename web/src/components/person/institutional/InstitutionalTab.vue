@@ -13,10 +13,10 @@
 
 <script>
 
-const AcademicAffiliations = () => import('./AcademicAffiliations')
-const Identifications = () => import('./Identifications')
-const InstitutionalContacts = () => import('./InstitutionalContacts')
-const Roles = () => import('./roles/Roles')
+const AcademicAffiliations = () => import(/* webpackChunkName: "person-academic-affiliations" */ './AcademicAffiliations')
+const Identifications = () => import(/* webpackChunkName: "person-identifications" */ './Identifications')
+const InstitutionalContacts = () => import(/* webpackChunkName: "person-academic-institutional-contacts" */ './InstitutionalContacts')
+const Roles = () => import(/* webpackChunkName: "person-roles" */ './roles/Roles')
 
 export default {
     components: {

@@ -43,7 +43,7 @@
                             </div>
                         </v-expansion-panel-header>
                         <v-expansion-panel-content>
-                            <Responsibles :person-id="personID"></Responsibles>
+                            <Responsibles :other-person-id="otherPersonId"></Responsibles>
                         </v-expansion-panel-content>
                     </v-expansion-panel>
                 </v-expansion-panels>
@@ -59,7 +59,7 @@
                             </div>
                         </v-expansion-panel-header>
                         <v-expansion-panel-content>
-                            <ScientificAffiliations></ScientificAffiliations>
+                            <ScientificAffiliations :other-person-id="otherPersonId"></ScientificAffiliations>
                         </v-expansion-panel-content>
                     </v-expansion-panel>
                     <v-expansion-panel v-if="data.isTechnical">
@@ -69,7 +69,7 @@
                             </div>
                         </v-expansion-panel-header>
                         <v-expansion-panel-content>
-                            <TechnicalAffiliations></TechnicalAffiliations>
+                            <TechnicalAffiliations :other-person-id="otherPersonId"></TechnicalAffiliations>
                         </v-expansion-panel-content>
                     </v-expansion-panel>
                     <v-expansion-panel v-if="data.isScienceManagement">
@@ -79,7 +79,7 @@
                             </div>
                         </v-expansion-panel-header>
                         <v-expansion-panel-content>
-                            <ScienceManagerAffiliations></ScienceManagerAffiliations>
+                            <ScienceManagerAffiliations :other-person-id="otherPersonId"></ScienceManagerAffiliations>
                         </v-expansion-panel-content>
                     </v-expansion-panel>
                     <v-expansion-panel v-if="data.isAdministrative">
@@ -89,7 +89,7 @@
                             </div>
                         </v-expansion-panel-header>
                         <v-expansion-panel-content>
-                            <AdministrativeAffiliations></AdministrativeAffiliations>
+                            <AdministrativeAffiliations :other-person-id="otherPersonId"></AdministrativeAffiliations>
                         </v-expansion-panel-content>
                     </v-expansion-panel>
                 </v-expansion-panels>
@@ -149,13 +149,16 @@
 <script>
 import subUtil from '../../../common/submit-utils'
 import time from '../../../common/date-utils'
-const Responsibles = () => import(/* webpackChunkName: "person-roles-responsibles" */ './Responsibles')
-const ScientificAffiliations = () => import(/* webpackChunkName: "person-roles-scientific-affiliations" */ './ScientificAffiliations')
-const TechnicalAffiliations = () => import(/* webpackChunkName: "person-roles-technical-affiliations" */ './TechnicalAffiliations')
-const ScienceManagerAffiliations = () => import(/* webpackChunkName: "person-roles-science-manager-affiliations" */ './ScienceManagerAffiliations')
-const AdministrativeAffiliations = () => import(/* webpackChunkName: "person-roles-administrative-affiliations" */ './AdministrativeAffiliations')
+const Responsibles = () => import(/* webpackChunkName: "person-on-behalf-roles-responsibles" */ './Responsibles')
+const ScientificAffiliations = () => import(/* webpackChunkName: "person-on-behalf-roles-scientific-affiliations" */ './ScientificAffiliations')
+const TechnicalAffiliations = () => import(/* webpackChunkName: "person-on-behalf-roles-technical-affiliations" */ './TechnicalAffiliations')
+const ScienceManagerAffiliations = () => import(/* webpackChunkName: "person-on-behalf-roles-science-manager-affiliations" */ './ScienceManagerAffiliations')
+const AdministrativeAffiliations = () => import(/* webpackChunkName: "person-on-behalf-roles-administrative-affiliations" */ './AdministrativeAffiliations')
 
 export default {
+    props: {
+        otherPersonId: Number,
+    },
     components: {
         Responsibles,
         ScientificAffiliations,
@@ -171,8 +174,8 @@ export default {
             dialog: false,
             message: '',
             formError: false,
-            personID: undefined,
             data: {
+                personName: '',
                 current_pole: {},
                 previous_poles: [],
                 roles: [],
@@ -191,10 +194,15 @@ export default {
         this.getPoles();
         this.getRoles();
     },
+    watch: {
+        otherPersonId () {
+            this.initialize();
+        },
+    },
     methods: {
         initialize () {
             if (this.$store.state.session.loggedIn) {
-                let personID = this.$store.state.session.personID;
+                let personID = this.otherPersonId;
                 this.personID = personID;
                 subUtil.getInfoPopulate(this, 'api/people/' + personID + '/poles', true)
                 .then( (result) => {
@@ -245,6 +253,13 @@ export default {
                         });
                     }
                 })
+                subUtil.getInfoPopulate(this, 'api'
+                                + '/people'
+                                + '/' + this.otherPersonId
+                                + '/nuclear-info', false)
+                .then( (result) => {
+                    this.data.personName = result.name;
+                })
             } else {
                 this.$refs.form.reset();
             }
@@ -268,12 +283,14 @@ export default {
         submitForm () {
             if (this.$store.state.session.loggedIn) {
                 this.progress = true;
-                const personID = this.$store.state.session.personID;
+                const personID = this.otherPersonId;
                 this.$http.post('api/people/' + personID + '/affiliation-message',
                     {
                         data: {
-                            message: this.message,
-                            personName: this.$store.state.session.personName,
+                            message: this.message
+                                + '\n(message sent on behalf by editor with id:'
+                                + this.$store.state.session.personID + ')',
+                            personName: this.data.personName,
                         }
                     },
                     {

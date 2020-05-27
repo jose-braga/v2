@@ -9,7 +9,7 @@
 
 <script>
 
-const ProfessionalSituations = () => import('./ProfessionalSituations')
+const ProfessionalSituations = () => import(/* webpackChunkName: "person-professional-professional-situations" */ './ProfessionalSituations')
 
 export default {
     components : {

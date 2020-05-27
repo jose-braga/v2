@@ -1,29 +1,24 @@
 <template>
 <v-tabs show-arrows
-    @change="tabChanged"
 >
-    <v-tab :to="currentPerson.link + '/personal'">
+    <v-tab :to="link + '/personal'">
         Personal
     </v-tab>
-    <v-tab :to="currentPerson.link + '/academic'">
+    <v-tab :to="link + '/academic'">
         Academic
     </v-tab>
-    <v-tab :to="currentPerson.link + '/institutional'">
+    <v-tab :to="link + '/institutional'">
         Institutional
     </v-tab>
-    <v-tab :to="currentPerson.link + '/professional'">
+    <v-tab :to="link + '/professional'">
         Professional
     </v-tab>
-    <v-tab :to="currentPerson.link + '/productivity '">
+    <v-tab :to="link + '/productivity '">
         Productivity
     </v-tab>
     <v-tabs-items>
         <keep-alive>
             <router-view
-                    :other-person-id="otherPersonId"
-                    :current-person="currentPerson"
-                    :active-tab="activeTab"
-                    :root-tab="rootTab"
             ></router-view>
         </keep-alive>
     </v-tabs-items>
@@ -33,26 +28,34 @@
 <script>
 export default {
     props: {
-        otherPersonId: Number,
-        currentPerson: Object,
-        rootTab: String,
     },
     data () {
         return {
-            activeTab: this.rootTab + '/personal',
         }
+    },
+    created() {
+        this.$router.replace(this.link + '/personal')
+    },
+    computed: {
+        otherPersonId() {
+            return this.$route.params.id;
+        },
+        link() {
+            let path_split = this.$route.path.split('/');
+            if (path_split.length === 3) {
+                return this.$route.path;
+            } else {
+                path_split.splice(-1,1);
+                return path_split.join('/');
+            }
+        },
     },
     watch: {
-        rootTab () {
-            this.activeTab = this.rootTab + '/personal';
-
+        otherPersonId () {
+            this.$router.replace(this.link + '/personal')
         },
-
     },
     methods: {
-        tabChanged: function(tab) {
-            this.activeTab = tab;
-        }
     },
 }
 </script>
