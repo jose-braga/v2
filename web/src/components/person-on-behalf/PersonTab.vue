@@ -13,7 +13,7 @@
     <v-tab :to="link + '/professional'">
         Professional
     </v-tab>
-    <v-tab :to="link + '/productivity '">
+    <v-tab :to="link + '/productivity'">
         Productivity
     </v-tab>
     <v-tabs-items>
@@ -34,7 +34,9 @@ export default {
         }
     },
     created() {
-        this.$router.replace(this.link + '/personal')
+        this.$router.push(this.link + '/personal')
+        .catch(err => {console.log(err)})
+
     },
     computed: {
         otherPersonId() {
@@ -44,15 +46,19 @@ export default {
             let path_split = this.$route.path.split('/');
             if (path_split.length === 3) {
                 return this.$route.path;
-            } else {
+            } else if (path_split.length === 4){
                 path_split.splice(-1,1);
+                return path_split.join('/');
+            } else {
+                path_split.splice(-2,2);
                 return path_split.join('/');
             }
         },
     },
     watch: {
         otherPersonId () {
-            this.$router.replace(this.link + '/personal')
+            this.$router.push(this.link + '/personal')
+            .catch(err => {console.log(err)})
         },
     },
     methods: {

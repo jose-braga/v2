@@ -653,7 +653,7 @@ export default {
                         + '/' + resource;
             this.progressORCID = true;
             if (this.$store.state.session.loggedIn) {
-                let urlSubmit = 'api/people/' + '/all-publications';
+                let urlSubmit = 'api/people' + '/all-publications';
                 this.messageORCIDRequest = 'Getting ORCID publications missing from DB'
                 subUtil.getInfoPopulate(this, urlSubmit, true)
                 .then( (result) => {

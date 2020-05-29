@@ -2,8 +2,9 @@
 <v-card flat>
     <v-card-title primary-title>
     </v-card-title>
-    <v-card-text>Shown are publications in your institutional repository
-        which are <b>not part of the LAQV/UCIBIO database</b><br>
+    <v-card-text>Search your ORCID profile (only publicly accessible data).
+        Search results will show only publications that are
+        <b>not part of the LAQV/UCIBIO database</b>.<br>
         It is advisable to check individual publication info before submitting (e.g. possible mismatches in journal info).<br>
         Items tagged <v-icon color="red">mdi-alert-circle-outline</v-icon> are missing
         crucial data.<br>
@@ -13,23 +14,23 @@
         <v-form ref="form" class="pa-4"
                 @submit.prevent="submitForm">
             <v-row>
-                <v-btn @click="getRepositoryPublications()"
-                        :disabled="repoError || !finishedJournals"
+                <v-btn @click="getORCIDPublications()"
+                        :disabled="orcidError || !finishedJournals"
                 >
-                    {{ repoMessage }}
+                    {{ orcidMessage }}
                 </v-btn>
                 <div class="request-status-container ml-2">
                     <v-progress-circular indeterminate
-                            v-show="progressRepo"
+                            v-show="progressORCID"
                             :size="20" :width="2"
                             color="primary">
                     </v-progress-circular>
                 </div>
-                <div v-show="progressRepo">
-                    {{ messageRepoRequest }}
+                <div v-show="progressORCID">
+                    {{ messageORCIDRequest }}
                 </div>
             </v-row>
-             <v-data-table v-if="finishedGetRepo"
+            <v-data-table v-if="finishedGetORCID"
                     item-key="id"
                     :headers="headers"
                     :footer-props="footerProps"
@@ -82,7 +83,7 @@
                     {{ messageErrorBeforeSubmit }}
                 </p>
             </v-row>
-            <v-row v-if="finishedGetRepo"
+            <v-row v-if="finishedGetORCID"
                     align-content="center"
                     justify="end"
                     class="pt-6">
@@ -102,7 +103,6 @@
                 </v-col>
             </v-row>
         </v-form>
-
     </v-container>
 </v-card>
 </template>
@@ -114,60 +114,262 @@ import leven from 'leven'
 
 import PublicationDetails from './PublicationDetails'
 
-function prepareStringComparison(str) {
-    if (str === null || str === undefined) {
-        return null;
-    } else {
-        return str.toLowerCase()
-            .replace(/[áàãâä]/g, 'a')
-            .replace(/[éèêë]/g, 'e')
-            .replace(/[íìîï]/g, 'i')
-            .replace(/[óòõôö]/g, 'o')
-            .replace(/[úùûü]/g, 'u')
-            .replace(/[ç]/g, 'c')
-            .replace(/[ñ]/g, 'n')
-            .replace(/(\.\s)/g, '')
-            .replace(/(\.)/g, '')
-            .replace(/[-:()]/g, ' ')
-            .trim()
-            ;
-    }
-}
-function compareTwoStrings(first, second) {
-    //https://github.com/aceakash/string-similarity/blob/master/compare-strings.js
-    first = first.replace(/\s+/g, '')
-    second = second.replace(/\s+/g, '')
+function filterORCIDData(works) {
+    // filter out any works which are not printed/digital publications
+    let publicationsFiltered = [];
+    if (Object.prototype.hasOwnProperty.call(works, 'group')
+            && works.group.length > 0) {
+        for (let ind in works.group) {
+            let publication = works.group[ind];
+            let getThisPublication = false;
+            let typeIsNull = false;
+            let hasPutcode = true;
+            let putcode = null;
+            let currentBest = 10; // this number is the order of preference
+            let thisClassification = 10;
+            // sources from by order of preference
+            // 1. CIÊNCIAVITAE,
+            // 2. Crossref, Crossref Metadata Search, Europe PubMed Central, Scopus - Elsevier
+            // (cont) ResearcherID, Universidade Nova de Lisboa
+            // 3. All others that have BIBTEK citations (only after getting details)
+            // 4. All others that have no BIBTEK citations (only after getting details)
+            if (Object.prototype.hasOwnProperty.call(publication, 'work-summary')
+                    && publication['work-summary'].length > 0) {
+                for (let indSum in publication['work-summary']) {
+                    if (Object.prototype.hasOwnProperty.call(publication['work-summary'][indSum],'type')) {
+                        if (publication['work-summary'][indSum].type !== 'LECTURE_SPEECH'
+                            && publication['work-summary'][indSum].type !== 'CONFERENCE_POSTER'
+                            && publication['work-summary'][indSum].type !== 'CONFERENCE_PAPER'
+                            && publication['work-summary'][indSum].type !== 'DISSERTATION'
+                            && publication['work-summary'][indSum].type !== 'BOOK_CHAPTER'
+                            && publication['work-summary'][indSum].type !== 'BOOK'
+                           // && publication['work-summary'][indSum].type !== 'OTHER'
+                        ) {
 
-    if (!first.length && !second.length) return 1;                   // if both are empty strings
-    if (!first.length || !second.length) return 0;                   // if only one is empty string
-    if (first === second) return 1;       							 // identical
-    if (first.length === 1 && second.length === 1) return 0;         // both are 1-letter strings
-    if (first.length < 2 || second.length < 2) return 0;			 // if either is a 1-letter string
+                            getThisPublication = true;
+                        }
+                    } else {
+                        typeIsNull === true;
+                    }
+                    if (Object.prototype.hasOwnProperty.call(publication['work-summary'][indSum],'put-code')) {
+                        if (Object.prototype.hasOwnProperty.call(publication['work-summary'][indSum],'source')) {
+                            if (Object.prototype.hasOwnProperty.call(publication['work-summary'][indSum].source,'source-name')) {
+                                if (publication['work-summary'][indSum].source['source-name'].value === 'CIÊNCIAVITAE') {
+                                    thisClassification = 1;
+                                } else if (publication['work-summary'][indSum].source['source-name'].value === 'Crossref Metadata Search'
+                                        || publication['work-summary'][indSum].source['source-name'].value === 'Crossref'
+                                        || publication['work-summary'][indSum].source['source-name'].value === 'Europe PubMed Central'
+                                        || publication['work-summary'][indSum].source['source-name'].value === 'Scopus - Elsevier'
+                                        || publication['work-summary'][indSum].source['source-name'].value === 'ResearcherID'
+                                        || publication['work-summary'][indSum].source['source-name'].value === 'Universidade Nova de Lisboa') {
+                                    thisClassification = 2;
+                                } else {
+                                    thisClassification = 4;
+                                }
+                            } else {
+                                thisClassification = 5;
+                            }
+                        } else {
+                            thisClassification = 10;
+                        }
+                        if (thisClassification <= currentBest) {
+                            currentBest = thisClassification;
+                            putcode = publication['work-summary'][indSum]['put-code'];
+                        }
+                    }
+                    let title = null;
+                    if (Object.prototype.hasOwnProperty.call(publication['work-summary'][indSum],'title')) {
+                        if (Object.prototype.hasOwnProperty.call(publication['work-summary'][indSum].title,'title')) {
+                            title = publication['work-summary'][indSum].title.title.value.trim();
+                        }
+                    }
+                    publication.title = title;
+                    let doi = null;
+                    if (Object.prototype.hasOwnProperty.call(publication['work-summary'][indSum],'external-ids')
+                            && publication['work-summary'][indSum]['external-ids'] !== null) {
+                        if (Object.prototype.hasOwnProperty.call(publication['work-summary'][indSum]['external-ids'],'external-id')) {
+                            let extId = publication['work-summary'][indSum]['external-ids']['external-id'];
+                            for (let indId in extId) {
+                                if (extId[indId]['external-id-type'] === 'doi') {
+                                    doi = extId[indId]['external-id-value'];
+                                }
+                            }
+                        }
+                    }
+                    publication.doi = doi;
+                }
+            }
+            if (putcode !== null) {
+                publication.putcode = putcode;
+                publication.preference = currentBest;
 
-    let firstBigrams = new Map();
-    for (let i = 0; i < first.length - 1; i++) {
-        const bigram = first.substr(i, 2);
-        const count = firstBigrams.has(bigram)
-            ? firstBigrams.get(bigram) + 1
-            : 1;
-
-        firstBigrams.set(bigram, count);
-    }
-
-    let intersectionSize = 0;
-    for (let i = 0; i < second.length - 1; i++) {
-        const bigram = second.substr(i, 2);
-        const count = firstBigrams.has(bigram)
-            ? firstBigrams.get(bigram)
-            : 0;
-
-        if (count > 0) {
-            firstBigrams.set(bigram, count - 1);
-            intersectionSize++;
+            } else {
+                hasPutcode = false;
+            }
+            if ((getThisPublication || typeIsNull) && hasPutcode) {
+                publicationsFiltered.push(publication);
+            }
         }
     }
-
-    return (2.0 * intersectionSize) / (first.length + second.length - 2);
+    return publicationsFiltered;
+}
+function removeExistingPublications(orcidPublications, dbPublications) {
+    let newPublications = [];
+    let dbDOIs = [];
+    let dbTitles = [];
+    for (let ind in dbPublications) {
+        if (dbPublications[ind].doi !== null) {
+            dbDOIs.push(dbPublications[ind].doi
+                        .toLowerCase()
+                        .replace('https://doi.org/','')
+                        .replace('http://dx.doi.org/','')
+                        .replace('doi: ','')
+                        .replace('doi:','')
+                        .replace('doi ',''))
+        }
+        dbTitles.push(dbPublications[ind].title
+                    .toLowerCase()
+                    .replace(/[-;,:]/g,''))
+    }
+    for (let ind in orcidPublications) {
+        let orcidDOI = null;
+        if (orcidPublications[ind].doi !== null) {
+            orcidDOI = orcidPublications[ind].doi
+                        .toLowerCase()
+                        .replace('https://doi.org/','')
+                        .replace('http://dx.doi.org/','')
+                        .replace('doi: ','')
+                        .replace('doi:','')
+                        .replace('doi ','');
+        }
+        // search existing DOI, then existing titles
+        if (orcidDOI === null || dbDOIs.indexOf(orcidDOI) === -1) {
+            let orcidTitle = orcidPublications[ind].title
+                            .toLowerCase()
+                            .replace(/[-;,:]/g,'')
+            if (dbTitles.indexOf(orcidTitle) === -1) {
+                //publication is not in DB
+                newPublications.push(orcidPublications[ind])
+            }
+        }
+    }
+    return newPublications;
+}
+function processDetails(pub, response) {
+    pub.isORCID = true; // send a signal to the details component that this data comes from ORCID
+    pub.publication_source_id = 2;
+    let details = response.data;
+    let journal = null;
+    if (Object.prototype.hasOwnProperty.call(details,'journal-title')) {
+        if (details['journal-title'] !== null
+                && Object.prototype.hasOwnProperty.call(details['journal-title'],'value')) {
+            journal = details['journal-title']['value'];
+        }
+    }
+    if (journal !== null) {
+        journal = journal.replace(/&amp;/g,'&');
+    }
+    pub.journal_name = journal;
+    let year = null;
+    let month = null;
+    let day = null;
+    if (Object.prototype.hasOwnProperty.call(details,'publication-date')) {
+        if (details['publication-date'] !== null
+                && Object.prototype.hasOwnProperty.call(details['publication-date'],'year')
+                && details['publication-date'].year !== null) {
+            year = details['publication-date'].year.value;
+            if (year !== null && year !== undefined) {
+                pub.year = year;
+            }
+        }
+        if (details['publication-date'] !== null
+                && Object.prototype.hasOwnProperty.call(details['publication-date'],'month')
+                && details['publication-date'].month !== null) {
+            month = details['publication-date'].month.value;
+            if (month !== null && month !== undefined) {
+                pub.month = month;
+            }
+        }
+        if (details['publication-date'] !== null
+                && Object.prototype.hasOwnProperty.call(details['publication-date'],'day')
+                && details['publication-date'].day !== null) {
+            day = details['publication-date'].day.value;
+            if (day !== null && day !== undefined) {
+                pub.day = day;
+            }
+        }
+    }
+    let contributors = [];
+    if (Object.prototype.hasOwnProperty.call(details,'contributors')) {
+        if (details['contributors'] !== null && Object.prototype.hasOwnProperty.call(details['contributors'],'contributor')) {
+            for (let ind in details.contributors.contributor) {
+                if (Object.prototype.hasOwnProperty.call(details.contributors.contributor[ind],'credit-name')) {
+                    if (details.contributors.contributor[ind]['credit-name'] !== null
+                        && Object.prototype.hasOwnProperty.call(details.contributors.contributor[ind]['credit-name'],'value')) {
+                        if (details.contributors.contributor[ind]['credit-name'].value !== null) {
+                            contributors.push(details.contributors.contributor[ind]['credit-name'].value);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    let volume = null;
+    let number = null; //this is used by some journals
+    let pages = null;
+    let authors = null;
+    if (Object.prototype.hasOwnProperty.call(details,'citation')) {
+        //from this we can get authors, volume, pages
+        if (details.citation !== null && Object.prototype.hasOwnProperty.call(details.citation,'citation-type')) {
+            if (details.citation['citation-type'] === 'BIBTEX') {
+                if (details.citation['citation-value'] !== null) {
+                    let vol = details.citation['citation-value'].match(/volume = {(.*?)}/);
+                    if (vol !== null) volume = vol[1];
+                    let num = details.citation['citation-value'].match(/number = {(.*?)}/);
+                    if (num !== null) number = num[1];
+                    let pg = details.citation['citation-value'].match(/pages = {(.*?)}/);
+                    if (pg !== null) pages = pg[1];
+                    let aut = details.citation['citation-value'].match(/author = {(.*?)}/);
+                    if (aut !== null) authors = aut[1];
+                    let j = details.citation['citation-value'].match(/journal = {(.*?)}/);
+                    if (journal === null) {
+                        if (j !== null) {
+                            journal = j[1];
+                            pub.journal_name = journal;
+                        }
+                    }
+                    if (year === null) {
+                        let yearCit = details.citation['citation-value'].match(/year = (\d+)/);
+                        if (yearCit !== null) {
+                            year = yearCit[1];
+                            pub.year = year
+                        }
+                    }
+                }
+            } else {
+                pub.alert_format = 1;
+                //'This data is not in an automatically parsed format (Bibtex), please add additional info below\nData format: ' + details.citation['citation-type']);
+            }
+        }
+    }
+    pub.volume = volume;
+    pub.number = number;
+    pub.pages = pages;
+    if (contributors.length ===0) {
+        if (authors !== null && authors !== '') {
+            pub.authors_raw = authors;
+        }
+    } else {
+        let strAuthors = '';
+        for (let ind in contributors) {
+            if (ind > 0) strAuthors = strAuthors + '; ';
+            strAuthors = strAuthors + contributors[ind];
+        }
+        pub.authors_raw = strAuthors
+                    .replace(/\.\s/g, '')
+                    .replace(/\./g, '');
+    }
+    return pub;
 }
 function determineJournal(pub, journals) {
     let mostSimilarJournalID = null;
@@ -210,226 +412,6 @@ function determineJournal(pub, journals) {
     }
     return pub;
 }
-function removeExistingPublications(purePublications, dbPublications) {
-    let newPublications = [];
-    let dbDOIs = [];
-    let dbWOSs = [];
-    let dbPubmeds = [];
-    let dbTitles = [];
-    let dbJournals = [];
-    let dbJournalsShort = [];
-
-    for (let ind in dbPublications) {
-        if (dbPublications[ind].doi !== null) {
-            dbDOIs.push(dbPublications[ind].doi
-                .toLowerCase()
-                .replace('https://doi.org/','')
-                .replace('http://dx.doi.org/','')
-                .replace('doi: ','')
-                .replace('doi:','')
-                .replace('doi ',''));
-        }
-        if (dbPublications[ind].wos !== null) {
-            dbWOSs.push(dbPublications[ind].wos
-                .toLowerCase()
-                .replace('WOS:',''));
-        }
-        if (dbPublications[ind].pubmed_id !== null) {
-            dbPubmeds.push(dbPublications[ind].pubmed_id);
-        }
-        if (dbPublications[ind].title !== null) {
-            dbTitles.push(prepareStringComparison(dbPublications[ind].title));
-            dbJournals.push(prepareStringComparison(dbPublications[ind].journal_name));
-            dbJournalsShort.push(prepareStringComparison(dbPublications[ind].journal_short_name));
-        }
-    }
-    for (let ind in purePublications) {
-        let pureDOI = null;
-        let electronicVersion = purePublications[ind].electronicVersions;
-        let checkMore = true;
-        if (electronicVersion !== null
-                && electronicVersion !== undefined
-                && electronicVersion.length !== 0) {
-            pureDOI = electronicVersion[0].doi;
-            if (pureDOI !== null && pureDOI !== undefined) {
-                pureDOI = pureDOI.toLowerCase()
-                        .replace('https://doi.org/','')
-                        .replace('http://dx.doi.org/','');
-                if (dbDOIs.indexOf(pureDOI) === -1) {
-                    checkMore = true;
-                } else {
-                    checkMore = false;
-                    continue;
-                }
-            }
-        }
-        // DOI didn't match, try WOS and Pubmed and title/journal
-        // this numbers can be found in several keys
-        if (checkMore) {
-            let pureWOS = null;
-            let purePubmedId = null;
-            let info = purePublications[ind].info;
-            if (info !== undefined && info !== null) {
-                let addExtID = info.additionalExternalIds;
-                if (addExtID !== undefined && addExtID !== null) {
-                    for (let indExt in addExtID) {
-                        if (addExtID[indExt].idSource === 'WOS') {
-                            pureWOS = addExtID[indExt].value;
-                        } else if (addExtID[indExt].idSource === 'PubMed') {
-                            purePubmedId = addExtID[indExt].value;
-                        }
-                    }
-                    if (dbWOSs.indexOf(pureWOS) === -1) {
-                        checkMore = true;
-                    } else {
-                        checkMore = false;
-                        continue;
-                    }
-                    if (dbPubmeds.indexOf(purePubmedId) === -1) {
-                        checkMore = true;
-                    } else {
-                        checkMore = false;
-                        continue;
-                    }
-                }
-            }
-            // now try checking by title/journal
-            if (checkMore) {
-                let pureTitle = prepareStringComparison(purePublications[ind].title.value);
-                let indTitle = dbTitles.indexOf(pureTitle);
-                if (indTitle === -1) {
-                    checkMore = true;
-                } else {
-                    // now check if corresponding journal is the same
-                    if (purePublications[ind].journalAssociation !== null
-                          && purePublications[ind].journalAssociation !== undefined) {
-                        let pureJournal = prepareStringComparison(purePublications[ind].journalAssociation.title.value);
-                        if (compareTwoStrings(pureTitle, dbTitles[indTitle]) > 0.95
-                            && (compareTwoStrings(pureJournal, dbJournals[indTitle]) > 0.95
-                                || compareTwoStrings(pureJournal, dbJournalsShort[indTitle]) > 0.95)
-                            ) {
-                            checkMore = false;
-                            continue;
-                        }
-                        else {
-                            checkMore = true;
-                        }
-                    }
-                }
-                if (checkMore) {
-                    let pureJournal = null;
-                    let pureISSN = null;
-                    let purePublisher = null;
-                    let purePages;
-                    let purePageStart = null;
-                    let purePageEnd = null;
-                    let pureYear, pureMonth, pureDay;
-                    let pureAuthors = ''
-                    let pureNumberAuthors = null;
-                    purePublications[ind].title = purePublications[ind].title.value
-                    if (purePublications[ind].journalAssociation !== null
-                          && purePublications[ind].journalAssociation !== undefined) {
-                        pureJournal = purePublications[ind].journalAssociation.title.value;
-                        if (purePublications[ind].journalAssociation.issn !== null
-                            && purePublications[ind].journalAssociation.issn !== undefined) {
-                            pureISSN = purePublications[ind].journalAssociation.issn.value;
-                        }
-                    }
-                    if (purePublications[ind].publisher !== null
-                          && purePublications[ind].publisher !== undefined) {
-                        if (purePublications[ind].publisher.name !== null
-                              && purePublications[ind].publisher.name !== undefined) {
-                            if (purePublications[ind].publisher.name.text !== null
-                                  && purePublications[ind].publisher.name.text !== undefined) {
-                                purePublisher = purePublications[ind].publisher.name.text[0].value;
-                            }
-                        }
-                    }
-                    purePages = purePublications[ind].pages;
-                    if (purePages !== null && purePages !== undefined) {
-                        purePages = purePages.split('-');
-                        if (purePages.length > 1) {
-                            purePageStart = purePages[0];
-                            purePageEnd = purePages[1];
-                        } else {
-                            purePageStart = purePages[0];
-                        }
-                    }
-                    if (purePublications[ind].publicationStatuses !== null
-                            && purePublications[ind].publicationStatuses !== undefined) {
-                        for (let stat in purePublications[ind].publicationStatuses) {
-                            if (purePublications[ind].publicationStatuses[stat].current === true) {
-                                pureYear = purePublications[ind].publicationStatuses[stat].publicationDate.year;
-                                pureMonth = purePublications[ind].publicationStatuses[stat].publicationDate.month;
-                                pureDay = purePublications[ind].publicationStatuses[stat].publicationDate.day;
-                                break;
-                            }
-                        }
-                    }
-                    if (purePublications[ind].personAssociations !== null
-                            && purePublications[ind].personAssociations !== undefined) {
-                        pureNumberAuthors = purePublications[ind].personAssociations.length;
-                    }
-                    for (let aut in purePublications[ind].personAssociations) {
-                        if (purePublications[ind].personAssociations[aut].name !== null
-                            && purePublications[ind].personAssociations[aut].name !== undefined) {
-                            let firstName = purePublications[ind].personAssociations[aut].name.firstName;
-                            let lastName = purePublications[ind].personAssociations[aut].name.lastName;
-                            if (lastName !== null && lastName !== undefined) {
-                                if (firstName !== null && firstName !== undefined) {
-                                    pureAuthors= pureAuthors + lastName + ', '
-                                                + firstName;
-                                } else {
-                                    pureAuthors = pureAuthors + lastName;
-                                }
-                            } else {
-                                if (firstName !== null && firstName !== undefined) {
-                                    pureAuthors = pureAuthors + firstName;
-                                }
-                            }
-                            if (parseInt(aut, 10) < purePublications[ind].personAssociations.length - 1) {
-                                pureAuthors = pureAuthors + '; ';
-                            }
-                        }
-                    }
-                    purePublications[ind].journal_name = pureJournal;
-                    purePublications[ind].publisher = purePublisher;
-                    purePublications[ind].doi = pureDOI;
-                    purePublications[ind].wos = pureWOS;
-                    purePublications[ind].pubmed_id = purePubmedId;
-                    purePublications[ind].issn = pureISSN;
-                    purePublications[ind].page_start = purePageStart;
-                    purePublications[ind].page_end = purePageEnd;
-                    purePublications[ind].year = pureYear;
-                    purePublications[ind].month = pureMonth;
-                    purePublications[ind].day = pureDay;
-                    let publicationDate = '';
-                    if (pureYear !== null && pureYear !== undefined) {
-                        publicationDate = publicationDate + pureYear;
-                        if (pureMonth !== null && pureMonth !== undefined) {
-                            publicationDate = publicationDate + '-' + pureMonth;
-                            if (pureDay !== null && pureDay !== undefined) {
-                                publicationDate = publicationDate + '-' + pureDay;
-                            }
-                        }
-                    } else {
-                        if (pureMonth !== null && pureMonth !== undefined) {
-                            publicationDate = publicationDate + pureMonth;
-                            if (pureDay !== null && pureDay !== undefined) {
-                                publicationDate = publicationDate + '-' + pureDay;
-                            }
-                        }
-                    }
-                    purePublications[ind].publication_date = pureYear + '-' + pureMonth + '-' + pureDay;
-                    purePublications[ind].authors_raw = pureAuthors;
-                    purePublications[ind].number_authors = pureNumberAuthors;
-                    newPublications.push(purePublications[ind])
-                }
-            }
-        }
-    }
-    return newPublications;
-}
 
 export default {
     components: {
@@ -437,12 +419,13 @@ export default {
     },
     props: {
         currentTab: String,
+        otherPersonId: Number,
     },
     data() {
         return {
-            repoError: false,
-            repoMessage: '',
-            messageRepoRequest: '',
+            orcidError: false,
+            orcidMessage: '',
+            messageORCIDRequest: '',
             dialog: false,
             editedIndex: -1,
             editedItem: {},
@@ -452,8 +435,8 @@ export default {
             success: false,
             error: false,
             formError: false,
-            progressRepo: false,
-            finishedGetRepo: false,
+            progressORCID: false,
+            finishedGetORCID: false,
             finishedJournals: false,
             headers: [
                 { text: 'Title', value:'title_show' },
@@ -468,8 +451,7 @@ export default {
             },
             journals: [],
             data: {
-                pureID: undefined, //actually in general it is the ID in the current repo
-                repoName: '',
+                orcid: undefined,
                 publicationsDB: [],
                 publications: [],
             },
@@ -478,7 +460,7 @@ export default {
     },
     mounted() {
         this.initialize();
-        this.$root.$on('updateSingleAddPublicationDatabasePURE',
+        this.$root.$on('updateSingleAddPublicationDatabaseORCID',
             (publicationData) => {
                 this.updateData(publicationData);
             }
@@ -486,16 +468,16 @@ export default {
     },
     watch: {
         currentTab () {
-            if (this.currentTab === '/person/productivity/add-publications') {
+            if (this.currentTab.includes('/add-publications')) {
                 this.initialize();
             }
         },
     },
     methods: {
         initialize () {
-            this.getRepoID();
+            this.getORCID();
             this.getJournals()
-                .then(() => { this.finishedJournals = true;});
+            .then(() => { this.finishedJournals = true;});
         },
         submitForm() {
             // first check if selected publications are OK for addition
@@ -513,7 +495,6 @@ export default {
                     }
                 }
             }
-            this.messageErrorBeforeSubmit = '';
             if (!publicationsOK) {
                 let textMessage = 'The following publications have problems: '
                 for (let ind in notOKPublications) {
@@ -526,8 +507,9 @@ export default {
                 this.errorBeforeSubmit = true;
                 this.messageErrorBeforeSubmit = textMessage;
             }
+
             if (this.$store.state.session.loggedIn && publicationsOK) {
-                let personID = this.$store.state.session.personID;
+                let personID = this.otherPersonId;
                 let urlCreateJournal = [];
                 let urlCreatePublications = [];
                 let urlCreatePersonPublications = [];
@@ -632,76 +614,90 @@ export default {
                 })
 
             }
-
         },
-        getRepoID () {
+        getORCID () {
             if (this.$store.state.session.loggedIn) {
-                let personID = this.$store.state.session.personID;
+                let personID = this.otherPersonId;
                 let urlSubmit = 'api/people/' + personID + '/researcher-ids';
                 subUtil.getInfoPopulate(this, urlSubmit, false)
                 .then( (result) => {
                     if (result !== undefined) {
-                        this.data.pureID = result.pure_id;
-                        this.data.repoName = result.repository_short_name;
+                        this.data.orcid = result.ORCID;
                     }
-                    if (this.data.pureID === undefined
-                            || this.data.pureID === null
-                            || this.data.pureID === ''
+                    if (this.data.orcid === undefined
+                            || this.data.orcid === null
+                            || this.data.orcid === ''
                             || result === undefined) {
-                        this.repoError = true;
-                        this.repoMessage = 'Missing ID in repository!';
+                        this.orcidError = true;
+                        this.orcidMessage = 'Missing ORCID!';
                     } else {
-                        this.repoError = false;
-                        this.repoMessage = 'Get from '+ this.data.repoName
-                                            + ' (id=' + this.data.pureID + ')';
+                        this.orcidError = false;
+                        this.orcidMessage = 'Get from ' + this.data.orcid;
                     }
                 });
             }
         },
         getJournals () {
-            let vm = this;
+            var vm = this;
             if (this.$store.state.session.loggedIn) {
                 const urlSubmit = 'api/v2/' + 'journals';
                 return subUtil.getPublicInfo(vm, urlSubmit, 'journals');
             }
         },
-        getRepositoryPublications () {
-            let personID = this.$store.state.session.personID;
+        getORCIDPublications () {
+            let baseURL = 'https://pub.orcid.org';
+            let version = 'v2.1';
+            let resource = 'works';
+            let urlORCID = baseURL
+                        + '/' + version
+                        + '/' + this.data.orcid
+                        + '/' + resource;
+            this.progressORCID = true;
             if (this.$store.state.session.loggedIn) {
                 let urlSubmit = 'api/people' + '/all-publications';
-                this.messageRepoRequest = 'Getting repository publications missing from DB';
-                this.progressRepo = true;
+                this.messageORCIDRequest = 'Getting ORCID publications missing from DB'
                 subUtil.getInfoPopulate(this, urlSubmit, true)
-                    .then( (result) => {
-                        this.data.publicationsDB = result;
-                        let urlPURE = 'api/people/' + personID + '/pure-publications';
-                        this.messageRepoRequest = 'Processing details of new publications';
-                        return subUtil.getInfoPopulate(this, urlPURE, true);
-                    })
-                    .then( (result) => {
-                        let publicationsPURE = result.publications;
-                        publicationsPURE = removeExistingPublications(publicationsPURE, this.data.publicationsDB);
-                        for (let ind in publicationsPURE) {
-                            this.$set(publicationsPURE[ind], 'publication_id',
-                                        parseInt(ind, 10));
-                            publicationsPURE[ind].publication_source_id = 4;
-                            publicationsPURE[ind].isPURE = true;
-                            publicationsPURE[ind] = determineJournal(publicationsPURE[ind], this.journals);
-                            if (publicationsPURE[ind].title === null
-                                    || publicationsPURE[ind].authors_raw === null
-                                    || publicationsPURE[ind].journal_name === null) {
-                                this.$set(publicationsPURE[ind], 'incomplete', true);
-                            }
-                        }
-                        this.data.publications = publicationsPURE;
-                        this.onResize();
-                        this.progressRepo = false;
-                        this.finishedGetRepo = true;
-                    })
-                    .catch((error) => {
-                        // eslint-disable-next-line
-                        console.log(error)
+                .then( (result) => {
+                    this.data.publicationsDB = result;
+                    return this.$http.get(urlORCID, {
+                        headers: { 'Accept': 'application/json' },
                     });
+                })
+                .then( (result) => {
+                    let resultFiltered = filterORCIDData(result.data)
+                    resultFiltered = removeExistingPublications(resultFiltered, this.data.publicationsDB);
+                    this.data.publications = resultFiltered;
+                    this.messageORCIDRequest = 'Processing results'
+                    return this.$http.all(
+                        this.data.publications.map(el => {
+                            let resource = 'work';
+                            let url = baseURL
+                                + '/' + version
+                                + '/' + this.data.orcid
+                                + '/' + resource
+                                + '/' + el.putcode;
+                            return this.$http.get(url, {
+                                headers: { 'Accept': 'application/json' },
+                            });
+                        }
+                    ))
+                })
+                .then( this.$http.spread( (...details) => {
+                    for (let ind in details) {
+                        this.$set(this.data.publications[ind], 'publication_id',
+                                        parseInt(ind, 10));
+                        this.data.publications[ind] = processDetails(this.data.publications[ind], details[ind]);
+                        this.data.publications[ind] = determineJournal(this.data.publications[ind], this.journals);
+                        if (this.data.publications[ind].title === null
+                            || this.data.publications[ind].authors_raw === null
+                            || this.data.publications[ind].journal_name === null) {
+                            this.$set(this.data.publications[ind], 'incomplete', true);
+                        }
+                    }
+                    this.onResize();
+                    this.progressORCID = false;
+                    this.finishedGetORCID = true;
+                }));
             }
         },
         updateData (publicationData) {
@@ -752,6 +748,7 @@ export default {
 
             }
             items = orderBy(items, funcOrderArray, directionArray);
+
             return items
         },
         cutLargeString (value, maxLength) {

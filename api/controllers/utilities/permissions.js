@@ -109,16 +109,9 @@ module.exports.checkPermissions = function (callback, callbackOptions) {
 
         // a user on behalf of another cannot change authorization for that user
         return callback(callbackOptions);
-
-        /*
-        if (resourceType.includes('photos')) {
-            return getResourceOwnership(resourceType, operationResource, callback, callbackOptions, true);
-        } else {
-            return getResourceOwnership(resourceType, operationResource, callback, callbackOptions, false);
-        }
-        */
+    } else if (personID !== undefined && reqEndpoint.includes('/api/people/all-publications')) {
+        return callback(callbackOptions);
     } else {
-
         responses.sendJSONResponse(res, 403, {
             "status": "error",
             "statusCode": 403,

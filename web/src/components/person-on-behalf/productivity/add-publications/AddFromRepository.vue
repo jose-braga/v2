@@ -437,6 +437,7 @@ export default {
     },
     props: {
         currentTab: String,
+        otherPersonId: Number,
     },
     data() {
         return {
@@ -486,7 +487,7 @@ export default {
     },
     watch: {
         currentTab () {
-            if (this.currentTab === '/person/productivity/add-publications') {
+            if (this.currentTab.includes('/add-publications')) {
                 this.initialize();
             }
         },
@@ -527,7 +528,7 @@ export default {
                 this.messageErrorBeforeSubmit = textMessage;
             }
             if (this.$store.state.session.loggedIn && publicationsOK) {
-                let personID = this.$store.state.session.personID;
+                let personID = this.otherPersonId;
                 let urlCreateJournal = [];
                 let urlCreatePublications = [];
                 let urlCreatePersonPublications = [];
@@ -636,7 +637,7 @@ export default {
         },
         getRepoID () {
             if (this.$store.state.session.loggedIn) {
-                let personID = this.$store.state.session.personID;
+                let personID = this.otherPersonId;
                 let urlSubmit = 'api/people/' + personID + '/researcher-ids';
                 subUtil.getInfoPopulate(this, urlSubmit, false)
                 .then( (result) => {
@@ -666,7 +667,7 @@ export default {
             }
         },
         getRepositoryPublications () {
-            let personID = this.$store.state.session.personID;
+            let personID = this.otherPersonId;
             if (this.$store.state.session.loggedIn) {
                 let urlSubmit = 'api/people' + '/all-publications';
                 this.messageRepoRequest = 'Getting repository publications missing from DB';

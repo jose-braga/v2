@@ -681,9 +681,9 @@ var insertContractJobRelationship = function (options) {
     places.push(jobID, contract_id);
     return sql.makeSQLOperation(req, res, querySQL, places,
         (options) => {
-            if (data.funding_agencies.length > 0) {
+            if (data.funding_agencies !== undefined && data.funding_agencies.length > 0) {
                 return insertContractFundingAgencyRelationship(options, 0)
-            } else if (data.management_entities.length > 0) {
+            } else if (data.management_entities !== undefined && data.management_entities.length > 0) {
                 return insertContractManagementEntityRelationship(options, 0)
             } else {
                 responses.sendJSONResponseOptions({
