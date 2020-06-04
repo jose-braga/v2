@@ -483,9 +483,6 @@ export default {
                             console.log(error)
                         })
                 }
-                /*
-
-                */
             }
         },
         generateSpreadsheet(members, labData) {
@@ -496,7 +493,8 @@ export default {
             let wb = XLSX.utils.book_new();
             let ws  = XLSX.utils.json_to_sheet(membersCurated);
             XLSX.utils.book_append_sheet(wb, ws, 'Past Members or Positions');
-            XLSX.writeFile(wb, labData.name + '_past-team-members_' + dateFile + '.xlsx');
+            let filename = labData.name.replace(/[^a-z0-9]/gi, '_')
+            XLSX.writeFile(wb, filename + '_past-team-members_' + dateFile + '.xlsx');
         },
         customSort (items, sortBy, sortDesc) {
             let funcOrderArray = [];

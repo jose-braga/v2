@@ -106,7 +106,6 @@ module.exports.checkPermissions = function (callback, callbackOptions) {
 
     } else if (hasAccessEndpoint(reqMethod, reqEndpoint, permissionsEndpoints)
                 && reqEndpointParts[2] !== 'external-api-authorization') {
-
         // a user on behalf of another cannot change authorization for that user
         return callback(callbackOptions);
     } else if (personID !== undefined && reqEndpoint.includes('/api/people/all-publications')) {

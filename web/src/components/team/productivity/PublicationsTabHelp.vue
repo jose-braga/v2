@@ -2,7 +2,7 @@
 <v-card>
     <v-card-title primary-title>
         <div>
-            <h3 class="headline">Help for Personal Tab 2</h3>
+            <h3 class="headline">Help for Publications by Team Tab</h3>
         </div>
     </v-card-title>
     <v-card-text>
@@ -22,6 +22,6 @@ export default {
 }
 </script>
 
- <style scoped>
+<style scoped>
 
 </style>

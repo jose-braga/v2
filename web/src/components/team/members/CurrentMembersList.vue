@@ -40,6 +40,9 @@
                 <template v-slot:top>
                     <v-dialog v-model="dialog" max-width="1600px">
                         <v-card>
+                            {{editedItem.most_recent_data.show_add_more_recent}}
+                            {{$v.editedItem.most_recent_data.valid_until}}
+                            {{$v.$invalid}}
                             <v-form @submit.prevent="submitForm(editedItem)">
                                 <v-card-title>
                                     <span class="headline">{{ editedItem.name }}</span>
@@ -100,12 +103,13 @@
                                                     transition="scale-transition"
                                                     offset-y min-width="290px">
                                                     <template v-slot:activator="{ on }">
-                                                        <v-text-field v-model="editedItem.most_recent_data.valid_until"
+                                                        <v-text-field v-model="$v.editedItem.most_recent_data.valid_until.$model"
+                                                            :error="$v.$invalid"
                                                             :disabled="editedItem.most_recent_data.to_delete"
                                                             label="Ended" v-on="on">
                                                         </v-text-field>
                                                     </template>
-                                                    <v-date-picker v-model="editedItem.most_recent_data.valid_until"
+                                                    <v-date-picker v-model="$v.editedItem.most_recent_data.valid_until.$model"
                                                             @input="editedItem.most_recent_data.show_valid_until = false"
                                                             no-title></v-date-picker>
                                                 </v-menu>
@@ -183,6 +187,9 @@
                                     <v-row justify="center" align="center">
                                         <v-col cols="11" sm="2">
                                             <v-row justify="end">
+                                                <div v-if="formError">
+                                                    <p class="caption red--text">Unable to submit form.</p>
+                                                </div>
                                                 <v-btn type="submit"
                                                     outlined
                                                     color="blue"
@@ -227,6 +234,7 @@ import time from '../../common/date-utils'
 import subUtil from '../../common/submit-utils'
 import {orderBy} from 'lodash'
 import XLSX from 'xlsx'
+import {requiredIf} from 'vuelidate/lib/validators'
 
 function processResults(vm, result) {
     let currentMembers = [];
@@ -256,7 +264,6 @@ function processResults(vm, result) {
     }
     return currentMembers;
 }
-
 function processForSpreadsheet(members) {
     let membersCurated = [];
     for (let ind in members) {
@@ -285,6 +292,7 @@ export default {
     data() {
         return {
             dialog: false,
+            formError: false,
             editedIndex: -1,
             editedItem: {
                 most_recent_data: {},
@@ -344,8 +352,7 @@ export default {
                 }
             }
             return false;
-        }
-
+        },
     },
     watch: {
         labId () {
@@ -394,83 +401,87 @@ export default {
             member.most_recent_data.show_add_more_recent = true;
         },
         submitForm (member) {
-            let this_session = this.$store.state.session;
-            if (this_session.loggedIn) {
-                member.most_recent_data.changed_by = this_session.userID;
-                member.progress = true;
-                let memberID = member.person_id;
-                let reqUpdate = '/labs/' + this.labId
-                            + '/members-affiliation/' + memberID
-                            + '/position/' + member.most_recent_data.id;
-                let urlUpdate = 'api' + reqUpdate;
+            if (this.$v.$invalid) {
+                this.formError = true;
+                setTimeout(() => {this.formError = false;}, 3000)
+            } else {
+                let this_session = this.$store.state.session;
+                if (this_session.loggedIn) {
+                    member.most_recent_data.changed_by = this_session.userID;
+                    member.progress = true;
+                    let memberID = member.person_id;
+                    let reqUpdate = '/labs/' + this.labId
+                                + '/members-affiliation/' + memberID
+                                + '/position/' + member.most_recent_data.id;
+                    let urlUpdate = 'api' + reqUpdate;
 
-                let reqCreate = '/labs/' + this.labId
-                            + '/members-affiliation/' + memberID
-                            + '/position';
-                let urlCreate = 'api' + reqCreate;
-                let reqDelete = '/labs/' + this.labId
-                            + '/members-affiliation/' + memberID
-                            + '/position/' + member.most_recent_data.id;
-                let urlDelete = 'api' + reqDelete;
+                    let reqCreate = '/labs/' + this.labId
+                                + '/members-affiliation/' + memberID
+                                + '/position';
+                    let urlCreate = 'api' + reqCreate;
+                    let reqDelete = '/labs/' + this.labId
+                                + '/members-affiliation/' + memberID
+                                + '/position/' + member.most_recent_data.id;
+                    let urlDelete = 'api' + reqDelete;
 
-                let requests = [];
-                for (let ind in this_session.permissionsEndpoints) {
-                    // TODO: It makes sense to add newer data only if previous is closed
-                    if (subUtil.checkPermissions(reqUpdate, 'PUT',
-                                this_session.permissionsEndpoints[ind].endpoint_url,
-                                this_session.permissionsEndpoints[ind].method_name)
-                        && !member.most_recent_data.to_delete ) {
-                        requests.push(this.$http.put(urlUpdate,
-                            {
-                                data: member.most_recent_data
-                            },
-                            {
-                               headers: {'Authorization': 'Bearer ' + localStorage['v2-token']},
-                            }
-                        ));
+                    let requests = [];
+                    for (let ind in this_session.permissionsEndpoints) {
+                        if (subUtil.checkPermissions(reqUpdate, 'PUT',
+                                    this_session.permissionsEndpoints[ind].endpoint_url,
+                                    this_session.permissionsEndpoints[ind].method_name)
+                            && !member.most_recent_data.to_delete ) {
+                            requests.push(this.$http.put(urlUpdate,
+                                {
+                                    data: member.most_recent_data
+                                },
+                                {
+                                headers: {'Authorization': 'Bearer ' + localStorage['v2-token']},
+                                }
+                            ));
+                        }
+                        if (subUtil.checkPermissions(reqCreate, 'POST',
+                                    this_session.permissionsEndpoints[ind].endpoint_url,
+                                    this_session.permissionsEndpoints[ind].method_name)
+                            && Object.keys(member.newer_data).length > 0) {
+                            member.newer_data.changed_by = this_session.userID;
+                            requests.push(this.$http.post(urlCreate,
+                                {
+                                    data: member.newer_data
+                                },
+                                {
+                                headers: {'Authorization': 'Bearer ' + localStorage['v2-token']},
+                                }
+                            ));
+                        }
+                        if (subUtil.checkPermissions(reqDelete, 'DELETE',
+                                    this_session.permissionsEndpoints[ind].endpoint_url,
+                                    this_session.permissionsEndpoints[ind].method_name)
+                            && member.most_recent_data.to_delete) {
+                            requests.push(this.$http.delete(urlDelete,
+                                {
+                                headers: {'Authorization': 'Bearer ' + localStorage['v2-token']},
+                                data: { data: member.most_recent_data },
+                                }
+                            ));
+                        }
                     }
-                    if (subUtil.checkPermissions(reqCreate, 'POST',
-                                this_session.permissionsEndpoints[ind].endpoint_url,
-                                this_session.permissionsEndpoints[ind].method_name)
-                        && Object.keys(member.newer_data).length > 0) {
-                        member.newer_data.changed_by = this_session.userID;
-                        requests.push(this.$http.post(urlCreate,
-                            {
-                                data: member.newer_data
-                            },
-                            {
-                               headers: {'Authorization': 'Bearer ' + localStorage['v2-token']},
-                            }
-                        ));
-                    }
-                    if (subUtil.checkPermissions(reqDelete, 'DELETE',
-                                this_session.permissionsEndpoints[ind].endpoint_url,
-                                this_session.permissionsEndpoints[ind].method_name)
-                         && member.most_recent_data.to_delete) {
-                        requests.push(this.$http.delete(urlDelete,
-                            {
-                               headers: {'Authorization': 'Bearer ' + localStorage['v2-token']},
-                               data: { data: member.most_recent_data },
-                            }
-                        ));
-                    }
+                    this.$http.all(requests)
+                        .then(this.$http.spread( () => {
+                            member.progress = false;
+                            member.success = true;
+                            setTimeout(() => {member.success = false;}, 1500)
+                            this.$root.$emit('updatePastTeamMembers')
+                            this.initialize();
+                        }))
+                        .catch((error) => {
+                            member.progress = false;
+                            member.error = true;
+                            this.initialize();
+                            setTimeout(() => {member.error = false;}, 6000)
+                            // eslint-disable-next-line
+                            console.log(error)
+                        })
                 }
-                this.$http.all(requests)
-                    .then(this.$http.spread( () => {
-                        member.progress = false;
-                        member.success = true;
-                        setTimeout(() => {member.success = false;}, 1500)
-                        this.$root.$emit('updatePastTeamMembers')
-                        this.initialize();
-                    }))
-                    .catch((error) => {
-                        member.progress = false;
-                        member.error = true;
-                        this.initialize();
-                        setTimeout(() => {member.error = false;}, 6000)
-                        // eslint-disable-next-line
-                        console.log(error)
-                    })
             }
 
         },
@@ -482,7 +493,8 @@ export default {
             let wb = XLSX.utils.book_new();
             let ws  = XLSX.utils.json_to_sheet(membersCurated);
             XLSX.utils.book_append_sheet(wb, ws, 'Current Team');
-            XLSX.writeFile(wb, labData.name + '_current-team-members_' + dateFile + '.xlsx');
+            let filename = labData.name.replace(/[^a-z0-9]/gi, '_')
+            XLSX.writeFile(wb, filename + '_current-team-members_' + dateFile + '.xlsx');
         },
         customSort (items, sortBy, sortDesc) {
             let funcOrderArray = [];
@@ -520,6 +532,20 @@ export default {
 
             return items
         },
+    },
+    //editedItem.most_recent_data.valid_until
+    validations: {
+        editedItem: {
+            most_recent_data: {
+                valid_until: {
+                    required: requiredIf(
+                        function () {
+                            return !this.editedItem.most_recent_data.show_add_more_recent;
+                        }
+                    ),
+                }
+            }
+        }
     }
 }
 </script>

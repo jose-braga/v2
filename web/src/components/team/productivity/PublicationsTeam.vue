@@ -2,28 +2,19 @@
 <v-card>
     <v-card-title primary-title>
         <div>
-            <h3 class="headline">Publications</h3>
+            <h3 class="headline">Your Team Publications</h3>
         </div>
     </v-card-title>
-    <v-card-text></v-card-text>
+    <v-card-text>
+    </v-card-text>
     <v-container>
         <v-form ref="form" class="pa-4"
                 @submit.prevent="submitForm">
-            <v-row class="mb-2" align="center">
-                <span class="blue--text show-clickable" @click="changeTab()">Click to add more publications</span>
-                <v-btn text icon large
-                        @click="changeTab()"
-                        color="blue"
-                        class="ml-1"
-                >
-                    <v-icon>mdi-page-next</v-icon>
-                </v-btn>
-            </v-row>
-            <v-row align-content="center" justify="end">
+            <v-row align-content="center" justify="end" class="mt-4">
                 <v-col cols="2" align-self="end">
                     <v-row justify="end">
                         <v-btn type="submit"
-                        outlined color="blue">Save</v-btn>
+                        outlined color="blue">Update</v-btn>
                     </v-row>
                 </v-col>
                 <v-col cols="1">
@@ -56,17 +47,6 @@
                 multi-sort
                 v-resize="onResize"
             >
-                <template v-slot:top>
-                    <v-dialog v-model="dialog" max-width="1600px">
-                        <PublicationDetails
-                            :person-publication-id="editedItem.id"
-                            :publication-updated="editedItem.updated"
-                            :publication-data="editedItem"
-                        >
-                        </PublicationDetails>
-                    </v-dialog>
-                </template>
-
                 <template v-slot:item.visible="{ item }">
                     <v-checkbox
                         v-model="item.public"
@@ -81,25 +61,16 @@
                 </template>
                 <template v-slot:item.action="{ item }">
                     <v-row class="pr-2">
-                        <v-col cols="6">
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on }">
-                                    <v-icon v-on="on"
-                                        @click="editItem(item)">mdi-pencil</v-icon>
-                                </template>
-                                <span>View & edit details</span>
-                            </v-tooltip>
-                        </v-col>
                         <v-col cols="6" v-if="!item.dissociate">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
                                     <v-icon
                                         v-on="on"
                                         color="green darken-1"
-                                        @click="dissociateItem(item)">mdi-account-plus</v-icon>
+                                        @click="dissociateItem(item)">mdi-link</v-icon>
                                 </template>
-                                <span>You are associated to publication.<br>
-                                    Click to tag this association for removal.
+                                <span>Publication associatd with team.<br>
+                                    Click to dissociate.
                                 </span>
                             </v-tooltip>
                         </v-col>
@@ -109,7 +80,7 @@
                                     <v-icon
                                         v-on="on"
                                         color="red darken-1"
-                                        @click="associateItem(item)">mdi-account-remove</v-icon>
+                                        @click="associateItem(item)">mdi-link-off</v-icon>
                                 </template>
                                 <span>Association to publication will be removed.<br>
                                     Click to undo the removal this association.
@@ -123,7 +94,7 @@
                 <v-col cols="2" align-self="end">
                     <v-row justify="end">
                         <v-btn type="submit"
-                        outlined color="blue">Save</v-btn>
+                        outlined color="blue">Update</v-btn>
                     </v-row>
                 </v-col>
                 <v-col cols="1">
@@ -151,12 +122,9 @@
 </template>
 
 <script>
-import subUtil from '../../../common/submit-utils'
-import time from '../../../common/date-utils'
+import time from '@/components/common/date-utils'
 import {orderBy} from 'lodash'
 import XLSX from 'xlsx'
-
-import PublicationDetails from './PublicationDetails'
 
 function processForSpreadsheet(items) {
     let itemsCurated = [];
@@ -187,18 +155,16 @@ function processForSpreadsheet(items) {
 }
 
 export default {
-    components: {
-        PublicationDetails,
-    },
     props: {
-        currentTab: String,
-        otherPersonId: Number,
+        labId: Number,
+        labData: Object,
+        labPositions: Array,
+        myLabs: Array,
+        publications: Array,
     },
     data() {
         return {
             dialog: false,
-            editedIndex: -1,
-            editedItem: {},
             progress: false,
             success: false,
             error: false,
@@ -211,7 +177,7 @@ export default {
                 { text: 'Year', value:'year' },
                 { text: 'Visible', value: 'visible', sortable: false},
                 { text: 'Highlight', value: 'highlight', sortable: false},
-                { text: 'Actions', value: 'action', sortable: false},
+                { text: 'Status', value: 'action', sortable: false},
             ],
             footerProps: {
                 'items-per-page-options': [10,20,50,-1]
@@ -220,55 +186,28 @@ export default {
                 publications: [],
             },
             toUpdate: [],
+            toDissociate: [],
         }
     },
-    computed: {},
+    mounted () {
+        this.initialize();
+
+    },
     watch: {
-        currentTab () {
-            if (this.currentTab.includes('/publications')) {
-                this.initialize();
-            }
+        labId () {
+            this.initialize();
         },
-        otherPersonId () {
+        publications () {
             this.initialize();
         },
     },
-    mounted() {
-        this.initialize();
-        //this.onResize();
-        this.$root.$on('updateSinglePublication', (personPublicationID) => {
-            // your code goes here
-            this.initialize('updated-single-publication', personPublicationID);
-        });
-    },
     methods: {
-        initialize (evt, id) {
-            if (this.$store.state.session.loggedIn) {
-                let personID = this.otherPersonId;
-                let urlSubmit = 'api/people/' + personID + '/publications';
-                subUtil.getInfoPopulate(this, urlSubmit, true)
-                .then( (result) => {
-                    let indexFound;
-                    for (let ind in result) {
-                        result[ind].title_show = result[ind].title;
-                        result[ind].authors_raw_show = result[ind].authors_raw;
-                        if (evt === 'updated-single-publication') {
-                            if (result[ind].id === id) {
-                                indexFound = ind;
-                            }
-                        }
-                    }
-                    this.data.publications = result;
-                    this.onResize();
-                    if (evt === 'updated-single-publication') {
-                        this.editItem(this.data.publications[indexFound]);
-                    }
-                })
-            }
+        initialize () {
+            this.data.publications = this.publications;
+            this.onResize();
         },
         submitForm() {
             if (this.$store.state.session.loggedIn) {
-                let personID = this.otherPersonId;
                 let urlDelete = [];
                 let urlUpdate = [];
                 let publications = this.data.publications;
@@ -276,13 +215,13 @@ export default {
                 for (let ind in publications) {
                     if (publications[ind].toUpdate && !publications[ind].dissociate) {
                         urlUpdate.push({
-                            url: 'api/people/' + personID
-                                    + '/people-publications/' + publications[ind].publication_id,
+                            url: 'api/labs/' + this.labId
+                                    + '/publications/' + publications[ind].id,
                             body: publications[ind],
                         });
                     } else if (publications[ind].toUpdate && publications[ind].dissociate) {
-                        urlDelete.push('api/people/' + personID
-                                    + '/people-publications/' + publications[ind].publication_id
+                        urlDelete.push('api/labs/' + this.labId
+                                    + '/publications/' + publications[ind].id
                         );
                     }
                 }
@@ -307,32 +246,21 @@ export default {
                         this.success = true;
                         setTimeout(() => {this.success = false;}, 1500)
                         this.toDelete = [];
+                        this.toUpdate = [];
+                        this.$root.$emit('updateLabPublications')
                         this.initialize();
                     }))
                     .catch((error) => {
                         this.progress = false;
                         this.error = true;
                         this.toDelete = [];
+                        this.toUpdate = [];
                         this.initialize();
                         setTimeout(() => {this.error = false;}, 6000)
                         // eslint-disable-next-line
                         console.log(error)
                     })
             }
-
-        },
-        editItem (item) {
-            item.citations_last_year = {};
-            item.impact_factor_last_year = {};
-            this.dialog = true;
-            this.editedIndex = this.data.publications.indexOf(item);
-            this.editedItem = item;
-        },
-        changeTab() {
-            let personID = this.otherPersonId;
-            this.$router.push('/person-on-behalf/'
-                            + personID
-                            +'/productivity/add-publications');
         },
         dissociateItem(item) {
             this.$set(item, 'dissociate', true);
@@ -348,13 +276,13 @@ export default {
         generateSpreadsheet(items) {
             let today = time.moment();
             let dateFile = time.momentToDate(today, 'Europe/Lisbon', 'YYYY-MM-DDTHHmmss')
-            let username = this.$store.state.session.username;
             let itemsCurated = processForSpreadsheet(items);
 
             let wb = XLSX.utils.book_new();
             let ws  = XLSX.utils.json_to_sheet(itemsCurated);
-            XLSX.utils.book_append_sheet(wb, ws, 'My Publications');
-            XLSX.writeFile(wb, username + '_publications_' + dateFile + '.xlsx');
+            XLSX.utils.book_append_sheet(wb, ws, 'Team Publications');
+            let filename = this.labData.name.replace(/[^a-z0-9]/gi, '_')
+            XLSX.writeFile(wb, filename + '_publications_' + dateFile + '.xlsx');
         },
         customSort (items, sortBy, sortDesc) {
             let funcOrderArray = [];
@@ -384,13 +312,6 @@ export default {
 
             return items
         },
-        cutLargeString (value, maxLength) {
-            if (value.length > maxLength) {
-                return value.substring(0, maxLength) + ' ...';
-            } else {
-                return value;
-            }
-        },
         onResize() {
             if (this.$vuetify.breakpoint.mdAndDown) {
                 for (let ind in this.data.publications) {
@@ -404,19 +325,23 @@ export default {
                 }
             }
         },
+        cutLargeString (value, maxLength) {
+            if (value.length > maxLength) {
+                return value.substring(0, maxLength) + ' ...';
+            } else {
+                return value;
+            }
+        },
     },
+
+
+
+
+
 
 }
 </script>
 
-<style scoped>
-.show-clickable {
-    cursor: pointer;
-    font-size: 0.9rem;
-}
-
-.to-delete {
-    background-color: lightslategray;
-}
+<style>
 
 </style>

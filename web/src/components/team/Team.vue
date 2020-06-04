@@ -2,27 +2,26 @@
 <div>
     <v-tabs v-if="loggedIn && hasPermissions"
             show-arrows
+            v-model="activeTab"
             @change="tabChanged">
         <v-tab v-for="(lab, i) in labData"
             :key="i"
-            :to="lab.link">
-            Members<br>@{{lab.name}}
+            :to="lab.link"
+        >
+            {{lab.name}}
         </v-tab>
-        <v-tab to="/team/pre-register">
+        <v-tab to="/team/pre-register" :key="labData.length">
             Pre-Register
         </v-tab>
        <v-tabs-items>
-            <!-- use :max="N" in keep-alive if necessary-->
-            <keep-alive>
-                <router-view v-if="data.labPositions && currentLab && data.myLabsManagement"
-                    :lab-id="labID"
-                    :lab-data="currentLab"
-                    :lab-positions="data.labPositions"
-                    :my-labs="data.myLabsManagement">
-                </router-view>
-            </keep-alive>
+            <router-view v-if="data.labPositions && currentLab && data.myLabsManagement"
+                :lab-id="labID"
+                :lab-data="currentLab"
+                :lab-positions="data.labPositions"
+                :my-labs="data.myLabsManagement">
+            </router-view>
             <v-dialog v-model="showHelp" content-class="help">
-                <router-view name="help"></router-view>
+                <router-view name="help2"></router-view>
             </v-dialog>
         </v-tabs-items>
     </v-tabs>
@@ -48,7 +47,7 @@ import subUtil from '../common/submit-utils'
 export default {
     data () {
         return {
-            //activeTab: 0,
+            activeTab: 0,
             labID: undefined,
             currentLab: undefined,
             data: {
@@ -78,6 +77,14 @@ export default {
         loggedIn () {
             return this.$store.state.session.loggedIn;
         },
+        labData () {
+            let labData = this.data.myLabs;
+            for (let ind in labData) {
+                this.$set(labData[ind], 'link', '/team/'
+                + labData[ind].name.toLowerCase().replace(/\s/g,'-'));
+            }
+            return labData;
+        },
         showHelp: {
             get() {
                 return this.$store.state.navigation.showHelp;
@@ -88,17 +95,15 @@ export default {
                 }
             }
         },
-        labData () {
-            let labData = this.data.myLabs;
-            for (let ind in labData) {
-                this.$set(labData[ind], 'link', '/team/'
-                + labData[ind].name.toLowerCase().replace(/\s/g,'-'));
-            }
-            return labData;
-        },
     },
     created() {
         this.initialize();
+    },
+    watch: {
+        $route () {
+            this.tabChanged(this.$route.path)
+        }
+
     },
 
     methods: {
@@ -120,7 +125,7 @@ export default {
                             if (firstLab) {
                                 firstLab = false;
                                 //this.activeTab = result.link;
-                                this.$router.replace(result.link)
+                                this.$router.replace(result.link).catch((err)=>console.log(err));
                             }
                         });
                         urlSubmit = 'api/v2/lab-positions';
@@ -145,14 +150,12 @@ export default {
             }
         },
         tabChanged: function(tab) {
-            //this.activeTab = tab;
             for (let ind in this.data.myLabs) {
                 if (this.data.myLabs[ind].link === tab) {
                     this.labID = this.data.myLabs[ind].id;
                     this.currentLab = this.data.myLabs[ind];
                 }
             }
-
         },
     }
 }

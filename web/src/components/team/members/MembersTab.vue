@@ -37,6 +37,8 @@ export default {
         labPositions: Array,
         myLabs: Array,
     },
+    computed: {
+    },
     data() {
         return {
             progress: false,

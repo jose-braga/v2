@@ -12,8 +12,20 @@
                 <v-col class="ml-6">LAQV/UCIBIO registration</v-col>
                 </v-row>
             </v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-tooltip bottom>
+                <template v-slot:activator="{ on }">
+                    <v-btn icon v-on="on" @click.stop="showHelp">
+                        <v-icon>mdi-help</v-icon>
+                    </v-btn>
+                </template>
+                <span>Help for this page</span>
+            </v-tooltip>
         </v-app-bar>
         <div v-if="loggedIn" class="px-4">
+            <v-dialog v-model="showHelp2" content-class="help">
+                <PreRegisterHelp></PreRegisterHelp>
+            </v-dialog>
             <v-row justify="center">
                 <span class="highlight-text mt-2">
                     Items with an asterisk (*) are <b>required</b>.
@@ -78,6 +90,7 @@
 </template>
 
 <script>
+import PreRegisterHelp from './PreRegisterHelp'
 import Password from './Password'
 import NuclearInformation from './NuclearInformation'
 import Authorization from './Authorization'
@@ -100,6 +113,7 @@ import time from '../common/date-utils'
 
 export default {
     components: {
+        PreRegisterHelp,
         Password,
         NuclearInformation,
         Authorization,
@@ -145,7 +159,23 @@ export default {
 
     },
     mounted() {},
+    computed: {
+        showHelp2: {
+            get() {
+                return this.$store.state.navigation.showHelp;
+            },
+            set(state) {
+                if (state !== this.$store.state.navigation.showHelp) {
+                    this.$store.dispatch('showHelp')
+                }
+            }
+
+        },
+    },
     methods: {
+        showHelp: function () {
+            this.$store.commit('showHelp');
+        },
         checkLogin() {
             const urlSubmit = 'api/pre-registration-login';
             this.$http.post(

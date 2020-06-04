@@ -20,7 +20,8 @@ router.options('*', cors())
 /**
  * Team Routes
  */
-var members = require('../controllers/team/members');
+const members = require('../controllers/team/members');
+const publications = require('../controllers/team/publications');
 
 router.get('/:labID', cors(corsOptions), members.getLabInfo);
 router.get('/:labID/people', cors(corsOptions), members.searchAllPeople);
@@ -32,6 +33,12 @@ router.put('/:labID/members-affiliation/:memberID/position/:positionID', cors(co
 router.delete('/:labID/members-affiliation/:memberID/position/:positionID', cors(corsOptions), members.deleteLabMemberPosition); // delete this members position
 
 
+router.get('/:labID/publications', cors(corsOptions), publications.getTeamPublications); // these are the team publications
+router.post('/:labID/publications', cors(corsOptions), publications.associateTeamPublication); // simply associates publication to lab
+router.put('/:labID/publications/:publicationID', cors(corsOptions), publications.updateTeamPublication); // update association state of publication
+router.delete('/:labID/publications/:publicationID', cors(corsOptions), publications.dissociateTeamPublication); // simply removes association to lab
+
+router.get('/:labID/members-publications', cors(corsOptions), publications.getMembersPublications); // these are the publications reported by team members
 
 router.use(function (req, res, next) {
   var err = new Error('Not Found');
@@ -40,7 +47,8 @@ router.use(function (req, res, next) {
 });
 router.use(function (err, req, res, next) {
     res.status(err.status || 500);
-    res.json({"message": "Route not found or other problem."});
+    res.json({"message": err});
+    //res.json({"message": "Route not found or other problem."});
 });
 
 module.exports = router;

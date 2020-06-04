@@ -81,15 +81,6 @@
                 </template>
                 <template v-slot:item.action="{ item }">
                     <v-row class="pr-2">
-                        <v-col cols="6">
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on }">
-                                    <v-icon v-on="on"
-                                        @click="editItem(item)">mdi-pencil</v-icon>
-                                </template>
-                                <span>View & edit details</span>
-                            </v-tooltip>
-                        </v-col>
                         <v-col cols="6" v-if="!item.dissociate">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
@@ -315,7 +306,6 @@ export default {
                         console.log(error)
                     })
             }
-
         },
         editItem (item) {
             item.citations_last_year = {};
