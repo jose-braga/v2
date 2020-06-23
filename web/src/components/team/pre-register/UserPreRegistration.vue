@@ -171,7 +171,7 @@
  * For members of labs
  */
 
-import subUtil from '../../common/submit-utils'
+import subUtil from '@/components/common/submit-utils'
 import { required, email, integer, between } from 'vuelidate/lib/validators'
 
 export default {

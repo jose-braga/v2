@@ -17,7 +17,7 @@
         ></v-text-field>
         <v-container>
             <v-data-table
-                item-key="person_id"                
+                item-key="person_id"
                 :headers="headers"
                 :options.sync="options"
                 :footer-props="footerProps"
@@ -29,7 +29,7 @@
             >
                 <template v-slot:top>
                     <v-dialog v-model="dialog" max-width="1600px">
-                        <MemberDetails 
+                        <MemberDetails
                             :person-id="memberID"
                             :person-name="memberName"
                             :manager-id="managerID"
@@ -47,35 +47,42 @@
 
 <script>
 
-import time from '../../common/date-utils'
-import subUtil from '../../common/submit-utils'
+import time from '@/components/common/date-utils'
+import subUtil from '@/components/common/submit-utils'
 import MemberDetails from '../member_details/MemberDetails'
+import {debounce} from 'lodash'
 
 function processResults(vm, result) {
     let currentMembers = [];
     let today = time.moment();
     for (let ind in result) {
-        for (let indHistory in result[ind].history) {
-            let validFrom = result[ind].history[indHistory].valid_from;
-            let validUntil = result[ind].history[indHistory].valid_until;
-            if ((validFrom === null || time.moment(validFrom).isBefore(today))
-                && (validUntil === null || time.moment(validUntil).isAfter(today))
-                ) {
-                //result[ind].progress = false;
-                //result[ind].success = undefined;
-                //result[ind].error = undefined;
-                result[ind].history[indHistory].valid_from = time.momentToDate(result[ind].history[indHistory].valid_from);
-                result[ind].history[indHistory].valid_until = time.momentToDate(result[ind].history[indHistory].valid_until);
-                //result[ind].history[indHistory].show_valid_from = false;
-                //result[ind].history[indHistory].show_valid_until = false;
-                //result[ind].history[indHistory].show_add_more_recent = true;
-                //result[ind].history[indHistory].to_delete = false;
-                result[ind].most_recent_data = result[ind].history[indHistory];
-                //result[ind].newer_data = {}
-                currentMembers.push(result[ind]);
-                break;
+        if (result[ind].history.length > 0) {
+            for (let indHistory in result[ind].history) {
+                let validFrom = result[ind].history[indHistory].valid_from;
+                let validUntil = result[ind].history[indHistory].valid_until;
+                if ((validFrom === null || time.moment(validFrom).isBefore(today))
+                    && (validUntil === null || time.moment(validUntil).isAfter(today))
+                    ) {
+                    //result[ind].progress = false;
+                    //result[ind].success = undefined;
+                    //result[ind].error = undefined;
+                    result[ind].history[indHistory].valid_from = time.momentToDate(result[ind].history[indHistory].valid_from);
+                    result[ind].history[indHistory].valid_until = time.momentToDate(result[ind].history[indHistory].valid_until);
+                    //result[ind].history[indHistory].show_valid_from = false;
+                    //result[ind].history[indHistory].show_valid_until = false;
+                    //result[ind].history[indHistory].show_add_more_recent = true;
+                    //result[ind].history[indHistory].to_delete = false;
+                    result[ind].most_recent_data = result[ind].history[indHistory];
+                    //result[ind].newer_data = {}
+                    currentMembers.push(result[ind]);
+                    break;
+                }
             }
+        } else {
+            result[ind].most_recent_data = {};
+            currentMembers.push(result[ind]);
         }
+
     }
     return currentMembers;
 }
@@ -145,7 +152,7 @@ export default {
             if (this.userAction) {
                 this.initialize(this.options.page, this.search);
             }
-            this.userAction = true;                
+            this.userAction = true;
         }
     },
     methods: {
@@ -169,18 +176,18 @@ export default {
                         let urlSubmit;
                         this.endpoint = this_session.permissionsEndpoints[ind].endpoint_url;
                         if (search !== undefined && search !== '') {
-                            urlSubmit = 'api' + this.endpoint 
-                                + '/current-members' 
-                                + '?limit=' + this.itemsPerPage 
+                            urlSubmit = 'api' + this.endpoint
+                                + '/current-members'
+                                + '?limit=' + this.itemsPerPage
                                 + '&offset=' + (page - 1) * this.itemsPerPage
                                 + '&q=' + search;
                         } else {
                             urlSubmit = 'api' + this.endpoint
-                                + '/current-members' 
-                                + '?limit=' + this.itemsPerPage 
+                                + '/current-members'
+                                + '?limit=' + this.itemsPerPage
                                 + '&offset=' + (page - 1) * this.itemsPerPage;
                         }
-                        
+
                         subUtil.getInfoPopulate(this, urlSubmit, true, true)
                         .then( (result) => {
                             this.totalMembers = result.count;
@@ -194,9 +201,9 @@ export default {
                 }
             }
         },
-        filterPeople () {
+        filterPeople: debounce(function () {
             this.initialize(1, this.search);
-        },
+        }, 200),
         editItem (item) {
             this.dialog = true;
             this.memberID = item.person_id;

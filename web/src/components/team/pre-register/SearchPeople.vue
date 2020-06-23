@@ -60,7 +60,7 @@
 </template>
 
 <script>
-import subUtil from '../../common/submit-utils'
+import subUtil from '@/components/common/submit-utils'
 
 export default {
     data () {

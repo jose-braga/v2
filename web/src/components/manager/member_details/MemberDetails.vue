@@ -34,14 +34,108 @@
                             :manager-id="managerId"
                             :endpoint="endpoint"
                         ></NuclearInformation>
+                        <v-expansion-panels multiple v-model="openPanel">
+                            <v-expansion-panel>
+                                <v-expansion-panel-header>
+                                    <h3>Personal Contacts</h3>
+                                </v-expansion-panel-header>
+                                <v-expansion-panel-content>
+                                    <PersonalContacts
+                                        :person-id="personId"
+                                        :manager-id="managerId"
+                                        :endpoint="endpoint"
+                                        v-if="openPanel.indexOf(0) !== -1"
+                                    >
+                                    </PersonalContacts>
+                                </v-expansion-panel-content>
+                            </v-expansion-panel>
+                            <v-expansion-panel>
+                                <v-expansion-panel-header>
+                                    <h3>Emergency Contacts</h3>
+                                </v-expansion-panel-header>
+                                <v-expansion-panel-content>
+                                    <EmergencyContacts
+                                        :person-id="personId"
+                                        :manager-id="managerId"
+                                        :endpoint="endpoint"
+                                    ></EmergencyContacts>
+                                </v-expansion-panel-content>
+                            </v-expansion-panel>
+                            <v-expansion-panel>
+                                <v-expansion-panel-header>
+                                    <h3>Identifications</h3>
+                                </v-expansion-panel-header>
+                                <v-expansion-panel-content>
+                                    <Identifications
+                                        :person-id="personId"
+                                        :manager-id="managerId"
+                                        :endpoint="endpoint"
+                                    ></Identifications>
+                                </v-expansion-panel-content>
+                            </v-expansion-panel>
+                            <v-expansion-panel>
+                                <v-expansion-panel-header>
+                                    <h3>Cars (FCT NOVA only)</h3>
+                                </v-expansion-panel-header>
+                                <v-expansion-panel-content>
+                                    <Cars
+                                        :person-id="personId"
+                                        :person-name="personName"
+                                        :manager-id="managerId"
+                                        :endpoint="endpoint"
+                                    ></Cars>
+                                </v-expansion-panel-content>
+                            </v-expansion-panel>
+                        </v-expansion-panels>
                     </v-col>
                     <v-col cols="12" md="6">
-
+                        <Photo
+                            :person-id="personId"
+                            :manager-id="managerId"
+                            :endpoint="endpoint"
+                        ></Photo>
                     </v-col>
                 </v-row>
             </v-tab-item>
-            <v-tab-item>Academic</v-tab-item>
-            <v-tab-item>Institutional</v-tab-item>
+            <v-tab-item>
+                <Degrees
+                    :person-id="personId"
+                    :manager-id="managerId"
+                    :endpoint="endpoint"
+                    class="mt-3"
+                ></Degrees>
+            </v-tab-item>
+            <v-tab-item>
+                <v-row class="pa-4">
+                    <v-col cols="12" md="6">
+                        <Roles
+                            :person-id="personId"
+                            :person-name="personName"
+                            :manager-id="managerId"
+                            :endpoint="endpoint"
+                        ></Roles>
+                    </v-col>
+                    <v-col cols="12" md="6">
+                        <!--
+                        <Identifications
+                            :person-id="personId"
+                            :manager-id="managerId"
+                            :endpoint="endpoint"
+                        ></Identifications>
+                        <InstitutionalContacts
+                            :person-id="personId"
+                            :manager-id="managerId"
+                            :endpoint="endpoint"
+                        ></InstitutionalContacts>
+                        <AcademicAffiliations
+                            :person-id="personId"
+                            :manager-id="managerId"
+                            :endpoint="endpoint"
+                        ></AcademicAffiliations>
+                        -->
+                    </v-col>
+                </v-row>
+            </v-tab-item>
             <v-tab-item>Productivity</v-tab-item>
         </v-tabs-items>
     </v-form>
@@ -51,15 +145,29 @@
 
 <script>
 
-const NuclearInformation = () => import(/* webpackChunkName: "team-nuclear-information" */ './personal/NuclearInformation')
-const AppAreaPermissions = () => import(/* webpackChunkName: "team-app-area-permissions" */ './permissions/AppAreaPermissions')
-const Permissions = () => import(/* webpackChunkName: "team-permissions" */ './permissions/Permissions')
+const AppAreaPermissions = () => import(/* webpackChunkName: "manager-details-app-area-permissions" */ './permissions/AppAreaPermissions')
+const Permissions = () => import(/* webpackChunkName: "manager-details-permissions" */ './permissions/Permissions')
+const NuclearInformation = () => import(/* webpackChunkName: "manager-details-nuclear-information" */ './personal/NuclearInformation')
+const Photo = () => import(/* webpackChunkName: "manager-details-photo" */ './personal/Photo')
+const PersonalContacts = () => import(/* webpackChunkName: "manager-details-personal-contacts" */ './personal/PersonalContacts')
+const EmergencyContacts = () => import(/* webpackChunkName: "manager-details-emergency-contacts" */ './personal/EmergencyContacts')
+const Identifications = () => import(/* webpackChunkName: "manager-details-identifications" */ './personal/Identifications')
+const Cars = () => import(/* webpackChunkName: "manager-details-cars" */ './personal/Cars')
+const Degrees = () => import(/* webpackChunkName: "manager-details-degrees" */ './academic/Degrees')
+const Roles = () => import(/* webpackChunkName: "manager-details-roles" */ './institutional/roles/Roles')
 
 export default {
     components: {
         AppAreaPermissions,
         Permissions,
-        NuclearInformation
+        NuclearInformation,
+        Photo,
+        PersonalContacts,
+        EmergencyContacts,
+        Identifications,
+        Cars,
+        Degrees,
+        Roles,
     },
     props: {
         personId: Number,
@@ -70,6 +178,7 @@ export default {
     data () {
         return {
             activeTab: 1,
+            openPanel: [],
         }
     },
     mounted () {

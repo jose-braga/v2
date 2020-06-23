@@ -107,9 +107,9 @@ import Comments from './Comments'
 
 import { PDFDocument, PDFName, PDFBool, PDFString, PDFNumber } from 'pdf-lib'
 //, StandardFonts
-import subUtil from '../common/submit-utils'
+import subUtil from '@/components/common/submit-utils'
 import download from 'downloadjs'
-import time from '../common/date-utils'
+import time from '@/components/common/date-utils'
 
 export default {
     components: {

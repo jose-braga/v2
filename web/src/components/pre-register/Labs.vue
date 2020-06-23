@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import time from '../common/date-utils'
+import time from '@/components/common/date-utils'
 
 export default {
     props: {

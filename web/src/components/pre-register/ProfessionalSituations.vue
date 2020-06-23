@@ -282,7 +282,7 @@
 </template>
 
 <script>
-import subUtil from '../common/submit-utils'
+import subUtil from '@/components/common/submit-utils'
 import {minValue, maxValue, integer} from 'vuelidate/lib/validators'
 
 export default {

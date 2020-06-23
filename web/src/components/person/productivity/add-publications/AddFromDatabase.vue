@@ -96,7 +96,7 @@
 </template>
 
 <script>
-import subUtil from '../../../common/submit-utils'
+import subUtil from '@/components/common/submit-utils'
 import {orderBy} from 'lodash'
 
 import PublicationDetails from './PublicationDetails'

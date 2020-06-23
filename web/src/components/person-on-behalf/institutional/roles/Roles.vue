@@ -147,8 +147,8 @@
 </template>
 
 <script>
-import subUtil from '../../../common/submit-utils'
-import time from '../../../common/date-utils'
+import subUtil from '@/components/common/submit-utils'
+import time from '@/components/common/date-utils'
 const Responsibles = () => import(/* webpackChunkName: "person-on-behalf-roles-responsibles" */ './Responsibles')
 const ScientificAffiliations = () => import(/* webpackChunkName: "person-on-behalf-roles-scientific-affiliations" */ './ScientificAffiliations')
 const TechnicalAffiliations = () => import(/* webpackChunkName: "person-on-behalf-roles-technical-affiliations" */ './TechnicalAffiliations')

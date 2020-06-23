@@ -230,8 +230,8 @@
 </template>
 
 <script>
-import time from '../../common/date-utils'
-import subUtil from '../../common/submit-utils'
+import time from '@/components/common/date-utils'
+import subUtil from '@/components/common/submit-utils'
 import {orderBy} from 'lodash'
 import XLSX from 'xlsx'
 import {requiredIf} from 'vuelidate/lib/validators'

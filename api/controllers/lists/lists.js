@@ -1,5 +1,6 @@
 const sql = require('../utilities/sql')
 const responses = require('../utilities/responses');
+const { options } = require('../../routes/indexPeople');
 
 // Alphabetically ordered
 var getCountries = function(req, res, next) {
@@ -38,6 +39,30 @@ var getLabPositions = function (req, res, next) {
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'SELECT * FROM lab_positions ORDER BY sort_order ASC;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getTechnicianPositions = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM technician_positions ORDER BY sort_order ASC;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getScienceManagerPositions = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM science_manager_positions ORDER BY sort_order ASC;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getAdministrativePositions = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM administrative_positions ORDER BY sort_order ASC;';
     //places.push()
     sql.makeSQLOperation(req, res, querySQL, places);
     return;
@@ -394,9 +419,99 @@ var getUnits = function (req, res, next) {
     var places = [];
     querySQL = querySQL + 'SELECT * FROM units;';
     //places.push()
+    let options = {
+        req,
+        res,
+        next,
+    }
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            options.units = resQuery;
+            options.i = 0;
+            getUnitsGroups(options);
+        },
+        options);
+
+};
+var getUnitsGroups = function (options) {
+    let { req, res, next, i } = options;
+    let unit = options.units[i];
+    var querySQL = '';
+    var places = [];
+    //+ ' groups_units.valid_from AS group_unit_valid_from, groups_units.valid_until AS group_unit_valid_until'
+    querySQL = querySQL + 'SELECT DISTINCT `groups`.*'
+                        + ' FROM groups_units'
+                        + ' JOIN `groups` ON `groups`.id = groups_units.group_id'
+                        + ' WHERE groups_units.unit_id = ?;';
+    places.push(unit.id);
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            options.units[i].groups = resQuery;
+            options.j = 0;
+            getUnitsGroupsLabs(options);
+        },
+        options);
+};
+var getUnitsGroupsLabs = function (options) {
+    let { req, res, next, i, j } = options;
+    let group = options.units[i].groups[j];
+    var querySQL = '';
+    var places = [];
+    //+ ' groups_units.valid_from AS group_unit_valid_from, groups_units.valid_until AS group_unit_valid_until'
+    querySQL = querySQL + 'SELECT DISTINCT labs.*'
+                        + ' FROM labs_groups'
+                        + ' JOIN labs ON labs.id = labs_groups.lab_id'
+                        + ' WHERE labs_groups.group_id = ?;';
+    places.push(group.id);
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            options.units[i].groups[j].labs = resQuery;
+            if (j + 1 < options.units[i].groups.length) {
+                options.j = j + 1;
+                getUnitsGroupsLabs(options);
+            } else if (i + 1 < options.units.length) {
+                options.i = i + 1;
+                getUnitsGroups(options);
+            } else {
+                responses.sendJSONResponseOptions({
+                    response: res,
+                    status: 200,
+                    message: {
+                        "status": "success", "statusCode": 200,
+                        "result":  options.units,
+                    }
+                });
+                return;
+            }
+        },
+        options);
+};
+var getFacilities = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM technician_offices;';
+    //places.push()
     sql.makeSQLOperation(req, res, querySQL, places);
     return;
 };
+var getScienceManagementOffices = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM science_manager_offices;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getAdministrativeOffices = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM administrative_offices;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+
+
 var getInstitutionCities = function (req, res, next) {
     var querySQL = '';
     var places = [];
@@ -415,6 +530,15 @@ module.exports.listItems = function (req, res, next) {
     }
     if (category === 'lab-positions') {
         getLabPositions(req, res, next);
+    }
+    if (category === 'technician-positions') {
+        getTechnicianPositions(req, res, next);
+    }
+    if (category === 'science-manager-positions') {
+        getScienceManagerPositions(req, res, next);
+    }
+    if (category === 'administrative-positions') {
+        getAdministrativePositions(req, res, next);
     }
     if (category === 'people') {
         getPeopleSimple(req, res, next);
@@ -478,6 +602,15 @@ module.exports.listItems = function (req, res, next) {
     }
     if (category === 'units') {
         getUnits(req, res, next);
+    }
+    if (category === 'facilities') {
+        getFacilities(req, res, next);
+    }
+    if (category === 'science-management-offices') {
+        getScienceManagementOffices(req, res, next);
+    }
+    if (category === 'administrative-offices') {
+        getAdministrativeOffices(req, res, next);
     }
     if (category === 'institution-cities') {
         getInstitutionCities(req, res, next);

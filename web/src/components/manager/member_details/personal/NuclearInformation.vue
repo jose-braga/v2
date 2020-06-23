@@ -1,5 +1,5 @@
 <template>
-    <v-card>
+    <v-card class="mb-4">
         <v-card-title primary-title>
             <div>
                 <h3 class="headline">Nuclear information</h3>
@@ -92,8 +92,8 @@
 </template>
 
 <script>
-import time from '../../../common/date-utils'
-import subUtil from '../../../common/submit-utils'
+import time from '@/components/common/date-utils'
+import subUtil from '@/components/common/submit-utils'
 import {maxLength, required} from 'vuelidate/lib/validators'
 
 var submitNuclearInformation = function (vm, urlSubmit) {

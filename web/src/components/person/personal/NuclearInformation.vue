@@ -1,99 +1,99 @@
 <template>
-    <v-card>
-        <v-card-title primary-title>
-            <div>
-                <h3 class="headline">Nuclear information</h3>
+<v-card>
+    <v-card-title primary-title>
+        <div>
+            <h3 class="headline">Nuclear information</h3>
+        </div>
+    </v-card-title>
+    <v-card-text></v-card-text>
+    <v-container class="px-6">
+        <v-form ref="form"
+                @submit.prevent="submitForm">
+            <v-text-field
+                v-model="$v.data.name.$model"
+                label="Full Name">
+            </v-text-field>
+            <div v-if="!$v.data.name.required">
+                <p class="caption red--text">Name is required.</p>
             </div>
-        </v-card-title>
-        <v-card-text></v-card-text>
-        <v-container class="px-6">
-            <v-form ref="form"
-                    @submit.prevent="submitForm">
-                <v-text-field
-                    v-model="$v.data.name.$model"
-                    label="Full Name">
-                </v-text-field>
-                <div v-if="!$v.data.name.required">
-                    <p class="caption red--text">Name is required.</p>
-                </div>
-                <div v-if="!$v.data.name.maxLength">
-                    <p class="caption red--text">Maximum characters: 100.</p>
-                </div>
-                <v-text-field
-                    v-model="$v.data.colloquial_name.$model"
-                    label="Colloquial Name (minimum: name and surname)">
-                </v-text-field>
-                <div v-if="!$v.data.colloquial_name.required">
-                    <p class="caption red--text">Colloquial name is required.</p>
-                </div>
-                <div v-if="!$v.data.colloquial_name.maxLength">
-                    <p class="caption red--text">Maximum characters: 100.</p>
-                </div>
-                <v-row>
-                    <v-col cols="12" sm="4">
-                        <v-select v-model="data.gender"
-                            :items="genders" item-value="id" item-text="value"
-                            label="Gender">
-                        </v-select>
-                    </v-col>
-                    <v-col cols="12" sm="4">
-                        <v-menu ref="date_menu" v-model="date_menu"
-                            :close-on-content-click="false"
-                            :nudge-right="10"
-                            transition="scale-transition"
-                            offset-y min-width="290px">
-                            <template v-slot:activator="{ on }">
-                                <v-text-field v-model="data.birth_date"
-                                    label="Birth date" v-on="on">
-                                </v-text-field>
-                            </template>
-                            <v-date-picker v-model="data.birth_date" @input="date_menu = false" no-title></v-date-picker>
-                        </v-menu>
-                    </v-col>
-                    <v-col cols="12" sm="4">
-                        <v-autocomplete
-                            v-model="data.countries" multiple
-                            :loading="loadingCountries"
-                            :items="countries" item-value="id" item-text="name"
-                            :search-input.sync="searchCountries"
-                            return-object
-                            cache-items
-                            flat
-                            hide-no-data
-                            hide-details
-                            label="Nationalities">
-                        </v-autocomplete>
-                    </v-col>
-                </v-row>
-                <v-row align-content="center" justify="end">
-                    <v-col cols="3" v-if="formError">
-                        <v-row justify="end">
-                            <p class="caption red--text">Unable to submit form.</p>
-                        </v-row>
-                    </v-col>
-                    <v-col cols="2" align-self="end">
-                        <v-row justify="end">
-                            <v-btn type="submit"
-                            outlined color="blue">Update</v-btn>
-                        </v-row>
-                    </v-col>
-                    <v-col cols="1">
-                        <v-progress-circular indeterminate
-                                v-show="progress"
-                                :size="20" :width="2"
-                                color="primary"></v-progress-circular>
-                        <v-icon v-show="success" color="green">mdi-check</v-icon>
-                        <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
-                    </v-col>
-                </v-row>
-            </v-form>
-        </v-container>
-    </v-card>
+            <div v-if="!$v.data.name.maxLength">
+                <p class="caption red--text">Maximum characters: 100.</p>
+            </div>
+            <v-text-field
+                v-model="$v.data.colloquial_name.$model"
+                label="Colloquial Name (minimum: name and surname)">
+            </v-text-field>
+            <div v-if="!$v.data.colloquial_name.required">
+                <p class="caption red--text">Colloquial name is required.</p>
+            </div>
+            <div v-if="!$v.data.colloquial_name.maxLength">
+                <p class="caption red--text">Maximum characters: 100.</p>
+            </div>
+            <v-row>
+                <v-col cols="12" sm="4">
+                    <v-select v-model="data.gender"
+                        :items="genders" item-value="id" item-text="value"
+                        label="Gender">
+                    </v-select>
+                </v-col>
+                <v-col cols="12" sm="4">
+                    <v-menu ref="date_menu" v-model="date_menu"
+                        :close-on-content-click="false"
+                        :nudge-right="10"
+                        transition="scale-transition"
+                        offset-y min-width="290px">
+                        <template v-slot:activator="{ on }">
+                            <v-text-field v-model="data.birth_date"
+                                label="Birth date" v-on="on">
+                            </v-text-field>
+                        </template>
+                        <v-date-picker v-model="data.birth_date" @input="date_menu = false" no-title></v-date-picker>
+                    </v-menu>
+                </v-col>
+                <v-col cols="12" sm="4">
+                    <v-autocomplete
+                        v-model="data.countries" multiple
+                        :loading="loadingCountries"
+                        :items="countries" item-value="id" item-text="name"
+                        :search-input.sync="searchCountries"
+                        return-object
+                        cache-items
+                        flat
+                        hide-no-data
+                        hide-details
+                        label="Nationalities">
+                    </v-autocomplete>
+                </v-col>
+            </v-row>
+            <v-row align-content="center" justify="end">
+                <v-col cols="3" v-if="formError">
+                    <v-row justify="end">
+                        <p class="caption red--text">Unable to submit form.</p>
+                    </v-row>
+                </v-col>
+                <v-col cols="2" align-self="end">
+                    <v-row justify="end">
+                        <v-btn type="submit"
+                        outlined color="blue">Update</v-btn>
+                    </v-row>
+                </v-col>
+                <v-col cols="1">
+                    <v-progress-circular indeterminate
+                            v-show="progress"
+                            :size="20" :width="2"
+                            color="primary"></v-progress-circular>
+                    <v-icon v-show="success" color="green">mdi-check</v-icon>
+                    <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
+                </v-col>
+            </v-row>
+        </v-form>
+    </v-container>
+</v-card>
 </template>
 
 <script>
-import time from '../../common/date-utils'
-import subUtil from '../../common/submit-utils'
+import time from '@/components/common/date-utils'
+import subUtil from '@/components/common/submit-utils'
 import {maxLength, required} from 'vuelidate/lib/validators'
 
 var submitNuclearInformation = function (vm, urlSubmit) {

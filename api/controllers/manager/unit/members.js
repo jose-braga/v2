@@ -44,14 +44,50 @@ var actionGetCurrentMembersList = function (options) {
         + '     OR (people_labs.valid_from <= ? AND people_labs.valid_until IS NULL)'
         + '     OR (people_labs.valid_from IS NULL AND people_labs.valid_until >= ?)'
         + '     OR (people_labs.valid_from <= ? AND people_labs.valid_until >= ?))'
-        + ' ORDER BY people.name ' + sortOrder
+        + ' UNION'
+        + ' SELECT DISTINCT people.id AS person_id, people.user_id, people.name, people.colloquial_name'
+        + ' FROM people'
+        + ' JOIN technicians ON technicians.person_id = people.id'
+        + ' JOIN technicians_units ON technicians_units.technician_id = technicians.id'
+        + ' WHERE people.status = 1 AND technicians_units.unit_id = ? AND people.name LIKE ?'
+        + ' AND ((technicians.valid_from IS NULL AND technicians.valid_until IS NULL)'
+        + '    OR (technicians.valid_from <= ? AND technicians.valid_until IS NULL)'
+        + '    OR (technicians.valid_from IS NULL AND technicians.valid_until >= ?)'
+        + '    OR (technicians.valid_from <= ? AND technicians.valid_until >= ?))'
+        + ' UNION'
+        + ' SELECT DISTINCT people.id AS person_id, people.user_id, people.name, people.colloquial_name'
+        + ' FROM people'
+        + ' JOIN science_managers ON science_managers.person_id = people.id'
+        + ' JOIN science_managers_units ON science_managers_units.science_manager_id = science_managers.id'
+        + ' WHERE people.status = 1 AND science_managers_units.unit_id = ? AND people.name LIKE ?'
+        + ' AND ((science_managers.valid_from IS NULL AND science_managers.valid_until IS NULL)'
+        + '    OR (science_managers.valid_from <= ? AND science_managers.valid_until IS NULL)'
+        + '    OR (science_managers.valid_from IS NULL AND science_managers.valid_until >= ?)'
+        + '    OR (science_managers.valid_from <= ? AND science_managers.valid_until >= ?))'
+        + ' UNION'
+        + ' SELECT DISTINCT people.id AS person_id, people.user_id, people.name, people.colloquial_name'
+        + ' FROM people'
+        + ' JOIN people_administrative_offices ON people_administrative_offices.person_id = people.id'
+        + ' JOIN people_administrative_units ON people_administrative_units.administrative_id = people_administrative_offices.id'
+        + ' WHERE people.status = 1 AND people_administrative_units.unit_id = ? AND people.name LIKE ?'
+        + ' AND ((people_administrative_offices.valid_from IS NULL AND people_administrative_offices.valid_until IS NULL)'
+        + '    OR (people_administrative_offices.valid_from <= ? AND people_administrative_offices.valid_until IS NULL)'
+        + '    OR (people_administrative_offices.valid_from IS NULL AND people_administrative_offices.valid_until >= ?)'
+        + '    OR (people_administrative_offices.valid_from <= ? AND people_administrative_offices.valid_until >= ?))'
+
+        + ' ORDER BY `name` ' + sortOrder
         + ' LIMIT ?, ?;';
-    places.push(unitID, q, today, today, today, today, offset, limit);
+    places.push(
+        unitID, q, today, today, today, today,
+        unitID, q, today, today, today, today,
+        unitID, q, today, today, today, today,
+        unitID, q, today, today, today, today,
+        offset, limit);
     options.today = today;
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             if (resQuery.length > 0) {
-                actionCountTotal(resQuery, options)
+                actionCountTotal(resQuery, options);
             } else {
                 responses.sendJSONResponseOptions({
                     response: res,
@@ -82,21 +118,59 @@ var actionCountTotal = function (people, options) {
     var places = [];
     querySQL = querySQL
         + 'SELECT COUNT(*) AS total_number'
-        + ' FROM (SELECT DISTINCT people.id AS person_id, people.user_id, people.name, people.colloquial_name'
-            + ' FROM people'
-            + ' JOIN people_labs ON people_labs.person_id = people.id'
-            + ' JOIN labs ON labs.id = people_labs.lab_id'
-            + ' JOIN labs_groups ON labs_groups.lab_id = labs.id'
-            + ' JOIN `groups` ON `groups`.id = labs_groups.group_id'
-            + ' JOIN groups_units ON groups_units.group_id = `groups`.id'
-            + ' WHERE people.status = 1 AND groups_units.unit_id = ? AND people.name LIKE ?'
-            + ' AND ((people_labs.valid_from IS NULL AND people_labs.valid_until IS NULL)'
-            + '     OR (people_labs.valid_from <= ? AND people_labs.valid_until IS NULL)'
-            + '     OR (people_labs.valid_from IS NULL AND people_labs.valid_until >= ?)'
-            + '     OR (people_labs.valid_from <= ? AND people_labs.valid_until >= ?))'
+        + ' FROM ('
+        + 'SELECT DISTINCT people.id AS person_id, people.user_id, people.name, people.colloquial_name'
+        + ' FROM people'
+        + ' JOIN people_labs ON people_labs.person_id = people.id'
+        + ' JOIN labs ON labs.id = people_labs.lab_id'
+        + ' JOIN labs_groups ON labs_groups.lab_id = labs.id'
+        + ' JOIN `groups` ON `groups`.id = labs_groups.group_id'
+        + ' JOIN groups_units ON groups_units.group_id = `groups`.id'
+        + ' WHERE people.status = 1 AND groups_units.unit_id = ? AND people.name LIKE ?'
+        + ' AND ((people_labs.valid_from IS NULL AND people_labs.valid_until IS NULL)'
+        + '     OR (people_labs.valid_from <= ? AND people_labs.valid_until IS NULL)'
+        + '     OR (people_labs.valid_from IS NULL AND people_labs.valid_until >= ?)'
+        + '     OR (people_labs.valid_from <= ? AND people_labs.valid_until >= ?))'
+        + ' UNION'
+        + ' SELECT DISTINCT people.id AS person_id, people.user_id, people.name, people.colloquial_name'
+        + ' FROM people'
+        + ' JOIN technicians ON technicians.person_id = people.id'
+        + ' JOIN technicians_units ON technicians_units.technician_id = technicians.id'
+        + ' WHERE people.status = 1 AND technicians_units.unit_id = ? AND people.name LIKE ?'
+        + ' AND ((technicians.valid_from IS NULL AND technicians.valid_until IS NULL)'
+        + '    OR (technicians.valid_from <= ? AND technicians.valid_until IS NULL)'
+        + '    OR (technicians.valid_from IS NULL AND technicians.valid_until >= ?)'
+        + '    OR (technicians.valid_from <= ? AND technicians.valid_until >= ?))'
+        + ' UNION'
+        + ' SELECT DISTINCT people.id AS person_id, people.user_id, people.name, people.colloquial_name'
+        + ' FROM people'
+        + ' JOIN science_managers ON science_managers.person_id = people.id'
+        + ' JOIN science_managers_units ON science_managers_units.science_manager_id = science_managers.id'
+        + ' WHERE people.status = 1 AND science_managers_units.unit_id = ? AND people.name LIKE ?'
+        + ' AND ((science_managers.valid_from IS NULL AND science_managers.valid_until IS NULL)'
+        + '    OR (science_managers.valid_from <= ? AND science_managers.valid_until IS NULL)'
+        + '    OR (science_managers.valid_from IS NULL AND science_managers.valid_until >= ?)'
+        + '    OR (science_managers.valid_from <= ? AND science_managers.valid_until >= ?))'
+        + ' UNION'
+        + ' SELECT DISTINCT people.id AS person_id, people.user_id, people.name, people.colloquial_name'
+        + ' FROM people'
+        + ' JOIN people_administrative_offices ON people_administrative_offices.person_id = people.id'
+        + ' JOIN people_administrative_units ON people_administrative_units.administrative_id = people_administrative_offices.id'
+        + ' WHERE people.status = 1 AND people_administrative_units.unit_id = ? AND people.name LIKE ?'
+        + ' AND ((people_administrative_offices.valid_from IS NULL AND people_administrative_offices.valid_until IS NULL)'
+        + '    OR (people_administrative_offices.valid_from <= ? AND people_administrative_offices.valid_until IS NULL)'
+        + '    OR (people_administrative_offices.valid_from IS NULL AND people_administrative_offices.valid_until >= ?)'
+        + '    OR (people_administrative_offices.valid_from <= ? AND people_administrative_offices.valid_until >= ?))'
+
+
         + ') AS unit_people'
         ;
-    places.push(unitID, q, today, today, today, today);
+    places.push(
+        unitID, q, today, today, today, today,
+        unitID, q, today, today, today, today,
+        unitID, q, today, today, today, today,
+        unitID, q, today, today, today, today
+    );
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             if (resQuery.length === 1) {
@@ -109,6 +183,7 @@ var actionCountTotal = function (people, options) {
         options);
 
 }
+// TODO: Construct interface for past members
 var actionGetPastMembersList = function (options) {
     let { req, res, next } = options;
     let today = time.moment().format('YYYY-MM-DD');
@@ -387,6 +462,9 @@ var actionGetGroupsUnits = function (groups, positions, people, options, i, j, k
         },
         options);
 };
+
+
+
 module.exports.getMembersList = function (req, res, next) {
     permissions.checkPermissions(
         (options) => { actionGetCurrentMembersList(options) },

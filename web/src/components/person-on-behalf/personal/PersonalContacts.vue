@@ -74,7 +74,7 @@
 </template>
 
 <script>
-import subUtil from '../../common/submit-utils'
+import subUtil from '@/components/common/submit-utils'
 import {helpers, maxLength, email} from 'vuelidate/lib/validators'
 
 const postalCodeValidate = (value) => {

@@ -441,10 +441,10 @@ var getCurrentCity = function (req, done, user) {
         + ' FROM people_institution_city'
         + ' JOIN institution_city ON institution_city.id = people_institution_city.city_id'
         + ' WHERE people_institution_city.person_id = ?'
-        + ' AND ((people_institution_city.valid_from <= CURDATE() AND CURDATE() <= people_institution_city.valid_from)'
-        + '     OR (people_institution_city.valid_from IS NULL AND CURDATE() <= people_institution_city.valid_from)'
-        + '     OR (people_institution_city.valid_from <= CURDATE() AND people_institution_city.valid_from IS NULL)'
-        + '     OR (people_institution_city.valid_from IS NULL AND people_institution_city.valid_from IS NULL));';
+        + ' AND ((people_institution_city.valid_from <= CURDATE() AND CURDATE() <= people_institution_city.valid_until)'
+        + '     OR (people_institution_city.valid_from IS NULL AND CURDATE() <= people_institution_city.valid_until)'
+        + '     OR (people_institution_city.valid_from <= CURDATE() AND people_institution_city.valid_until IS NULL)'
+        + '     OR (people_institution_city.valid_from IS NULL AND people_institution_city.valid_until IS NULL));';
     var places = [person_id];
     pool.getConnection(function (err, connection) {
         if (err) {

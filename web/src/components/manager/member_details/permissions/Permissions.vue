@@ -503,7 +503,7 @@
 
 </template>
 <script>
-import subUtil from '../../../common/submit-utils'
+import subUtil from '@/components/common/submit-utils'
 
 function makeEndpointURL(data) {
     for (let ind in data) {

@@ -79,7 +79,7 @@
 import Cropper from 'cropperjs'
 import 'cropperjs/dist/cropper.css'
 import {debounce} from 'lodash'
-import subUtil from '../../common/submit-utils'
+import subUtil from '@/components/common/submit-utils'
 
 export default {
     components: {
