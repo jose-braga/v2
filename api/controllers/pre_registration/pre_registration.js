@@ -117,6 +117,9 @@ var actionUpdatePersonInitial = function (options) {
     let { req, res, next } = options;
     let personID = req.params.personID;
     let person = req.body.data;
+    if (person.birth_date === '') {
+        person.birth_date = null;
+    }
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'UPDATE people'
@@ -143,6 +146,9 @@ var actionUpdatePersonInitialHistory = function (options) {
     let { req, res, next } = options;
     let personID = req.params.personID;
     let person = req.body.data;
+    if (person.birth_date === '') {
+        person.birth_date = null;
+    }
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'INSERT INTO people_history'
@@ -279,6 +285,8 @@ var actionCreateResponsibles = function (options) {
     let personID = req.params.personID;
     let person = req.body.data;
     if (person.responsibles !== undefined && person.responsibles.length > 0) {
+        if (person.responsibles[i].valid_from === '') person.responsibles[i].valid_from = null;
+        if (person.responsibles[i].valid_until === '') person.responsibles[i].valid_until = null;
         var querySQL = '';
         var places = [];
         querySQL = querySQL + 'INSERT INTO people_responsibles'
@@ -311,6 +319,8 @@ var actionCreateAcademicAffiliations = function (options) {
     let personID = req.params.personID;
     let person = req.body.data;
     if (person.academicAffiliations !== undefined && person.academicAffiliations.length > 0) {
+        if (person.academicAffiliations[i].valid_from === '') person.academicAffiliations[i].valid_from = null;
+        if (person.academicAffiliations[i].valid_until === '') person.academicAffiliations[i].valid_until = null;
         var querySQL = '';
         var places = [];
         querySQL = querySQL + 'INSERT INTO people_departments'
@@ -414,6 +424,7 @@ var actionCreatePersonalIdentifications = function (options) {
     let personID = req.params.personID;
     let person = req.body.data;
     if (person.identifications !== undefined && person.identifications.length > 0) {
+        if (person.identifications[i].valid_until === '') person.identifications[i].valid_until = null;
         var querySQL = '';
         var places = [];
         querySQL = querySQL + 'INSERT INTO identifications'
@@ -477,7 +488,8 @@ var actionCreateJob = function (options) {
     let { req, res, next, i } = options;
     let personID = req.params.personID;
     let person = req.body.data;
-
+    if (person.situations[i].valid_from === '') person.situations[i].valid_from = null;
+    if (person.situations[i].valid_until === '') person.situations[i].valid_until = null;
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'INSERT INTO jobs'
@@ -514,6 +526,9 @@ var actionCreateJob = function (options) {
 var actionCreateFellowship = function (options) {
     let { req, res, next, i, j } = options;
     let person = req.body.data;
+    if (person.situations[i].fellowships[j].start === '') person.situations[i].fellowships[j].start = null;
+    if (person.situations[i].fellowships[j].end === '') person.situations[i].fellowships[j].end = null;
+    if (person.situations[i].fellowships[j].maximum_extension === '') person.situations[i].fellowships[j].maximum_extension = null;
 
     var querySQL = '';
     var places = [];
@@ -627,6 +642,9 @@ var actionCreateJobFellowshipRelationship = function (options) {
 var actionCreateContract = function (options) {
     let { req, res, next, i, j } = options;
     let person = req.body.data;
+    if (person.situations[i].contracts[j].start === '') person.situations[i].contracts[j].start = null;
+    if (person.situations[i].contracts[j].end === '') person.situations[i].contracts[j].end = null;
+    if (person.situations[i].contracts[j].maximum_extension === '') person.situations[i].contracts[j].maximum_extension = null;
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'INSERT INTO contracts'
@@ -752,6 +770,7 @@ var actionUpdatePersonFinalHistory = function (options) {
     let { req, res, next } = options;
     let personID = req.params.personID;
     let person = req.body.data;
+    if (person.birth_date === '') person.birth_date = null;
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'INSERT INTO people_history'

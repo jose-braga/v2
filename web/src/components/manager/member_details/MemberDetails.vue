@@ -116,12 +116,11 @@
                         ></Roles>
                     </v-col>
                     <v-col cols="12" md="6">
-                        <!--
-                        <Identifications
+                        <ScientificIdentifications
                             :person-id="personId"
                             :manager-id="managerId"
                             :endpoint="endpoint"
-                        ></Identifications>
+                        ></ScientificIdentifications>
                         <InstitutionalContacts
                             :person-id="personId"
                             :manager-id="managerId"
@@ -132,7 +131,6 @@
                             :manager-id="managerId"
                             :endpoint="endpoint"
                         ></AcademicAffiliations>
-                        -->
                     </v-col>
                 </v-row>
             </v-tab-item>
@@ -155,6 +153,9 @@ const Identifications = () => import(/* webpackChunkName: "manager-details-ident
 const Cars = () => import(/* webpackChunkName: "manager-details-cars" */ './personal/Cars')
 const Degrees = () => import(/* webpackChunkName: "manager-details-degrees" */ './academic/Degrees')
 const Roles = () => import(/* webpackChunkName: "manager-details-roles" */ './institutional/roles/Roles')
+const ScientificIdentifications = () => import(/* webpackChunkName: "manager-details-sc-identifications" */ './institutional/Identifications')
+const InstitutionalContacts = () => import(/* webpackChunkName: "manager-details-institutional-contacts" */ './institutional/InstitutionalContacts')
+const AcademicAffiliations = () => import(/* webpackChunkName: "manager-details-academic-affiliations" */ './institutional/AcademicAffiliations')
 
 export default {
     components: {
@@ -168,6 +169,9 @@ export default {
         Cars,
         Degrees,
         Roles,
+        ScientificIdentifications,
+        InstitutionalContacts,
+        AcademicAffiliations,
     },
     props: {
         personId: Number,

@@ -536,6 +536,12 @@ var actionAddPersonLab = function (options) {
     let { req, res, next } = options;
     let labID = req.params.labID;
     let person = req.body.data;
+    if (person.valid_from === '') {
+        person.valid_from = null;
+    }
+    if (person.valid_until === '') {
+        person.valid_until = null;
+    }
     let places = [];
     querySQL = 'INSERT INTO people_labs'
         + ' (person_id, lab_id, lab_position_id, dedication, valid_from, valid_until)'
@@ -559,6 +565,12 @@ var actionAddPersonLabHistory = function (options) {
     let { req, res, next } = options;
     let labID = req.params.labID;
     let person = req.body.data;
+    if (person.valid_from === '') {
+        person.valid_from = null;
+    }
+    if (person.valid_until === '') {
+        person.valid_until = null;
+    }
     let places = [];
     querySQL = 'INSERT INTO people_labs_history'
         + ' (people_labs_id, person_id, lab_id, lab_position_id, dedication, valid_from, valid_until, created, operation, changed_by)'

@@ -28,6 +28,12 @@ var actionCreatePole = function (options) {
     let { req, res, next } = options;
     let personID = req.params.personID;
     let data = req.body.data;
+    if (data.valid_from === '') {
+        data.valid_from = null;
+    }
+    if (data.valid_until === '') {
+        data.valid_until = null;
+    }
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'INSERT INTO people_institution_city'
@@ -197,6 +203,12 @@ var actionGetLabAffiliations = function (options) {
 };
 var actionGetLabGroups = function (positions, options, i) {
     let { req, res, next } = options;
+    if (positions[i].valid_from === '') {
+        positions[i].valid_from = null;
+    }
+    if (positions[i].valid_until === '') {
+        positions[i].valid_until = null;
+    }
     var querySQL = '';
     var places = [];
     // to be selected it suffices having an overlap
@@ -233,6 +245,12 @@ var actionGetLabGroups = function (positions, options, i) {
 };
 var actionGetGroupsUnits = function (positions, options, i, j) {
     let { req, res, next } = options;
+    if (positions[i].groups[j].valid_from === '') {
+        positions[i].groups[j].valid_from = null;
+    }
+    if (positions[i].groups[j].valid_until === '') {
+        positions[i].groups[j].valid_until = null;
+    }
     var querySQL = '';
     var places = [];
     // to be selected it suffices having an overlap
@@ -314,6 +332,12 @@ var actionUpdateLabAffiliation = function (options) {
     let personID = req.params.personID;
     let affiliationID = req.params.affiliationID;
     let data = req.body.data;
+    if (data.valid_from === '') {
+        data.valid_from = null;
+    }
+    if (data.valid_until === '') {
+        data.valid_until = null;
+    }
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'UPDATE people_labs'
@@ -385,6 +409,12 @@ var actionCreateTechnicalAffiliation = function (options) {
     let { req, res, next } = options;
     let personID = req.params.personID;
     let data = req.body.data;
+    if (data.valid_from === '') {
+        data.valid_from = null;
+    }
+    if (data.valid_until === '') {
+        data.valid_until = null;
+    }
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'INSERT INTO technicians'
@@ -427,6 +457,12 @@ var actionUpdateTechnicalAffiliation = function (options) {
     let personID = req.params.personID;
     let affiliationID = req.params.affiliationID;
     let data = req.body.data;
+    if (data.valid_from === '') {
+        data.valid_from = null;
+    }
+    if (data.valid_until === '') {
+        data.valid_until = null;
+    }
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'UPDATE technicians'
@@ -526,6 +562,12 @@ var actionCreateScienceManagementAffiliation = function (options) {
     let { req, res, next } = options;
     let personID = req.params.personID;
     let data = req.body.data;
+    if (data.valid_from === '') {
+        data.valid_from = null;
+    }
+    if (data.valid_until === '') {
+        data.valid_until = null;
+    }
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'INSERT INTO science_managers'
@@ -568,6 +610,12 @@ var actionUpdateScienceManagementAffiliation = function (options) {
     let personID = req.params.personID;
     let affiliationID = req.params.affiliationID;
     let data = req.body.data;
+    if (data.valid_from === '') {
+        data.valid_from = null;
+    }
+    if (data.valid_until === '') {
+        data.valid_until = null;
+    }
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'UPDATE science_managers'
@@ -638,11 +686,6 @@ module.exports.deleteScienceManagementAffiliation = function (req, res, next) {
     );
 };
 
-
-
-
-
-
 var actionGetAdministrativeAffiliations = function (options) {
     let { req, res, next } = options;
     let personID = req.params.personID;
@@ -674,6 +717,12 @@ var actionCreateAdministrativeAffiliation = function (options) {
     let { req, res, next } = options;
     let personID = req.params.personID;
     let data = req.body.data;
+    if (data.valid_from === '') {
+        data.valid_from = null;
+    }
+    if (data.valid_until === '') {
+        data.valid_until = null;
+    }
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'INSERT INTO people_administrative_offices'
@@ -716,6 +765,12 @@ var actionUpdateAdministrativeAffiliation = function (options) {
     let personID = req.params.personID;
     let affiliationID = req.params.affiliationID;
     let data = req.body.data;
+    if (data.valid_from === '') {
+        data.valid_from = null;
+    }
+    if (data.valid_until === '') {
+        data.valid_until = null;
+    }
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'UPDATE people_administrative_offices'
@@ -785,12 +840,6 @@ module.exports.deleteAdministrativeAffiliation = function (req, res, next) {
         { req, res, next }
     );
 };
-
-
-
-
-
-
 
 var getRecipientsGroups = function (options, email_type_id, is_local) {
     let { req, res, next } = options;

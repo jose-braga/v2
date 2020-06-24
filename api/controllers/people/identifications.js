@@ -21,6 +21,9 @@ var actionCreateIdentification = function (options) {
     let { req, res, next } = options;
     let personID = req.params.personID;
     let data = req.body.data;
+    if (data.valid_until === '') {
+        data.valid_until = null;
+    }
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'INSERT INTO identifications'
@@ -39,6 +42,9 @@ module.exports.createIdentification = function (req, res, next) {
 var actionUpdateIdentification = function (options) {
     let { req, res, next } = options;
     let identificationID = req.params.identificationID;
+    if (data.valid_until === '') {
+        data.valid_until = null;
+    }
     let data = req.body.data;
     var querySQL = '';
     var places = [];

@@ -33,6 +33,12 @@ var actionCreateAcademicAffiliations = function (options) {
     let data = req.body.data;
     var querySQL = '';
     var places = [];
+    if (data.valid_from === '') {
+        data.valid_from = null;
+    }
+    if (data.valid_until === '') {
+        data.valid_until = null;
+    }
     querySQL = querySQL + 'INSERT INTO people_departments'
                         + ' (person_id, department_id, valid_from, valid_until)'
                         + ' VALUES (?, ?, ?, ?);';
@@ -50,6 +56,12 @@ var actionUpdateAcademicAffiliations = function (options) {
     let { req, res, next } = options;
     let affiliationID = req.params.affiliationID;
     let data = req.body.data;
+    if (data.valid_from === '') {
+        data.valid_from = null;
+    }
+    if (data.valid_until === '') {
+        data.valid_until = null;
+    }
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'UPDATE people_departments'

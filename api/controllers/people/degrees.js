@@ -161,6 +161,12 @@ var getPeopleDegreesID = function (resQuery, options) {
 var actionCreateDegreesCreateSupervisors = function (options) {
     let { req, res, next, personDegreeID, i } = options;
     let data = req.body.data.supervisors[i];
+    if (data.valid_from === '') {
+        data.valid_from = null;
+    }
+    if (data.valid_until === '') {
+        data.valid_until = null;
+    }
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'INSERT INTO degrees_supervisors'
@@ -187,6 +193,12 @@ var actionCreateDegreesCreateSupervisors = function (options) {
 var actionCreateDegreesCreateExtSupervisors = function (options) {
     let { req, res, next, personDegreeID, i } = options;
     let data = req.body.data.external_supervisors[i];
+    if (data.valid_from === '') {
+        data.valid_from = null;
+    }
+    if (data.valid_until === '') {
+        data.valid_until = null;
+    }
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'INSERT INTO degrees_external_supervisors'
@@ -250,6 +262,15 @@ var actionUpdateDegrees = function (options) {
     let personID = req.params.personID;
     let personDegreeID = req.params.degreeID;
     let data = req.body.data;
+    if (data.start === '') {
+        data.start = null;
+    }
+    if (data.end === '') {
+        data.end = null;
+    }
+    if (data.estimate_end === '') {
+        data.end = null;
+    }
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'UPDATE degrees_people'
@@ -449,6 +470,12 @@ var actionDeleteSupervisors = function (options) {
 var actionUpdateExtSupervisors = function (options) {
     let { req, res, next, i } = options;
     let data = req.body.data.external_supervisors[i];
+    if (data.valid_from === '') {
+        data.valid_from = null;
+    }
+    if (data.valid_until === '') {
+        data.valid_until = null;
+    }
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'UPDATE degrees_external_supervisors'
@@ -487,6 +514,12 @@ var actionCreateExtSupervisors = function (options) {
     let { req, res, next, i } = options;
     let personDegreeID = req.params.degreeID;
     let data = req.body.data.external_supervisors[i];
+    if (data.valid_from === '') {
+        data.valid_from = null;
+    }
+    if (data.valid_until === '') {
+        data.valid_until = null;
+    }
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'INSERT INTO degrees_external_supervisors'

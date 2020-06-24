@@ -31,6 +31,7 @@ const degrees = require('../controllers/people/degrees');
 const institutionalContacts = require('../controllers/people/institutional_contacts');
 const institutionalAffiliations = require('../controllers/people/institutional_affiliations');
 const institutionalResponsibles = require('../controllers/people/institutional_responsibles');
+const researchIDs = require('../controllers/people/research_IDs');
 const academicAffiliations = require('../controllers/people/academic_affiliations');
 
 const managePermissionsUnit = require('../controllers/manager/unit/manage_permissions');
@@ -127,6 +128,9 @@ router.post('/:userID/units/:unitID/members/:personID/academic-affiliations', co
 router.put('/:userID/units/:unitID/members/:personID/academic-affiliations/:affiliationID', cors(corsOptions), academicAffiliations.updateAcademicAffiliations);
 router.delete('/:userID/units/:unitID/members/:personID/academic-affiliations/:affiliationID', cors(corsOptions), academicAffiliations.deleteAcademicAffiliations);
 
+router.get('/:userID/units/:unitID/members/:personID/researcher-ids', cors(corsOptions), researchIDs.getResearcherIDs);
+router.post('/:userID/units/:unitID/members/:personID/researcher-ids', cors(corsOptions), researchIDs.createResearcherIDs);
+router.put('/:userID/units/:unitID/members/:personID/researcher-ids/:researcherInfoID', cors(corsOptions), researchIDs.updateResearcherIDs);
 
 
 
