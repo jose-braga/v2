@@ -1,7 +1,5 @@
 <template>
 <v-card flat>
-    <v-card-title primary-title>
-    </v-card-title>
     <v-card-text>Shown are publications in your institutional repository
         which are <b>not part of the LAQV/UCIBIO database</b><br>
         It is advisable to check individual publication info before submitting (e.g. possible mismatches in journal info).<br>
@@ -10,7 +8,7 @@
         Should a warning about a slow script appear, you can safely choose "Wait".
     </v-card-text>
     <v-container>
-        <v-form ref="form" class="pa-4"
+        <v-form ref="form" class="px-4"
                 @submit.prevent="submitForm">
             <v-row>
                 <v-btn @click="getRepositoryPublications()"
@@ -216,7 +214,9 @@ export default {
         PublicationDetails,
     },
     props: {
-        currentTab: String,
+        personId: Number,
+        managerId: Number,
+        endpoint: String,
     },
     data() {
         return {
@@ -256,20 +256,18 @@ export default {
 
         }
     },
+    watch: {
+        personId () {
+            this.initialize();
+        },
+    },
     mounted() {
         this.initialize();
-        this.$root.$on('updateSingleAddPublicationDatabasePURE',
+        this.$root.$on('managerUpdateSingleAddPublicationDatabasePURE',
             (publicationData) => {
                 this.updateData(publicationData);
             }
         );
-    },
-    watch: {
-        currentTab () {
-            if (this.currentTab === '/person/productivity/add-publications') {
-                this.initialize();
-            }
-        },
     },
     methods: {
         initialize () {
@@ -309,7 +307,7 @@ export default {
                 this.messageErrorBeforeSubmit = textMessage;
             }
             if (this.$store.state.session.loggedIn && publicationsOK) {
-                let personID = this.$store.state.session.personID;
+                let personID = this.personId;
                 let urlCreateJournal = [];
                 let urlCreatePublications = [];
                 let urlCreatePersonPublications = [];
@@ -320,16 +318,20 @@ export default {
                     if (publications[ind].to_associate) {
                         if (publications[ind].new_journal === true) {
                             urlCreateJournal.push({
-                                url: 'api/people/' + personID
-                                        + '/journals',
+                                url: 'api' + this.endpoint
+                                    + '/members'
+                                    + '/' + personID
+                                    + '/journals',
                                 body: publications[ind],
                             });
 
                         } else {
                             urlCreatePublications.push({
-                                url: 'api/people/' + personID
-                                        + '/journals/' + publications[ind].journal_id
-                                        + '/publications',
+                                url: 'api' + this.endpoint
+                                    + '/members'
+                                    + '/' + personID
+                                    + '/journals/' + publications[ind].journal_id
+                                    + '/publications',
                                 body: publications[ind],
                             });
                         }
@@ -349,9 +351,11 @@ export default {
                     for (let ind in createdJournals) {
                         let journalID = createdJournals[ind].data.result.journalID;
                         urlCreatePublications.push({
-                            url: 'api/people/' + personID
-                                    + '/journals/' + journalID
-                                    + '/publications',
+                            url: 'api' + this.endpoint
+                                + '/members'
+                                + '/' + personID
+                                + '/journals/' + journalID
+                                + '/publications',
                             body: urlCreateJournal[ind].body,
                         });
                     }
@@ -369,13 +373,17 @@ export default {
                     for (let ind in createdPublications) {
                         let publicationID = createdPublications[ind].data.result.publicationID;
                         urlCreatePersonPublications.push({
-                            url: 'api/people/' + personID
-                                    + '/people-publications/' + publicationID,
+                            url: 'api' + this.endpoint
+                                + '/members'
+                                + '/' + personID
+                                + '/people-publications/' + publicationID,
                             body: urlCreatePublications[ind].body,
                         });
                         urlUpdatePublications.push({
-                            url: 'api/people/' + personID
-                                    + '/publications/' + publicationID,
+                            url: 'api' + this.endpoint
+                                + '/members'
+                                + '/' + personID
+                                + '/publications/' + publicationID,
                             body: urlCreatePublications[ind].body,
                         });
                     }
@@ -403,7 +411,8 @@ export default {
                     this.progress = false;
                     this.success = true;
                     this.getRepositoryPublications();
-                    setTimeout(() => {this.success = false;}, 1500)
+                    setTimeout(() => {this.success = false;}, 1500);
+                    this.$root.$emit('managerReloadPublicationsList');
                 }))
                 .catch((error) => {
                     this.progress = false;
@@ -412,14 +421,14 @@ export default {
                     // eslint-disable-next-line
                     console.log(error)
                 })
-
             }
-
         },
         getRepoID () {
             if (this.$store.state.session.loggedIn) {
-                let personID = this.$store.state.session.personID;
-                let urlSubmit = 'api/people/' + personID + '/researcher-ids';
+                let personID = this.personId;
+                let urlSubmit = 'api' + this.endpoint
+                                + '/members'
+                                + '/' + personID + '/researcher-ids';
                 subUtil.getInfoPopulate(this, urlSubmit, false)
                 .then( (result) => {
                     if (result !== undefined) {
@@ -448,17 +457,21 @@ export default {
             }
         },
         getRepositoryPublications () {
-            let personID = this.$store.state.session.personID;
+            let personID = this.personId;
             this.data.publicationsDB = [];
             this.data.publications = [];
             if (this.$store.state.session.loggedIn) {
-                let urlSubmit = 'api/people' + '/all-publications';
+                let urlSubmit = 'api' + this.endpoint
+                                + '/members'
+                                + '/' + 'all-publications';
                 this.messageRepoRequest = 'Getting repository publications missing from DB';
                 this.progressRepo = true;
                 subUtil.getInfoPopulate(this, urlSubmit, true)
                     .then( (result) => {
                         this.data.publicationsDB = result;
-                        let urlPURE = 'api/people/' + personID + '/pure-publications';
+                        let urlPURE = 'api' + this.endpoint
+                                + '/members'
+                                + '/' + personID + '/pure-publications';
                         this.messageRepoRequest = 'Processing details of new publications';
                         return subUtil.getInfoPopulate(this, urlPURE, true);
                     })
@@ -488,7 +501,7 @@ export default {
                     });
             }
         },
-        removeExistingPublications(purePublications, dbPublications) {
+        removeExistingPublications (purePublications, dbPublications) {
             let newPublications = [];
             let dbDOIs = [];
             let dbWOSs = [];
@@ -573,6 +586,12 @@ export default {
                     }
                     // now try checking by title/journal
                     if (checkMore) {
+                        if (purePublications[ind].title === undefined) {
+                            console.log(purePublications[ind])
+                        }
+                        if (purePublications[ind].title === "Crystallization and preliminary X-ray analysis of a membrane-bound nitrite reductase from Desulfovibrio desulfuricans ATCC 27774") {
+                            console.log('jejejeje')
+                        }
                         let pureTitle = prepareStringComparison(purePublications[ind].title.value);
                         let indTitle = dbTitles.indexOf(pureTitle);
                         if (indTitle === -1) {
@@ -707,6 +726,7 @@ export default {
                 }
             }
             return newPublications;
+
         },
         updateData (publicationData) {
             for (let ind in this.data.publications) {

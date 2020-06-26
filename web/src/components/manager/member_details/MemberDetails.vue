@@ -6,10 +6,13 @@
         </v-card-title>
         <v-tabs v-model="activeTab">
             <v-tab>Permissions</v-tab>
+            <v-tab>User</v-tab>
             <v-tab>Personal</v-tab>
             <v-tab>Academic</v-tab>
             <v-tab>Institutional</v-tab>
-            <v-tab>Productivity</v-tab>
+            <v-tab>Professional</v-tab>
+            <v-tab>Publications</v-tab>
+            <v-tab>Other productivity</v-tab>
         </v-tabs>
         <v-tabs-items v-model="activeTab">
             <v-tab-item>
@@ -25,6 +28,8 @@
                     :endpoint="endpoint"
                     class="mt-6"
                 ></Permissions>
+            </v-tab-item>
+            <v-tab-item>
             </v-tab-item>
             <v-tab-item>
                 <v-row>
@@ -134,7 +139,68 @@
                     </v-col>
                 </v-row>
             </v-tab-item>
-            <v-tab-item>Productivity</v-tab-item>
+            <v-tab-item>
+                <ProfessionalSituations
+                    :person-id="personId"
+                    :manager-id="managerId"
+                    :endpoint="endpoint"
+                    class="mt-6"
+                ></ProfessionalSituations>
+            </v-tab-item>
+            <v-tab-item>
+                <v-expansion-panels multiple v-model="openPanel" class="mt-4">
+                    <v-expansion-panel>
+                        <v-expansion-panel-header>
+                            <h3>Publications list</h3>
+                        </v-expansion-panel-header>
+                        <v-expansion-panel-content>
+                            <PublicationsList
+                                :person-id="personId"
+                                :manager-id="managerId"
+                                :endpoint="endpoint"
+                            ></PublicationsList>
+                        </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel>
+                        <v-expansion-panel-header>
+                            <h3>Add from LAQV/UCIBIO database</h3>
+                        </v-expansion-panel-header>
+                        <v-expansion-panel-content>
+                            <AddFromDatabase
+                                :person-id="personId"
+                                :manager-id="managerId"
+                                :endpoint="endpoint"
+                            ></AddFromDatabase>
+                        </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel>
+                        <v-expansion-panel-header>
+                            <h3>Add from ORCID</h3>
+                        </v-expansion-panel-header>
+                        <v-expansion-panel-content>
+                            <AddFromOrcid
+                                :person-id="personId"
+                                :manager-id="managerId"
+                                :endpoint="endpoint"
+                            ></AddFromOrcid>
+                        </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel>
+                        <v-expansion-panel-header>
+                            <h3>Add from Institutional Repository</h3>
+                        </v-expansion-panel-header>
+                        <v-expansion-panel-content>
+                            <AddFromRepository
+                                :person-id="personId"
+                                :manager-id="managerId"
+                                :endpoint="endpoint"
+                            ></AddFromRepository>
+                        </v-expansion-panel-content>
+                    </v-expansion-panel>
+                </v-expansion-panels>
+            </v-tab-item>
+            <v-tab-item>
+            </v-tab-item>
         </v-tabs-items>
     </v-form>
 </v-card>
@@ -156,6 +222,11 @@ const Roles = () => import(/* webpackChunkName: "manager-details-roles" */ './in
 const ScientificIdentifications = () => import(/* webpackChunkName: "manager-details-sc-identifications" */ './institutional/Identifications')
 const InstitutionalContacts = () => import(/* webpackChunkName: "manager-details-institutional-contacts" */ './institutional/InstitutionalContacts')
 const AcademicAffiliations = () => import(/* webpackChunkName: "manager-details-academic-affiliations" */ './institutional/AcademicAffiliations')
+const ProfessionalSituations = () => import(/* webpackChunkName: "manager-details-professional-situations" */ './professional/ProfessionalSituations')
+const PublicationsList = () => import(/* webpackChunkName: "manager-details-publications-list" */ './productivity/publications/PublicationsList')
+const AddFromDatabase = () => import(/* webpackChunkName: "manager-details-add-from-database" */ './productivity/publications/add-publications/AddFromDatabase')
+const AddFromOrcid = () => import(/* webpackChunkName: "manager-details-add-from-orcid" */ './productivity/publications/add-publications/AddFromOrcid')
+const AddFromRepository = () => import(/* webpackChunkName: "manager-details-add-from-repo" */ './productivity/publications/add-publications/AddFromRepository')
 
 export default {
     components: {
@@ -172,6 +243,11 @@ export default {
         ScientificIdentifications,
         InstitutionalContacts,
         AcademicAffiliations,
+        ProfessionalSituations,
+        PublicationsList,
+        AddFromDatabase,
+        AddFromOrcid,
+        AddFromRepository,
     },
     props: {
         personId: Number,
@@ -181,7 +257,7 @@ export default {
     },
     data () {
         return {
-            activeTab: 1,
+            activeTab: 2,
             openPanel: [],
         }
     },

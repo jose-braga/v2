@@ -210,226 +210,6 @@ function determineJournal(pub, journals) {
     }
     return pub;
 }
-function removeExistingPublications(purePublications, dbPublications) {
-    let newPublications = [];
-    let dbDOIs = [];
-    let dbWOSs = [];
-    let dbPubmeds = [];
-    let dbTitles = [];
-    let dbJournals = [];
-    let dbJournalsShort = [];
-
-    for (let ind in dbPublications) {
-        if (dbPublications[ind].doi !== null) {
-            dbDOIs.push(dbPublications[ind].doi
-                .toLowerCase()
-                .replace('https://doi.org/','')
-                .replace('http://dx.doi.org/','')
-                .replace('doi: ','')
-                .replace('doi:','')
-                .replace('doi ',''));
-        }
-        if (dbPublications[ind].wos !== null) {
-            dbWOSs.push(dbPublications[ind].wos
-                .toLowerCase()
-                .replace('WOS:',''));
-        }
-        if (dbPublications[ind].pubmed_id !== null) {
-            dbPubmeds.push(dbPublications[ind].pubmed_id);
-        }
-        if (dbPublications[ind].title !== null) {
-            dbTitles.push(prepareStringComparison(dbPublications[ind].title));
-            dbJournals.push(prepareStringComparison(dbPublications[ind].journal_name));
-            dbJournalsShort.push(prepareStringComparison(dbPublications[ind].journal_short_name));
-        }
-    }
-    for (let ind in purePublications) {
-        let pureDOI = null;
-        let electronicVersion = purePublications[ind].electronicVersions;
-        let checkMore = true;
-        if (electronicVersion !== null
-                && electronicVersion !== undefined
-                && electronicVersion.length !== 0) {
-            pureDOI = electronicVersion[0].doi;
-            if (pureDOI !== null && pureDOI !== undefined) {
-                pureDOI = pureDOI.toLowerCase()
-                        .replace('https://doi.org/','')
-                        .replace('http://dx.doi.org/','');
-                if (dbDOIs.indexOf(pureDOI) === -1) {
-                    checkMore = true;
-                } else {
-                    checkMore = false;
-                    continue;
-                }
-            }
-        }
-        // DOI didn't match, try WOS and Pubmed and title/journal
-        // this numbers can be found in several keys
-        if (checkMore) {
-            let pureWOS = null;
-            let purePubmedId = null;
-            let info = purePublications[ind].info;
-            if (info !== undefined && info !== null) {
-                let addExtID = info.additionalExternalIds;
-                if (addExtID !== undefined && addExtID !== null) {
-                    for (let indExt in addExtID) {
-                        if (addExtID[indExt].idSource === 'WOS') {
-                            pureWOS = addExtID[indExt].value;
-                        } else if (addExtID[indExt].idSource === 'PubMed') {
-                            purePubmedId = addExtID[indExt].value;
-                        }
-                    }
-                    if (dbWOSs.indexOf(pureWOS) === -1) {
-                        checkMore = true;
-                    } else {
-                        checkMore = false;
-                        continue;
-                    }
-                    if (dbPubmeds.indexOf(purePubmedId) === -1) {
-                        checkMore = true;
-                    } else {
-                        checkMore = false;
-                        continue;
-                    }
-                }
-            }
-            // now try checking by title/journal
-            if (checkMore) {
-                let pureTitle = prepareStringComparison(purePublications[ind].title.value);
-                let indTitle = dbTitles.indexOf(pureTitle);
-                if (indTitle === -1) {
-                    checkMore = true;
-                } else {
-                    // now check if corresponding journal is the same
-                    if (purePublications[ind].journalAssociation !== null
-                          && purePublications[ind].journalAssociation !== undefined) {
-                        let pureJournal = prepareStringComparison(purePublications[ind].journalAssociation.title.value);
-                        if (compareTwoStrings(pureTitle, dbTitles[indTitle]) > 0.95
-                            && (compareTwoStrings(pureJournal, dbJournals[indTitle]) > 0.95
-                                || compareTwoStrings(pureJournal, dbJournalsShort[indTitle]) > 0.95)
-                            ) {
-                            checkMore = false;
-                            continue;
-                        }
-                        else {
-                            checkMore = true;
-                        }
-                    }
-                }
-                if (checkMore) {
-                    let pureJournal = null;
-                    let pureISSN = null;
-                    let purePublisher = null;
-                    let purePages;
-                    let purePageStart = null;
-                    let purePageEnd = null;
-                    let pureYear, pureMonth, pureDay;
-                    let pureAuthors = ''
-                    let pureNumberAuthors = null;
-                    purePublications[ind].title = purePublications[ind].title.value
-                    if (purePublications[ind].journalAssociation !== null
-                          && purePublications[ind].journalAssociation !== undefined) {
-                        pureJournal = purePublications[ind].journalAssociation.title.value;
-                        if (purePublications[ind].journalAssociation.issn !== null
-                            && purePublications[ind].journalAssociation.issn !== undefined) {
-                            pureISSN = purePublications[ind].journalAssociation.issn.value;
-                        }
-                    }
-                    if (purePublications[ind].publisher !== null
-                          && purePublications[ind].publisher !== undefined) {
-                        if (purePublications[ind].publisher.name !== null
-                              && purePublications[ind].publisher.name !== undefined) {
-                            if (purePublications[ind].publisher.name.text !== null
-                                  && purePublications[ind].publisher.name.text !== undefined) {
-                                purePublisher = purePublications[ind].publisher.name.text[0].value;
-                            }
-                        }
-                    }
-                    purePages = purePublications[ind].pages;
-                    if (purePages !== null && purePages !== undefined) {
-                        purePages = purePages.split('-');
-                        if (purePages.length > 1) {
-                            purePageStart = purePages[0];
-                            purePageEnd = purePages[1];
-                        } else {
-                            purePageStart = purePages[0];
-                        }
-                    }
-                    if (purePublications[ind].publicationStatuses !== null
-                            && purePublications[ind].publicationStatuses !== undefined) {
-                        for (let stat in purePublications[ind].publicationStatuses) {
-                            if (purePublications[ind].publicationStatuses[stat].current === true) {
-                                pureYear = purePublications[ind].publicationStatuses[stat].publicationDate.year;
-                                pureMonth = purePublications[ind].publicationStatuses[stat].publicationDate.month;
-                                pureDay = purePublications[ind].publicationStatuses[stat].publicationDate.day;
-                                break;
-                            }
-                        }
-                    }
-                    if (purePublications[ind].personAssociations !== null
-                            && purePublications[ind].personAssociations !== undefined) {
-                        pureNumberAuthors = purePublications[ind].personAssociations.length;
-                    }
-                    for (let aut in purePublications[ind].personAssociations) {
-                        if (purePublications[ind].personAssociations[aut].name !== null
-                            && purePublications[ind].personAssociations[aut].name !== undefined) {
-                            let firstName = purePublications[ind].personAssociations[aut].name.firstName;
-                            let lastName = purePublications[ind].personAssociations[aut].name.lastName;
-                            if (lastName !== null && lastName !== undefined) {
-                                if (firstName !== null && firstName !== undefined) {
-                                    pureAuthors= pureAuthors + lastName + ', '
-                                                + firstName;
-                                } else {
-                                    pureAuthors = pureAuthors + lastName;
-                                }
-                            } else {
-                                if (firstName !== null && firstName !== undefined) {
-                                    pureAuthors = pureAuthors + firstName;
-                                }
-                            }
-                            if (parseInt(aut, 10) < purePublications[ind].personAssociations.length - 1) {
-                                pureAuthors = pureAuthors + '; ';
-                            }
-                        }
-                    }
-                    purePublications[ind].journal_name = pureJournal;
-                    purePublications[ind].publisher = purePublisher;
-                    purePublications[ind].doi = pureDOI;
-                    purePublications[ind].wos = pureWOS;
-                    purePublications[ind].pubmed_id = purePubmedId;
-                    purePublications[ind].issn = pureISSN;
-                    purePublications[ind].page_start = purePageStart;
-                    purePublications[ind].page_end = purePageEnd;
-                    purePublications[ind].year = pureYear;
-                    purePublications[ind].month = pureMonth;
-                    purePublications[ind].day = pureDay;
-                    let publicationDate = '';
-                    if (pureYear !== null && pureYear !== undefined) {
-                        publicationDate = publicationDate + pureYear;
-                        if (pureMonth !== null && pureMonth !== undefined) {
-                            publicationDate = publicationDate + '-' + pureMonth;
-                            if (pureDay !== null && pureDay !== undefined) {
-                                publicationDate = publicationDate + '-' + pureDay;
-                            }
-                        }
-                    } else {
-                        if (pureMonth !== null && pureMonth !== undefined) {
-                            publicationDate = publicationDate + pureMonth;
-                            if (pureDay !== null && pureDay !== undefined) {
-                                publicationDate = publicationDate + '-' + pureDay;
-                            }
-                        }
-                    }
-                    purePublications[ind].publication_date = pureYear + '-' + pureMonth + '-' + pureDay;
-                    purePublications[ind].authors_raw = pureAuthors;
-                    purePublications[ind].number_authors = pureNumberAuthors;
-                    newPublications.push(purePublications[ind])
-                }
-            }
-        }
-    }
-    return newPublications;
-}
 
 export default {
     components: {
@@ -494,6 +274,8 @@ export default {
     },
     methods: {
         initialize () {
+            this.data.publicationsDB = [];
+            this.data.publications = [];
             this.getRepoID();
             this.getJournals()
                 .then(() => { this.finishedJournals = true;});
@@ -621,7 +403,7 @@ export default {
                 .then(this.$http.spread( () => {
                     this.progress = false;
                     this.success = true;
-                    this.data.publications = removeExistingPublications(this.data.publications, this.data.publicationsDB);
+                    this.getRepositoryPublications();
                     setTimeout(() => {this.success = false;}, 1500)
                 }))
                 .catch((error) => {
@@ -668,6 +450,8 @@ export default {
         },
         getRepositoryPublications () {
             let personID = this.otherPersonId;
+            this.data.publicationsDB = [];
+            this.data.publications = [];
             if (this.$store.state.session.loggedIn) {
                 let urlSubmit = 'api/people' + '/all-publications';
                 this.messageRepoRequest = 'Getting repository publications missing from DB';
@@ -681,7 +465,7 @@ export default {
                     })
                     .then( (result) => {
                         let publicationsPURE = result.publications;
-                        publicationsPURE = removeExistingPublications(publicationsPURE, this.data.publicationsDB);
+                        publicationsPURE = this.removeExistingPublications(publicationsPURE, this.data.publicationsDB);
                         for (let ind in publicationsPURE) {
                             this.$set(publicationsPURE[ind], 'publication_id',
                                         parseInt(ind, 10));
@@ -704,6 +488,226 @@ export default {
                         console.log(error)
                     });
             }
+        },
+        removeExistingPublications(purePublications, dbPublications) {
+            let newPublications = [];
+            let dbDOIs = [];
+            let dbWOSs = [];
+            let dbPubmeds = [];
+            let dbTitles = [];
+            let dbJournals = [];
+            let dbJournalsShort = [];
+
+            for (let ind in dbPublications) {
+                if (dbPublications[ind].doi !== null) {
+                    dbDOIs.push(dbPublications[ind].doi
+                        .toLowerCase()
+                        .replace('https://doi.org/','')
+                        .replace('http://dx.doi.org/','')
+                        .replace('doi: ','')
+                        .replace('doi:','')
+                        .replace('doi ',''));
+                }
+                if (dbPublications[ind].wos !== null) {
+                    dbWOSs.push(dbPublications[ind].wos
+                        .toLowerCase()
+                        .replace('WOS:',''));
+                }
+                if (dbPublications[ind].pubmed_id !== null) {
+                    dbPubmeds.push(dbPublications[ind].pubmed_id);
+                }
+                if (dbPublications[ind].title !== null) {
+                    dbTitles.push(prepareStringComparison(dbPublications[ind].title));
+                    dbJournals.push(prepareStringComparison(dbPublications[ind].journal_name));
+                    dbJournalsShort.push(prepareStringComparison(dbPublications[ind].journal_short_name));
+                }
+            }
+            for (let ind in purePublications) {
+                let pureDOI = null;
+                let electronicVersion = purePublications[ind].electronicVersions;
+                let checkMore = true;
+                if (electronicVersion !== null
+                        && electronicVersion !== undefined
+                        && electronicVersion.length !== 0) {
+                    pureDOI = electronicVersion[0].doi;
+                    if (pureDOI !== null && pureDOI !== undefined) {
+                        pureDOI = pureDOI.toLowerCase()
+                                .replace('https://doi.org/','')
+                                .replace('http://dx.doi.org/','');
+                        if (dbDOIs.indexOf(pureDOI) === -1) {
+                            checkMore = true;
+                        } else {
+                            checkMore = false;
+                            continue;
+                        }
+                    }
+                }
+                // DOI didn't match, try WOS and Pubmed and title/journal
+                // this numbers can be found in several keys
+                if (checkMore) {
+                    let pureWOS = null;
+                    let purePubmedId = null;
+                    let info = purePublications[ind].info;
+                    if (info !== undefined && info !== null) {
+                        let addExtID = info.additionalExternalIds;
+                        if (addExtID !== undefined && addExtID !== null) {
+                            for (let indExt in addExtID) {
+                                if (addExtID[indExt].idSource === 'WOS') {
+                                    pureWOS = addExtID[indExt].value;
+                                } else if (addExtID[indExt].idSource === 'PubMed') {
+                                    purePubmedId = addExtID[indExt].value;
+                                }
+                            }
+                            if (dbWOSs.indexOf(pureWOS) === -1) {
+                                checkMore = true;
+                            } else {
+                                checkMore = false;
+                                continue;
+                            }
+                            if (dbPubmeds.indexOf(purePubmedId) === -1) {
+                                checkMore = true;
+                            } else {
+                                checkMore = false;
+                                continue;
+                            }
+                        }
+                    }
+                    // now try checking by title/journal
+                    if (checkMore) {
+                        let pureTitle = prepareStringComparison(purePublications[ind].title.value);
+                        let indTitle = dbTitles.indexOf(pureTitle);
+                        if (indTitle === -1) {
+                            checkMore = true;
+                        } else {
+                            // now check if corresponding journal is the same
+                            if (purePublications[ind].journalAssociation !== null
+                                && purePublications[ind].journalAssociation !== undefined) {
+                                let pureJournal = prepareStringComparison(purePublications[ind].journalAssociation.title.value);
+                                if (compareTwoStrings(pureTitle, dbTitles[indTitle]) > 0.95
+                                    && (compareTwoStrings(pureJournal, dbJournals[indTitle]) > 0.95
+                                        || compareTwoStrings(pureJournal, dbJournalsShort[indTitle]) > 0.95)
+                                    ) {
+                                    checkMore = false;
+                                    continue;
+                                }
+                                else {
+                                    checkMore = true;
+                                }
+                            }
+                        }
+                        if (checkMore) {
+                            let pureJournal = null;
+                            let pureISSN = null;
+                            let purePublisher = null;
+                            let purePages;
+                            let purePageStart = null;
+                            let purePageEnd = null;
+                            let pureYear, pureMonth, pureDay;
+                            let pureAuthors = ''
+                            let pureNumberAuthors = null;
+                            purePublications[ind].title = purePublications[ind].title.value
+                            if (purePublications[ind].journalAssociation !== null
+                                && purePublications[ind].journalAssociation !== undefined) {
+                                pureJournal = purePublications[ind].journalAssociation.title.value;
+                                if (purePublications[ind].journalAssociation.issn !== null
+                                    && purePublications[ind].journalAssociation.issn !== undefined) {
+                                    pureISSN = purePublications[ind].journalAssociation.issn.value;
+                                }
+                            }
+                            if (purePublications[ind].publisher !== null
+                                && purePublications[ind].publisher !== undefined) {
+                                if (purePublications[ind].publisher.name !== null
+                                    && purePublications[ind].publisher.name !== undefined) {
+                                    if (purePublications[ind].publisher.name.text !== null
+                                        && purePublications[ind].publisher.name.text !== undefined) {
+                                        purePublisher = purePublications[ind].publisher.name.text[0].value;
+                                    }
+                                }
+                            }
+                            purePages = purePublications[ind].pages;
+                            if (purePages !== null && purePages !== undefined) {
+                                purePages = purePages.split('-');
+                                if (purePages.length > 1) {
+                                    purePageStart = purePages[0];
+                                    purePageEnd = purePages[1];
+                                } else {
+                                    purePageStart = purePages[0];
+                                }
+                            }
+                            if (purePublications[ind].publicationStatuses !== null
+                                    && purePublications[ind].publicationStatuses !== undefined) {
+                                for (let stat in purePublications[ind].publicationStatuses) {
+                                    if (purePublications[ind].publicationStatuses[stat].current === true) {
+                                        pureYear = purePublications[ind].publicationStatuses[stat].publicationDate.year;
+                                        pureMonth = purePublications[ind].publicationStatuses[stat].publicationDate.month;
+                                        pureDay = purePublications[ind].publicationStatuses[stat].publicationDate.day;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (purePublications[ind].personAssociations !== null
+                                    && purePublications[ind].personAssociations !== undefined) {
+                                pureNumberAuthors = purePublications[ind].personAssociations.length;
+                            }
+                            for (let aut in purePublications[ind].personAssociations) {
+                                if (purePublications[ind].personAssociations[aut].name !== null
+                                    && purePublications[ind].personAssociations[aut].name !== undefined) {
+                                    let firstName = purePublications[ind].personAssociations[aut].name.firstName;
+                                    let lastName = purePublications[ind].personAssociations[aut].name.lastName;
+                                    if (lastName !== null && lastName !== undefined) {
+                                        if (firstName !== null && firstName !== undefined) {
+                                            pureAuthors= pureAuthors + lastName + ', '
+                                                        + firstName;
+                                        } else {
+                                            pureAuthors = pureAuthors + lastName;
+                                        }
+                                    } else {
+                                        if (firstName !== null && firstName !== undefined) {
+                                            pureAuthors = pureAuthors + firstName;
+                                        }
+                                    }
+                                    if (parseInt(aut, 10) < purePublications[ind].personAssociations.length - 1) {
+                                        pureAuthors = pureAuthors + '; ';
+                                    }
+                                }
+                            }
+                            purePublications[ind].journal_name = pureJournal;
+                            purePublications[ind].publisher = purePublisher;
+                            purePublications[ind].doi = pureDOI;
+                            purePublications[ind].wos = pureWOS;
+                            purePublications[ind].pubmed_id = purePubmedId;
+                            purePublications[ind].issn = pureISSN;
+                            purePublications[ind].page_start = purePageStart;
+                            purePublications[ind].page_end = purePageEnd;
+                            purePublications[ind].year = pureYear;
+                            purePublications[ind].month = pureMonth;
+                            purePublications[ind].day = pureDay;
+                            let publicationDate = '';
+                            if (pureYear !== null && pureYear !== undefined) {
+                                publicationDate = publicationDate + pureYear;
+                                if (pureMonth !== null && pureMonth !== undefined) {
+                                    publicationDate = publicationDate + '-' + pureMonth;
+                                    if (pureDay !== null && pureDay !== undefined) {
+                                        publicationDate = publicationDate + '-' + pureDay;
+                                    }
+                                }
+                            } else {
+                                if (pureMonth !== null && pureMonth !== undefined) {
+                                    publicationDate = publicationDate + pureMonth;
+                                    if (pureDay !== null && pureDay !== undefined) {
+                                        publicationDate = publicationDate + '-' + pureDay;
+                                    }
+                                }
+                            }
+                            purePublications[ind].publication_date = pureYear + '-' + pureMonth + '-' + pureDay;
+                            purePublications[ind].authors_raw = pureAuthors;
+                            purePublications[ind].number_authors = pureNumberAuthors;
+                            newPublications.push(purePublications[ind])
+                        }
+                    }
+                }
+            }
+            return newPublications;
         },
         updateData (publicationData) {
             for (let ind in this.data.publications) {

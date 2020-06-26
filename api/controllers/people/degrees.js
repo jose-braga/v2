@@ -118,6 +118,9 @@ var actionCreateDegrees = function (options) {
     let personID = req.params.personID;
     let personDegreeID = req.params.degreeID;
     let data = req.body.data;
+    if (data.start === '') data.start = null;
+    if (data.end === '') data.end = null;
+    if (data.estimate_end === '') data.estimate_end = null;
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'INSERT INTO degrees_people'

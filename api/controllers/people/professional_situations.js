@@ -413,8 +413,8 @@ var actionUpdateProfessionalSituationsFellowships = function (options) {
     let { req, res, next } = options;
     let fellowshipID = req.params.fellowshipID;
     let data = req.body.data;
-    if (data.valid_from === '') data.valid_from = null;
-    if (data.valid_until === '') data.valid_until = null;
+    if (data.start === '') data.start = null;
+    if (data.end === '') data.end = null;
     if (data.maximum_extension === '') data.maximum_extension = null;
     var querySQL = '';
     var places = [];
@@ -639,8 +639,8 @@ var actionUpdateProfessionalSituationsContracts = function (options) {
     let { req, res, next } = options;
     let contractID = req.params.contractID;
     let data = req.body.data;
-    if (data.valid_from === '') data.valid_from = null;
-    if (data.valid_until === '') data.valid_until = null;
+    if (data.start === '') data.start = null;
+    if (data.end === '') data.end = null;
     if (data.maximum_extension === '') data.maximum_extension = null;
     var querySQL = '';
     var places = [];

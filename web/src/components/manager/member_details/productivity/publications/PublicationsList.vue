@@ -1,40 +1,8 @@
 <template>
-<v-card>
-    <v-card-title primary-title>
-        <div>
-            <h3 class="headline">Your Publications</h3>
-        </div>
-    </v-card-title>
-    <v-card-text></v-card-text>
+<v-card flat>
     <v-container>
-        <v-form ref="form" class="pa-4"
+        <v-form ref="form" class="px-4"
                 @submit.prevent="submitForm">
-            <v-row class="mb-2" align="center">
-                <span class="blue--text show-clickable" @click="changeTab()">Click to add more publications</span>
-                <v-btn text icon large
-                        @click="changeTab()"
-                        color="blue"
-                        class="ml-1"
-                >
-                    <v-icon>mdi-page-next</v-icon>
-                </v-btn>
-            </v-row>
-            <v-row align-content="center" justify="end">
-                <v-col cols="2" align-self="end">
-                    <v-row justify="end">
-                        <v-btn type="submit"
-                        outlined color="blue">Save</v-btn>
-                    </v-row>
-                </v-col>
-                <v-col cols="1">
-                    <v-progress-circular indeterminate
-                            v-show="progress"
-                            :size="20" :width="2"
-                            color="primary"></v-progress-circular>
-                    <v-icon v-show="success" color="green">mdi-check</v-icon>
-                    <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
-                </v-col>
-            </v-row>
             <v-text-field
                 v-model="search"
                 append-icon="mdi-magnify"
@@ -191,7 +159,9 @@ export default {
         PublicationDetails,
     },
     props: {
-        currentTab: String,
+        personId: Number,
+        managerId: Number,
+        endpoint: String,
     },
     data() {
         return {
@@ -223,25 +193,25 @@ export default {
     },
     computed: {},
     watch: {
-        currentTab () {
-            if (this.currentTab === '/person/productivity/publications') {
-                this.initialize();
-            }
-        },
+
     },
     mounted() {
         this.initialize();
-        //this.onResize();
-        this.$root.$on('updateSinglePublication', (personPublicationID) => {
-            // your code goes here
+        //TODO: change event updateSinglePublication name to managerUpdateSinglePublication
+        this.$root.$on('managerUpdateSinglePublication', (personPublicationID) => {
             this.initialize('updated-single-publication', personPublicationID);
+        });
+        this.$root.$on('managerReloadPublicationsList', () => {
+            this.initialize();
         });
     },
     methods: {
         initialize (evt, id) {
             if (this.$store.state.session.loggedIn) {
-                let personID = this.$store.state.session.personID;
-                let urlSubmit = 'api/people/' + personID + '/publications';
+                let personID = this.personId;
+                let urlSubmit = 'api' + this.endpoint
+                                + '/members'
+                                + '/' + personID + '/publications';
                 subUtil.getInfoPopulate(this, urlSubmit, true)
                 .then( (result) => {
                     let indexFound;
@@ -264,7 +234,7 @@ export default {
         },
         submitForm() {
             if (this.$store.state.session.loggedIn) {
-                let personID = this.$store.state.session.personID;
+                let personID = this.personId;
                 let urlDelete = [];
                 let urlUpdate = [];
                 let publications = this.data.publications;
@@ -272,12 +242,16 @@ export default {
                 for (let ind in publications) {
                     if (publications[ind].toUpdate && !publications[ind].dissociate) {
                         urlUpdate.push({
-                            url: 'api/people/' + personID
-                                    + '/people-publications/' + publications[ind].publication_id,
+                            url: 'api' + this.endpoint
+                                + '/members'
+                                + '/' + personID
+                                + '/people-publications/' + publications[ind].publication_id,
                             body: publications[ind],
                         });
                     } else if (publications[ind].toUpdate && publications[ind].dissociate) {
-                        urlDelete.push('api/people/' + personID
+                        urlDelete.push('api' + this.endpoint
+                                    + '/members'
+                                    + '/' + personID
                                     + '/people-publications/' + publications[ind].publication_id
                         );
                     }
@@ -322,9 +296,6 @@ export default {
             this.dialog = true;
             this.editedIndex = this.data.publications.indexOf(item);
             this.editedItem = item;
-        },
-        changeTab() {
-            this.$router.push('/person/productivity/add-publications')
         },
         dissociateItem(item) {
             this.$set(item, 'dissociate', true);

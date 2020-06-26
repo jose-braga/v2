@@ -33,6 +33,12 @@ const institutionalAffiliations = require('../controllers/people/institutional_a
 const institutionalResponsibles = require('../controllers/people/institutional_responsibles');
 const researchIDs = require('../controllers/people/research_IDs');
 const academicAffiliations = require('../controllers/people/academic_affiliations');
+const professionalSituations = require('../controllers/people/professional_situations');
+const publicationsList = require('../controllers/people/publications_list');
+const addPublications = require('../controllers/people/add_publications');
+const addPubORCID = require('../controllers/people/add_pub_ORCID');
+const addPubRepository = require('../controllers/people/add_pub_repository');
+
 
 const managePermissionsUnit = require('../controllers/manager/unit/manage_permissions');
 const manageAppAreaPermissionsUnit = require('../controllers/manager/unit/manage_app_area_permissions');
@@ -87,36 +93,29 @@ router.get('/:userID/units/:unitID/members/:personID/poles', cors(corsOptions), 
 router.post('/:userID/units/:unitID/members/:personID/poles', cors(corsOptions), institutionalAffiliations.createPole);
 router.put('/:userID/units/:unitID/members/:personID/poles/:poleID', cors(corsOptions), institutionalAffiliations.updatePole);
 router.delete('/:userID/units/:unitID/members/:personID/poles/:poleID', cors(corsOptions), institutionalAffiliations.deletePole);
-
 router.get('/:userID/units/:unitID/members/:personID/roles', cors(corsOptions), institutionalAffiliations.getRoles);
 router.post('/:userID/units/:unitID/members/:personID/roles', cors(corsOptions), institutionalAffiliations.createRole);
 router.delete('/:userID/units/:unitID/members/:personID/roles', cors(corsOptions), institutionalAffiliations.deleteRoles); // before changing delete all roles of this person
-
 router.get('/:userID/units/:unitID/members/:personID/lab-affiliations', cors(corsOptions), institutionalAffiliations.getLabAffiliations);
 router.post('/:userID/units/:unitID/members/:personID/lab-affiliations', cors(corsOptions), institutionalAffiliations.createLabAffiliation);
 router.put('/:userID/units/:unitID/members/:personID/lab-affiliations/:affiliationID', cors(corsOptions), institutionalAffiliations.updateLabAffiliation);
 router.delete('/:userID/units/:unitID/members/:personID/lab-affiliations/:affiliationID', cors(corsOptions), institutionalAffiliations.deleteLabAffiliation);
-
 router.get('/:userID/units/:unitID/members/:personID/technical-affiliations', cors(corsOptions), institutionalAffiliations.getTechnicalAffiliations);
 router.post('/:userID/units/:unitID/members/:personID/technical-affiliations', cors(corsOptions), institutionalAffiliations.createTechnicalAffiliation);
 router.put('/:userID/units/:unitID/members/:personID/technical-affiliations/:affiliationID', cors(corsOptions), institutionalAffiliations.updateTechnicalAffiliation);
 router.delete('/:userID/units/:unitID/members/:personID/technical-affiliations/:affiliationID', cors(corsOptions), institutionalAffiliations.deleteTechnicalAffiliation);
-
 router.get('/:userID/units/:unitID/members/:personID/science-management-affiliations', cors(corsOptions), institutionalAffiliations.getScienceManagementAffiliations);
 router.post('/:userID/units/:unitID/members/:personID/science-management-affiliations', cors(corsOptions), institutionalAffiliations.createScienceManagementAffiliation);
 router.put('/:userID/units/:unitID/members/:personID/science-management-affiliations/:affiliationID', cors(corsOptions), institutionalAffiliations.updateScienceManagementAffiliation);
 router.delete('/:userID/units/:unitID/members/:personID/science-management-affiliations/:affiliationID', cors(corsOptions), institutionalAffiliations.deleteScienceManagementAffiliation);
-
 router.get('/:userID/units/:unitID/members/:personID/administrative-affiliations', cors(corsOptions), institutionalAffiliations.getAdministrativeAffiliations);
 router.post('/:userID/units/:unitID/members/:personID/administrative-affiliations', cors(corsOptions), institutionalAffiliations.createAdministrativeAffiliation);
 router.put('/:userID/units/:unitID/members/:personID/administrative-affiliations/:affiliationID', cors(corsOptions), institutionalAffiliations.updateAdministrativeAffiliation);
 router.delete('/:userID/units/:unitID/members/:personID/administrative-affiliations/:affiliationID', cors(corsOptions), institutionalAffiliations.deleteAdministrativeAffiliation);
-
 router.get('/:userID/units/:unitID/members/:personID/responsibles', cors(corsOptions), institutionalResponsibles.getResponsibles);
 router.post('/:userID/units/:unitID/members/:personID/responsibles', cors(corsOptions), institutionalResponsibles.createResponsibles);
 router.put('/:userID/units/:unitID/members/:personID/responsibles/:peopleResponsibleID', cors(corsOptions), institutionalResponsibles.updateResponsibles);
 router.delete('/:userID/units/:unitID/members/:personID/responsibles/:peopleResponsibleID', cors(corsOptions), institutionalResponsibles.deleteResponsibles);
-
 router.get('/:userID/units/:unitID/members/:personID/institutional-phone', cors(corsOptions), institutionalContacts.getInstitutionalPhone);
 router.put('/:userID/units/:unitID/members/:personID/institutional-phone/:phoneID', cors(corsOptions), institutionalContacts.updateInstitutionalPhone);
 router.post('/:userID/units/:unitID/members/:personID/institutional-phone', cors(corsOptions), institutionalContacts.createInstitutionalPhone);
@@ -127,18 +126,40 @@ router.get('/:userID/units/:unitID/members/:personID/academic-affiliations', cor
 router.post('/:userID/units/:unitID/members/:personID/academic-affiliations', cors(corsOptions), academicAffiliations.createAcademicAffiliations);
 router.put('/:userID/units/:unitID/members/:personID/academic-affiliations/:affiliationID', cors(corsOptions), academicAffiliations.updateAcademicAffiliations);
 router.delete('/:userID/units/:unitID/members/:personID/academic-affiliations/:affiliationID', cors(corsOptions), academicAffiliations.deleteAcademicAffiliations);
-
 router.get('/:userID/units/:unitID/members/:personID/researcher-ids', cors(corsOptions), researchIDs.getResearcherIDs);
 router.post('/:userID/units/:unitID/members/:personID/researcher-ids', cors(corsOptions), researchIDs.createResearcherIDs);
 router.put('/:userID/units/:unitID/members/:personID/researcher-ids/:researcherInfoID', cors(corsOptions), researchIDs.updateResearcherIDs);
 
+// Professional Situations
+router.get('/:userID/units/:unitID/members/:personID/professional-situations', cors(corsOptions), professionalSituations.getProfessionalSituations);
+router.post('/:userID/units/:unitID/members/:personID/professional-situations', cors(corsOptions), professionalSituations.createProfessionalSituations);
+router.put('/:userID/units/:unitID/members/:personID/professional-situations/:jobID', cors(corsOptions), professionalSituations.updateProfessionalSituations);
+router.delete('/:userID/units/:unitID/members/:personID/professional-situations/:jobID', cors(corsOptions), professionalSituations.deleteProfessionalSituations);
+router.post('/:userID/units/:unitID/members/:personID/professional-situations/:jobID/fellowships', cors(corsOptions), professionalSituations.createProfessionalSituationsFellowships);
+router.put('/:userID/units/:unitID/members/:personID/professional-situations/:jobID/fellowships/:fellowshipID', cors(corsOptions), professionalSituations.updateProfessionalSituationsFellowships);
+router.delete('/:userID/units/:unitID/members/:personID/professional-situations/:jobID/fellowships/:fellowshipID', cors(corsOptions), professionalSituations.deleteProfessionalSituationsFellowships);
+router.post('/:userID/units/:unitID/members/:personID/professional-situations/:jobID/contracts', cors(corsOptions), professionalSituations.createProfessionalSituationsContracts);
+router.put('/:userID/units/:unitID/members/:personID/professional-situations/:jobID/contracts/:contractID', cors(corsOptions), professionalSituations.updateProfessionalSituationsContracts);
+router.delete('/:userID/units/:unitID/members/:personID/professional-situations/:jobID/contracts/:contractID', cors(corsOptions), professionalSituations.deleteProfessionalSituationsContracts);
+
+//Publications
+router.get('/:userID/units/:unitID/members/all-publications', cors(corsOptions), publicationsList.getAllPublications);
+router.get('/:userID/units/:unitID/members/:personID/publications', cors(corsOptions), publicationsList.getPublications);
+router.get('/:userID/units/:unitID/members/:personID/pure-publications', cors(corsOptions), addPubRepository.getPUREPublications);
+router.post('/:userID/units/:unitID/members/:personID/people-publications/:publicationID', cors(corsOptions), addPublications.createPersonPublicationAssociation);
+router.put('/:userID/units/:unitID/members/:personID/people-publications/:publicationID', cors(corsOptions), publicationsList.updatePersonPublicationAssociation);
+router.delete('/:userID/units/:unitID/members/:personID/people-publications/:publicationID', cors(corsOptions), publicationsList.deletePersonPublicationAssociation);
+router.put('/:userID/units/:unitID/members/:personID/publications/:publicationID', cors(corsOptions), publicationsList.updatePublication);
+
+router.post('/:userID/units/:unitID/members/:personID/journals', cors(corsOptions), addPubORCID.createJournal);
+router.post('/:userID/units/:unitID/members/:personID/journals/:journalID/publications', cors(corsOptions), addPubORCID.createPublication);
 
 
+//Permissions
 router.get('/:userID/units/:unitID/members/:personID/app-area-permissions', cors(corsOptions), manageAppAreaPermissionsUnit.getPermissions);
 router.post('/:userID/units/:unitID/members/:personID/app-area-permissions', cors(corsOptions), manageAppAreaPermissionsUnit.createPermissions);
 router.put('/:userID/units/:unitID/members/:personID/app-area-permissions/:permissionID', cors(corsOptions), manageAppAreaPermissionsUnit.updatePermissions);
 router.delete('/:userID/units/:unitID/members/:personID/app-area-permissions/:permissionID', cors(corsOptions), manageAppAreaPermissionsUnit.deletePermissions);
-
 router.get('/:userID/units/:unitID/members/:personID/permissions', cors(corsOptions), managePermissionsUnit.getPermissions);
 router.post('/:userID/units/:unitID/members/:personID/permissions', cors(corsOptions), managePermissionsUnit.createPermissions);
 router.put('/:userID/units/:unitID/members/:personID/permissions/:permissionID', cors(corsOptions), managePermissionsUnit.updatePermissions);
