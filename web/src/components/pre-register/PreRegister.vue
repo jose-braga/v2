@@ -199,9 +199,8 @@ export default {
             });
         },
         confirmForm() {
-            let person = this.$store.state.preregistration.person;
-            this.fillPDF(person);
-            /*
+            //let person = this.$store.state.preregistration.person;
+            //this.fillPDF(person);
             let proceed = true;
             let person = this.$store.state.preregistration.person;
             if (person.visible_public !== true) {
@@ -243,7 +242,6 @@ export default {
                     this.submitForms();
                 }
             }
-            */
         },
         uploadThisImage(i) {
             let urlSubmit = 'api/people/' + this.personID

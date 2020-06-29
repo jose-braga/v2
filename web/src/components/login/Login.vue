@@ -164,6 +164,8 @@ export default {
                         }
                         // eslint-disable-next-line
                         //console.log(result)
+                        this.showChangePassword = false;
+                        this.passwordLabel = 'Password'
                         return result;
                     })
                     .catch((error) => {

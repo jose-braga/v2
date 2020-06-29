@@ -21,6 +21,7 @@ const membersAll = require('../controllers/manager/all/members');
 const membersUnit = require('../controllers/manager/unit/members');
 const membersUnitCity = require('../controllers/manager/unit_city/members');
 const membersCity = require('../controllers/manager/city/members');
+const users = require('../controllers/people/users');
 const nuclearInformation = require('../controllers/people/nuclear_information');
 const photo = require('../controllers/people/photo');
 const personalContacts = require('../controllers/people/personal_contacts');
@@ -50,6 +51,12 @@ router.get('/:userID/units/:unitID/', cors(corsOptions), membersUnit.getUnitInfo
 
 router.get('/:userID/units/:unitID/cities/:cityID/current-members', cors(corsOptions), membersUnitCity.getMembersList);
 router.get('/:userID/cities/:cityID/current-members', cors(corsOptions), membersCity.getMembersList);
+
+router.get('/:userID/units/:unitID/members/:personID/users/:username', cors(corsOptions), users.checkUserExistence);
+router.get('/:userID/units/:unitID/members/:personID/users', cors(corsOptions), users.getUsername);
+router.put('/:userID/units/:unitID/members/:personID/users/:userID', cors(corsOptions), users.updateUsername);
+router.put('/:userID/units/:unitID/members/:personID/password/:userID', cors(corsOptions), users.updatePassword);
+
 
 // routes for manager with access to a single whole unit
 router.get('/:userID/units/:unitID/current-members', cors(corsOptions), membersUnit.getMembersList);

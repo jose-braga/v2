@@ -30,6 +30,12 @@
                 ></Permissions>
             </v-tab-item>
             <v-tab-item>
+                <ManageUser
+                    :person-id="personId"
+                    :manager-id="managerId"
+                    :endpoint="endpoint"
+                    class="mt-6"
+                ></ManageUser>
             </v-tab-item>
             <v-tab-item>
                 <v-row>
@@ -211,6 +217,7 @@
 
 const AppAreaPermissions = () => import(/* webpackChunkName: "manager-details-app-area-permissions" */ './permissions/AppAreaPermissions')
 const Permissions = () => import(/* webpackChunkName: "manager-details-permissions" */ './permissions/Permissions')
+const ManageUser = () => import(/* webpackChunkName: "manager-details-user" */ './user/ManageUser')
 const NuclearInformation = () => import(/* webpackChunkName: "manager-details-nuclear-information" */ './personal/NuclearInformation')
 const Photo = () => import(/* webpackChunkName: "manager-details-photo" */ './personal/Photo')
 const PersonalContacts = () => import(/* webpackChunkName: "manager-details-personal-contacts" */ './personal/PersonalContacts')
@@ -232,6 +239,7 @@ export default {
     components: {
         AppAreaPermissions,
         Permissions,
+        ManageUser,
         NuclearInformation,
         Photo,
         PersonalContacts,
