@@ -9,6 +9,7 @@ var routesPublicAPI = require('./routes/indexPublic');
 var routesAPIPeople = require('./routes/indexPeople');
 var routesAPILabs = require('./routes/indexLabs');
 var routesAPIManagers = require('./routes/indexManager');
+var routesAPIAdmins = require('./routes/indexAdmins');
 var routesAPIPreRegister = require('./routes/indexPreRegister');
 var routesAPIAuth = require('./routes/indexAuth');
 
@@ -27,7 +28,8 @@ app.use('/api/people', routesAPIPeople);
 app.use('/api/labs', routesAPILabs);
 // TODO: create API routes for facilities, science mngmt offices and administrative
 app.use('/api/managers', routesAPIManagers);
-app.use('/api/pre-register/people', routesAPIPreRegister );
+app.use('/api/admins', routesAPIAdmins);
+app.use('/api/pre-register/people', routesAPIPreRegister);
 app.use('/api', routesAPIAuth);
 
 module.exports = app;

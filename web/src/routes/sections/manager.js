@@ -1,7 +1,7 @@
 //TODO: Add a No Roles tab
-const Manager = () => import(/* webpackChunkName: "manager" */ '../../components/manager/Manager.vue')
-const ManagerMembersTab = () => import(/* webpackChunkName: "manager-members-tab" */ '../../components/manager/members/MembersTab.vue')
-const ManagerMembersTabHelp = () => import(/* webpackChunkName: "manager-members-tab-help" */ '../../components/manager/members/MembersTabHelp.vue')
+const Manager = () => import(/* webpackChunkName: "manager" */ '@/components/manager/Manager.vue')
+const ManagerMembersTab = () => import(/* webpackChunkName: "manager-members-tab" */ '@/components/manager/members/MembersTab.vue')
+const ManagerMembersTabHelp = () => import(/* webpackChunkName: "manager-members-tab-help" */ '@/components/manager/members/MembersTabHelp.vue')
 
 const routes = {
     path: '/manager',
