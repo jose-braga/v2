@@ -60,6 +60,8 @@ export default {
         $route () {
             if (this.$route.path.includes('/pre-register/')) {
                 this.standardPath = false;
+            } else if (this.$route.path.includes('/calls')) {
+                this.standardPath = false;
             } else { this.standardPath = true; }
         }
     },

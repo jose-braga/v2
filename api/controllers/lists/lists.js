@@ -1,6 +1,6 @@
 const sql = require('../utilities/sql')
 const responses = require('../utilities/responses');
-const { options } = require('../../routes/indexPeople');
+//const { options } = require('../../routes/indexPeople');
 
 // Alphabetically ordered
 var getCountries = function(req, res, next) {
@@ -510,12 +510,34 @@ var getAdministrativeOffices = function (req, res, next) {
     sql.makeSQLOperation(req, res, querySQL, places);
     return;
 };
-
-
 var getInstitutionCities = function (req, res, next) {
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'SELECT * FROM institution_city;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getDocumentTypes = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM document_types;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getOpenCalls = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT *'
+                        + ' FROM call_applications'
+                        + ' WHERE ('
+                        + ' (valid_from IS NULL AND valid_until IS NULL)'
+                        + ' OR (valid_from <= NOW() AND valid_until IS NULL)'
+                        + ' OR (valid_from IS NULL AND valid_until >= NOW())'
+                        + ' OR (valid_from <= NOW() AND valid_until >= NOW())'
+                        + ')'
+                        ;
     //places.push()
     sql.makeSQLOperation(req, res, querySQL, places);
     return;
@@ -614,6 +636,12 @@ module.exports.listItems = function (req, res, next) {
     }
     if (category === 'institution-cities') {
         getInstitutionCities(req, res, next);
+    }
+    if (category === 'document-types') {
+        getDocumentTypes(req, res, next);
+    }
+    if (category === 'open-calls') {
+        getOpenCalls(req, res, next);
     }
 
 };

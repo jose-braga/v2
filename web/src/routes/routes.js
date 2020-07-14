@@ -6,10 +6,12 @@ import team from './sections/team'
 import group from './sections/group'
 import manager from './sections/manager'
 import admin from './sections/admin'
+import unitArea from './sections/unit-area' // area for documents: MyLAQV, MyUCIBIO
 import preRegister from './sections/pre-register'
+import calls from './sections/calls'
 
 
-const routes = [
+let routes1 = [
     {
         path: '/',
         redirect: '/person/personal'
@@ -20,9 +22,15 @@ const routes = [
     group,
     manager,
     admin,
+    unitArea,
     preRegister,
-    { path: '*', redirect: '/' } // this redirect should be in the end always
+     // this redirect should be in the end always
 ]
+
+const routes = routes1
+        .concat(calls)
+        .concat([{ path: '*', redirect: '/' }])
+
 
 const router = new VueRouter({
     mode: 'history',

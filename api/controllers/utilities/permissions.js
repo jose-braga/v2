@@ -50,6 +50,8 @@ module.exports.checkPermissions = function (callback, callbackOptions) {
     let {
         personID,
         userID,
+        currentUnits,
+        currentCity,
         permissionsLevel,
         permissionsEndpoints,
     } = req.payload;
@@ -101,9 +103,45 @@ module.exports.checkPermissions = function (callback, callbackOptions) {
             });
             return;
         }
-    } else if (reqEndpointParts[0] === 'documents') {
-        // TODO: for documents permissions
-
+    } else if (reqEndpointParts[0] === 'unit-areas') {
+        // requester current units must include resource unit
+        let sameUnit = false;
+        for (let ind in currentUnits) {
+            if (currentUnits[ind] === parseInt(req.params.unitID, 10)) {
+                sameUnit = true;
+            }
+        }
+        if (sameUnit) {
+            if (reqEndpointParts[2] === 'cities') {
+                if (currentCity.city_id === parseInt(req.params.cityID, 10)) {
+                    if (reqMethod === 'GET') {
+                        return callback(callbackOptions);
+                    } else if (hasAccessEndpoint(reqMethod, reqEndpoint, permissionsEndpoints)) {
+                        return callback(callbackOptions);
+                    } else {
+                        responses.sendJSONResponse(res, 403, {
+                            "status": "error",
+                            "statusCode": 403,
+                            "error": "User is not authorized to this operation (units-cities)."
+                        });
+                        return;
+                    }
+                }
+            } else {
+                if (reqMethod === 'GET') {
+                    return callback(callbackOptions);
+                } else if (hasAccessEndpoint(reqMethod, reqEndpoint, permissionsEndpoints)) {
+                    return callback(callbackOptions);
+                } else {
+                    responses.sendJSONResponse(res, 403, {
+                        "status": "error",
+                        "statusCode": 403,
+                        "error": "User is not authorized to this operation (units)."
+                    });
+                    return;
+                }
+            }
+        }
     } else if (hasAccessEndpoint(reqMethod, reqEndpoint, permissionsEndpoints)
                 && reqEndpointParts[2] !== 'external-api-authorization') {
         // a user on behalf of another cannot change authorization for that user

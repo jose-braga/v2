@@ -104,7 +104,6 @@ var createPhoto = function (options) {
     let { req, res, next, personID, imageType } = options;
     var querySQL = '';
     var places = [];
-    // TODO: Check if this holds in production
     let url = process.env.PATH_PREFIX + '/' + req.file.path;
     querySQL = querySQL + 'INSERT INTO personal_photo'
         + '(person_id, photo_type_id, url)'
