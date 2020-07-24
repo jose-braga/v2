@@ -32,7 +32,10 @@ router.options('*', cors())
 var calls = require('../controllers/calls/calls');
 var lists = require('../controllers/lists/lists');
 
-router.get('/calls/:callID', cors(corsOptions), calls.getCallInfo);
+router.get('/calls/:callSegment', cors(corsOptions), calls.getCallInfo);
+router.post('/calls/:callSegment/applications', cors(corsOptions), calls.createApplication);
+router.post('/calls/:callSegment/application-documents', cors(corsOptions), calls.uploadApplicationDocuments);
+router.post('/calls/:callSegment/applications/:applicationID/scores', cors(corsOptions), calls.computeScores);
 
 
 // this must be in the end if there are going to be other public routes

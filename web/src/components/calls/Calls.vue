@@ -1,9 +1,8 @@
 <template>
 <div>
     <v-app-bar prominent app>
-        <v-toolbar-title>
-            <v-row align="center">
-            <v-col>
+        <v-row align="center">
+            <v-col cols="2">
                 <img src="/images/logo/ucibio-logo.png" width="40">
             </v-col>
             <!--
@@ -11,10 +10,8 @@
                 <img src="/images/logo/laqv-logo.png" width="64">
             </v-col>
             -->
-            <v-col class="ml-6">UCIBIO Applications Portal</v-col>
-            </v-row>
-        </v-toolbar-title>
-        <v-spacer></v-spacer>
+            <v-col cols="10" class="ml-6">UCIBIO Applications Portal</v-col>
+        </v-row>
         <!--
         <v-tooltip bottom>
             <template v-slot:activator="{ on }">
@@ -40,7 +37,7 @@
                         <li v-for="(call, i) in openCalls"
                             :key="i"
                         >
-                            <a :href="baseURL + call.id">
+                            <a :href="baseURL + call.call_url_segment">
                                 <b>{{call.call_name}}</b> - Open from
                                 {{call.date_from_show}}, {{call.time_from_show}}
                                 to

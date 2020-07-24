@@ -1,20 +1,19 @@
 <template>
 <div>
     <v-app-bar prominent app>
-        <v-toolbar-title>
-            <v-row align="center">
-                <v-col>
-                    <img src="/images/logo/ucibio-logo.png" width="40">
-                </v-col>
-                <!--
-                <v-col>
-                    <img src="/images/logo/laqv-logo.png" width="64">
-                </v-col>
-                -->
-                <v-col class="ml-6 call-title">{{data.call.call_name}}</v-col>
-            </v-row>
-        </v-toolbar-title>
-        <v-spacer></v-spacer>
+        <v-row align="center">
+            <v-col cols="2">
+                <img src="/images/logo/ucibio-logo.png" width="40">
+            </v-col>
+            <!--
+            <v-col>
+                <img src="/images/logo/laqv-logo.png" width="64">
+            </v-col>
+            -->
+            <v-col cols="10"
+                class="">{{data.call.call_name}}
+            </v-col>
+        </v-row>
     </v-app-bar>
     <v-container>
         <!--
@@ -82,17 +81,17 @@ export default {
         }
     },
     created () {
-        let callID = this.$route.params.callID
-        this.initialize(callID);
-        this.getCallInfo(callID);
+        let callSegment = this.$route.params.callSegment
+        this.initialize(callSegment);
+        this.getCallInfo(callSegment);
     },
     methods: {
-        initialize(callID) {
-            this.data.urlApplicants = this.baseURL + callID + '/applicants';
-            this.data.urlReviewers = this.baseURL + callID + '/reviewers';
+        initialize(callSegment) {
+            this.data.urlApplicants = this.baseURL + callSegment + '/applicants';
+            this.data.urlReviewers = this.baseURL + callSegment + '/reviewers';
         },
-        getCallInfo(callID) {
-            let urlSubmit = 'api/v2/calls/' + callID;
+        getCallInfo(callSegment) {
+            let urlSubmit = 'api/v2/calls/' + callSegment;
             let sponsors = '';
             this.$http.get(urlSubmit)
             .then((response) => {
@@ -142,6 +141,7 @@ export default {
 </script>
 
 <style scoped>
+
 .call-title {
     font-size: 26px;
 }

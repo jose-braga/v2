@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import navigation from './modules/navigation'
 import session from './modules/session'
 import preregistration from './modules/pre-registration'
+import application from './modules/application'
 
 Vue.use(Vuex)
 
@@ -12,6 +13,7 @@ const store = new Vuex.Store({
         navigation,
         session,
         preregistration,
+        application,
     }
 })
 

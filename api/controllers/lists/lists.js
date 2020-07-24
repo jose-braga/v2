@@ -542,6 +542,14 @@ var getOpenCalls = function (req, res, next) {
     sql.makeSQLOperation(req, res, querySQL, places);
     return;
 };
+var getApplicationDegrees = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * from application_academic_degree_types;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
 module.exports.listItems = function (req, res, next) {
     let category = req.params.listCategory;
     if (category === 'countries') {
@@ -642,6 +650,9 @@ module.exports.listItems = function (req, res, next) {
     }
     if (category === 'open-calls') {
         getOpenCalls(req, res, next);
+    }
+    if (category === 'application-degrees') {
+        getApplicationDegrees(req, res, next);
     }
 
 };

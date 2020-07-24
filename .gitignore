@@ -83,6 +83,7 @@ v2.code-workspace
 #user input images and documents
 web/public/images/people/
 web/public/documents/
+web/public/applications/
 
 # ignore test files
 test*.*

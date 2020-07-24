@@ -13,33 +13,51 @@ const routes = [
         component: Calls,
     },
     {
-        path: '/calls/:callID',
+        path: '/calls/:callSegment',
         components: {
             default: CallPage,
         },
     },
     {
-        path: '/calls/:callID/applicants',
+        path: '/calls/:callSegment/applicants',
         components: {
             default: Applicants,
             help: ApplicantsHelp
         },
     },
     {
-        path: '/calls/:callID/reviewers',
+        path: '/calls/:callSegment/reviewers',
         components: {
             default: Reviewers,
             help: ReviewersHelp
         },
     },
     {
-        path: '/calls/:callID/applications/:applicationID'
+        path: '/calls/:callSegment/applications/:applicationID'
             + '/recommendations/:recommenderID/:password',
         components: {
             default: Recommenders,
             help: RecommendersHelp
         },
-    }
+    },
+    /*
+    Add a route for an applicant to watch his/hers submission
+    {
+        path: '/calls/:callSegment/applications/:applicationID'
+            + '/submitted/:password',
+        components: {
+            default: ApplicationSubmitted,
+            help: ApplicationSubmittedHelp
+        },
+    },
+    {
+        path: '/calls/:callSegment/managers/:password',
+        components: {
+            default: ApplicationSubmitted,
+            help: ApplicationSubmittedHelp
+        },
+    },
+     */
 ]
 
 export default routes

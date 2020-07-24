@@ -213,7 +213,6 @@ export default {
             if (proceed) {
                 let person = this.$store.state.preregistration.person;
                 // only after submitting all information is the PDF generated
-                //console.log(person)
                 let affiliationFCT = false;
                 for (let ind in person.academicAffiliations) {
                     if (person.academicAffiliations[ind].department_id <= 4) {

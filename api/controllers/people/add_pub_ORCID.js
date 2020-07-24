@@ -14,7 +14,7 @@ var actionCreateJournal = function (options) {
                         + ' (name, short_name)'
                         + ' VALUES (?, ?);';
     places.push(data.journal_name, data.journal_name);
-    return sql.makeSQLOperation(req, res, querySQL, places,
+    return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             responses.sendJSONResponseOptions({
                 response: res,
