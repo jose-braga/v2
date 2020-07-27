@@ -374,7 +374,7 @@ export default {
                 setTimeout(() => {
                     this.success = false;}
                 , 1500)
-                //this.$store.dispatch('setApplicationSubmitted', {submitted: true});
+                this.$store.dispatch('setApplicationSubmitted', {submitted: true});
 
             })
             .catch((error) => {

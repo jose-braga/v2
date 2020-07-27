@@ -61,6 +61,34 @@ module.exports.preRegistrationLogin = function (req, res, next) {
     })(req, res);
 };
 
+module.exports.recommendationLogin = function (req, res, next) {
+    if (!req.body.recommenderID || !req.body.password) {
+        responses.sendJSONResponse(res, 400, {
+            "message": "All fields required"
+        });
+        return;
+    }
+    passport.authenticate('local-recommendation', function (err, user, info) {
+        if (err) {
+            responses.sendJSONResponse(res, 404, err);
+            return;
+        }
+        if (user) {
+            var token = jwtUtils.generateJWTRecommendation(user);
+            responses.sendJSONResponse(res, 200, {
+                "token": token,
+                "application_id": user.application_id,
+                "name": user.name,
+                "email": user.email,
+                "application": user.application,
+                "call": user.call,
+            });
+        } else {
+            responses.sendJSONResponse(res, 401, info);
+        }
+    })(req, res);
+};
+
 var actionChangePassword = function (req, res, next) {
     let querySQL = '';
     let places = [];

@@ -5,13 +5,14 @@ var express = require('express');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var routesPublicAPI = require('./routes/indexPublic');
+var routesPublicAPI = require('./routes/indexPublic'); //includes Applicant submission
 var routesAPIPeople = require('./routes/indexPeople');
 var routesAPILabs = require('./routes/indexLabs');
 var routesAPIManagers = require('./routes/indexManager');
 var routesAPIAdmins = require('./routes/indexAdmins');
 var routesAPIAreas = require('./routes/indexUnitAreas');
 var routesAPIPreRegister = require('./routes/indexPreRegister');
+var routesAPIApplications = require('./routes/indexApplications');
 var routesAPIAuth = require('./routes/indexAuth');
 
 var app = express();
@@ -32,6 +33,7 @@ app.use('/api/managers', routesAPIManagers);
 app.use('/api/admins', routesAPIAdmins);
 app.use('/api/unit-areas', routesAPIAreas);
 app.use('/api/pre-register/people', routesAPIPreRegister);
+app.use('/api/calls', routesAPIApplications);
 app.use('/api', routesAPIAuth);
 
 module.exports = app;

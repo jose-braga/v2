@@ -12,6 +12,7 @@ var authentication = require('../controllers/authentication/authentication');
 // authentication routes
 router.post('/login', cors(corsOptions), authentication.login);
 router.post('/pre-registration-login', cors(corsOptions), authentication.preRegistrationLogin);
+router.post('/recommendation-login', cors(corsOptions), authentication.recommendationLogin);
 // TODO: (Applications submission) create authentication routes for applicants,
 //  recommenders, reviewers and responsibles
 router.put('/change-password/:userID', cors(corsOptions), authentication.changePassword);

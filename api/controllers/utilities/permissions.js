@@ -157,3 +157,31 @@ module.exports.checkPermissions = function (callback, callbackOptions) {
         return;
     }
 };
+
+
+module.exports.checkPermissionsRecommendations = function (callback, callbackOptions) {
+    let { req, res, next } = callbackOptions; // should contain always these 3
+    // get requester permission data
+    let {
+        recommenderID,
+        applicationID,
+        callID,
+    } = req.payload;
+
+    let requestRecommenderID = parseInt(req.params.recommenderID, 10);
+    let requestApplicationID = parseInt(req.params.applicationID, 10);
+    let requestCallID = parseInt(req.params.callID, 10);
+
+    if (recommenderID === requestRecommenderID
+            && applicationID === requestApplicationID
+            && callID === requestCallID) {
+        return callback(callbackOptions);
+    } else {
+        responses.sendJSONResponse(res, 403, {
+            "status": "error",
+            "statusCode": 403,
+            "error": "User is not authorized to this operation (1)."
+        });
+        return;
+    }
+};

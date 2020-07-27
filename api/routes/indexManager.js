@@ -3,7 +3,6 @@ var jwt = require('express-jwt');
 var cors = require('cors')
 var router = express.Router();
 
-
 var auth = jwt({
     secret: process.env.JWT_SECRET,
     requestProperty: 'payload'
