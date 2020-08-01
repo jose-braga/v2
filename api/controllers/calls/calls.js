@@ -879,7 +879,7 @@ var computeScoreDegrees = function (options) {
 var computeScoreProjects = function (options) {
     let { req, res, next } = options;
     let data = req.body.data;
-    let pointsProject = 0.5;
+    let pointsProject = 5;
     // the algorithm is dependent on specific names in the criteria, change???
     let indCriteria;
     for (let ind in options.criteria) {
@@ -909,12 +909,12 @@ var computeScoreProjects = function (options) {
 var computeScorePapers = function (options) {
     let { req, res, next } = options;
     let data = req.body.data;
-    let q1Points = 1;
-    let q2Points = 0.8;
-    let q3Points = 0.6;
-    let q4Points = 0.6;
-    let firstAuthorPoints = 0.2;
-    let maxPoints = 3.0;
+    let q1Points = 1.667;
+    let q2Points = 1.333;
+    let q3Points = 1;
+    let q4Points = 1;
+    let firstAuthorPoints = 0.333;
+    let maxPoints = 5.0;
 
     let indCriteria;
     for (let ind in options.criteria) {
@@ -952,10 +952,10 @@ var computeScorePapers = function (options) {
 var computeScoreCommunications = function (options) {
     let { req, res, next } = options;
     let data = req.body.data;
-    let nationalPoints = 0.2;
-    let internationalPoints = 0.25;
-    let firstAuthorPoints = 0.05;
-    let maxPoints = 0.5;
+    let nationalPoints = 2;
+    let internationalPoints = 2.5;
+    let firstAuthorPoints = 0.5;
+    let maxPoints = 5;
 
     let indCriteria;
     for (let ind in options.criteria) {
@@ -989,10 +989,10 @@ var computeScoreCommunications = function (options) {
 var computeScorePosters = function (options) {
     let { req, res, next } = options;
     let data = req.body.data;
-    let nationalPoints = 0.1;
-    let internationalPoints = 0.15;
-    let firstAuthorPoints = 0.05;
-    let maxPoints = 0.3;
+    let nationalPoints = 1.667;
+    let internationalPoints = 2.5;
+    let firstAuthorPoints = 0.833;
+    let maxPoints = 5;
 
     let indCriteria;
     for (let ind in options.criteria) {
@@ -1026,7 +1026,7 @@ var computeScorePosters = function (options) {
 var computeScorePatentsPrizesProfessional = function (options) {
     let { req, res, next } = options;
     let data = req.body.data;
-    let patentsEtcPoints = 0.2;
+    let patentsEtcPoints = 5;
 
     let indCriteria;
     for (let ind in options.criteria) {
@@ -1101,10 +1101,18 @@ var writeAutomaticScoresDB = function (options) {
         querySQL = querySQL + 'INSERT INTO application_automatic_scores'
                             + ' (application_id, criteria_id, score)'
                             + ' VALUES (?, ?, ?);';
-        places.push( data.applicationID,
-            score.id,
-            score.score_auto
-        )
+        // scores from criteria with children are always the result of computationns
+        if (Object.keys(score.children).length === 0) {
+            places.push( data.applicationID,
+                score.id,
+                score.score_auto
+            );
+        } else {
+            places.push( data.applicationID,
+                score.id,
+                null
+            );
+        }
         return sql.makeSQLOperation(req, res, querySQL, places,
             (options) => {
                 if (i + 1 < options.criteria.length) {

@@ -88,7 +88,7 @@ export default {
     methods: {
         initialize(callSegment) {
             this.data.urlApplicants = this.baseURL + callSegment + '/applicants';
-            this.data.urlReviewers = this.baseURL + callSegment + '/reviewers';
+            this.data.urlReviewers = '/reviewers';
         },
         getCallInfo(callSegment) {
             let urlSubmit = 'api/v2/calls/' + callSegment;

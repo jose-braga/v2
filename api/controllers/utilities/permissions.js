@@ -185,3 +185,24 @@ module.exports.checkPermissionsRecommendations = function (callback, callbackOpt
         return;
     }
 };
+
+module.exports.checkPermissionsReviewers = function (callback, callbackOptions) {
+    let { req, res, next } = callbackOptions; // should contain always these 3
+    // get requester permission data
+    let {
+        reviewerID,
+    } = req.payload;
+
+    let requestReviewerID = parseInt(req.params.reviewerID, 10);
+
+    if (reviewerID === requestReviewerID) {
+        return callback(callbackOptions);
+    } else {
+        responses.sendJSONResponse(res, 403, {
+            "status": "error",
+            "statusCode": 403,
+            "error": "User is not authorized to this operation (1)."
+        });
+        return;
+    }
+};

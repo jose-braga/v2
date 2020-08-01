@@ -89,6 +89,44 @@ module.exports.recommendationLogin = function (req, res, next) {
     })(req, res);
 };
 
+var makeReviewerLogin = function (req, res, next) {
+    if (!req.body.username || !req.body.password) {
+        responses.sendJSONResponse(res, 400, {
+            "message": "All fields required"
+        });
+        return;
+    }
+    passport.authenticate('local-reviewer', function (err, user, info) {
+        if (err) {
+            responses.sendJSONResponse(res, 404, err);
+            return;
+        }
+        if (user) {
+            var token = jwtUtils.generateJWTReviewer(user);
+
+            if (req.body.changePassword) {
+                return actionReviewerChangePassword(req, res, next);
+            } else {
+                responses.sendJSONResponse(res, 200, {
+                    "token": token,
+                    "reviewerID": user.id,
+                    "name": user.name,
+                    "username": user.username,
+                });
+            }
+        } else {
+            responses.sendJSONResponse(res, 401, info);
+        }
+    })(req, res);
+
+};
+
+module.exports.reviewerLogin = function (req, res, next) {
+    return makeReviewerLogin(req, res, next);
+};
+
+
+
 var actionChangePassword = function (req, res, next) {
     let querySQL = '';
     let places = [];
@@ -123,4 +161,36 @@ module.exports.changePassword = function (req, res, next) {
     // first makes login with old password
     req.body.changePassword = true;
     return makeLogin(req, res, next);
+};
+
+var actionReviewerChangePassword = function (req, res, next) {
+    let querySQL = '';
+    let places = [];
+    let hashedPassword = jwtUtils.hashPassword(req.body.newPassword);
+    querySQL = querySQL + 'UPDATE application_reviewers'
+                        + ' SET password = ?'
+                        + ' WHERE id = ?;';
+    places.push(
+        hashedPassword,
+        req.params.reviewerID);
+    return sql.makeSQLOperation(req, res, querySQL, places);
+};
+module.exports.reviewerChangePassword = function (req, res, next) {
+    // Initial verifications
+    if (!req.body.username || !req.body.password
+        || !req.body.newPassword || !req.body.newPasswordConfirm) {
+        responses.sendJSONResponse(res, 400, {
+            "message": "All fields required."
+        });
+        return;
+    }
+    if (req.body.newPassword !== req.body.newPasswordConfirm) {
+        responses.sendJSONResponse(res, 400, {
+            "message": "Passwords do not match."
+        });
+        return;
+    }
+    // first makes login with old password
+    req.body.changePassword = true;
+    return makeReviewerLogin(req, res, next);
 };

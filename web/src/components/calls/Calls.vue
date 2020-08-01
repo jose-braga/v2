@@ -37,18 +37,17 @@
                         <li v-for="(call, i) in openCalls"
                             :key="i"
                         >
-                            <a :href="baseURL + call.call_url_segment">
+                            <router-link :to="baseURL + call.call_url_segment">
                                 <b>{{call.call_name}}</b> - Open from
                                 {{call.date_from_show}}, {{call.time_from_show}}
                                 to
                                 {{call.date_until_show}}, {{call.time_until_show}}
-                            </a>
+                            </router-link>
                         </li>
                     </ul>
                 </v-col>
             </v-row>
         </v-container>
-        <!-- <router-view></router-view> -->
     </v-card>
 </div>
 </template>

@@ -638,4 +638,46 @@ var getCallInfo = function (req, done, user) {
     });
 };
 
+passport.use(
+    'local-reviewer',
+    new LocalStrategy({
+        // by default, local strategy uses username and password
+        usernameField: 'username',
+        passwordField: 'password',
+        passReqToCallback: true // allows us to pass back the entire request to the callback
+    },
+    function (req, username, password, done) {
+        var query =
+            'SELECT application_reviewers.*' +
+            ' FROM application_reviewers' +
+            ' WHERE username = ?;';
+        var places = [username];
+        pool.getConnection(function (err, connection) {
+            if (err) {
+                return done(err);
+            }
+            connection.query(query, places,
+                function (err, rows) {
+                    // And done with the connection.
+                    connection.release();
+                    if (err) {
+                        return done(err);
+                    }
+                    if (rows.length < 1) {
+                        return done(null, false, { message: 'Incorrect username or password.' });
+                    }
+                    // if the user is found but the password is wrong
+                    if (!jwtUtils.checkPassword(password, rows[0].password)) {
+                        return done(null, false, { message: 'Incorrect username or password.' });
+                    }
+                    // all is well, return successful user
+                    let user = Object.assign({}, rows[0]);
+                    return done(null, user);
+                }
+            );
+        });
+    })
+);
+
+
 module.exports = passport;

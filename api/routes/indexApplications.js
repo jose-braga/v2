@@ -17,9 +17,18 @@ var corsOptions = {
 router.options('*', cors())
 
 const recommendations = require('../controllers/calls/recommendations');
+const reviewers = require('../controllers/calls/reviewers');
 
 router.get('/:callID/applications/:applicationID/recommenders/:recommenderID/questions', cors(corsOptions), recommendations.getQuestions);
 router.post('/:callID/applications/:applicationID/recommenders/:recommenderID', cors(corsOptions), recommendations.writeRecommenderAnswers);
+
+router.get('/reviewers/:reviewerID', cors(corsOptions), reviewers.getCalls);
+router.get('/:callSegment/applications/reviewers/:reviewerID', cors(corsOptions), reviewers.getCallApplications);
+router.get('/:callSegment/applications/:applicationID/reviewers/:reviewerID', cors(corsOptions), reviewers.getApplicationInfo);
+router.post('/:callSegment/applications/:applicationID/reviewers/:reviewerID/scores', cors(corsOptions), reviewers.createScores);
+router.put('/:callSegment/applications/:applicationID/reviewers/:reviewerID/tag-reviewed', cors(corsOptions), reviewers.updateTagReviewed);
+router.post('/:callSegment/applications/:applicationID/reviewers/:reviewerID/tag-reviewed', cors(corsOptions), reviewers.createTagReviewed);
+
 
 router.use(function (req, res, next) {
     var err = new Error('Not Found');

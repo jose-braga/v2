@@ -138,7 +138,7 @@
         </v-container>
     </div>
     <div v-else class="pa-6">
-        The link you are using is incorrect.
+        Either the link you are using is incorrect or you have already submitted your letter of reference.
     </div>
 </div>
 </template>

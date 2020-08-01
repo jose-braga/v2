@@ -21,11 +21,22 @@ module.exports.generateJWT = function (user) {
 
 module.exports.generateJWTRecommendation = function (user) {
     var expiry = new Date();
-    expiry.setDate(expiry.getDate() + 1); // pre-registration token is valid only for 1 day
+    expiry.setDate(expiry.getDate() + 7);
     return jwt.sign({
         recommenderID: user.id,
         applicationID: user.application_id,
         callID: user.call.id,
+        exp: parseInt(expiry.getTime() / 1000, 10)
+    }, process.env.JWT_SECRET);
+};
+
+module.exports.generateJWTReviewer = function (user) {
+    var expiry = new Date();
+    expiry.setDate(expiry.getDate() + 7);
+    return jwt.sign({
+        reviewerID: user.id,
+        reviewerName: user.name,
+        reviewerUsername: user.username,
         exp: parseInt(expiry.getTime() / 1000, 10)
     }, process.env.JWT_SECRET);
 };

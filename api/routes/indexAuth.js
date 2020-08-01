@@ -13,9 +13,11 @@ var authentication = require('../controllers/authentication/authentication');
 router.post('/login', cors(corsOptions), authentication.login);
 router.post('/pre-registration-login', cors(corsOptions), authentication.preRegistrationLogin);
 router.post('/recommendation-login', cors(corsOptions), authentication.recommendationLogin);
+router.post('/reviewer-login', cors(corsOptions), authentication.reviewerLogin);
 // TODO: (Applications submission) create authentication routes for applicants,
 //  recommenders, reviewers and responsibles
 router.put('/change-password/:userID', cors(corsOptions), authentication.changePassword);
+router.put('/reviewer-change-password/:reviewerID', cors(corsOptions), authentication.reviewerChangePassword);
 
 router.use(function (req, res, next) {
   var err = new Error('Not Found');
