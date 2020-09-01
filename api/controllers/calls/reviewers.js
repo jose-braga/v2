@@ -469,7 +469,6 @@ module.exports.getApplicationInfo = function (req, res, next) {
 };
 
 var actionDeletePreviousScores = function (options) {
-    console.log('---------2-----------')
     let { req, res, next } = options;
     let reviewerID = req.params.reviewerID;
     let applicationID = req.params.applicationID;
@@ -482,19 +481,15 @@ var actionDeletePreviousScores = function (options) {
     return sql.makeSQLOperation(req, res, querySQL, places,
         (options) => {
             options.i = 0;
-            console.log('---------2a-----------')
             return actionCreateScore(options);
         },
         options)
 };
 var actionCreateScore = function (options) {
-    console.log('---------3-----------')
     let { req, res, next, i } = options;
     let reviewerID = req.params.reviewerID;
     let applicationID = req.params.applicationID;
     let score = req.body.data.scores[i];
-    console.log(score.score_manual)
-    console.log(checkManualScoreValid(score.score_manual))
     if (checkManualScoreValid(score.score_manual)) {
         var querySQL = '';
         var places = [];
@@ -542,7 +537,6 @@ var actionCreateScore = function (options) {
 module.exports.createScores = function (req, res, next) {
     permissions.checkPermissionsReviewers(
         (options) => {
-            console.log('---------1-----------')
             return actionDeletePreviousScores(options);
         },
         { req, res, next }

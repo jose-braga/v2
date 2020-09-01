@@ -29,13 +29,26 @@
             </v-col>
             <v-col cols="12" sm="3">
                 <v-text-field
+                    v-model="v.$model.course_name"
+                    :error="v.course_name.$error"
+                    @input="v.course_name.$touch(); addValue()"
+                    label="Course*">
+                </v-text-field>
+                <div v-if="v.course_name.$error">
+                    <p v-if="!v.course_name.maxLength" class="caption red--text">Maximum length is 200 characters.</p>
+                    <p v-if="!v.course_name.required" class="caption red--text">Field is required.</p>
+                </div>
+            </v-col>
+            <v-col cols="12" sm="3">
+                <v-text-field
                     v-model="v.$model.institution"
                     :error="v.institution.$error"
                     @input="v.institution.$touch(); addValue()"
-                    label="Institution">
+                    label="Institution*">
                 </v-text-field>
                 <div v-if="v.institution.$error">
                     <p v-if="!v.institution.maxLength" class="caption red--text">Maximum length is 200 characters.</p>
+                    <p v-if="!v.institution.required" class="caption red--text">Field is required.</p>
                 </div>
             </v-col>
             <v-col cols="12" sm="2">
@@ -93,6 +106,9 @@
                 <v-btn icon @click="removeItem(data.academicDegrees, i)" class="mt-3">
                     <v-icon color="red darken">mdi-delete</v-icon>
                 </v-btn>
+            </v-col>
+            <v-col cols="12">
+                <v-divider></v-divider>
             </v-col>
         </v-row>
         <v-row v-if="data.academicDegrees.length < 2">
@@ -189,7 +205,8 @@ export default {
                             return true;
                         }
                     },
-                    institution: { maxLength: maxLength(200) },
+                    course_name: { required, maxLength: maxLength(200) },
+                    institution: { required, maxLength: maxLength(200) },
                     date_end: { required },
                     grade: { decimal, required, minValue: minValue(0), maxValue: maxValue(20) },
                     certificate: { required },

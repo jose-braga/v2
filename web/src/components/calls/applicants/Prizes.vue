@@ -7,7 +7,7 @@
         <v-row v-else
             v-for="(v,i) in $v.data.prizes.$each.$iter"
             :key="i"
-            align="center"
+            align="start"
         >
             <v-col cols="12" sm="4">
                 <v-text-field

@@ -84,6 +84,7 @@
                                                             >
                                                                 <v-row class="pl-2" align="center">
                                                                     <span class="highlight">{{datum.degree_name}}</span>
+                                                                    <span class="standard-text">, {{datum.course_name}}</span>
                                                                     <span class="standard-text">, {{datum.institution}}.</span>
                                                                     <span class="standard-text"> ({{datum.date_end | formatDate}}).</span>
                                                                     <span class="highlight"> Grade: ({{datum.grade}})</span>

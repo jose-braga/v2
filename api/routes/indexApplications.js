@@ -18,6 +18,7 @@ router.options('*', cors())
 
 const recommendations = require('../controllers/calls/recommendations');
 const reviewers = require('../controllers/calls/reviewers');
+const managers = require('../controllers/calls/managers');
 
 router.get('/:callID/applications/:applicationID/recommenders/:recommenderID/questions', cors(corsOptions), recommendations.getQuestions);
 router.post('/:callID/applications/:applicationID/recommenders/:recommenderID', cors(corsOptions), recommendations.writeRecommenderAnswers);
@@ -29,6 +30,8 @@ router.post('/:callSegment/applications/:applicationID/reviewers/:reviewerID/sco
 router.put('/:callSegment/applications/:applicationID/reviewers/:reviewerID/tag-reviewed', cors(corsOptions), reviewers.updateTagReviewed);
 router.post('/:callSegment/applications/:applicationID/reviewers/:reviewerID/tag-reviewed', cors(corsOptions), reviewers.createTagReviewed);
 
+router.get('/call-managers/:personID', cors(corsOptions), managers.getCalls);
+router.get('/:callSegment/applications/call-managers/:personID', cors(corsOptions), managers.getCallApplications);
 
 router.use(function (req, res, next) {
     var err = new Error('Not Found');

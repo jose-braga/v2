@@ -64,6 +64,8 @@ export default {
                 this.standardPath = false;
             } else if (this.$route.path.includes('/reviewers')) {
                 this.standardPath = false;
+            } else if (this.$route.path.includes('/call-managers')) {
+                this.standardPath = false;
             } else { this.standardPath = true; }
         }
     },

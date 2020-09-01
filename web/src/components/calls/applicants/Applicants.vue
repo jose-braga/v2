@@ -124,6 +124,7 @@
                     <v-btn @click="confirmForm" large
                         color="blue"
                         class="white--text"
+                        :disabled="buttonDisabled"
                     >
                         Submit application
                     </v-btn>
@@ -190,6 +191,7 @@ export default {
             gotInitialData: false,
             openPanel: [],
             formError: false,
+            buttonDisabled: false,
             progress: false,
             success: false,
             error: false,
@@ -310,6 +312,7 @@ export default {
         },
         submitForm() {
             this.progress = true;
+            this.buttonDisabled = true;
             let callSegment = this.$route.params.callSegment;
             // submission is made in steps:
             // 1. submit data & send recommender emails
@@ -372,7 +375,9 @@ export default {
                 this.progress = false;
                 this.success = true;
                 setTimeout(() => {
-                    this.success = false;}
+                        this.success = false;
+                        this.buttonDisabled = false;
+                    }
                 , 1500)
                 this.$store.dispatch('setApplicationSubmitted', {submitted: true});
 

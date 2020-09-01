@@ -267,7 +267,16 @@ export default {
         getCardTypes () {
             let this_vm = this;
             const urlSubmit = 'api/v2/' + 'card-types';
-            subUtil.getPublicInfo(this_vm, urlSubmit, 'cardTypes');
+            subUtil.getPublicInfo(this_vm, urlSubmit, 'cardTypes')
+            .then(() => {
+                this.cardTypes = this.cardTypes.filter(
+                    (el) => {
+                        return el.name_en !== "Fiscal Number"
+                            && el.name_en !== "Social Security Number"
+                    }
+                );
+                console.log(this.cardTypes);
+            });
         },
     },
     validations: {

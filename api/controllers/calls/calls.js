@@ -240,13 +240,14 @@ var createAcademicDegrees = function (options) {
         }
         querySQL = querySQL + 'INSERT INTO application_academic_degrees'
                             + ' (application_id, academic_degree_id, date_end, grade,'
-                            + ' maximum_grade, institution)'
-                            + ' VALUES (?, ?, ?, ?, ?, ?);';
+                            + ' maximum_grade, course_name, institution)'
+                            + ' VALUES (?, ?, ?, ?, ?, ?, ?);';
         places.push( applicationID,
             degree.academic_degree_id,
             degree.date_end,
             degree.grade,
             degree.maximum_grade,
+            degree.course_name,
             degree.institution,
         )
         return sql.getSQLOperationResult(req, res, querySQL, places,

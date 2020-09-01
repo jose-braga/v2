@@ -1,5 +1,8 @@
 <template>
 <v-card flat>
+    <v-card-text>
+        <b>Tip:</b> <a href="https://www.scimagojr.com/" target="_blank">Scimago</a> has information on journal quartiles.
+    </v-card-text>
     <v-container class="px-6">
         <v-row v-if="$v.data.papers.$model.length === 0">
             Please add publications in which you are a co-author

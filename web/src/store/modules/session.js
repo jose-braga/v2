@@ -22,7 +22,7 @@ const session = {
 
     },
     mutations: {
-        checkExistingSession(state) {
+        checkExistingSession(state, payload) {
             if (localStorage['v2-token']) {
                 let token_json = readLocalStorage(localStorage['v2-token']);
                 if (token_json.exp > Date.now() / 1000) {
@@ -44,9 +44,23 @@ const session = {
                     state.permissionsWebAreas = token_json.permissionsWebAreas;
                     state.baseURL = token_json.base_url;
                     state.loggedIn = true;
+                    if (router.currentRoute.path === '/call-managers') {
+                        router.push({ path: '/call-managers/calls' });
+                    }
                 } else {
-                    router.push({ path: '/' });
+                    if (payload === undefined) {
+                        router.push({ path: '/' });
+                    } else if (payload.path !== undefined
+                            && router.currentRoute.path !== payload.path) {
+                        router.push({ path: payload.path });
+                    }
                     localStorage.removeItem('v2-token');
+                }
+            } else {
+                if (payload !== undefined
+                        && payload.path !== undefined
+                        && router.currentRoute.path !== payload.path) {
+                    router.push({ path: payload.path });
                 }
             }
         },
@@ -77,7 +91,7 @@ const session = {
             state.permissionsWebAreas = token_json.permissionsWebAreas;
             state.baseURL = token_json.base_url;
         },
-        logoutProcedure(state) {
+        logoutProcedure(state, payload) {
             localStorage.removeItem('v2-token');
             state.loggedIn = false;
             state.personID = undefined;
@@ -90,7 +104,12 @@ const session = {
             state.permissionsEndpoints = [];
             state.permissionsWebAreas = [];
             state.baseURL = undefined;
-            router.push({ path: '/' });
+            if (payload === undefined) {
+                router.push({ path: '/' });
+            } else if (payload.path !== undefined) {
+                router.push({ path: payload.path });
+            }
+
             //router.go();
         },
     }

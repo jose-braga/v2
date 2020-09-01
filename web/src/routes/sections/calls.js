@@ -13,6 +13,13 @@ const ReviewerCallApplicationHelp = () => import(/* webpackChunkName: "reviewers
 const Recommenders = () => import(/* webpackChunkName: "recommenders" */ '@/components/calls/recommenders/Recommenders.vue')
 const RecommendersHelp = () => import(/* webpackChunkName: "recommenders-help" */ '@/components/calls/recommenders/RecommendersHelp.vue')
 
+const Managers = () => import(/* webpackChunkName: "call-managers" */ '@/components/calls/managers/Managers.vue')
+const ManagerCallsList = () => import(/* webpackChunkName: "call-managers-calls-list" */ '@/components/calls/managers/ManagerCallsList.vue')
+const ManagerCallsListHelp = () => import(/* webpackChunkName: "call-managers-calls-list-help" */ '@/components/calls/managers/ManagersHelp.vue')
+const ManagerCallApplicationsList = () => import(/* webpackChunkName: "call-managers-calls-applications-list" */ '@/components/calls/managers/ManagerCallApplicationsList.vue')
+const ManagerCallApplicationsListHelp = () => import(/* webpackChunkName: "call-managers-calls-applications-list-help" */ '@/components/calls/managers/ManagerCallApplicationsListHelp.vue')
+
+
 const routes = [
     {
         path: '/calls',
@@ -66,6 +73,28 @@ const routes = [
         components: {
             default: Recommenders,
             help: RecommendersHelp
+        },
+    },
+
+    {
+        path: '/call-managers',
+        components: {
+            default: Managers
+        }
+    },
+
+    {
+        path: '/call-managers/calls',
+        components: {
+            default: ManagerCallsList,
+            help: ManagerCallsListHelp
+        },
+    },
+    {
+        path: '/call-managers/calls/:callSegment',
+        components: {
+            default: ManagerCallApplicationsList,
+            help: ManagerCallApplicationsListHelp
         },
     },
     /*
