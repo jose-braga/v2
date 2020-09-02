@@ -12,6 +12,16 @@
         </v-row>
     </v-app-bar>
     <div v-if="loggedIn" class="px-4">
+        <v-row justify="center" align="center" class="mt-1">
+            <v-col cols="12" align="center">
+                <v-row justify="center" align="center">
+                    <span class="mr-4">Export to spreadsheet</span>
+                    <v-btn fab color="green" @click="generateSpreadsheet(applications)">
+                        <v-icon color="white" x-large>mdi-file-excel</v-icon>
+                    </v-btn>
+                </v-row>
+            </v-col>
+        </v-row>
         <div
             v-for="(application, ind) in applications"
             :key="ind"
@@ -358,6 +368,30 @@
                                     </v-expansion-panel-content>
                                 </v-expansion-panel>
                             </v-expansion-panels>
+                            <v-expansion-panels class="mt-3 px-2">
+                                <v-expansion-panel>
+                                    <v-expansion-panel-header>
+                                        <span class="title-level-1">
+                                            Application documents
+                                        </span>
+                                    </v-expansion-panel-header>
+                                    <v-expansion-panel-content>
+                                        <ol>
+                                            <li v-for="(doc, i) in application.documents"
+                                                :key="ind + '-doc-' + i"
+                                                class="mb-2"
+                                            >
+                                                <span>
+                                                    <a :href="doc.url" target="_blank">
+                                                        {{doc.document_type_name}}
+                                                    </a>
+                                                </span>
+                                            </li>
+                                        </ol>
+
+                                    </v-expansion-panel-content>
+                                </v-expansion-panel>
+                            </v-expansion-panels>
                         </v-expansion-panel-content>
                     </v-expansion-panel>
                 </v-expansion-panels>
@@ -369,6 +403,7 @@
 
 <script>
 import time from '@/components/common/date-utils'
+import XLSX from 'xlsx'
 
 const scoreSum = (obj, sum) => {
     if (sum === undefined) sum = 0;
@@ -390,6 +425,29 @@ const scoreSum = (obj, sum) => {
     }
     return sum;
 };
+function processForSpreadsheet(items) {
+    let itemsCurated = [];
+    for (let ind in items) {
+        let thisItem = {};
+        thisItem.applicant_name = items[ind].applicant_name;
+        thisItem.submission_time = items[ind].date_submitted + ' ' + items[ind].time_submitted;
+        thisItem.score_average = items[ind].score_average;
+        for (let indRev in items[ind].reviewers) {
+            thisItem[
+                    items[ind].reviewers[indRev].name
+                    + '_reviewed'
+                ] = items[ind].reviewers[indRev].reviewed ? items[ind].reviewers[indRev].reviewed : 0;
+            for (let indAuto in items[ind].reviewers[indRev].automaticScores) {
+                thisItem[
+                    items[ind].reviewers[indRev].name
+                    + '_' + items[ind].reviewers[indRev].automaticScores[indAuto].criteria_name
+                ] = items[ind].reviewers[indRev].automaticScores[indAuto].score_final;
+            }
+        }
+        itemsCurated.push(thisItem);
+    }
+    return itemsCurated;
+}
 
 export default {
     data () {
@@ -496,6 +554,19 @@ export default {
             .catch( (error) => {
                 console.log(error);
             })
+        },
+        generateSpreadsheet(items) {
+            let today = time.moment();
+            let dateFile = time.momentToDate(today, 'Europe/Lisbon', 'YYYY-MM-DDTHHmmss')
+            let username = this.$store.state.session.username;
+            let itemsCurated = processForSpreadsheet(items);
+
+            let wb = XLSX.utils.book_new();
+            let ws  = XLSX.utils.json_to_sheet(itemsCurated);
+            XLSX.utils.book_append_sheet(wb, ws, 'Applicants');
+            XLSX.writeFile(wb, username
+                    + '_' + this.callName
+                    + '_applicants_' + dateFile + '.xlsx');
         },
     },
 
