@@ -274,7 +274,7 @@ export default {
         getPeople() {
             var vm = this;
             if (this.$store.state.session.loggedIn) {
-                const urlSubmit = 'api/v2/' + 'people';
+                const urlSubmit = 'api/v2/' + 'people-simple';
                 return subUtil.getPublicInfo(vm, urlSubmit, 'people', 'colloquial_name');
             }
         },

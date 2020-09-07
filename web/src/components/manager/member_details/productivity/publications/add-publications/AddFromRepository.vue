@@ -589,9 +589,6 @@ export default {
                         if (purePublications[ind].title === undefined) {
                             console.log(purePublications[ind])
                         }
-                        if (purePublications[ind].title === "Crystallization and preliminary X-ray analysis of a membrane-bound nitrite reductase from Desulfovibrio desulfuricans ATCC 27774") {
-                            console.log('jejejeje')
-                        }
                         let pureTitle = prepareStringComparison(purePublications[ind].title.value);
                         let indTitle = dbTitles.indexOf(pureTitle);
                         if (indTitle === -1) {

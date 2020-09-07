@@ -570,7 +570,7 @@ module.exports.listItems = function (req, res, next) {
     if (category === 'administrative-positions') {
         getAdministrativePositions(req, res, next);
     }
-    if (category === 'people') {
+    if (category === 'people-simple') {
         getPeopleSimple(req, res, next);
     }
     if (category === 'poles') {

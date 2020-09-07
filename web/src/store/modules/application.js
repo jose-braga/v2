@@ -2,6 +2,8 @@ const application = {
     state: {
         application: {
             submitted: false,
+            callID: null,
+            applicationID: null,
             name: '',
             gender: null,
             birth_date: null,
@@ -75,6 +77,8 @@ const application = {
         },
         setApplicationSubmitted(state, payload) {
             state.application.submitted = payload.submitted;
+            state.application.applicationID = payload.applicationID;
+            state.application.callID = payload.callID;
             let callApplicationToken = 'v2-call-application-' + state.callSegment;
             localStorage.setItem(callApplicationToken, JSON.stringify(state.application));
         },

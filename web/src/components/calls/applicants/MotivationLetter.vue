@@ -5,7 +5,7 @@
             <h3 class="headline">Motivation Letter</h3>
         </div>
     </v-card-title>
-    <v-card-text>Why do you want yo apply to this PhD program?
+    <v-card-text>Why do you want to apply to this PhD program?
         What are your main strengths as a candidate? (2000 characters max)
     </v-card-text>
     <v-container class="px-6">

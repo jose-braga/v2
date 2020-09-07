@@ -321,6 +321,7 @@ export default {
                     this.progress = false;
                     this.success = true;
                     this.initialize();
+                    this.$root.$emit('updateUnitUserDocumentsList')
                     setTimeout(() => {this.success = false;}, 1500);
                 })
                 .catch((error) => {
@@ -360,6 +361,7 @@ export default {
                     this.success = true;
                     setTimeout(() => {this.success = false;}, 1500)
                     this.toDelete = [];
+                    this.$root.$emit('updateUnitUserDocumentsList')
                     this.initialize();
                 }))
                 .catch((error) => {

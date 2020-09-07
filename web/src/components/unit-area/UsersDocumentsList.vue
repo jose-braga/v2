@@ -5,7 +5,7 @@
             <h3 class="headline">Documents</h3>
         </div>
     </v-card-title>
-    <v-container class="px-4">
+    <v-container>
         <v-row>
             <v-col v-for="(col, i) in data.col_documents"
                 cols="12" md="4"
@@ -15,30 +15,35 @@
                     :key="i + '-' + j"
                 >
                     <v-col>
-                        <div class="type-name">{{type.type}}</div>
-                        <v-row v-for="(item, k) in type.items"
-                            :key="i + '-' + j + '-' + k"
-                            align="center"
-                        >
-                            <v-col cols="12" class="item-title">{{item.title}}</v-col>
-                            <v-col cols="12" class="item-content">{{item.content}}</v-col>
-                            <v-col cols="12" v-if="item.attachment_url !== null"
-                                class="item-url"
+                        <v-card>
+                            <v-card-title>
+                                <span class="type-name">{{type.type}}</span>
+                            </v-card-title>
+                            <v-row v-for="(item, k) in type.items"
+                                :key="i + '-' + j + '-' + k"
+                                align="center"
+                                class="px-3"
                             >
-                                <a :href="item.attachment_url" target="_blank">Link</a>
-                            </v-col>
-                            <v-col cols="12" class="item-dates">
-                                Visible from
-                                <span v-if="item.valid_from !== null">{{item.valid_from | formatDate}}</span>
-                                <span v-else>-∞</span>
-                                to
-                                <span v-if="item.valid_until !== null">{{item.valid_until | formatDate}}</span>
-                                <span v-else>+∞</span>
-                            </v-col>
-                            <v-col cols="12">
-                                <v-divider></v-divider>
-                            </v-col>
-                        </v-row>
+                                <v-col cols="12" class="item-title">{{item.title}}</v-col>
+                                <v-col cols="12" class="item-content">{{item.content}}</v-col>
+                                <v-col cols="12" v-if="item.attachment_url !== null"
+                                    class="item-url"
+                                >
+                                    <a :href="item.attachment_url" target="_blank">Link</a>
+                                </v-col>
+                                <v-col cols="12" class="item-dates">
+                                    Visible from
+                                    <span v-if="item.valid_from !== null">{{item.valid_from | formatDate}}</span>
+                                    <span v-else>-∞</span>
+                                    to
+                                    <span v-if="item.valid_until !== null">{{item.valid_until | formatDate}}</span>
+                                    <span v-else>+∞</span>
+                                </v-col>
+                                <v-col cols="12">
+                                    <v-divider></v-divider>
+                                </v-col>
+                            </v-row>
+                        </v-card>
                     </v-col>
                 </v-row>
             </v-col>
@@ -66,6 +71,11 @@ export default {
     },
     mounted () {
         this.initialize();
+        this.$root.$on('updateUnitUserDocumentsList',
+            () => {
+                this.initialize();
+            }
+        );
     },
     watch: {
         cityId () {
@@ -110,6 +120,7 @@ export default {
         initialize () {
             this.data.documents = [];
             this.data.col_documents = [];
+            this.data.documentsByType = [];
             if (this.cityId !== undefined) {
                 let urlSubmit = 'api/unit-areas/' + this.unitId
                                 + '/cities/' + this.cityId

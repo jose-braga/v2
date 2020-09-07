@@ -119,6 +119,23 @@
                     </v-col>
                 </v-row>
             </v-col>
+            <v-col cols="12" v-if="applicationData.application.submitted">
+                <v-row align-content="center" justify="center">
+                    <v-col cols="2" align-self="end">
+                        <v-row justify="end">
+                            <v-btn @click="confirmForm('update')" large
+                                color="red"
+                                class="white--text"
+                                :disabled="buttonDisabled"
+                            >
+                                Submit correction
+                            </v-btn>
+                        </v-row>
+                    </v-col>
+                    <v-col cols="1">
+                    </v-col>
+                </v-row>
+            </v-col>
             <v-col cols="2" align-self="end">
                 <v-row justify="end">
                     <v-btn @click="confirmForm" large
@@ -272,15 +289,21 @@ export default {
                 console.log(error)
             });
         },
-        confirmForm() {
+        confirmForm(typeStr) {
             let proceed = true;
-            if (this.applicationData.application.submitted) {
+            let sendToRecommenders = false;
+            if (this.applicationData.application.submitted && typeStr !== 'update') {
                 proceed = confirm('You already submitted an application successfully.\n\n'
                                 + ' Do you wish to proceed and submit a new one?');
-
+            } else if (typeStr === 'update') {
+                sendToRecommenders = confirm('We have already sent emails requesting letters of recommendation.\n\n'
+                                + ' Do you want to send these emails again?\n\n'
+                                + ' Cancel = proceed without sending emails');
             }
             if (proceed) {
-                this.$store.dispatch('setApplicationSubmitted', {submitted: false});
+                if (typeStr !== 'update') {
+                    this.$store.dispatch('setApplicationSubmitted', {submitted: false});
+                }
                 this.errorsList = [];
                 this.errorsList.push('Check the following sections:');
                 let sections = [
@@ -306,11 +329,11 @@ export default {
                     }
                 }
                 if (!this.formError) {
-                    this.submitForm();
+                    this.submitForm(typeStr, sendToRecommenders);
                 }
             }
         },
-        submitForm() {
+        submitForm(typeStr, sendToRecommenders) {
             this.progress = true;
             this.buttonDisabled = true;
             let callSegment = this.$route.params.callSegment;
@@ -319,84 +342,170 @@ export default {
             // 2. upload documents (adding their info to the database)
             // 3. Compute scores (server-side)
             let data;
-
-            this.$http.post('api/v2/calls/' + callSegment + '/applications',
-                { data: this.applicationData.application },
-                { }
-            )
-            .then((result) => {
-                    data = result.data.data;
-                    let uploadDocuments = [];
-                    let formDataCV = new FormData();
-                    formDataCV.append('doc_type_id', 1); // CV doc type
-                    formDataCV.append('application_id', data.applicationID);
-                    formDataCV.append('file_name', this.applicationData.application.cv.name);
-                    formDataCV.append('file', this.applicationData.application.cv);
-                    let url = 'api/v2/calls/' + callSegment + '/application-documents';
-                    uploadDocuments.push({
-                        url,
-                        body: formDataCV,
-                    })
-                    for (let ind in this.applicationData.application.academicDegrees) {
-                        let formDataDegree = new FormData();
-                        formDataDegree.append('doc_type_id', 2); // degree doc type
-                        formDataDegree.append('application_id', data.applicationID);
-                        formDataDegree.append('file_name',
-                            this.applicationData.application.academicDegrees[ind].certificate.name);
-                        formDataDegree.append('file',
-                            this.applicationData.application.academicDegrees[ind].certificate);
+            if (typeStr !== 'update') {
+                this.$http.post('api/v2/calls/' + callSegment + '/applications',
+                    { data: this.applicationData.application },
+                    { }
+                )
+                .then((result) => {
+                        data = result.data.data;
+                        let uploadDocuments = [];
+                        let formDataCV = new FormData();
+                        formDataCV.append('doc_type_id', 1); // CV doc type
+                        formDataCV.append('application_id', data.applicationID);
+                        formDataCV.append('file_name', this.applicationData.application.cv.name);
+                        formDataCV.append('file', this.applicationData.application.cv);
+                        let url = 'api/v2/calls/' + callSegment
+                                + '/applications/' + data.applicationID
+                                + '/documents';
                         uploadDocuments.push({
                             url,
-                            body: formDataDegree,
+                            body: formDataCV,
                         })
-                    }
-                    return this.$http.all(
-                        uploadDocuments.map(el =>
-                            this.$http.post(el.url,
-                                el.body,
-                                { headers:
-                                    { 'Content-Type': 'multipart/form-data' },
-                                }
+                        for (let ind in this.applicationData.application.academicDegrees) {
+                            let formDataDegree = new FormData();
+                            formDataDegree.append('doc_type_id', 2); // degree doc type
+                            formDataDegree.append('application_id', data.applicationID);
+                            formDataDegree.append('file_name',
+                                this.applicationData.application.academicDegrees[ind].certificate.name);
+                            formDataDegree.append('file',
+                                this.applicationData.application.academicDegrees[ind].certificate);
+                            uploadDocuments.push({
+                                url,
+                                body: formDataDegree,
+                            })
+                        }
+                        //this.$store.dispatch('addApplicationData', data);
+                        return this.$http.all(
+                            uploadDocuments.map(el =>
+                                this.$http.post(el.url,
+                                    el.body,
+                                    { headers:
+                                        { 'Content-Type': 'multipart/form-data' },
+                                    }
+                                )
                             )
-                        )
-                    );
-                }
-            )
-            .then(this.$http.spread( () => {
-                    this.$http.post('api/v2/calls/' + callSegment
-                                + '/applications/' + data.applicationID + '/scores',
-                        { data },
-                        { }
-                    )
-
-                }
-            ))
-            .then( () => {
-                this.progress = false;
-                this.success = true;
-                setTimeout(() => {
-                        this.success = false;
-                        this.buttonDisabled = false;
+                        );
                     }
-                , 1500)
-                this.$store.dispatch('setApplicationSubmitted', {submitted: true});
+                )
+                .then(this.$http.spread( () => {
+                    //this.$store.dispatch('addApplicationData', data);
+                    return this.$http.post('api/v2/calls/' + callSegment
+                                    + '/applications/' + data.applicationID
+                                    + '/scores',
+                            { data },
+                            { }
+                        )
+                    }
+                ))
+                .then( (result) => {
+                    this.progress = false;
+                    this.success = true;
+                    setTimeout(() => {
+                            this.success = false;
+                            this.buttonDisabled = false;
+                        }
+                    , 1500)
+                    this.$store.dispatch('setApplicationSubmitted',
+                        {
+                            submitted: true,
+                            applicationID: result.data.result.applicationID,
+                            callID: result.data.result.callID,
+                        });
+                })
+                .catch((error) => {
+                    this.progress = false;
+                    this.error = true;
+                    this.initialize();
+                    setTimeout(() => {this.error = false;}, 6000)
+                    // eslint-disable-next-line
+                    console.log(error)
+                })
+            } else {
+                this.applicationData.application.sendToRecommenders = sendToRecommenders;
+                this.$http.put('api/v2/calls/' + callSegment
+                        + '/applications/' + this.applicationData.application.applicationID,
+                    { data: this.applicationData.application },
+                    { }
+                )
+                .then(() => {
+                    return this.$http.delete('api/v2/calls/' + callSegment
+                        + '/applications/' + this.applicationData.application.applicationID
+                        + '/documents');
+                })
+                .then(() => {
+                        let uploadDocuments = [];
+                        let formDataCV = new FormData();
+                        formDataCV.append('doc_type_id', 1); // CV doc type
+                        formDataCV.append('application_id', this.applicationData.application.applicationID);
+                        formDataCV.append('file_name', this.applicationData.application.cv.name);
+                        formDataCV.append('file', this.applicationData.application.cv);
+                        let url = 'api/v2/calls/' + callSegment
+                            + '/applications/' + this.applicationData.application.applicationID
+                            + '/documents';
+                        uploadDocuments.push({
+                            url,
+                            body: formDataCV,
+                        })
+                        for (let ind in this.applicationData.application.academicDegrees) {
+                            let formDataDegree = new FormData();
+                            formDataDegree.append('doc_type_id', 2); // degree doc type
+                            formDataDegree.append('application_id', this.applicationData.application.applicationID);
+                            formDataDegree.append('file_name',
+                                this.applicationData.application.academicDegrees[ind].certificate.name);
+                            formDataDegree.append('file',
+                                this.applicationData.application.academicDegrees[ind].certificate);
+                            uploadDocuments.push({
+                                url,
+                                body: formDataDegree,
+                            })
+                        }
+                        return this.$http.all(
+                            uploadDocuments.map(el =>
+                                this.$http.post(el.url,
+                                    el.body,
+                                    { headers:
+                                        { 'Content-Type': 'multipart/form-data' },
+                                    }
+                                )
+                            )
+                        );
+                    }
+                )
+                .then(this.$http.spread( () => {
+                    return this.$http.put('api/v2/calls/' + callSegment
+                                    + '/applications/' + this.applicationData.application.applicationID
+                                    + '/scores',
+                            { data: this.applicationData.application },
+                            { }
+                        )
+                    }
+                ))
+                .then( () => {
+                    this.progress = false;
+                    this.success = true;
+                    setTimeout(() => {
+                            this.success = false;
+                            this.buttonDisabled = false;
+                        }
+                    , 1500)
+                    this.$store.dispatch('setApplicationSubmitted',
+                        {
+                            submitted: true,
+                            applicationID: this.applicationData.application.applicationID,
+                            callID: this.applicationData.application.callID,
+                        });
+                })
+                .catch((error) => {
+                    this.progress = false;
+                    this.error = true;
+                    this.initialize();
+                    setTimeout(() => {this.error = false;}, 6000)
+                    // eslint-disable-next-line
+                    console.log(error)
+                })
 
-            })
-            .catch((error) => {
-                this.progress = false;
-                this.error = true;
-                this.initialize();
-                setTimeout(() => {this.error = false;}, 6000)
-                // eslint-disable-next-line
-                console.log(error)
-            })
-
-
-
-            // this should be at the end of a successful application submission
-
-
-
+            }
         },
     }
 

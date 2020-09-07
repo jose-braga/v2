@@ -78,6 +78,8 @@ temp/
 database/
 prod_settings/
 api/images/people/
+api/documents/
+api/applications/
 v2.code-workspace
 
 #user input images and documents

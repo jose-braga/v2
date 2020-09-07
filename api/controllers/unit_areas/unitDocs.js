@@ -17,21 +17,14 @@ var storage = multer.diskStorage({ //multers disk storage settings
         } else {
             tempDirectory = 'documents/units/' + unitID + '/cities/' + cityID + '/' + addDocID;
         }
-        fs.ensureDir(tempDirectory)
-            .then(() => {
-                fs.emptyDir(tempDirectory)
-                    .then(() => {
-                        callback(null, tempDirectory);
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                        callback(null, tempDirectory);
-                    });
-            })
-            .catch((err) => {
-                console.log(err);
-                callback(null, tempDirectory);
-            });
+        fs.emptyDir(tempDirectory)
+        .then(() => {
+            callback(null, tempDirectory);
+        })
+        .catch((err) => {
+            console.log(err);
+            callback(null, tempDirectory);
+        });
     },
     filename: function (req, file, callback) {
         var datetimestamp = time.momentToDate(time.moment(), undefined, 'YYYYMMDD_HHmmss');
@@ -156,17 +149,22 @@ var updateDocwriteFile = function (options) {
     let docID = req.params.docID;
     // to keep file system clean the directory is always removed
     let deleteDirectory = 'documents/units/' + unitID + '/' + docID;
-    fs.remove(deleteDirectory);
-    req.docID = docID;
-    var upload = multer({
-        storage: storage,
-    }).single('file');
-    upload(req, res, function (err) {
-        if (err) {
-            responses.sendJSONResponse(res, 500, { "status": "error", "statusCode": 500, "error": err.stack });
-            return;
-        }
-        return updateDocDataDB(req, res, next);
+    fs.remove(deleteDirectory)
+    .then(() => {
+        req.docID = docID;
+        var upload = multer({
+            storage: storage,
+        }).single('file');
+        upload(req, res, function (err) {
+            if (err) {
+                responses.sendJSONResponse(res, 500, { "status": "error", "statusCode": 500, "error": err.stack });
+                return;
+            }
+            return updateDocDataDB(req, res, next);
+        });
+    })
+    .catch((err) => {
+        console.log(err);
     });
 };
 var updateDocDataDB = function (req, res, next) {
@@ -220,13 +218,16 @@ var actionDeleteDoc = function (options) {
     let unitID = req.params.unitID;
 
     let deleteDirectory = 'documents/units/' + unitID + '/' + docID;
-    fs.remove(deleteDirectory);
-    var querySQL = '';
-    var places = [];
-    querySQL = querySQL + 'DELETE FROM unit_documents'
-                        + ' WHERE id = ?;';
-    places.push(docID)
-    return sql.makeSQLOperation(req, res, querySQL, places)
+    fs.remove(deleteDirectory)
+    .then(() => {
+        var querySQL = '';
+        var places = [];
+        querySQL = querySQL + 'DELETE FROM unit_documents'
+                            + ' WHERE id = ?;';
+        places.push(docID);
+        return sql.makeSQLOperation(req, res, querySQL, places);
+    })
+
 };
 module.exports.deleteDoc = function (req, res, next) {
     permissions.checkPermissions(

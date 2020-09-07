@@ -118,7 +118,7 @@
                                 v-model="permission.resource1_id"
                                 @change="processGenericId(i, 1, 'resourceID')"
                                 :items="people"
-                                item-value="id" item-text="colloquial_name"
+                                item-value="user_id" item-text="colloquial_name"
                                 label="Resource 1 person name"
                                 dense>
                             </v-autocomplete>
@@ -219,7 +219,7 @@
                                 v-model="permission.resource2_id"
                                 @change="processGenericId(i, 2, 'resourceID')"
                                 :items="people"
-                                item-value="id" item-text="colloquial_name"
+                                item-value="user_id" item-text="colloquial_name"
                                 label="Resource 2 person name"
                                 dense>
                             </v-autocomplete>
@@ -325,7 +325,7 @@
                                 v-model="permission.resource1_id"
                                 @change="processGenericId(i, 3, 'resourceID')"
                                 :items="people"
-                                item-value="id" item-text="colloquial_name"
+                                item-value="user_id" item-text="colloquial_name"
                                 label="Resource 3 person name"
                                 dense>
                             </v-autocomplete>
@@ -431,7 +431,7 @@
                                 v-model="permission.resource4_id"
                                 @change="processGenericId(i, 4, 'resourceID')"
                                 :items="people"
-                                item-value="id" item-text="colloquial_name"
+                                item-value="user_id" item-text="colloquial_name"
                                 label="Resource 4 person name"
                                 dense>
                             </v-autocomplete>
@@ -881,7 +881,7 @@ export default {
         getPeople() {
             var vm = this;
             if (this.$store.state.session.loggedIn) {
-                const urlSubmit = 'api/v2/' + 'people';
+                const urlSubmit = 'api/v2/' + 'people-simple';
                 return subUtil.getPublicInfo(vm, urlSubmit, 'people', 'colloquial_name');
             }
         },

@@ -201,8 +201,8 @@ export default {
                 .then(() => {
                     this.progress = false;
                     this.success = true;
-                    setTimeout(() => {this.success = false;}, 1500)
-
+                    setTimeout(() => {this.success = false;}, 1500);
+                    this.$root.$emit('updateUnitUserDocumentsList');
                 })
                 .catch((error) => {
                     this.progress = false;

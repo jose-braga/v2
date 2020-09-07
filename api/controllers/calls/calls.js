@@ -140,6 +140,10 @@ var actionGetCallID = function (options) {
         (resQuery, options) => {
             if (resQuery.length === 1) {
                 options.call = resQuery[0];
+                options.callID = resQuery[0].id;
+                if (options.type === 'update') {
+                    return actionUpdateApplication(options);
+                }
                 return actionCreateApplication(options);
             } else {
                 return responses.sendJSONResponseOptions({
@@ -223,10 +227,26 @@ var createMotivationLetter = function (options) {
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             options.i = 0;
-            return createAcademicDegrees(options);
+            return deleteAcademicDegrees(options);
         },
         options);
 
+};
+var deleteAcademicDegrees = function (options) {
+    // delete previous data (important when correcting application)
+    let { req, res, next, applicationID } = options;
+    let data = req.body.data;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'DELETE FROM application_academic_degrees'
+                        + ' WHERE application_id  = ?;';
+
+    places.push(applicationID)
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            return createAcademicDegrees(options);
+        },
+        options);
 };
 var createAcademicDegrees = function (options) {
     let { req, res, next, applicationID, i } = options;
@@ -252,20 +272,38 @@ var createAcademicDegrees = function (options) {
         )
         return sql.getSQLOperationResult(req, res, querySQL, places,
             (resQuery, options) => {
+                options.req.body.data.academicDegrees[i].degree_id
+                    = resQuery.insertId;
                 if (i + 1 < data.academicDegrees.length) {
                     options.i = i + 1;
                     return createAcademicDegrees(options);
                 } else {
                     options.i = 0;
-                    return createProjects(options);
+                    return deleteProjects(options);
                 }
 
             },
             options);
     } else {
         options.i = 0;
-        return createProjects(options);
+        return deleteProjects(options);
     }
+};
+var deleteProjects = function (options) {
+    // delete previous data (important when correcting application)
+    let { req, res, next, applicationID } = options;
+    let data = req.body.data;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'DELETE FROM application_projects'
+                        + ' WHERE application_id  = ?;';
+
+    places.push(applicationID)
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            return createProjects(options);
+        },
+        options);
 };
 var createProjects = function (options) {
     let { req, res, next, applicationID, i } = options;
@@ -291,20 +329,37 @@ var createProjects = function (options) {
         )
         return sql.getSQLOperationResult(req, res, querySQL, places,
             (resQuery, options) => {
+                options.req.body.data.projects[i].project_id = resQuery.insertId;
                 if (i + 1 < data.projects.length) {
                     options.i = i + 1;
                     return createProjects(options);
                 } else {
                     options.i = 0;
-                    return createPapers(options);
+                    return deletePapers(options);
                 }
 
             },
             options);
     } else {
         options.i = 0;
-        return createPapers(options);
+        return deletePapers(options);
     }
+};
+var deletePapers = function (options) {
+    // delete previous data (important when correcting application)
+    let { req, res, next, applicationID } = options;
+    let data = req.body.data;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'DELETE FROM application_papers'
+                        + ' WHERE application_id  = ?;';
+
+    places.push(applicationID)
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            return createPapers(options);
+        },
+        options);
 };
 var createPapers = function (options) {
     let { req, res, next, applicationID, i } = options;
@@ -330,20 +385,37 @@ var createPapers = function (options) {
         )
         return sql.getSQLOperationResult(req, res, querySQL, places,
             (resQuery, options) => {
+                options.req.body.data.papers[i].paper_id = resQuery.insertId;
                 if (i + 1 < data.papers.length) {
                     options.i = i + 1;
                     return createPapers(options);
                 } else {
                     options.i = 0;
-                    return createCommunications(options);
+                    return deleteCommunications(options);
                 }
 
             },
             options);
     } else {
         options.i = 0;
-        return createCommunications(options);
+        return deleteCommunications(options);
     }
+};
+var deleteCommunications = function (options) {
+    // delete previous data (important when correcting application)
+    let { req, res, next, applicationID } = options;
+    let data = req.body.data;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'DELETE FROM application_communications'
+                        + ' WHERE application_id  = ?;';
+
+    places.push(applicationID)
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            return createCommunications(options);
+        },
+        options);
 };
 var createCommunications = function (options) {
     let { req, res, next, applicationID, i } = options;
@@ -374,20 +446,37 @@ var createCommunications = function (options) {
         )
         return sql.getSQLOperationResult(req, res, querySQL, places,
             (resQuery, options) => {
+                options.req.body.data.communications[i].communication_id = resQuery.insertId;
                 if (i + 1 < data.communications.length) {
                     options.i = i + 1;
                     return createCommunications(options);
                 } else {
                     options.i = 0;
-                    return createPosters(options);
+                    return deletePosters(options);
                 }
 
             },
             options);
     } else {
         options.i = 0;
-        return createPosters(options);
+        return deletePosters(options);
     }
+};
+var deletePosters = function (options) {
+    // delete previous data (important when correcting application)
+    let { req, res, next, applicationID } = options;
+    let data = req.body.data;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'DELETE FROM application_posters'
+                        + ' WHERE application_id  = ?;';
+
+    places.push(applicationID)
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            return createPosters(options);
+        },
+        options);
 };
 var createPosters = function (options) {
     let { req, res, next, applicationID, i } = options;
@@ -418,20 +507,37 @@ var createPosters = function (options) {
         )
         return sql.getSQLOperationResult(req, res, querySQL, places,
             (resQuery, options) => {
+                options.req.body.data.posters[i].poster_id = resQuery.insertId;
                 if (i + 1 < data.posters.length) {
                     options.i = i + 1;
                     return createPosters(options);
                 } else {
                     options.i = 0;
-                    return createPrizes(options);
+                    return deletePrizes(options);
                 }
 
             },
             options);
     } else {
         options.i = 0;
-        return createPrizes(options);
+        return deletePrizes(options);
     }
+};
+var deletePrizes = function (options) {
+    // delete previous data (important when correcting application)
+    let { req, res, next, applicationID } = options;
+    let data = req.body.data;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'DELETE FROM application_prizes'
+                        + ' WHERE application_id  = ?;';
+
+    places.push(applicationID)
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            return createPrizes(options);
+        },
+        options);
 };
 var createPrizes = function (options) {
     let { req, res, next, applicationID, i } = options;
@@ -450,20 +556,37 @@ var createPrizes = function (options) {
         )
         return sql.getSQLOperationResult(req, res, querySQL, places,
             (resQuery, options) => {
+                options.req.body.data.prizes[i].prize_id = resQuery.insertId;
                 if (i + 1 < data.prizes.length) {
                     options.i = i + 1;
                     return createPrizes(options);
                 } else {
                     options.i = 0;
-                    return createPatents(options);
+                    return deletePatents(options);
                 }
 
             },
             options);
     } else {
         options.i = 0;
-        return createPatents(options);
+        return deletePatents(options);
     }
+};
+var deletePatents = function (options) {
+    // delete previous data (important when correcting application)
+    let { req, res, next, applicationID } = options;
+    let data = req.body.data;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'DELETE FROM application_patents'
+                        + ' WHERE application_id  = ?;';
+
+    places.push(applicationID)
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            return createPatents(options);
+        },
+        options);
 };
 var createPatents = function (options) {
     let { req, res, next, applicationID, i } = options;
@@ -484,20 +607,37 @@ var createPatents = function (options) {
         )
         return sql.getSQLOperationResult(req, res, querySQL, places,
             (resQuery, options) => {
+                options.req.body.data.patents[i].patent_id = resQuery.insertId;
                 if (i + 1 < data.patents.length) {
                     options.i = i + 1;
                     return createPatents(options);
                 } else {
                     options.i = 0;
-                    return createProfessional(options);
+                    return deleteProfessional(options);
                 }
 
             },
             options);
     } else {
         options.i = 0;
-        return createProfessional(options);
+        return deleteProfessional(options);
     }
+};
+var deleteProfessional = function (options) {
+    // delete previous data (important when correcting application)
+    let { req, res, next, applicationID } = options;
+    let data = req.body.data;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'DELETE FROM application_professional_experience'
+                        + ' WHERE application_id  = ?;';
+
+    places.push(applicationID)
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            return createProfessional(options);
+        },
+        options);
 };
 var createProfessional = function (options) {
     let { req, res, next, applicationID, i } = options;
@@ -517,18 +657,52 @@ var createProfessional = function (options) {
         )
         return sql.getSQLOperationResult(req, res, querySQL, places,
             (resQuery, options) => {
+                options.req.body.data.professional[i].professional_id = resQuery.insertId;
                 if (i + 1 < data.professional.length) {
                     options.i = i + 1;
                     return createProfessional(options);
                 } else {
                     options.i = 0;
-                    return createRecommenders(options);
+                    return deleteRecommenders(options);
                 }
             },
             options);
     } else {
         options.i = 0;
-        return createRecommenders(options);
+        return deleteRecommenders(options);
+    }
+};
+var deleteRecommenders = function (options) {
+    let { req, res, next, type, applicationID, callID } = options;
+    let data = req.body.data;
+    if ((type === 'update' && data.sendToRecommenders)
+            || type !== 'update') {
+        // delete previous data (important when correcting application)
+        let { req, res, next, applicationID } = options;
+        let data = req.body.data;
+        var querySQL = '';
+        var places = [];
+        querySQL = querySQL + 'DELETE FROM application_recommenders'
+                            + ' WHERE application_id  = ?;';
+        places.push(applicationID)
+        return sql.getSQLOperationResult(req, res, querySQL, places,
+            (resQuery, options) => {
+                return createRecommenders(options);
+            },
+            options);
+    } else {
+        data.applicationID = applicationID;
+        data.callID = callID;
+        responses.sendJSONResponseOptions({
+            response: res,
+            status: 200,
+            message: {
+                "status": "success",
+                "statusCode": 200,
+                data,
+            }
+        });
+        return;
     }
 };
 var createRecommenders = function (options) {
@@ -607,6 +781,8 @@ async function sendRecommenderMessage(options) {
         + '\n\n'
         + ' Your answers and the contents of the letter of reference will only'
         + ' be visible to the reviewers of the application.\n\n'
+        + ' In case you have received a previous message from us requesting'
+        + ' a recommendation for this applicant, please disregard it.\n\n'
         + ' Best regards,\n'
         + ' The ' + call.call_name + ' Scientific Committee';
     let emailBodyHtml = '<p>' + 'Dear ' + recommendation.name + ',</p>'
@@ -623,6 +799,8 @@ async function sendRecommenderMessage(options) {
         + '<br>'
         + ' <p>Your answers and the contents of the letter of reference will only'
         + ' be visible to the reviewers of the application.</p>'
+        + ' <p>In case you have received a previous message from us requesting'
+        + ' a recommendation for this applicant, please disregard it.</p>'
         + ' <p>Best regards,<br>'
         + ' The ' + call.call_name + ' Scientific Committee</p>';
     options.req.body.data.recommendations[i].subjectText = subjectText;
@@ -676,7 +854,6 @@ var writeRecommenderMessageDB = function (options, error) {
     );
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
-            options.req.body.data.recommendations[i].recommenderID = resQuery.insertId;
             if (i + 1 < data.recommendations.length) {
                 options.i = i + 1;
                 return sendRecommenderMessage(options)
@@ -687,11 +864,17 @@ var writeRecommenderMessageDB = function (options, error) {
             } else {
                 data.applicationID = applicationID;
                 data.callID = call.id;
+                for (let el in data.recommendations) {
+                    delete data.recommendations[el].subjectText;
+                    delete data.recommendations[el].emailBody;
+                    delete data.recommendations[el].password;
+                }
                 responses.sendJSONResponseOptions({
                     response: res,
                     status: 200,
                     message: {
-                        "status": "success", "statusCode": 200,
+                        "status": "success",
+                        "statusCode": 200,
                         data,
                     }
                 });
@@ -753,7 +936,19 @@ var createApplicantDocAddRemainingDataDB = function (req, res, next) {
         url,
         req.docID
     );
-    return sql.makeSQLOperation(req, res, querySQL, places);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            return responses.sendJSONResponseOptions({
+                response: res,
+                status: 200,
+                message: {
+                    "status": "success",
+                    "statusCode": 200,
+                    "result": { docID: req.docID },
+                }
+            });
+        },
+        {req, res, next});
 };
 
 module.exports.uploadApplicationDocuments = function (req, res, next) {
@@ -1090,7 +1285,11 @@ var computeGlobalAutomaticScores = function (options) {
     }
     options.criteria = Object.values(score);
     options.i = 0;
-    return writeAutomaticScoresDB(options);
+    if (options.type === 'update') {
+        return updateAutomaticScoresDB(options);
+    } else {
+        return writeAutomaticScoresDB(options);
+    }
 }
 var writeAutomaticScoresDB = function (options) {
     let { req, res, next, i } = options;
@@ -1126,7 +1325,10 @@ var writeAutomaticScoresDB = function (options) {
                         message: {
                             "status": "success",
                             "statusCode": 200,
-                            "message": "Done!",
+                            "result": {
+                                applicationID: data.applicationID,
+                                callID: data.callID
+                            },
                         }
                     });
                 }
@@ -1154,3 +1356,237 @@ module.exports.computeScores = function (req, res, next) {
     }
     return actionGetApplicationCriteria(options);
 }
+
+
+var actionUpdateApplication = function (options) {
+    let { req, res, next, call } = options;
+    let applicationID = req.params.applicationID;
+    var querySQL = '';
+    var places = [];
+    let now = time.momentToDate(time.moment(), undefined, 'YYYY-MM-DD HH:mm:ss');
+    querySQL = querySQL + 'UPDATE applications'
+                        + ' SET submitted = ?'
+                        + ' WHERE id = ?;';
+    // the initial status is 1 until the end of saving of application data do DB
+    // TODO: in the end add the generated reference also!!!!!!
+    places.push(now, applicationID)
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            return updateApplicant(options);
+        },
+        options);
+};
+var updateApplicant = function (options) {
+    let { req, res, next } = options;
+    let applicationID = req.params.applicationID;
+    let data = req.body.data;
+    var querySQL = '';
+    var places = [];
+    if (data.birth_date === '') {
+        data.birth_date = null;
+    }
+    if (data.identification_valid_until === '') {
+        data.identification_valid_until = null;
+    }
+    // TODO: create url_access for applicant in the end if is successfull
+    querySQL = querySQL + 'UPDATE applicants'
+                        + ' SET name = ?,'
+                        + ' document_type_id = ?,'
+                        + ' document_number = ?,'
+                        + ' document_valid_until = ?,'
+                        + ' gender = ?,'
+                        + ' email = ?,'
+                        + ' birth_date = ?,'
+                        + ' address = ?,'
+                        + ' postal_code = ?,'
+                        + ' city = ?,'
+                        + ' id_country = ?,'
+                        + ' phone = ?'
+                        + ' WHERE application_id = ?;';
+
+    places.push(
+        data.name,
+        data.identification_type_id,
+        data.identification_number,
+        data.identification_valid_until,
+        data.gender,
+        data.email,
+        data.birth_date,
+        data.address,
+        data.postal_code,
+        data.city,
+        data.id_country,
+        data.phone,
+        applicationID
+    )
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            return updateMotivationLetter(options);
+        },
+        options);
+};
+var updateMotivationLetter = function (options) {
+    let { req, res, next } = options;
+    let applicationID = req.params.applicationID;
+    let data = req.body.data;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'UPDATE application_motivation_letter'
+                        + ' SET motivation_letter = ?'
+                        + ' WHERE application_id = ?;';
+    places.push(data.motivation, applicationID)
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            options.i = 0;
+            return deleteAcademicDegrees(options);
+        },
+        options);
+};
+
+module.exports.updateApplication = function (req, res, next) {
+    let options = {
+        req,
+        res,
+        next,
+    }
+    let applicationID = req.params.applicationID;
+    options.applicationID = applicationID;
+    options.type = 'update';
+    return actionGetCallID(options);
+};
+
+var actionDeleteApplicationDocuments = function (options) {
+    // delete previous data (important when correcting application)
+    let { req, res, next, applicationID } = options;
+    let tempDirectory = 'applications/' + applicationID
+                    + '/doc-type';
+    fs.emptyDir(tempDirectory)
+    .then(() => {
+        var querySQL = '';
+        var places = [];
+        querySQL = querySQL + 'DELETE FROM application_documents'
+                            + ' WHERE application_id  = ?;';
+
+        places.push(applicationID)
+        return sql.makeSQLOperation(req, res, querySQL, places);
+    });
+};
+module.exports.deleteApplicationDocuments = function (req, res, next) {
+    let options = {
+        req,
+        res,
+        next,
+    }
+    let applicationID = req.params.applicationID;
+    options.applicationID = applicationID;
+    return actionDeleteApplicationDocuments(options);
+};
+
+var updateApplicantDocwriteFile = function (options) {
+    let { req, res, next } = options;
+    var upload = multer({
+        storage: storage,
+    }).single('file');
+    upload(req, res, function (err) {
+        if (err) {
+            responses.sendJSONResponse(res, 500, { "status": "error", "statusCode": 500, "error": err.stack });
+            return;
+        }
+        return updateApplicantDocAddRemainingDataDB(req, res, next);
+    });
+};
+var updateApplicantDocAddRemainingDataDB = function (req, res, next) {
+    let docID = req.params.docID;
+    let docData = req.body;
+    let url = process.env.PATH_PREFIX + '/' + req.file.path;
+    url = url.replace(/\s/g,'%20');
+    let querySQL = '';
+    let places = [];
+    querySQL = 'UPDATE application_documents'
+                + ' SET application_id = ?,'
+                + ' document_type_id = ?,'
+                + ' url = ? '
+                + ' WHERE id = ?';
+    places.push(
+        docData.application_id,
+        docData.doc_type_id,
+        url,
+        docID
+    );
+    return sql.makeSQLOperation(req, res, querySQL, places);
+};
+module.exports.updateUploadApplicationDocuments = function (req, res, next) {
+    let options = {
+        req,
+        res,
+        next,
+    }
+    options.type = 'update';
+    return updateApplicantDocwriteFile(options);
+};
+
+var updateAutomaticScoresDB = function (options) {
+    let { req, res, next, i } = options;
+    let data = req.body.data;
+    if (options.criteria.length > 0) {
+        let score = options.criteria[i];
+        var querySQL = '';
+        var places = [];
+        querySQL = querySQL + 'UPDATE application_automatic_scores'
+                            + ' SET score = ?'
+                            + ' WHERE application_id = ? AND criteria_id = ?;';
+        // scores from criteria with children are always the result of computationns
+        if (Object.keys(score.children).length === 0) {
+            places.push(
+                score.score_auto,
+                data.applicationID,
+                score.id,
+            );
+        } else {
+            places.push(
+                null,
+                data.applicationID,
+                score.id
+            );
+        }
+        return sql.makeSQLOperation(req, res, querySQL, places,
+            (options) => {
+                if (i + 1 < options.criteria.length) {
+                    options.i = i + 1;
+                    return updateAutomaticScoresDB(options);
+                } else {
+                    return responses.sendJSONResponseOptions({
+                        response: res,
+                        status: 200,
+                        message: {
+                            "status": "success",
+                            "statusCode": 200,
+                            "message": "Data updated!",
+                        }
+                    });
+                }
+            },
+            options);
+
+    } else {
+        //error no criteria defined yet
+        return responses.sendJSONResponseOptions({
+            response: res,
+            status: 403,
+            message: {
+                "status": "error", "statusCode": 403,
+                "message": "No criteria defined yet!"
+            }
+        });
+    }
+}
+
+module.exports.updateComputeScores = function (req, res, next) {
+    let options = {
+        req,
+        res,
+        next,
+    }
+    options.type = 'update';
+    return actionGetApplicationCriteria(options);
+};

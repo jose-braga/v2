@@ -275,7 +275,6 @@ export default {
                             && el.name_en !== "Social Security Number"
                     }
                 );
-                console.log(this.cardTypes);
             });
         },
     },
