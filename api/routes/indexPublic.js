@@ -3,7 +3,7 @@ var jwt = require('express-jwt');
 var cors = require('cors')
 var router = express.Router();
 
-
+/*
 var auth = jwt({
   secret: process.env.JWT_SECRET,
   requestProperty: 'payload'
@@ -20,9 +20,7 @@ router.use(auth
         }
     )
 );
-
-
-
+*/
 var corsOptions = {
   origin: '*',
 }
@@ -45,9 +43,6 @@ router.put('/calls/:callSegment/applications/:applicationID/scores', cors(corsOp
 router.get('/people', cors(corsOptions), people.searchPeople);
 router.get('/people/:personID', cors(corsOptions), people.getPersonInfo);
 router.get('/people/:personID/publications', cors(corsOptions), people.getPersonPublications);
-
-
-
 
 
 // this must be in the end if there are going to be other public routes

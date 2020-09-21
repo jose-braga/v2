@@ -1,5 +1,7 @@
 const sql = require('../utilities/sql');
+const responses = require('../utilities/responses');
 const permissions = require('../utilities/permissions');
+const notifications = require('../utilities/notifications');
 
 var actionGetInstitutionalPhone = function (options) {
     let { req, res, next } = options;
@@ -32,7 +34,20 @@ var actionUpdateInstitutionalPhone = function (options) {
         data.extension,
         phoneID,
         personID);
-    return sql.makeSQLOperation(req, res, querySQL, places);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            let notificationConfig = { entityID: personID };
+            notifications.notifyWebsiteAPI(notificationConfig)
+            return responses.sendJSONResponseOptions(options)
+        },
+        {
+            response: res,
+            status: 200,
+            message: {
+                "status": "success", "statusCode": 200, "count": 0,
+                "result": "OK - updated institutional phone!"
+            }
+        });
 };
 module.exports.updateInstitutionalPhone = function (req, res, next) {
     permissions.checkPermissions(
@@ -55,7 +70,20 @@ var actionCreateInstitutionalPhone = function (options) {
         data.phone,
         data.extension
     );
-    return sql.makeSQLOperation(req, res, querySQL, places);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            let notificationConfig = { entityID: personID };
+            notifications.notifyWebsiteAPI(notificationConfig)
+            return responses.sendJSONResponseOptions(options)
+        },
+        {
+            response: res,
+            status: 200,
+            message: {
+                "status": "success", "statusCode": 200, "count": 0,
+                "result": "OK - created institutional phone!"
+            }
+        });
 };
 module.exports.createInstitutionalPhone = function (req, res, next) {
     permissions.checkPermissions(
@@ -94,7 +122,20 @@ var actionUpdateInstitutionalEmail = function (options) {
         data.email,
         emailID,
         personID);
-    return sql.makeSQLOperation(req, res, querySQL, places);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            let notificationConfig = { entityID: personID };
+            notifications.notifyWebsiteAPI(notificationConfig)
+            return responses.sendJSONResponseOptions(options)
+        },
+        {
+            response: res,
+            status: 200,
+            message: {
+                "status": "success", "statusCode": 200, "count": 0,
+                "result": "OK - updated institutional email!"
+            }
+        });
 };
 module.exports.updateInstitutionalEmail = function (req, res, next) {
     permissions.checkPermissions(
@@ -116,7 +157,20 @@ var actionCreateInstitutionalEmail = function (options) {
         personID,
         data.email
     );
-    return sql.makeSQLOperation(req, res, querySQL, places);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            let notificationConfig = { entityID: personID };
+            notifications.notifyWebsiteAPI(notificationConfig)
+            return responses.sendJSONResponseOptions(options)
+        },
+        {
+            response: res,
+            status: 200,
+            message: {
+                "status": "success", "statusCode": 200, "count": 0,
+                "result": "OK - created institutional email!"
+            }
+        });
 };
 module.exports.createInstitutionalEmail = function (req, res, next) {
     permissions.checkPermissions(

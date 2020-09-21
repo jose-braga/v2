@@ -1,7 +1,56 @@
 const sql = require('../utilities/sql');
 const time = require('../utilities/time');
+var jwtUtils = require('../../config/jwt_utilities');
 const responses = require('../utilities/responses');
 
+module.exports.login = function (req, res, next) {
+    var username = req.body.username;
+    var password = req.body.password;
+    var places = [];
+    var querySQL = 'SELECT people.id, users.id AS user_id, users.username, users.password'
+                 + ' FROM users'
+                 + ' LEFT JOIN people ON people.user_id = users.id'
+                 + ' LEFT JOIN people_labs ON people_labs.person_id = people.id'
+                 + ' LEFT JOIN labs ON labs.id = people_labs.lab_id'
+                 + ' LEFT JOIN labs_groups ON labs_groups.lab_id = labs.id'
+                 + ' LEFT JOIN `groups` ON labs_groups.group_id = `groups`.id'
+                 + ' LEFT JOIN groups_units ON groups_units.group_id = `groups`.id'
+                 + ' LEFT JOIN technicians ON technicians.person_id = people.id'
+                 + ' LEFT JOIN technician_offices ON technician_offices.id = technicians.technician_office_id'
+                 + ' LEFT JOIN technicians_units ON technicians_units.technician_id = technicians.id'
+                 + ' LEFT JOIN science_managers ON science_managers.person_id = people.id'
+                 + ' LEFT JOIN science_manager_offices ON science_manager_offices.id = science_managers.science_manager_office_id'
+                 + ' LEFT JOIN science_managers_units ON science_managers_units.science_manager_id = science_managers.id'
+                 + ' LEFT JOIN people_administrative_offices ON people_administrative_offices.person_id = people.id'
+                 + ' LEFT JOIN administrative_offices ON administrative_offices.id = people_administrative_offices.administrative_office_id'
+                 + ' LEFT JOIN people_administrative_units ON people_administrative_units.administrative_id = people_administrative_offices.id'
+                 + ' WHERE users.username = ?  AND people.status = 1 AND '
+                 + ' (groups_units.unit_id = 2 OR technicians_units.unit_id = 2 OR '
+                 + ' science_managers_units.unit_id = 2 OR people_administrative_units.unit_id = 2);';
+    places = [username];
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            if (resQuery.length < 1) {
+                return responses.sendJSONResponse(res, 400,
+                    { statusCode: 400, message: 'Incorrect credentials.' }
+                );
+            }
+            if (!jwtUtils.checkPassword(password, resQuery[0].password)) {
+                return sendJSONResponse(res, 400,
+                    { statusCode: 400, message: 'Incorrect credentials.' }
+                );
+            }
+            return responses.sendJSONResponse(res, 200,
+                {
+                    statusCode: 200,
+                    result: { person_id: resQuery[0].id },
+                }
+            );
+
+        },
+        { req, res, next }
+    );
+};
 var getEmail = function(options) {
     let { req, res, next, people, i } = options;
     let querySQL;
@@ -44,39 +93,17 @@ var getResearcherInfo = function(options) {
     let { req, res, next, people, i } = options;
     let querySQL;
     let places = [];
-    querySQL = 'SELECT ORCID, researcher_id, ciencia_id FROM researchers_info WHERE person_id = ?;';
-    places.push(people[i].id)
-    return sql.getSQLOperationResult(req, res, querySQL, places,
-        (resQuery, options) => {
-            if (resQuery.length > 0) {
-                options.people[i].ORCID = resQuery[0].ORCID;
-                options.people[i].researcher_id = resQuery[0].researcher_id;
-                options.people[i].ciencia_id = resQuery[0].ciencia_id;
-            } else {
-                options.people[i].ORCID = null;
-                options.people[i].researcher_id = null;
-                options.people[i].ciencia_id = null;
-            }
-            return getPhoto(options);
-        },
-        options
-    );
-};
-var getResearcherInfo = function(options) {
-    let { req, res, next, people, i } = options;
-    let querySQL;
-    let places = [];
     querySQL = 'SELECT ORCID, researcherID, ciencia_id FROM researchers_info WHERE person_id = ?;';
     places.push(people[i].id)
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             if (resQuery.length > 0) {
                 options.people[i].ORCID = resQuery[0].ORCID;
-                options.people[i].researcher_id = resQuery[0].researcherID;
+                options.people[i].researcherID = resQuery[0].researcherID;
                 options.people[i].ciencia_id = resQuery[0].ciencia_id;
             } else {
                 options.people[i].ORCID = null;
-                options.people[i].researcher_id = null;
+                options.people[i].researcherID = null;
                 options.people[i].ciencia_id = null;
             }
             return getPhoto(options);
@@ -88,15 +115,22 @@ var getPhoto = function(options) {
     let { req, res, next, people, i } = options;
     let querySQL;
     let places = [];
-    querySQL = 'SELECT url FROM personal_photo WHERE person_id = ?;';
+    querySQL = 'SELECT personal_photo.*, personal_photo_type.name_en AS photo_type_name_en'
+             + ' FROM personal_photo'
+             + ' JOIN personal_photo_type ON personal_photo_type.id = personal_photo.photo_type_id'
+             + ' WHERE personal_photo.person_id = ?;';
     places.push(people[i].id)
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
-            if (resQuery.length > 0) {
-                options.people[i].image_path = resQuery[0].url;
-            } else {
-                options.people[i].image_path = null;
+            data = [];
+            for (let ind in resQuery){
+                data.push({
+                    photo_type_id: resQuery[ind].photo_type_id,
+                    photo_type_name_en: resQuery[ind].photo_type_name_en,
+                    image_path: resQuery[ind].url,
+                })
             }
+            options.people[i].photo_data = data;
             return getWebsiteTexts(options);
         },
         options
@@ -176,7 +210,7 @@ var getDegrees = function(options) {
                     degree_institution: resQuery[ind].institution
                 });
             }
-            options.people[i].degrees_data = data;
+            options.people[i].degree_data = data;
             return getJobs(options)
         },
         options
@@ -408,8 +442,13 @@ var getTechnicianUnit = function(options) {
         (resQuery, options) => {
             // there should be only 1 unit per group at a time
             // also it should always return a result
-            options.people[i].technician_data[j].technician_unit_id = resQuery[0].unit_id;
-            options.people[i].technician_data[j].technician_unit_name = resQuery[0].unit_name;
+            if (resQuery.length > 0) {
+                options.people[i].technician_data[j].technician_unit_id = resQuery[0].unit_id;
+                options.people[i].technician_data[j].technician_unit_name = resQuery[0].unit_name;
+            } else {
+                options.people[i].technician_data[j].technician_unit_id = null;
+                options.people[i].technician_data[j].technician_unit_name = null;
+            }
             if (j + 1 < people[i].technician_data.length) {
                 options.j = options.j + 1;
                 return getTechnicianUnit(options);
@@ -480,8 +519,13 @@ var getScienceManagerUnit = function(options) {
         (resQuery, options) => {
             // there should be only 1 unit per group at a time
             // also it should always return a result
-            options.people[i].science_management_data[j].science_manager_unit_id = resQuery[0].unit_id;
-            options.people[i].science_management_data[j].science_manager_unit_name = resQuery[0].unit_name;
+            if (resQuery.length > 0) {
+                options.people[i].science_management_data[j].science_manager_unit_id = resQuery[0].unit_id;
+                options.people[i].science_management_data[j].science_manager_unit_name = resQuery[0].unit_name;
+            } else {
+                options.people[i].science_management_data[j].science_manager_unit_id = null;
+                options.people[i].science_management_data[j].science_manager_unit_name = null;
+            }
             if (j + 1 < people[i].science_management_data.length) {
                 options.j = options.j + 1;
                 return getScienceManagerUnit(options);
@@ -569,8 +613,13 @@ var getAdministrativeUnit = function(options) {
         (resQuery, options) => {
             // there should be only 1 unit per group at a time
             // also it should always return a result
-            options.people[i].administrative_data[j].administrative_unit_id = resQuery[0].unit_id;
-            options.people[i].administrative_data[j].administrative_unit_name = resQuery[0].unit_name;
+            if (resQuery.length > 0) {
+                options.people[i].administrative_data[j].administrative_unit_id = resQuery[0].unit_id;
+                options.people[i].administrative_data[j].administrative_unit_name = resQuery[0].unit_name;
+            } else {
+                options.people[i].administrative_data[j].administrative_unit_id = null;
+                options.people[i].administrative_data[j].administrative_unit_name = null;
+            }
             if (j + 1 < people[i].administrative_data.length) {
                 options.j = options.j + 1;
                 return getAdministrativeUnit(options);
@@ -628,82 +677,6 @@ var queryTotal = function(options) {
         options
     )
 };
-
-module.exports.searchPeople = function (req, res, next) {
-    let offset = 0;
-    let limit = 10;
-    let names = [];
-    let lab = null;
-    if (req.query.hasOwnProperty('name')) {
-        names = req.query.name.split(' ');
-    }
-    if (req.query.hasOwnProperty('lab')) {
-        lab = req.query.lab.replace(/\s/gi,'%');
-    }
-    if (req.query.hasOwnProperty('offset')) {
-        offset = parseInt(req.query.offset, 10);
-    }
-    if (req.query.hasOwnProperty('limit')) {
-        limit = parseInt(req.query.limit, 10);
-    }
-    if (req.query.hasOwnProperty('lab')) {
-        lab = req.query.lab.replace(/\s/gi,'%');
-    }
-    let querySQL;
-    let places = [];
-    querySQL = 'SELECT DISTINCT people.id, people.name AS full_name, people.colloquial_name AS name,'
-             + ' people.active_from, people.active_until'
-             + ' FROM people'
-             + ' LEFT JOIN people_labs ON people.id = people_labs.person_id'
-             + ' LEFT JOIN labs ON labs.id = people_labs.lab_id'
-             + ' WHERE people.status = ? AND people.visible_public = 1'
-             + ' AND ( (people.active_from <= CURDATE() AND people.active_until >= CURDATE()) '
-                + ' OR (people.active_from <= CURDATE() AND people.active_until IS NULL)'
-                + ' OR (people.active_from IS NULL AND people.active_until >= CURDATE())'
-                + ' OR (people.active_from IS NULL AND people.active_until IS NULL) )'
-    places.push(1);
-    if (names.length > 0) {
-        for (let name of names) {
-            let searchStr = '%' + name + '%'
-            querySQL = querySQL + 'AND people.name LIKE ?';
-            places.push(searchStr);
-        }
-    }
-    if(lab) {
-        let searchStr = '%' + lab + '%'
-        querySQL = querySQL + 'AND labs.name LIKE ?';
-        places.push(searchStr);
-    }
-
-    let querySQLForTotals = querySQL;
-    let placeholdersForTotals = places;
-    querySQL = querySQL + ' ORDER BY people.name'
-                        + ' LIMIT ?, ?'
-    places.push(offset, limit);
-    return sql.getSQLOperationResult(req, res, querySQL, places,
-        (resQuery, options) => {
-            if (resQuery.length > 0) {
-                options.querySQLForTotals = querySQLForTotals;
-                options.placeholdersForTotals = placeholdersForTotals;
-                options.limit = limit;
-                options.offset = offset;
-                options.people = resQuery;
-                options.i = 0;
-                return getEmail(options);
-            } else {
-                responses.sendJSONResponse(res, 200,
-                    {
-                        "status": "success",
-                        "statusCode": 200,
-                        "count": 0,
-                        "result": []
-                    });
-                return;
-            }
-        },
-        {req, res, next}
-    );
-};
 module.exports.getPersonInfo = function (req, res, next) {
     let personID = req.params.personID
     let querySQL;
@@ -739,8 +712,108 @@ module.exports.getPersonInfo = function (req, res, next) {
         },
         {req, res, next}
     );
-
 };
-module.exports.getPersonPublications = function (req, res, next) {
+module.exports.searchPeople = function (req, res, next) {
+    let offset = 0;
+    let limit = 10;
+    var names = [];
+    var lab = null;
+    let email = null;
+    let rgID = null;
+    var unitID = null;
+    if (req.query.hasOwnProperty('name')) {
+        names = req.query.name.split(' ');
+    }
+    if (req.query.hasOwnProperty('lab')) {
+        lab = req.query.lab.replace(/\s/gi,'%');
+    }
+    if (req.query.hasOwnProperty('email')) {
+        email = req.query.email;
+    }
+    if (req.query.hasOwnProperty('rg')) {
+        rgID = req.query.rg;
+    }
+    if (req.query.hasOwnProperty('unit')) {
+        unitID = req.query.unit;
+    }
+    var querySQL;
+    var places = [];
+    querySQL = 'SELECT DISTINCT people.id, people.name AS full_name, people.colloquial_name AS name,'
+             + ' people.active_from, people.active_until'
+             + ' FROM people'
+             + ' LEFT JOIN people_labs ON people.id = people_labs.person_id'
+             + ' LEFT JOIN labs ON labs.id = people_labs.lab_id'
+             + ' LEFT JOIN labs_groups ON labs_groups.lab_id = labs.id'
+             + ' LEFT JOIN `groups` ON labs_groups.group_id = `groups`.id'
+             + ' LEFT JOIN groups_units ON groups_units.group_id = groups.id'
+             + ' LEFT JOIN units ON groups_units.unit_id = units.id'
+             + ' LEFT JOIN technicians ON technicians.person_id = people.id'
+             + ' LEFT JOIN technicians_units ON technicians_units.technician_id = technicians.id'
+             + ' LEFT JOIN units AS technician_units_units ON technician_units_units.id = technicians_units.unit_id'
+             + ' LEFT JOIN science_managers ON science_managers.person_id = people.id'
+             + ' LEFT JOIN science_managers_units ON science_managers_units.science_manager_id = science_managers.id'
+             + ' LEFT JOIN units AS science_manager_units_units ON science_manager_units_units.id = science_managers_units.unit_id'
+             + ' LEFT JOIN people_administrative_offices ON people_administrative_offices.person_id = people.id'
+             + ' LEFT JOIN people_administrative_units ON people_administrative_units.administrative_id = people_administrative_offices.id'
+             + ' LEFT JOIN units AS administrative_units ON administrative_units.id = people_administrative_units.unit_id'
+             + ' WHERE people.status = ? AND people.visible_public = 1'
+             + ' AND ( (people.active_from <= CURDATE() AND people.active_until >= CURDATE()) '
+                + ' OR (people.active_from <= CURDATE() AND people.active_until IS NULL)'
+                + ' OR (people.active_from IS NULL AND people.active_until >= CURDATE())'
+                + ' OR (people.active_from IS NULL AND people.active_until IS NULL) )'
+    places.push(1);
+    if (names.length > 0) {
+        for (let name of names) {
+            let searchStr = '%' + name + '%'
+            querySQL = querySQL + 'AND people.name LIKE ?';
+            places.push(searchStr);
+        }
+    }
+    if (lab !== null) {
+        lab = '%' + lab + '%';
+        querySQL = querySQL + ' AND labs.name LIKE ?'
+        places.push(lab);
+    }
+    if (email !== null) {
+        email = '%' + email + '%';
+        querySQL = querySQL + ' AND emails.email LIKE ?'
+        places.push(email);
+    }
+    if (rgID !== null) {
+        querySQL = querySQL + ' AND `groups`.id = ?'
+        places.push(rgID);
+    }
+    if (unitID !== null) {
+        querySQL = querySQL + ' AND (units.id = ? OR technicians_units.unit_id = ? OR science_managers_units.unit_id = ? OR people_administrative_units.unit_id = ?)';
+        places.push(unitID, unitID, unitID, unitID);
+    }
+    let querySQLForTotals = querySQL;
+    let placeholdersForTotals = places;
+    querySQL = querySQL + ' ORDER BY people.name'
+                        + ' LIMIT ?, ?'
+    places.push(offset, limit);
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            if (resQuery.length > 0) {
+                options.querySQLForTotals = querySQLForTotals;
+                options.placeholdersForTotals = placeholdersForTotals;
+                options.limit = limit;
+                options.offset = offset;
+                options.people = resQuery;
+                options.i = 0;
+                return getEmail(options);
+            } else {
+                responses.sendJSONResponse(res, 200,
+                    {
+                        "status": "success",
+                        "statusCode": 200,
+                        "count": 0,
+                        "result": []
+                    });
+                return;
+            }
+        },
+        {req, res, next}
+    );
 
 };

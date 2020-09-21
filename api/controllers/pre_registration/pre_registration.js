@@ -917,6 +917,7 @@ async function actionSendManagersMessage(options, recipientEmails) {
         // send mail with defined transport object
         let info = await transporter.sendMail(mailOptions);
         console.log('Message %s sent: %s', info.messageId, info.response);
+        return writeMessageDB(options);
     }
 };
 var writeMessageDB = function (options, error) {

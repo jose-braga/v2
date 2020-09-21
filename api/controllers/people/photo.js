@@ -89,7 +89,11 @@ var updatePhoto = function (options) {
         url,
         options.photoID);
     return sql.makeSQLOperation(req, res, querySQL, places,
-        (options) => { responses.sendJSONResponseOptions(options) },
+        (options) => {
+            let notificationConfig = { entityID: personID };
+            notifications.notifyWebsiteAPI(notificationConfig);
+            responses.sendJSONResponseOptions(options);
+        },
         {
             response: res,
             status: 200,
@@ -113,7 +117,11 @@ var createPhoto = function (options) {
         imageType,
         url);
     return sql.makeSQLOperation(req, res, querySQL, places,
-        (options) => { responses.sendJSONResponseOptions(options) },
+        (options) => {
+            let notificationConfig = { entityID: personID };
+            notifications.notifyWebsiteAPI(notificationConfig);
+            responses.sendJSONResponseOptions(options);
+        },
         {
             response: res,
             status: 200,

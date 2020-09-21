@@ -2,6 +2,7 @@ const sql = require('../utilities/sql');
 const time = require('../utilities/time');
 const responses = require('../utilities/responses');
 const permissions = require('../utilities/permissions');
+const notifications = require('../utilities/notifications');
 
 /**
  * For reading professional situations data
@@ -312,7 +313,9 @@ var actionUpdateProfessionalSituations = function (options) {
         data.valid_until,
         data.id)
     return sql.makeSQLOperation(req, res, querySQL, places,
-        (options) => { getCategorySituationID(options) },
+        (options) => {
+            getCategorySituationID(options)
+        },
         options);
 };
 
@@ -403,11 +406,26 @@ var actionCreateProfessionalSituationsFellowships = function (options) {
 var actionDeleteProfessionalSituationsFellowships = function (options) {
     let { req, res, next } = options;
     let fellowshipID = req.params.fellowshipID;
+    let personID = req.params.personID;
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'DELETE FROM fellowships WHERE id = ?;';
     places.push(fellowshipID)
-    return sql.makeSQLOperation(req, res, querySQL, places);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            let notificationConfig = { entityID: personID };
+            notifications.notifyWebsiteAPI(notificationConfig);
+            return responses.sendJSONResponseOptions(options);
+        },
+        {
+            response: res,
+            status: 200,
+            message: {
+                "status": "success", "statusCode": 200, "count": 0,
+                "result": "OK - Changed people job"
+            }
+        }
+    );
 };
 var actionUpdateProfessionalSituationsFellowships = function (options) {
     let { req, res, next } = options;
@@ -447,6 +465,7 @@ var actionUpdateProfessionalSituationsFellowships = function (options) {
 var insertFellowshipJobRelationship = function (options) {
     let { req, res, next, fellowship_id } = options;
     let jobID = req.params.jobID;
+    let personID = req.params.personID;
     let data = req.body.data;
     var querySQL = '';
     var places = [];
@@ -461,6 +480,8 @@ var insertFellowshipJobRelationship = function (options) {
             } else if (data.management_entities.length > 0) {
                 return insertFellowshipManagementEntityRelationship(options, 0)
             } else {
+                let notificationConfig = { entityID: personID };
+                notifications.notifyWebsiteAPI(notificationConfig);
                 responses.sendJSONResponseOptions({
                     response: res,
                     status: 200,
@@ -475,6 +496,7 @@ var insertFellowshipJobRelationship = function (options) {
 };
 var insertFellowshipFundingAgencyRelationship = function (options, i) {
     let { req, res, next, fellowship_id } = options;
+    let personID = req.params.personID;
     let data = req.body.data;
     var querySQL = '';
     var places = [];
@@ -493,6 +515,9 @@ var insertFellowshipFundingAgencyRelationship = function (options, i) {
             } else if (data.management_entities.length > 0) {
                 return insertFellowshipManagementEntityRelationship(options, 0);
             } else {
+                console.log('oi!')
+                let notificationConfig = { entityID: personID };
+                notifications.notifyWebsiteAPI(notificationConfig);
                 responses.sendJSONResponseOptions({
                     response: res,
                     status: 200,
@@ -507,6 +532,7 @@ var insertFellowshipFundingAgencyRelationship = function (options, i) {
 };
 var insertFellowshipManagementEntityRelationship = function (options, i) {
     let { req, res, next, fellowship_id } = options;
+    let personID = req.params.personID;
     let data = req.body.data;
     var querySQL = '';
     var places = [];
@@ -523,6 +549,8 @@ var insertFellowshipManagementEntityRelationship = function (options, i) {
             if (i + 1 < data.management_entities.length) {
                 return insertFellowshipManagementEntityRelationship(options, i + 1);
             } else {
+                let notificationConfig = { entityID: personID };
+                notifications.notifyWebsiteAPI(notificationConfig);
                 responses.sendJSONResponseOptions({
                     response: res,
                     status: 200,
@@ -553,6 +581,7 @@ var deleteFellowshipFundingAgencies = function (options) {
 var deleteFellowshipManagementEntities = function (options) {
     let { req, res, next } = options;
     let fellowshipID = req.params.fellowshipID;
+    let personID = req.params.personID;
     let data;
     if (req.body !== undefined) {
         data = req.body.data;
@@ -569,6 +598,8 @@ var deleteFellowshipManagementEntities = function (options) {
                 } else if (data.management_entities.length > 0) {
                     return insertFellowshipManagementEntityRelationship(options, 0)
                 } else {
+                    let notificationConfig = { entityID: personID };
+                    notifications.notifyWebsiteAPI(notificationConfig);
                     responses.sendJSONResponseOptions({
                         response: res,
                         status: 200,
@@ -672,6 +703,7 @@ var actionUpdateProfessionalSituationsContracts = function (options) {
 var insertContractJobRelationship = function (options) {
     let { req, res, next, contract_id } = options;
     let jobID = req.params.jobID;
+    let personID = req.params.personID;
     let data = req.body.data;
     var querySQL = '';
     var places = [];
@@ -686,6 +718,8 @@ var insertContractJobRelationship = function (options) {
             } else if (data.management_entities !== undefined && data.management_entities.length > 0) {
                 return insertContractManagementEntityRelationship(options, 0)
             } else {
+                let notificationConfig = { entityID: personID };
+                notifications.notifyWebsiteAPI(notificationConfig);
                 responses.sendJSONResponseOptions({
                     response: res,
                     status: 200,
@@ -700,6 +734,7 @@ var insertContractJobRelationship = function (options) {
 };
 var insertContractFundingAgencyRelationship = function (options, i) {
     let { req, res, next, contract_id } = options;
+    let personID = req.params.personID;
     let data = req.body.data;
     var querySQL = '';
     var places = [];
@@ -718,6 +753,8 @@ var insertContractFundingAgencyRelationship = function (options, i) {
             } else if (data.management_entities.length > 0) {
                 return insertContractManagementEntityRelationship(options, 0);
             } else {
+                let notificationConfig = { entityID: personID };
+                notifications.notifyWebsiteAPI(notificationConfig);
                 responses.sendJSONResponseOptions({
                     response: res,
                     status: 200,
@@ -732,6 +769,7 @@ var insertContractFundingAgencyRelationship = function (options, i) {
 };
 var insertContractManagementEntityRelationship = function (options, i) {
     let { req, res, next, contract_id } = options;
+    let personID = req.params.personID;
     let data = req.body.data;
     var querySQL = '';
     var places = [];
@@ -748,6 +786,8 @@ var insertContractManagementEntityRelationship = function (options, i) {
             if (i + 1 < data.management_entities.length) {
                 return insertContractManagementEntityRelationship(options, i + 1);
             } else {
+                let notificationConfig = { entityID: personID };
+                notifications.notifyWebsiteAPI(notificationConfig);
                 responses.sendJSONResponseOptions({
                     response: res,
                     status: 200,
@@ -794,6 +834,8 @@ var deleteContractManagementEntities = function (options) {
                 } else if (data.management_entities.length > 0) {
                     return insertContractManagementEntityRelationship(options, 0)
                 } else {
+                    let notificationConfig = { entityID: personID };
+                    notifications.notifyWebsiteAPI(notificationConfig);
                     responses.sendJSONResponseOptions({
                         response: res,
                         status: 200,

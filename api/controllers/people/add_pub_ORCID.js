@@ -3,6 +3,7 @@ const time = require('../utilities/time');
 const responses = require('../utilities/responses');
 const permissions = require('../utilities/permissions');
 const publicationsList = require('./publications_list');
+const notifications = require('../utilities/notifications');
 
 var actionCreateJournal = function (options) {
     let now = time.momentToDate(time.moment(), undefined, 'YYYY-MM-DD HH:mm:ss');
@@ -65,6 +66,12 @@ var actionCreatePublication = function (options) {
     )
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
+            let notificationConfig = {
+                operation: 'create',
+                entityType: 'publications',
+                entityID: resQuery.insertId
+            };
+            notifications.notifyWebsiteAPI(notificationConfig)
             responses.sendJSONResponseOptions({
                 response: res,
                 status: 200,

@@ -62,28 +62,6 @@ var getResearcherInfo = function(options) {
         options
     );
 };
-var getResearcherInfo = function(options) {
-    let { req, res, next, people, i } = options;
-    let querySQL;
-    let places = [];
-    querySQL = 'SELECT ORCID, researcherID, ciencia_id FROM researchers_info WHERE person_id = ?;';
-    places.push(people[i].id)
-    return sql.getSQLOperationResult(req, res, querySQL, places,
-        (resQuery, options) => {
-            if (resQuery.length > 0) {
-                options.people[i].ORCID = resQuery[0].ORCID;
-                options.people[i].researcher_id = resQuery[0].researcherID;
-                options.people[i].ciencia_id = resQuery[0].ciencia_id;
-            } else {
-                options.people[i].ORCID = null;
-                options.people[i].researcher_id = null;
-                options.people[i].ciencia_id = null;
-            }
-            return getPhoto(options);
-        },
-        options
-    );
-};
 var getPhoto = function(options) {
     let { req, res, next, people, i } = options;
     let querySQL;
@@ -741,6 +719,4 @@ module.exports.getPersonInfo = function (req, res, next) {
     );
 
 };
-module.exports.getPersonPublications = function (req, res, next) {
 
-};

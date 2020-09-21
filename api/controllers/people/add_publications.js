@@ -3,6 +3,7 @@ const time = require('../utilities/time');
 const responses = require('../utilities/responses');
 const permissions = require('../utilities/permissions');
 const publicationsList = require('./publications_list');
+const notifications = require('../utilities/notifications');
 
 function processQuery(query, prop) {
     let regExact = /".+?"/g
@@ -112,7 +113,23 @@ var actionCreatePersonPublicationAssociation = function (options) {
                         + ' (person_id, publication_id)'
                         + ' VALUES (?, ?);';
     places.push(personID, publicationID)
-    return sql.makeSQLOperation(req, res, querySQL, places);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            let notificationConfig = {
+                entityType: 'publications',
+                entityID: publicationID
+            };
+            notifications.notifyWebsiteAPI(notificationConfig)
+            return responses.sendJSONResponseOptions(options)
+        },
+        {
+            response: res,
+            status: 200,
+            message: {
+                "status": "success", "statusCode": 200, "count": 0,
+                "result": "OK - Associated person with publication!"
+            }
+        });
 };
 module.exports.createPersonPublicationAssociation = function (req, res, next) {
     permissions.checkPermissions(

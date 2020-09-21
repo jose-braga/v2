@@ -5,6 +5,8 @@ var express = require('express');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+var routesPublicLegacyAPI = require('./routes/indexPublicLegacy');
+var routesPublicLegacyAPI_LAQV = require('./routes/indexPublicLegacy_LAQV');
 var routesPublicAPI = require('./routes/indexPublic'); //includes Applicant submission
 var routesAPIPeople = require('./routes/indexPeople');
 var routesAPILabs = require('./routes/indexLabs');
@@ -24,6 +26,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 // Public API routes
+app.use('/api/v1', routesPublicLegacyAPI);
+app.use('/api/v1.1', routesPublicLegacyAPI_LAQV);
 app.use('/api/v2', routesPublicAPI);
 // Interal API routes below
 app.use('/api/people', routesAPIPeople);

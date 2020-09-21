@@ -4,8 +4,10 @@ const sql = require('../utilities/sql');
 const time = require('../utilities/time');
 const responses = require('../utilities/responses');
 const permissions = require('../utilities/permissions');
+const notifications = require('../utilities/notifications');
 const jwtUtil = require('../../config/jwt_utilities')
 const nodemailer = require('../../config/emailer');
+
 let transporter = nodemailer.transporter;
 
 var make_password = function(n, a) {
@@ -290,7 +292,22 @@ var actionAddLabMemberPositionHistory = function (resQuery, options) {
                 updated,
                 options.operation,
                 positionData.changed_by)
-    sql.makeSQLOperation(req, res, querySQL, places)
+    sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            let notificationConfig = {
+                entityID: personID
+            };
+            notifications.notifyWebsiteAPI(notificationConfig)
+            return responses.sendJSONResponseOptions(options)
+        },
+        {
+            response: res,
+            status: 200,
+            message: {
+                "status": "success", "statusCode": 200, "count": 0,
+                "result": "OK - Updated lab member!"
+            }
+        })
 };
 module.exports.updateLabMemberPosition = function (req, res, next) {
     permissions.checkPermissions(

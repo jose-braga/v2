@@ -10,6 +10,9 @@
                 Members@{{segment.short_name}}
             </div>
         </v-tab>
+        <v-tab to="/manager/validate">
+            To validate
+        </v-tab>
         <v-tabs-items>
             <!-- use :max="N" in keep-alive if necessary-->
             <keep-alive>

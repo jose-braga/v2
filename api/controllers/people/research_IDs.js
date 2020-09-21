@@ -2,6 +2,7 @@ const sql = require('../utilities/sql');
 const time = require('../utilities/time');
 const responses = require('../utilities/responses');
 const permissions = require('../utilities/permissions');
+const notifications = require('../utilities/notifications');
 
 
 var actionGetResearcherIDs = function (options) {
@@ -56,6 +57,8 @@ var actionUpdateResearcherIDs = function(options) {
             options.researcherInfoID = researcherInfoID;
             options.personID = personID;
             options.operation = 'update'
+            let notificationConfig = { entityID: personID };
+            notifications.notifyWebsiteAPI(notificationConfig);
             return actionAddResearcherInfoHistory(options)
         },
         options);
@@ -76,8 +79,9 @@ var actionCreateResearcherIDs = function(options) {
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'INSERT INTO researchers_info'
-        + '(person_id, researcherID, ORCID, scopusID, institutional_repository_id, pure_id, ciencia_id, association_key)'
-        + ' VALUES (?,?,?,?,?,?,?);';
+        + '(person_id, researcherID, ORCID, scopusID, institutional_repository_id,'
+        + ' pure_id, ciencia_id, association_key)'
+        + ' VALUES (?,?,?,?,?,?,?,?);';
     places.push(
         personID,
         data.researcherID,
@@ -92,6 +96,8 @@ var actionCreateResearcherIDs = function(options) {
             options.researcherInfoID = resQuery.insertId;
             options.personID = personID;
             options.operation = 'create'
+            let notificationConfig = { entityID: personID };
+            notifications.notifyWebsiteAPI(notificationConfig)
             return actionAddResearcherInfoHistory(options)
         },
         options);

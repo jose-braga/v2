@@ -2,6 +2,7 @@ const sql = require('../utilities/sql');
 const time = require('../utilities/time');
 const responses = require('../utilities/responses');
 const permissions = require('../utilities/permissions');
+const notifications = require('../utilities/notifications');
 const addPublication = require('./add_publications');
 
 var actionGetAllPublications = function (options) {
@@ -150,7 +151,23 @@ var actionUpdatePersonPublicationAssociation = function (options) {
                         + ' SET public = ?, selected = ?'
                         + ' WHERE person_id = ? AND publication_id = ?;';
     places.push(data.public, data.selected, personID, publicationID)
-    return sql.makeSQLOperation(req, res, querySQL, places);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            let notificationConfig = {
+                entityType: 'publications',
+                entityID: publicationID
+            };
+            notifications.notifyWebsiteAPI(notificationConfig)
+            return responses.sendJSONResponseOptions(options)
+        },
+        {
+            response: res,
+            status: 200,
+            message: {
+                "status": "success", "statusCode": 200, "count": 0,
+                "result": "OK - Associated person with publication!"
+            }
+        });
 };
 module.exports.updatePersonPublicationAssociation = function (req, res, next) {
     permissions.checkPermissions(
@@ -168,7 +185,23 @@ var actionDeletePersonPublicationAssociation = function (options) {
     querySQL = querySQL + 'DELETE FROM people_publications'
                         + ' WHERE person_id = ? AND publication_id = ?;';
     places.push(personID, publicationID)
-    return sql.makeSQLOperation(req, res, querySQL, places);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            let notificationConfig = {
+                entityType: 'publications',
+                entityID: publicationID
+            };
+            notifications.notifyWebsiteAPI(notificationConfig)
+            return responses.sendJSONResponseOptions(options)
+        },
+        {
+            response: res,
+            status: 200,
+            message: {
+                "status": "success", "statusCode": 200, "count": 0,
+                "result": "OK - Dissociated person with publication!"
+            }
+        });
 };
 module.exports.deletePersonPublicationAssociation = function (req, res, next) {
     permissions.checkPermissions(
@@ -285,6 +318,11 @@ var actionInsertNewPublicationDescription = function (options, i) {
             if (i + 1 < req.body.data.publication_types.length) {
                 return actionInsertNewPublicationDescription(options, i + 1);
             } else {
+                let notificationConfig = {
+                    entityType: 'publications',
+                    entityID: publicationID
+                };
+                notifications.notifyWebsiteAPI(notificationConfig)
                 responses.sendJSONResponseOptions({
                     response: res,
                     status: 200,

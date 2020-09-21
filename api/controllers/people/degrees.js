@@ -2,6 +2,7 @@ const sql = require('../utilities/sql');
 const time = require('../utilities/time');
 const responses = require('../utilities/responses');
 const permissions = require('../utilities/permissions');
+const notifications = require('../utilities/notifications');
 
 /**
  * For reading degrees data
@@ -137,7 +138,11 @@ var actionCreateDegrees = function (options) {
         data.program
         );
     return sql.getSQLOperationResult(req, res, querySQL, places,
-        (resQuery, options) => { getPeopleDegreesID(resQuery, options) },
+        (resQuery, options) => {
+            let notificationConfig = { entityID: personID };
+            notifications.notifyWebsiteAPI(notificationConfig);
+            getPeopleDegreesID(resQuery, options)
+        },
         options);
 };
 
@@ -257,7 +262,20 @@ var actionDeleteDegrees = function (options) {
     var places = [];
     querySQL = querySQL + 'DELETE FROM degrees_people WHERE id = ?;';
     places.push(personDegreeID)
-    return sql.makeSQLOperation(req, res, querySQL, places);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            let notificationConfig = { entityID: personID };
+            notifications.notifyWebsiteAPI(notificationConfig);
+            return responses.sendJSONResponseOptions(options)
+        },
+        {
+            response: res,
+            status: 200,
+            message: {
+                "status": "success", "statusCode": 200, "count": 0,
+                "result": "OK - Created people history entry!"
+            }
+        });
 };
 
 var actionUpdateDegrees = function (options) {
@@ -296,7 +314,11 @@ var actionUpdateDegrees = function (options) {
         data.program,
         personDegreeID, personID)
     return sql.getSQLOperationResult(req, res, querySQL, places,
-        (resQuery, options) => { processSupervisors(resQuery, options) },
+        (resQuery, options) => {
+            let notificationConfig = { entityID: personID };
+            notifications.notifyWebsiteAPI(notificationConfig);
+            processSupervisors(resQuery, options)
+        },
         options);
 };
 
