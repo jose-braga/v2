@@ -179,6 +179,7 @@ var actionCreateApplication = function (options) {
 var actionCreateApplicant = function (options) {
     let { req, res, next, applicationID } = options;
     let data = req.body.data;
+    let isLAQV = req.body.isLAQV;
     var querySQL = '';
     var places = [];
     if (data.birth_date === '') {
@@ -187,25 +188,46 @@ var actionCreateApplicant = function (options) {
     if (data.identification_valid_until === '') {
         data.identification_valid_until = null;
     }
-    // TODO: create url_access for applicant in the end if is successfull
-    querySQL = querySQL + 'INSERT INTO applicants'
-                        + ' (application_id, name, document_type_id, document_number, document_valid_until,'
-                        + ' gender, email, birth_date, address, postal_code, city, id_country, phone)'
-                        + ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
-    places.push( applicationID,
-        data.name,
-        data.identification_type_id,
-        data.identification_number,
-        data.identification_valid_until,
-        data.gender,
-        data.email,
-        data.birth_date,
-        data.address,
-        data.postal_code,
-        data.city,
-        data.id_country,
-        data.phone
-    )
+    if (isLAQV) {
+        querySQL = querySQL + 'INSERT INTO applicants'
+                            + ' (application_id, name, document_type_id, document_number, document_valid_until,'
+                            + ' gender, email, birth_date, address, postal_code, city, id_country, phone, erasmus_experience)'
+                            + ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+        places.push( applicationID,
+            data.name,
+            data.identification_type_id,
+            data.identification_number,
+            data.identification_valid_until,
+            data.gender,
+            data.email,
+            data.birth_date,
+            data.address,
+            data.postal_code,
+            data.city,
+            data.id_country,
+            data.phone,
+            data.erasmus
+        )
+    } else {
+        querySQL = querySQL + 'INSERT INTO applicants'
+                            + ' (application_id, name, document_type_id, document_number, document_valid_until,'
+                            + ' gender, email, birth_date, address, postal_code, city, id_country, phone)'
+                            + ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+        places.push( applicationID,
+            data.name,
+            data.identification_type_id,
+            data.identification_number,
+            data.identification_valid_until,
+            data.gender,
+            data.email,
+            data.birth_date,
+            data.address,
+            data.postal_code,
+            data.city,
+            data.id_country,
+            data.phone
+        )
+    }
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             return createMotivationLetter(options);
@@ -333,6 +355,63 @@ var createProjects = function (options) {
                 if (i + 1 < data.projects.length) {
                     options.i = i + 1;
                     return createProjects(options);
+                } else {
+                    options.i = 0;
+                    return deleteMobility(options);
+                }
+
+            },
+            options);
+    } else {
+        options.i = 0;
+        return deleteMobility(options);
+    }
+};
+var deleteMobility = function (options) {
+    // delete previous data (important when correcting application)
+    let { req, res, next, applicationID } = options;
+    let data = req.body.data;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'DELETE FROM application_mobility'
+                        + ' WHERE application_id  = ?;';
+
+    places.push(applicationID)
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            return createMobility(options);
+        },
+        options);
+};
+var createMobility = function (options) {
+    let { req, res, next, applicationID, i } = options;
+    let data = req.body.data;
+    if (data.mobility !== undefined && data.mobility.length > 0) {
+        var querySQL = '';
+        var places = [];
+        let mobility = data.mobility[i];
+        if (mobility.start_date === '') {
+            mobility.start_date = null;
+        }
+        querySQL = querySQL + 'INSERT INTO application_mobility'
+                            + ' (application_id, reference, title,'
+                            + ' institution, start_date, duration,'
+                            + ' additional_data)'
+                            + ' VALUES (?, ?, ?, ?, ?, ?, ?);';
+        places.push( applicationID,
+            mobility.reference,
+            mobility.title,
+            mobility.institution,
+            mobility.start_date,
+            mobility.duration,
+            mobility.additional
+        )
+        return sql.getSQLOperationResult(req, res, querySQL, places,
+            (resQuery, options) => {
+                options.req.body.data.mobility[i].mobility_id = resQuery.insertId;
+                if (i + 1 < data.projects.length) {
+                    options.i = i + 1;
+                    return createMobility(options);
                 } else {
                     options.i = 0;
                     return deletePapers(options);
@@ -512,10 +591,15 @@ var createPosters = function (options) {
                     options.i = i + 1;
                     return createPosters(options);
                 } else {
-                    options.i = 0;
-                    return deletePrizes(options);
+                    let isLAQV = req.body.isLAQV;
+                    if (isLAQV) {
+                        options.i = 0;
+                        return deleteRecommenders(options);
+                    } else {
+                        options.i = 0;
+                        return deletePrizes(options);
+                    }
                 }
-
             },
             options);
     } else {
@@ -782,7 +866,7 @@ async function sendRecommenderMessage(options) {
         + ' Your answers and the contents of the letter of reference will only'
         + ' be visible to the reviewers of the application.\n\n'
         + ' In case you have received a previous message from us requesting'
-        + ' a recommendation for this applicant, please disregard it.\n\n'
+        + ' a recommendation for this applicant, please disregard that message.\n\n'
         + ' Best regards,\n'
         + ' The ' + call.call_name + ' Scientific Committee';
     let emailBodyHtml = '<p>' + 'Dear ' + recommendation.name + ',</p>'
@@ -800,7 +884,7 @@ async function sendRecommenderMessage(options) {
         + ' <p>Your answers and the contents of the letter of reference will only'
         + ' be visible to the reviewers of the application.</p>'
         + ' <p>In case you have received a previous message from us requesting'
-        + ' a recommendation for this applicant, please disregard it.</p>'
+        + ' a recommendation for this applicant, please disregard that message.</p>'
         + ' <p>Best regards,<br>'
         + ' The ' + call.call_name + ' Scientific Committee</p>';
     options.req.body.data.recommendations[i].subjectText = subjectText;
@@ -963,6 +1047,7 @@ module.exports.uploadApplicationDocuments = function (req, res, next) {
 var actionGetApplicationCriteria = function (options) {
     let { req, res, next } = options;
     let data = req.body.data;
+    let isLAQV = data.isLAQV
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'SELECT *'
@@ -971,8 +1056,13 @@ var actionGetApplicationCriteria = function (options) {
     places.push(data.callID);
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
-            options.criteria = resQuery;
-            return computeScoreDegrees(options);
+            if (isLAQV) {
+                options.criteria = resQuery;
+                return computeScoreDegreesLAQV(options);
+            } else {
+                options.criteria = resQuery;
+                return computeScoreDegrees(options);
+            }
         },
         options);
 };
@@ -1348,6 +1438,184 @@ var writeAutomaticScoresDB = function (options) {
     }
 }
 
+var computeScoreDegreesLAQV = function (options) {
+    let { req, res, next } = options;
+    let data = req.body.data;
+    let minimumLevel = 14;
+    let penaltyIncomplete = 0.5;
+    let erasmusBonus = 0.5;
+    let bachelorWeight = 0.6;
+    let mastersWeight = 0.4;
+    // the algorithm is dependent on specific names in the criteria, change???
+    let indCriteria;
+    for (let ind in options.criteria) {
+        if (options.criteria[ind].name_en === 'Academic Curriculum') {
+            indCriteria = ind;
+            break;
+        }
+    }
+    if (indCriteria === undefined) {
+        console.log(' Error in scores computation - Degrees.',
+            'Call Id:', data.callID ,
+            'Application ID:', data.applicationID)
+    } else {
+        let score = 0.0;
+        if (data.academicDegrees.length === 1) {
+            if (data.academicDegrees[0].academic_degree_id === 1) {
+                score = score + (parseFloat(data.academicDegrees[0].grade) - minimumLevel)
+            }
+        } else if (data.academicDegrees.length === 2) {
+            if (data.academicDegrees[0].academic_degree_id === 1
+                    || data.academicDegrees[1].academic_degree_id === 1) {
+                console.log(' Error (2) in scores computation - Degrees.',
+                        'Call Id:', data.callID ,
+                        'Application ID:', data.applicationID)
+            } else if (data.academicDegrees[0].academic_degree_id ===
+            data.academicDegrees[1].academic_degree_id) {
+                console.log(' Error (3) in scores computation - Degrees.',
+                    'Call Id:', data.callID ,
+                    'Application ID:', data.applicationID)
+            } else {
+                let bachelorGrade = 0;
+                let mastersGrade = 0;
+                if (data.academicDegrees[0].academic_degree_id === 2) {
+                    bachelorGrade = parseFloat(data.academicDegrees[1].grade);
+                    mastersGrade = parseFloat(data.academicDegrees[0].grade);
+                } else {
+                    bachelorGrade = parseFloat(data.academicDegrees[0].grade);
+                    mastersGrade = parseFloat(data.academicDegrees[1].grade);
+                }
+                let average = bachelorGrade * bachelorWeight
+                            + mastersGrade * mastersWeight;
+                score = score + (average - minimumLevel);
+                score = Math.max(score, 0);
+            }
+        } else {
+            console.log(' Error (4) in scores computation - Degrees.',
+                        'Call Id:', data.callID ,
+                        'Application ID:', data.applicationID)
+        }
+        if (data.erasmus && score >= 0.0) {
+            score = score + erasmusBonus;
+        }
+        console.log('final:',score)
+        options.criteria[indCriteria].score_auto = Math.min(score, 5.0)
+
+    }
+    return computeScoreProjectsLAQV(options);
+
+};
+var computeScoreProjectsLAQV = function (options) {
+    let { req, res, next } = options;
+    let data = req.body.data;
+    let pointsProject = 1.25;
+    let pointsMobility = 1.25;
+    let score = 0;
+    let indCriteria;
+    for (let ind in options.criteria) {
+        if (options.criteria[ind].name_en === 'Scientific activity') {
+            indCriteria = ind;
+            break;
+        }
+    }
+    if (indCriteria === undefined) {
+        console.log(' Error in scores computation - Scientific activity.',
+            'Call Id:', data.callID ,
+            'Application ID:', data.applicationID)
+    } else {
+        if (data.projects.length > 0) {
+            for (let ind in data.projects) {
+                score = score + pointsProject;
+            }
+        }
+    }
+    let scoreProjects = Math.min(score, 2.5)
+    score = 0;
+    if (data.mobility.length > 0) {
+        for (let ind in data.mobility) {
+            score = score + pointsMobility;
+        }
+    }
+    let scoreMobility = Math.min(score, 2.5);
+    options.criteria[indCriteria].score_auto = scoreProjects + scoreMobility;
+
+    return computeScorePapersLAQV(options);
+};
+var computeScorePapersLAQV = function (options) {
+    let { req, res, next } = options;
+    let data = req.body.data;
+    let firstAuthorPoints = 1.5;
+    let otherPoints = 0.4;
+    let firstAuthorScore = 0.0;
+    let otherScore = 0.0;
+    let maxFirstAuthorScore = 4;
+    let maxOtherScore = 1;
+
+    let indCriteria;
+    for (let ind in options.criteria) {
+        if (options.criteria[ind].name_en === 'Papers') {
+            indCriteria = ind;
+            break;
+        }
+    }
+    if (indCriteria === undefined) {
+        console.log(' Error in scores computation - Papers.',
+            'Call Id:', data.callID ,
+            'Application ID:', data.applicationID)
+    } else {
+        if (data.papers.length > 0) {
+            for (let ind in data.papers) {
+                if (data.papers[ind].first_author) {
+                    firstAuthorScore = firstAuthorScore + firstAuthorPoints;
+                } else  {
+                    otherScore = otherScore + otherPoints;
+                }
+            }
+
+        }
+    }
+    options.criteria[indCriteria].score_auto = Math.min(firstAuthorScore, maxFirstAuthorScore)
+                    + Math.min(otherScore, maxOtherScore);
+    return computeScoreCommunicationsLAQV(options);
+};
+var computeScoreCommunicationsLAQV = function (options) {
+    let { req, res, next } = options;
+    let data = req.body.data;
+    let score = 0.0;
+    let communicationsPoints = 1.0;
+    let postersPoints = 0.5;
+    let maxScore = 5.0;
+
+    let indCriteria;
+    for (let ind in options.criteria) {
+        if (options.criteria[ind].name_en === 'Communications') {
+            indCriteria = ind;
+            break;
+        }
+    }
+    if (indCriteria === undefined) {
+        console.log(' Error in scores computation - Communications.',
+            'Call Id:', data.callID ,
+            'Application ID:', data.applicationID)
+    } else {
+        if (data.communications.length > 0) {
+            for (let ind in data.communications) {
+                score = score + communicationsPoints;
+            }
+        }
+        if (data.posters.length > 0) {
+            for (let ind in data.communications) {
+                score = score + postersPoints;
+            }
+        }
+    }
+    options.criteria[indCriteria].score_auto = Math.min(score, maxScore);
+
+    options.i = 0;
+    return computeGlobalAutomaticScores(options);
+};
+
+
 module.exports.computeScores = function (req, res, next) {
     let options = {
         req,
@@ -1380,6 +1648,7 @@ var updateApplicant = function (options) {
     let { req, res, next } = options;
     let applicationID = req.params.applicationID;
     let data = req.body.data;
+    let isLAQV = req.body.isLAQV;
     var querySQL = '';
     var places = [];
     if (data.birth_date === '') {
@@ -1388,37 +1657,74 @@ var updateApplicant = function (options) {
     if (data.identification_valid_until === '') {
         data.identification_valid_until = null;
     }
-    // TODO: create url_access for applicant in the end if is successfull
-    querySQL = querySQL + 'UPDATE applicants'
-                        + ' SET name = ?,'
-                        + ' document_type_id = ?,'
-                        + ' document_number = ?,'
-                        + ' document_valid_until = ?,'
-                        + ' gender = ?,'
-                        + ' email = ?,'
-                        + ' birth_date = ?,'
-                        + ' address = ?,'
-                        + ' postal_code = ?,'
-                        + ' city = ?,'
-                        + ' id_country = ?,'
-                        + ' phone = ?'
-                        + ' WHERE application_id = ?;';
+    if (isLAQV) {
+        querySQL = querySQL + 'UPDATE applicants'
+                            + ' SET name = ?,'
+                            + ' document_type_id = ?,'
+                            + ' document_number = ?,'
+                            + ' document_valid_until = ?,'
+                            + ' gender = ?,'
+                            + ' email = ?,'
+                            + ' birth_date = ?,'
+                            + ' address = ?,'
+                            + ' postal_code = ?,'
+                            + ' city = ?,'
+                            + ' id_country = ?,'
+                            + ' phone = ?,'
+                            + ' erasmus_experience = ?'
+                            + ' WHERE application_id = ?;';
 
-    places.push(
-        data.name,
-        data.identification_type_id,
-        data.identification_number,
-        data.identification_valid_until,
-        data.gender,
-        data.email,
-        data.birth_date,
-        data.address,
-        data.postal_code,
-        data.city,
-        data.id_country,
-        data.phone,
-        applicationID
-    )
+        places.push(
+            data.name,
+            data.identification_type_id,
+            data.identification_number,
+            data.identification_valid_until,
+            data.gender,
+            data.email,
+            data.birth_date,
+            data.address,
+            data.postal_code,
+            data.city,
+            data.id_country,
+            data.phone,
+            data.erasmus,
+            applicationID
+        )
+
+    } else {
+        querySQL = querySQL + 'UPDATE applicants'
+                            + ' SET name = ?,'
+                            + ' document_type_id = ?,'
+                            + ' document_number = ?,'
+                            + ' document_valid_until = ?,'
+                            + ' gender = ?,'
+                            + ' email = ?,'
+                            + ' birth_date = ?,'
+                            + ' address = ?,'
+                            + ' postal_code = ?,'
+                            + ' city = ?,'
+                            + ' id_country = ?,'
+                            + ' phone = ?'
+                            + ' WHERE application_id = ?;';
+
+        places.push(
+            data.name,
+            data.identification_type_id,
+            data.identification_number,
+            data.identification_valid_until,
+            data.gender,
+            data.email,
+            data.birth_date,
+            data.address,
+            data.postal_code,
+            data.city,
+            data.id_country,
+            data.phone,
+            applicationID
+        )
+    }
+    // TODO: create url_access for applicant in the end if is successfull
+
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             return updateMotivationLetter(options);

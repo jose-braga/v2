@@ -2,6 +2,8 @@ const Calls = () => import(/* webpackChunkName: "calls" */ '@/components/calls/C
 const CallPage = () => import(/* webpackChunkName: "call-page" */ '@/components/calls/CallPage.vue')
 const Applicants = () => import(/* webpackChunkName: "applicants" */ '@/components/calls/applicants/Applicants.vue')
 const ApplicantsHelp = () => import(/* webpackChunkName: "applicants-help" */ '@/components/calls/applicants/ApplicantsHelp.vue')
+const ApplicantsLAQV = () => import(/* webpackChunkName: "applicants" */ '@/components/calls/applicants/ApplicantsLAQV.vue')
+const ApplicantsLAQVHelp = () => import(/* webpackChunkName: "applicants-help" */ '@/components/calls/applicants/ApplicantsLAQVHelp.vue')
 const Reviewers = () => import(/* webpackChunkName: "reviewers" */ '@/components/calls/reviewers/Reviewers.vue')
 const ReviewerCallsList = () => import(/* webpackChunkName: "reviewers-calls-list" */ '@/components/calls/reviewers/ReviewerCallsList.vue')
 const ReviewerCallsListHelp = () => import(/* webpackChunkName: "reviewers-calls-list-help" */ '@/components/calls/reviewers/ReviewersHelp.vue')
@@ -22,13 +24,32 @@ const ManagerCallApplicationsListHelp = () => import(/* webpackChunkName: "call-
 
 const routes = [
     {
+        path: '/laqv/calls',
+        component: Calls,
+        props: { isLaqv: true },
+    },
+    {
         path: '/calls',
         component: Calls,
+        props: { isLaqv: false },
+    },
+    {
+        path: '/laqv/calls/:callSegment',
+        components: {
+            default: CallPage,
+        },
     },
     {
         path: '/calls/:callSegment',
         components: {
             default: CallPage,
+        },
+    },
+    {
+        path: '/laqv/calls/:callSegment/applicants',
+        components: {
+            default: ApplicantsLAQV,
+            help: ApplicantsLAQVHelp
         },
     },
     {

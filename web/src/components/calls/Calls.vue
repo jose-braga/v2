@@ -3,25 +3,14 @@
     <v-app-bar prominent app>
         <v-row align="center">
             <v-col cols="2">
-                <img src="/images/logo/ucibio-logo.png" width="40">
+                <img v-if="isLaqv" src="/images/logo/laqv-logo.png" width="80">
+                <img v-else src="/images/logo/ucibio-logo.png" width="40">
             </v-col>
-            <!--
-            <v-col>
-                <img src="/images/logo/laqv-logo.png" width="64">
+            <v-col cols="9" class="ml-6">
+                <div v-if="isLaqv"> LAQV Applications Portal</div>
+                <div v-else> UCIBIO Applications Portal</div>
             </v-col>
-            -->
-            <v-col cols="10" class="ml-6">UCIBIO Applications Portal</v-col>
         </v-row>
-        <!--
-        <v-tooltip bottom>
-            <template v-slot:activator="{ on }">
-                <v-btn icon v-on="on" @click.stop="showHelp">
-                    <v-icon>mdi-help</v-icon>
-                </v-btn>
-            </template>
-            <span>Help for this page</span>
-        </v-tooltip>
-        -->
     </v-app-bar>
     <v-card>
         <v-card-title primary-title>
@@ -57,6 +46,9 @@ import subUtil from '@/components/common/submit-utils'
 import time from '@/components/common/date-utils'
 
 export default {
+    props: {
+        isLaqv: Boolean,
+    },
     data() {
         return {
             data: {
@@ -67,16 +59,26 @@ export default {
         }
     },
     created () {
+        console.log(this.isLaqv)
         this.initialize();
         this.getOpenCalls();
     },
     methods: {
         initialize() {
+            if (!this.isLaqv) {
+                this.baseURL = '/calls/';
+            } else {
+                this.baseURL = '/laqv/calls/';
+            }
         },
         getOpenCalls () {
             let vm = this;
-
-            const urlSubmit = 'api/v2/' + 'open-calls';
+            let urlSubmit
+            if (!this.isLaqv) {
+                urlSubmit = 'api/v2/' + 'open-calls';
+            } else {
+                urlSubmit = 'api/v2/' + 'laqv/open-calls';
+            }
             subUtil.getPublicInfo(vm, urlSubmit, 'openCalls')
             .then(() => {
                 for (let ind in this.openCalls) {

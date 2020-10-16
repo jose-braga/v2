@@ -2,7 +2,7 @@
     <v-card>
         <v-card-title primary-title>
             <div>
-                <h3 class="headline">Current members and positions</h3>
+                <h3 class="headline">Past members or positions</h3>
             </div>
         </v-card-title>
         <v-card-text></v-card-text>
@@ -99,38 +99,31 @@ import {debounce} from 'lodash'
 import XLSX from 'xlsx'
 
 function processResults(vm, result) {
-    let currentMembers = [];
-    let today = time.moment();
+    let pastMembers = [];
+    //let today = time.moment();
     for (let ind in result) {
         if (result[ind].history.length > 0) {
+            let lastDate = time.moment('1901-01-01')
+            let toAdd = false;
             for (let indHistory in result[ind].history) {
-                let validFrom = result[ind].history[indHistory].valid_from;
                 let validUntil = result[ind].history[indHistory].valid_until;
-                if ((validFrom === null || time.moment(validFrom).isBefore(today))
-                    && (validUntil === null || time.moment(validUntil).isAfter(today))
+                if ( validUntil !== null
+                        && time.moment(validUntil).isAfter(lastDate)
+                        && time.moment().isAfter(time.moment(validUntil))
                     ) {
-                    //result[ind].progress = false;
-                    //result[ind].success = undefined;
-                    //result[ind].error = undefined;
+                    toAdd = true;
                     result[ind].history[indHistory].valid_from = time.momentToDate(result[ind].history[indHistory].valid_from);
                     result[ind].history[indHistory].valid_until = time.momentToDate(result[ind].history[indHistory].valid_until);
-                    //result[ind].history[indHistory].show_valid_from = false;
-                    //result[ind].history[indHistory].show_valid_until = false;
-                    //result[ind].history[indHistory].show_add_more_recent = true;
-                    //result[ind].history[indHistory].to_delete = false;
+                    lastDate = result[ind].history[indHistory].valid_until;
                     result[ind].most_recent_data = result[ind].history[indHistory];
-                    //result[ind].newer_data = {}
-                    currentMembers.push(result[ind]);
-                    break;
                 }
             }
-        } else {
-            result[ind].most_recent_data = {};
-            currentMembers.push(result[ind]);
+            if (toAdd) {
+                pastMembers.push(result[ind]);
+            }
         }
-
     }
-    return currentMembers;
+    return pastMembers;
 }
 function processForSpreadsheet(members) {
     let membersCurated = [];
@@ -149,20 +142,31 @@ function processForSpreadsheet(members) {
         }
         thisMember['Pole'] = '';
         for (let indPole in members[ind].pole) {
-            let validFrom = members[ind].pole[indPole].valid_from;
-            let validUntil = members[ind].pole[indPole].valid_until;
-            if ((validFrom === null || time.moment(validFrom).isBefore(today))
-                    && (validUntil === null || time.moment(validUntil).isAfter(today))
-            ) {
-                thisMember['Pole'] = members[ind].pole[indPole].city;
+            if (members[ind].pole[indPole].valid_from !== null && members[ind].pole[indPole].valid_from !== undefined) {
+                members[ind].pole[indPole].valid_from = time.moment(members[ind].pole[indPole].valid_from)
+                                                                .format('YYYY-MM-DD')
             }
+            if (members[ind].pole[indPole].valid_until !== null && members[ind].pole[indPole].valid_until !== undefined) {
+                members[ind].pole[indPole].valid_until = time.moment(members[ind].pole[indPole].valid_until)
+                                                                .format('YYYY-MM-DD')
+            }
+            thisMember['Pole'] = thisMember['Pole']
+                            + members[ind].pole[indPole].city
+                            + '(' + members[ind].pole[indPole].valid_from
+                            + ', '+ members[ind].pole[indPole].valid_until
+                            + ')\n';
         }
         thisMember.Lab = members[ind].most_recent_data.lab_name;
+        let memberLabValidUntil = null
+        // TODO: work here (adapt to past dates)
+        if (members[ind].most_recent_data.valid_until !== null && members[ind].most_recent_data.valid_until !== undefined) {
+            memberLabValidUntil = time.moment(members[ind].most_recent_data.valid_until);
+        }
         for (let indGroup in members[ind].most_recent_data.groups) {
             let validFrom = members[ind].most_recent_data.groups[indGroup].valid_from;
             let validUntil = members[ind].most_recent_data.groups[indGroup].valid_until;
-            if ((validFrom === null || time.moment(validFrom).isBefore(today))
-                    && (validUntil === null || time.moment(validUntil).isAfter(today))
+            if ((validFrom === null || time.moment(validFrom).isBefore(memberLabValidUntil))
+                    && (validUntil === null || time.moment(validUntil).isAfter(memberLabValidUntil))
             ) {
                 thisMember.Group = members[ind].most_recent_data.groups[indGroup].name;
                 thisMember.Unit = members[ind].most_recent_data.groups[indGroup].units[0].short_name;
@@ -281,7 +285,7 @@ function processForSpreadsheet(members) {
                 members[ind].departments[indDep].department_end = time.moment(members[ind].departments[indDep].department_end)
                                                                 .format('YYYY-MM-DD')
             }
-            thisMember['Departments'] =  thisMember['Departments']
+            thisMember['Departments'] = thisMember['Departments']
                         + members[ind].departments[indDep].department
                         + ',' + members[ind].departments[indDep].school_shortname_en
                         + ',' + members[ind].departments[indDep].university_shortname_en
@@ -311,7 +315,6 @@ function processForSpreadsheet(members) {
     }
     return membersCurated;
 }
-
 
 export default {
     components: {
@@ -399,12 +402,12 @@ export default {
                 for (let ind in this_session.permissionsEndpoints) {
                     let decomposedPath = this_session.permissionsEndpoints[ind].decomposedPath;
                     if ( this.segmentType === 'unit'
-                            && decomposedPath.length === 4
-                            && decomposedPath[0] === 'managers'
-                            && parseInt(decomposedPath[1], 10) === this_session.userID
-                            && decomposedPath[2] === 'units'
-                            && parseInt(decomposedPath[3], 10) === this.unitId
-                            && this_session.permissionsEndpoints[ind].method_name === 'GET') {
+                        && decomposedPath.length === 4
+                        && decomposedPath[0] === 'managers'
+                        && parseInt(decomposedPath[1], 10) === this_session.userID
+                        && decomposedPath[2] === 'units'
+                        && parseInt(decomposedPath[3], 10) === this.unitId
+                        && this_session.permissionsEndpoints[ind].method_name === 'GET') {
                         foundEndpoint = true;
                         let urlSubmit;
                         this.endpoint = this_session.permissionsEndpoints[ind].endpoint_url;
@@ -413,7 +416,7 @@ export default {
                             || (searchGroup !== undefined && searchGroup !== '')
                         ) {
                             urlSubmit = 'api' + this.endpoint
-                                + '/current-members'
+                                + '/past-members'
                                 + '?limit=' + this.itemsPerPage
                                 + '&offset=' + (page - 1) * this.itemsPerPage
                                 + '&q=' + search
@@ -422,10 +425,11 @@ export default {
                                 ;
                         } else {
                             urlSubmit = 'api' + this.endpoint
-                                + '/current-members'
+                                + '/past-members'
                                 + '?limit=' + this.itemsPerPage
                                 + '&offset=' + (page - 1) * this.itemsPerPage;
                         }
+
                         subUtil.getInfoPopulate(this, urlSubmit, true, true)
                         .then( (result) => {
                             this.totalMembers = result.count;
@@ -433,14 +437,14 @@ export default {
                             this.loading = false;
                         });
                     } else if ( this.segmentType === 'unit-city'
-                            && decomposedPath.length === 6
-                            && decomposedPath[0] === 'managers'
-                            && parseInt(decomposedPath[1], 10) === this_session.userID
-                            && decomposedPath[2] === 'units'
-                            && parseInt(decomposedPath[3], 10) === this.unitId
-                            && decomposedPath[4] === 'cities'
-                            && parseInt(decomposedPath[5], 10) === this.unitId
-                            && this_session.permissionsEndpoints[ind].method_name === 'GET') {
+                        && decomposedPath.length === 6
+                        && decomposedPath[0] === 'managers'
+                        && parseInt(decomposedPath[1], 10) === this_session.userID
+                        && decomposedPath[2] === 'units'
+                        && parseInt(decomposedPath[3], 10) === this.unitId
+                        && decomposedPath[4] === 'cities'
+                        && parseInt(decomposedPath[5], 10) === this.unitId
+                        && this_session.permissionsEndpoints[ind].method_name === 'GET') {
                         foundEndpoint = true;
                         let urlSubmit;
                         this.endpoint = this_session.permissionsEndpoints[ind].endpoint_url;
@@ -449,7 +453,7 @@ export default {
                             || (searchGroup !== undefined && searchGroup !== '')
                         ) {
                             urlSubmit = 'api' + this.endpoint
-                                + '/current-members'
+                                + '/past-members'
                                 + '?limit=' + this.itemsPerPage
                                 + '&offset=' + (page - 1) * this.itemsPerPage
                                 + '&q=' + search
@@ -458,7 +462,7 @@ export default {
                                 ;
                         } else {
                             urlSubmit = 'api' + this.endpoint
-                                + '/current-members'
+                                + '/past-members'
                                 + '?limit=' + this.itemsPerPage
                                 + '&offset=' + (page - 1) * this.itemsPerPage;
                         }
@@ -483,7 +487,7 @@ export default {
                             || (searchGroup !== undefined && searchGroup !== '')
                         ) {
                             urlSubmit = 'api' + this.endpoint
-                                + '/current-members'
+                                + '/past-members'
                                 + '?limit=' + this.itemsPerPage
                                 + '&offset=' + (page - 1) * this.itemsPerPage
                                 + '&q=' + search
@@ -492,7 +496,7 @@ export default {
                                 ;
                         } else {
                             urlSubmit = 'api' + this.endpoint
-                                + '/current-members'
+                                + '/past-members'
                                 + '?limit=' + this.itemsPerPage
                                 + '&offset=' + (page - 1) * this.itemsPerPage;
                         }
@@ -520,21 +524,21 @@ export default {
         generateSpreadsheet() {
             this.progress = true;
             let today = time.moment();
-            let dateFile = time.momentToDate(today, 'Europe/Lisbon', 'YYYY-MM-DDTHHmmss');
+            let dateFile = time.momentToDate(today, 'Europe/Lisbon', 'YYYY-MM-DDTHHmmss')
             let urlSubmit;
             if ((this.search !== undefined && this.search !== '')
                 || (this.searchLab !== undefined && this.searchLab !== '')
                 || (this.searchGroup !== undefined && this.searchGroup !== '')
             ) {
                  urlSubmit = 'api' + this.endpoint
-                        + '/current-members'
+                        + '/past-members'
                         + '?q=' + this.search
                         + '&lab=' + this.searchLab
                         + '&group=' + this.searchGroup
                         + '&details=' + 1;
             } else {
                 urlSubmit = 'api' + this.endpoint
-                    + '/current-members'
+                    + '/past-members'
                     + '?details=' + 1;
             }
             this.$http.get(urlSubmit,
@@ -549,7 +553,7 @@ export default {
                 let wb = XLSX.utils.book_new();
                 let ws  = XLSX.utils.json_to_sheet(itemsCurated);
                 XLSX.utils.book_append_sheet(wb, ws, 'Data');
-                let filename = 'members_'
+                let filename = 'past_members_'
                 if (this.unitId !== null && this.unitId !== undefined) {
                     filename = filename + 'unit_' + this.unitId;
                 }
@@ -569,6 +573,7 @@ export default {
             })
 
         },
+
     },
 
 }

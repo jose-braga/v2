@@ -43,7 +43,7 @@
                     offset-y min-width="290px">
                     <template v-slot:activator="{ on }">
                         <v-text-field v-model="v.$model.date_start"
-                            @input="addValue"
+                            @input="v.date_start.$touch(); addValue()"
                             label="Start date" v-on="on">
                         </v-text-field>
                     </template>
@@ -51,6 +51,9 @@
                             @input="v.$model.show_date_start = false; addValue()"
                             no-title></v-date-picker>
                 </v-menu>
+                <div v-if="v.date_start.$error">
+                    <p v-if="!v.date_start.dateFormat" class="caption red--text">Format should be<br>YYYY-MM-DD.</p>
+                </div>
             </v-col>
             <v-col cols="12" sm="2">
                 <v-menu ref="v.$model.show_date_end"
@@ -61,7 +64,7 @@
                     offset-y min-width="290px">
                     <template v-slot:activator="{ on }">
                         <v-text-field v-model="v.$model.date_end"
-                            @input="addValue"
+                            @input="v.date_end.$touch(); addValue()"
                             label="End date" v-on="on">
                         </v-text-field>
                     </template>
@@ -69,6 +72,9 @@
                             @input="v.$model.show_date_end = false; addValue()"
                             no-title></v-date-picker>
                 </v-menu>
+                <div v-if="v.date_end.$error">
+                    <p v-if="!v.date_end.dateFormat" class="caption red--text">Format should be<br>YYYY-MM-DD.</p>
+                </div>
             </v-col>
             <v-col cols="1" sm="1">
                 <v-btn icon @click="removeItem(data.professional, i)" class="mt-3">
@@ -141,8 +147,18 @@ export default {
                 $each: {
                     company: { required, maxLength: maxLength(100) },
                     business_areas: { required, maxLength: maxLength(500) },
-                    date_start: {},
-                    date_end: {},
+                    date_start: {
+                        dateFormat: (value) => {
+                            if (value === undefined || value === null || value === '') return true;
+                            return /^\d\d\d\d-\d\d-\d\d$/.test(value);
+                        }
+                    },
+                    date_end: {
+                        dateFormat: (value) => {
+                            if (value === undefined || value === null || value === '') return true;
+                            return /^\d\d\d\d-\d\d-\d\d$/.test(value);
+                        }
+                    },
                 }
             },
         },

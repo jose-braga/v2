@@ -44,6 +44,7 @@
                 </v-menu>
                 <div v-if="$v.data.birth_date.$error">
                     <p v-if="!$v.data.birth_date.required" class="caption red--text">Birth date is required.</p>
+                    <p v-if="!$v.data.birth_date.dateFormat" class="caption red--text">Format should be<br>YYYY-MM-DD.</p>
                 </div>
             </v-col>
             <v-col cols="12" sm="4">
@@ -90,15 +91,18 @@
                     transition="scale-transition"
                     offset-y min-width="290px">
                     <template v-slot:activator="{ on }">
-                        <v-text-field v-model="data.identification_valid_until"
-                            @input="addValue"
+                        <v-text-field v-model="$v.data.identification_valid_until.$model"
+                            @input="v.date.$touch(); addValue()"
                             label="Valid until" v-on="on">
                         </v-text-field>
                     </template>
-                    <v-date-picker v-model="data.identification_valid_until"
+                    <v-date-picker v-model="$v.data.identification_valid_until.$model"
                             @input="data.identification_show_date_end = false; addValue()"
                             no-title></v-date-picker>
                 </v-menu>
+                <div v-if="$v.data.identification_valid_until.$error">
+                    <p v-if="!$v.data.identification_valid_until.dateFormat" class="caption red--text">Format should be<br>YYYY-MM-DD.</p>
+                </div>
             </v-col>
         </v-row>
     </v-container>
@@ -281,8 +285,21 @@ export default {
     validations: {
         data: {
             name: { maxLength: maxLength(200), required },
-            birth_date: { required },
+            birth_date: {
+                required,
+                dateFormat: (value) => {
+                    if (value === undefined || value === null || value === '') return true;
+                    return /^\d\d\d\d-\d\d-\d\d$/.test(value);
+                }
+            },
             identification_number: { required },
+            identification_valid_until: {
+                required,
+                dateFormat: (value) => {
+                    if (value === undefined || value === null || value === '') return true;
+                    return /^\d\d\d\d-\d\d-\d\d$/.test(value);
+                }
+            },
             email: { required, email, maxLength: maxLength(200) },
             address: { required, maxLength: maxLength(500) },
             postal_code: { required, maxLength: maxLength(45) },

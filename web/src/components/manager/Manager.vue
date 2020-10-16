@@ -9,6 +9,12 @@
             <div v-if="segment.type === 'unit'">
                 Members@{{segment.short_name}}
             </div>
+            <div v-if="segment.type === 'city'">
+                Members@{{segment.city[0].city}}
+            </div>
+            <div v-if="segment.type === 'unit-city'">
+                Members@{{segment.city[0].city}}&{{segment.unit[0].short_name}}
+            </div>
         </v-tab>
         <v-tab to="/manager/validate">
             To validate
@@ -16,7 +22,7 @@
         <v-tabs-items>
             <!-- use :max="N" in keep-alive if necessary-->
             <keep-alive>
-                <router-view v-if="segmentType && data.myUnits"
+                <router-view v-if="segmentType && (data.myUnits || data.myUnitsCities)"
                     :segment-type="segmentType"
                     :unit-id="unitID"
                     :city-id="cityID"
@@ -100,27 +106,12 @@ export default {
             let allWithRolesData = this.data.myAllWithRoles;
             for (let ind in unitsCitiesData) {
                 this.$set(unitsCitiesData[ind], 'type', 'unit-city');
-                /*this.$set(unitsCitiesData[ind], 'link', '/manager/unit/'
-                + unitsCitiesData[ind].short_name.toLowerCase().replace(/\s/g,'-')
-                + '/city/'
-                + unitsCitiesData[ind].short_name.toLowerCase().replace(/\s/g,'-'))
-                ;
-                */
             }
             for (let ind in citiesData) {
                 this.$set(citiesData[ind], 'type', 'city');
-                /*
-                this.$set(citiesData[ind], 'link', '/manager/city/'
-                + unitsCitiesData[ind].city_id.toLowerCase().replace(/\s/g,'-'))
-                ;*/
             }
             for (let ind in unitsData) {
                 this.$set(unitsData[ind], 'type', 'unit');
-                /*
-                this.$set(unitsData[ind], 'link', '/manager/unit/'
-                + unitsData[ind].short_name.toLowerCase().replace(/\s/g,'-'))
-                ;
-                */
             }
             let segmentData;
             if (allWithRolesData.length > 0) {
@@ -166,18 +157,48 @@ export default {
                                 this.unitID = result.id;
                             }
                         });
-
                     } else if (decomposedPath[0] === 'managers'
                         && decomposedPath.length === 4
                         && decomposedPath[2] === 'cities'
                         && this_session.permissionsEndpoints[ind].method_name === 'GET') {
-                            console.log('-------------3-------------')
+                        let urlSubmit = 'api' + this_session.permissionsEndpoints[ind].endpoint_url;
+                        subUtil.getInfoPopulate(this, urlSubmit, false)
+                        .then( (result) => {
+                            this.$set(result, 'link', '/manager/city/'
+                                + result.city[0].city.toLowerCase().replace(/\s/g,'-'));
+                            this.data.myCities.push(result);
+                            if (initialSegment) {
+                                initialSegment = false;
+                                //this.activeTab = result.link;
+                                this.$router.replace(result.link)
+                                    .catch(err => {err});
+                                this.cityID = result.city[0].id;
+                            }
+                        });
+
                     } else if (decomposedPath[0] === 'managers'
                         && decomposedPath.length === 6
                         && decomposedPath[2] === 'units'
                         && decomposedPath[4] === 'cities'
                         && this_session.permissionsEndpoints[ind].method_name === 'GET') {
-                            console.log('-------------4-------------')
+                        let urlSubmit = 'api' + this_session.permissionsEndpoints[ind].endpoint_url;
+                        subUtil.getInfoPopulate(this, urlSubmit, false)
+                        .then( (result) => {
+                            this.$set(result, 'link', '/manager/unit/'
+                                + result.unit[0].short_name.toLowerCase().replace(/\s/g,'-')
+                                + '/city/'
+                                + result.city[0].city.toLowerCase().replace(/\s/g,'-')
+                            );
+                            this.data.myUnitsCities.push(result);
+                            if (initialSegment) {
+                                initialSegment = false;
+                                //this.activeTab = result.link;
+                                this.$router.replace(result.link)
+                                    .catch(err => {err});
+                                this.unitID = result.unit[0].id;
+                                this.cityID = result.city[0].id;
+                            }
+                        });
                     }
                 }
             }
@@ -188,16 +209,16 @@ export default {
                 if (this.segmentData[ind].link === tab) {
                     if (this.segmentData[ind].type === 'unit-city') {
                         this.segmentType = this.segmentData[ind].type;
-                        this.unitID= undefined;
-                        this.cityID= undefined;
-                        this.currentUnit= undefined;
-                        this.currentCity= undefined;
+                        this.unitID = this.segmentData[ind].unit[0].id;
+                        this.cityID = this.segmentData[ind].city[0].id;
+                        this.currentUnit = this.segmentData[ind].unit[0];
+                        this.currentCity = this.segmentData[ind].city[0];
                     } else if (this.segmentData[ind].type === 'city') {
                         this.segmentType = this.segmentData[ind].type;
-                        this.unitID= undefined;
-                        this.cityID= undefined;
-                        this.currentUnit= undefined;
-                        this.currentCity= undefined;
+                        this.unitID = undefined;
+                        this.cityID = this.segmentData[ind].city[0].id;
+                        this.currentUnit = undefined;
+                        this.currentCity = this.segmentData[ind].city[0];
                     } else if (this.segmentData[ind].type === 'unit') {
                         this.segmentType = this.segmentData[ind].type;
                         this.unitID = this.segmentData[ind].id;
@@ -206,10 +227,10 @@ export default {
                         this.currentCity = undefined;
                     } else {
                         this.segmentType = 'all';
-                        this.unitID= undefined;
-                        this.cityID= undefined;
-                        this.currentUnit= undefined;
-                        this.currentCity= undefined;
+                        this.unitID = undefined;
+                        this.cityID = undefined;
+                        this.currentUnit = undefined;
+                        this.currentCity = undefined;
                     }
 
                     /*this.labID = this.data.myLabs[ind].id;

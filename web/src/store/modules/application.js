@@ -16,11 +16,13 @@ const application = {
             cv: null,
             motivation: null,
             academicDegrees: [],
+            erasmus: null,
             recommendations: [
                 {name: '', email: '', institution: '', role: ''},
                 {name: '', email: '', institution: '', role: ''},
             ],
             projects: [],
+            mobility: [],
             papers: [],
             communications: [],
             posters: [],

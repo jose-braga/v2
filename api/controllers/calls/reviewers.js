@@ -107,7 +107,7 @@ var actionGetApplicationInfo = function (options) {
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'SELECT applications.*,'
-                        + ' applicants.name AS applicant_name,'
+                        + ' applicants.name AS applicant_name, applicants.erasmus_experience,'
                         + ' application_reviewer_applications.reviewed'
                         + ' FROM applications'
                         + ' JOIN applicants ON applicants.application_id = applications.id'
@@ -179,6 +179,22 @@ var getApplicationProjects = function (options) {
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             options.application.projects = resQuery;
+            return getApplicationMobility(options);
+        },
+        options);
+};
+var getApplicationMobility = function (options) {
+    let { req, res, next } = options;
+    let applicationID = req.params.applicationID;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT *'
+                        + ' FROM application_mobility'
+                        + ' WHERE application_id = ?;';
+    places.push(applicationID)
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            options.application.mobility = resQuery;
             return getApplicationPapers(options);
         },
         options);

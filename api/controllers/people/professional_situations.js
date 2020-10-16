@@ -515,7 +515,6 @@ var insertFellowshipFundingAgencyRelationship = function (options, i) {
             } else if (data.management_entities.length > 0) {
                 return insertFellowshipManagementEntityRelationship(options, 0);
             } else {
-                console.log('oi!')
                 let notificationConfig = { entityID: personID };
                 notifications.notifyWebsiteAPI(notificationConfig);
                 responses.sendJSONResponseOptions({

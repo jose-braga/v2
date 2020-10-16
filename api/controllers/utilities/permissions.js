@@ -35,6 +35,131 @@ var hasAccessEndpoint = function (reqMethod, reqEndpoint, permissionsEndpoints) 
 //var TEAM_MANAGER_PERMISSION_LEVEL = 4;
 //var STANDARD_USER_PERMISSION_LEVEL = 5;
 
+
+module.exports.checkResourceLocation = function (callback, callbackOptions) {
+    // this works for resources that have personID in endpoint path
+    if (callbackOptions !== undefined) {
+        let { req, res, next } = callbackOptions;
+        let unitID = req.params.unitID;
+        let cityID = req.params.cityID;
+        let personID = req.params.personID;
+        let querySQL = '';
+        let joinCity = ' JOIN people_institution_city ON people_institution_city.person_id = people.id'
+        let whereCity = ' people_institution_city.city_id = ?';
+        let wherePerson = ' AND people.id = ?'
+        let places = [];
+        let preamble = 'SELECT people.id AS person_id, people.user_id, people.name, people.colloquial_name'
+                     + ' FROM people'
+        querySQL = querySQL + preamble;
+        if (unitID !== undefined) {
+            querySQL = querySQL
+                + ' JOIN people_labs ON people_labs.person_id = people.id'
+                + ' JOIN labs ON labs.id = people_labs.lab_id'
+                + ' JOIN labs_groups ON labs_groups.lab_id = labs.id'
+                + ' JOIN `groups` ON `groups`.id = labs_groups.group_id'
+                + ' JOIN groups_units ON groups_units.group_id = `groups`.id'
+        }
+        if (cityID !== undefined) {
+            querySQL = querySQL+ joinCity;
+        }
+        if (unitID !== undefined) {
+            querySQL = querySQL + ' WHERE groups_units.unit_id = ?';
+            places.push(unitID);
+            if (cityID !== undefined) {
+                querySQL = querySQL + ' AND' + whereCity;
+                places.push(cityID);
+            }
+        } else if (cityID !== undefined) {
+            querySQL = querySQL + ' WHERE' + whereCity;
+            places.push(cityID);
+        }
+        querySQL = querySQL + wherePerson;
+        places.push(personID);
+        querySQL = querySQL + ' UNION ' + preamble;
+        if (unitID !== undefined) {
+            querySQL = querySQL
+            + ' JOIN technicians ON technicians.person_id = people.id'
+            + ' JOIN technicians_units ON technicians_units.technician_id = technicians.id'
+        }
+        if (cityID !== undefined) {
+            querySQL = querySQL+ joinCity;
+        }
+        if (unitID !== undefined) {
+            querySQL = querySQL + ' WHERE technicians_units.unit_id = ?';
+            places.push(unitID);
+            if (cityID !== undefined) {
+                querySQL = querySQL + ' AND' + whereCity;
+                places.push(cityID);
+            }
+        } else if (cityID !== undefined) {
+            querySQL = querySQL + ' WHERE' + whereCity;
+            places.push(cityID);
+        }
+        querySQL = querySQL + wherePerson;
+        places.push(personID);
+        querySQL = querySQL + ' UNION ' + preamble;
+        if (unitID !== undefined) {
+            querySQL = querySQL
+                + ' JOIN science_managers ON science_managers.person_id = people.id'
+                + ' JOIN science_managers_units ON science_managers_units.science_manager_id = science_managers.id'
+        }
+        if (cityID !== undefined) {
+            querySQL = querySQL+ joinCity;
+        }
+        if (unitID !== undefined) {
+            querySQL = querySQL + ' WHERE science_managers_units.unit_id = ?';
+            places.push(unitID);
+            if (cityID !== undefined) {
+                querySQL = querySQL + ' AND' + whereCity;
+                places.push(cityID);
+            }
+        } else if (cityID !== undefined) {
+            querySQL = querySQL + ' WHERE' + whereCity;
+            places.push(cityID);
+        }
+        querySQL = querySQL + wherePerson;
+        places.push(personID);
+        querySQL = querySQL + ' UNION ' + preamble;
+        if (unitID !== undefined) {
+            querySQL = querySQL
+            + ' JOIN people_administrative_offices ON people_administrative_offices.person_id = people.id'
+            + ' JOIN people_administrative_units ON people_administrative_units.administrative_id = people_administrative_offices.id'
+        }
+        if (cityID !== undefined) {
+            querySQL = querySQL + joinCity;
+        }
+        if (unitID !== undefined) {
+            querySQL = querySQL + ' WHERE people_administrative_units.unit_id = ?';
+            places.push(unitID);
+            if (cityID !== undefined) {
+                querySQL = querySQL + ' AND' + whereCity;
+                places.push(cityID);
+            }
+        } else if (cityID !== undefined) {
+            querySQL = querySQL + ' WHERE' + whereCity;
+            places.push(cityID);
+        }
+        querySQL = querySQL + wherePerson;
+        places.push(personID);
+        sql.getSQLOperationResult(req, res, querySQL, places,
+            (resQuery, options) => {
+                if (resQuery.length > 0) {
+                    return callback(options);
+                } else {
+                    responses.sendJSONResponse(res, 403, {
+                        "status": "error",
+                        "statusCode": 403,
+                        "error": "User is not authorized to this operation (4)."
+                    });
+                    return;
+                }
+            },
+            callbackOptions
+        )
+    }
+}
+
+
 /**
  * Middleware to check requester permissions to a resource
  * This function is the entry point for the computation of permissions

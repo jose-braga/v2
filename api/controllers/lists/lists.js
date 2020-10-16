@@ -529,15 +529,29 @@ var getDocumentTypes = function (req, res, next) {
 var getOpenCalls = function (req, res, next) {
     var querySQL = '';
     var places = [];
-    querySQL = querySQL + 'SELECT *'
-                        + ' FROM call_applications'
-                        + ' WHERE ('
-                        + ' (valid_from IS NULL AND valid_until IS NULL)'
-                        + ' OR (valid_from <= NOW() AND valid_until IS NULL)'
-                        + ' OR (valid_from IS NULL AND valid_until >= NOW())'
-                        + ' OR (valid_from <= NOW() AND valid_until >= NOW())'
-                        + ')'
-                        ;
+    if (req.originalUrl.includes('/laqv/')) {
+        querySQL = querySQL + 'SELECT *'
+                            + ' FROM call_applications'
+                            + ' WHERE ('
+                            + ' (valid_from IS NULL AND valid_until IS NULL)'
+                            + ' OR (valid_from <= NOW() AND valid_until IS NULL)'
+                            + ' OR (valid_from IS NULL AND valid_until >= NOW())'
+                            + ' OR (valid_from <= NOW() AND valid_until >= NOW())'
+                            + ')'
+                            + ' AND is_laqv = 1;'
+                            ;
+    } else {
+        querySQL = querySQL + 'SELECT *'
+                            + ' FROM call_applications'
+                            + ' WHERE ('
+                            + ' (valid_from IS NULL AND valid_until IS NULL)'
+                            + ' OR (valid_from <= NOW() AND valid_until IS NULL)'
+                            + ' OR (valid_from IS NULL AND valid_until >= NOW())'
+                            + ' OR (valid_from <= NOW() AND valid_until >= NOW())'
+                            + ')'
+                            + ' AND (is_laqv IS NULL OR is_laqv = 0);'
+                            ;
+    }
     //places.push()
     sql.makeSQLOperation(req, res, querySQL, places);
     return;

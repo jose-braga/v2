@@ -71,7 +71,6 @@
                 </v-menu>
                 <div v-if="v.date_end.$error">
                     <p v-if="!v.date_end.required" class="caption red--text">Input required.</p>
-                    <p v-if="!v.date_end.dateFormat" class="caption red--text">Format should be<br>YYYY-MM-DD.</p>
                 </div>
             </v-col>
             <v-col cols="4" sm="2">
@@ -121,6 +120,15 @@
                 </v-btn>
             </v-col>
         </v-row>
+        <v-row>
+            <v-col cols="12" sm="4">
+                <v-checkbox
+                    v-model="$v.data.erasmus.$model"
+                    @change="$v.data.erasmus.$touch(); addValue()"
+                    label="Participation in Erasmus Programme?"
+                ></v-checkbox>
+            </v-col>
+        </v-row>
     </v-container>
 </v-card>
 
@@ -140,6 +148,7 @@ export default {
         return {
             data: {
                 academicDegrees: [],
+                erasmus: undefined,
             },
             degrees: [],
         }
@@ -165,7 +174,15 @@ export default {
         getDegrees() {
             var this_vm = this;
             const urlSubmit = 'api/v2/' + 'application-degrees';
-            subUtil.getPublicInfo(this_vm, urlSubmit, 'degrees');
+            subUtil.getPublicInfo(this_vm, urlSubmit, 'degrees')
+                .then(() => {
+                    for (let ind in this.degrees) {
+                        if (this.degrees[ind].name === 'Integrated Master') {
+                            this.$set(this.degrees[ind], 'name',
+                            'Integrated Master or equivalent 5 years degree (300 ECTS)')
+                        }
+                    }
+                });
         },
         addItem(list) {
             if (list.length < 2) {
@@ -204,21 +221,16 @@ export default {
                             }
                             if (countSame > 1) return false;
                             return true;
-                        },
+                        }
                     },
                     course_name: { required, maxLength: maxLength(200) },
                     institution: { required, maxLength: maxLength(200) },
-                    date_end: {
-                        required,
-                        dateFormat: (value) => {
-                            if (value === undefined || value === null || value === '') return true;
-                            return /^\d\d\d\d-\d\d-\d\d$/.test(value);
-                        }
-                    },
+                    date_end: { required },
                     grade: { decimal, required, minValue: minValue(0), maxValue: maxValue(20) },
                     certificate: { required },
                 }
             },
+            erasmus: {},
         },
     },
 

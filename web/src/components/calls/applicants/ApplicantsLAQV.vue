@@ -3,7 +3,7 @@
     <v-app-bar prominent app>
         <v-row  align="center">
             <v-col cols="1">
-                <img src="/images/logo/ucibio-logo.png" width="40">
+                <img src="/images/logo/laqv-logo.png" width="80">
             </v-col>
             <v-col cols="10" class="ml-auto call-title">{{data.call.call_name}} - Application page</v-col>
         </v-row>
@@ -23,9 +23,6 @@
                     Information entered will remain in this browser even if you close the window or restart the device.<br>
                     <span class="note-warning">(Exception: file inputs, should be verified before submission)</span>.<br>
                     Data you submit will be used solely for the evaluation of the application by the reviewers.
-                    <br>
-                    <br>
-                    Note: When you input dates, you can click the header of the datepicker to navigate dates easily (1 click for months, 2 clicks for years).
                 </p>
                 <p class="form-note"></p>
             <!-- </v-col> -->
@@ -59,6 +56,14 @@
             </v-expansion-panel>
             <v-expansion-panel>
                 <v-expansion-panel-header>
+                    <h2>Mobility between Institutions within the scope of Projects</h2>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <Mobility ref="mobility" v-if="gotInitialData"></Mobility>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+                <v-expansion-panel-header>
                     <h2>Papers Published in Indexed Journals</h2>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
@@ -67,7 +72,7 @@
             </v-expansion-panel>
             <v-expansion-panel>
                 <v-expansion-panel-header>
-                    <h2>Oral Communications in Scientific Meetings</h2>
+                    <h2>Presenting Author of Oral Communications in Scientific Meetings</h2>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
                     <Communications ref="communications" v-if="gotInitialData"></Communications>
@@ -75,34 +80,10 @@
             </v-expansion-panel>
             <v-expansion-panel>
                 <v-expansion-panel-header>
-                    <h2>Posters Presented in Scientifc Meetings</h2>
+                    <h2>Presenting Author of Posters Presented in Scientifc Meetings</h2>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
                     <Posters ref="posters" v-if="gotInitialData"></Posters>
-                </v-expansion-panel-content>
-            </v-expansion-panel>
-            <v-expansion-panel>
-                <v-expansion-panel-header>
-                    <h2>Prizes Received</h2>
-                </v-expansion-panel-header>
-                <v-expansion-panel-content>
-                    <Prizes ref="prizes" v-if="gotInitialData"></Prizes>
-                </v-expansion-panel-content>
-            </v-expansion-panel>
-            <v-expansion-panel>
-                <v-expansion-panel-header>
-                    <h2>Participation in Submitted Patents</h2>
-                </v-expansion-panel-header>
-                <v-expansion-panel-content>
-                    <Patents ref="patents" v-if="gotInitialData"></Patents>
-                </v-expansion-panel-content>
-            </v-expansion-panel>
-            <v-expansion-panel>
-                <v-expansion-panel-header>
-                    <h2>Professional Experience</h2>
-                </v-expansion-panel-header>
-                <v-expansion-panel-content>
-                    <ProfessionalExperience ref="professional" v-if="gotInitialData"></ProfessionalExperience>
                 </v-expansion-panel-content>
             </v-expansion-panel>
         </v-expansion-panels>
@@ -174,14 +155,12 @@
 //import time from '@/components/common/date-utils'
 import PersonalData from './PersonalData'
 import MotivationLetter from './MotivationLetter'
-import AcademicDegrees from './AcademicDegrees'
+import AcademicDegrees from './AcademicDegreesLAQV'
 import Projects from './Projects'
-import Papers from './Papers'
-import Communications from './Communications'
-import Posters from './Posters'
-import Prizes from './Prizes'
-import Patents from './Patents'
-import ProfessionalExperience from './ProfessionalExperience'
+import Mobility from './MobilityLAQV'
+import Papers from './PapersLAQV'
+import Communications from './CommunicationsLAQV'
+import Posters from './PostersLAQV'
 import ReferenceLetters from './ReferenceLetters'
 
 
@@ -191,12 +170,10 @@ export default {
         MotivationLetter,
         AcademicDegrees,
         Projects,
+        Mobility,
         Papers,
         Communications,
         Posters,
-        Prizes,
-        Patents,
-        ProfessionalExperience,
         ReferenceLetters,
     },
     data() {
@@ -207,7 +184,6 @@ export default {
                 dates: '',
                 sponsors: ''
             },
-            baseURL: '/calls/',
             gotInitialData: false,
             openPanel: [],
             formError: false,
@@ -241,23 +217,26 @@ export default {
             if (this.applicationData.application.projects.length > 0) {
                 this.openPanel.push(0);
             }
-            if (this.applicationData.application.papers.length > 0) {
+            if (this.applicationData.application.projects.length > 0) {
                 this.openPanel.push(1);
             }
-            if (this.applicationData.application.communications.length > 0) {
+            if (this.applicationData.application.papers.length > 0) {
                 this.openPanel.push(2);
             }
-            if (this.applicationData.application.posters.length > 0) {
+            if (this.applicationData.application.communications.length > 0) {
                 this.openPanel.push(3);
             }
-            if (this.applicationData.application.prizes.length > 0) {
+            if (this.applicationData.application.posters.length > 0) {
                 this.openPanel.push(4);
             }
-            if (this.applicationData.application.patents.length > 0) {
+            if (this.applicationData.application.prizes.length > 0) {
                 this.openPanel.push(5);
             }
-            if (this.applicationData.application.professional.length > 0) {
+            if (this.applicationData.application.patents.length > 0) {
                 this.openPanel.push(6);
+            }
+            if (this.applicationData.application.professional.length > 0) {
+                this.openPanel.push(7);
             }
             this.gotInitialData = true;
         },
@@ -315,12 +294,10 @@ export default {
                     {ref: 'academic', text:' - Academic Degrees'},
                     {ref: 'recommendation', text:' - Contacts for Letters of Recommendation'},
                     {ref: 'projects', text:' - Participation in Scientific Projects'},
+                    {ref: 'mobility', text:' - Mobility between Institutions in the scope of Projects'},
                     {ref: 'papers', text:' - Papers Published in Indexed Journals'},
                     {ref: 'communications', text:' - Oral Communications in Scientific Meetings'},
                     {ref: 'posters', text:' - Posters Presented in Scientifc Meetings'},
-                    {ref: 'prizes', text:' - Prizes Received'},
-                    {ref: 'patents', text:' - Participation in Submitted Patents'},
-                    {ref: 'professional', text:' - Professional Experience'},
                 ];
                 this.formError = false;
                 for (let ind in sections) {
@@ -347,11 +324,15 @@ export default {
             let data;
             if (typeStr !== 'update') {
                 this.$http.post('api/v2/calls/' + callSegment + '/applications',
-                    { data: this.applicationData.application },
+                    {
+                        data: this.applicationData.application,
+                        isLAQV: true,
+                    },
                     { }
                 )
                 .then((result) => {
                         data = result.data.data;
+                        data.isLAQV = true;
                         let uploadDocuments = [];
                         let formDataCV = new FormData();
                         formDataCV.append('doc_type_id', 1); // CV doc type
@@ -428,7 +409,10 @@ export default {
                 this.applicationData.application.sendToRecommenders = sendToRecommenders;
                 this.$http.put('api/v2/calls/' + callSegment
                         + '/applications/' + this.applicationData.application.applicationID,
-                    { data: this.applicationData.application },
+                    {
+                        data: this.applicationData.application,
+                        isLAQV: true
+                    },
                     { }
                 )
                 .then(() => {

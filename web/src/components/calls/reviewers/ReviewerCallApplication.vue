@@ -15,7 +15,10 @@
          @submit.prevent="submitForm"
     >
         <div v-if="loggedIn" class="px-4 mt-2">
-            <v-card pa-2>
+            <v-card v-if="data.isLAQV === 1" pa-2>
+                <ApplicationViewLAQV></ApplicationViewLAQV>
+            </v-card>
+            <v-card v-else pa-2>
                 <v-card-title>
                     <v-container>
                         <v-row class="applicant-name">
@@ -476,6 +479,7 @@
 </template>
 
 <script>
+import ApplicationViewLAQV from './ReviewerCallApplicationLAQV'
 
 const scoreSum = (obj, sum) => {
     if (sum === undefined) sum = 0;
@@ -499,6 +503,9 @@ const scoreSum = (obj, sum) => {
 };
 
 export default {
+    components: {
+        ApplicationViewLAQV,
+    },
     data () {
         return {
             error: false,
@@ -509,6 +516,7 @@ export default {
             data: {
                 application: {},
                 scores: {},
+                isLAQV: false,
             },
             indTotal: undefined,
             applicationCriteria: [],
@@ -618,6 +626,7 @@ export default {
                 this.callName = result.data.result.call.call_name
                 this.data.application = result.data.result.application;
                 this.applicationCriteria = result.data.result.applicationCriteria;
+                this.data.isLAQV = result.data.result.call.is_laqv;
 
                 for (let ind in this.data.application.reviewerScores) {
                     for (let indAuto in this.data.application.automaticScores) {

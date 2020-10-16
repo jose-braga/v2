@@ -40,9 +40,11 @@
                 <template v-slot:top>
                     <v-dialog v-model="dialog" max-width="1600px">
                         <v-card>
+                            <!--
                             {{editedItem.most_recent_data.show_add_more_recent}}
                             {{$v.editedItem.most_recent_data.valid_until}}
                             {{$v.$invalid}}
+                            -->
                             <v-form @submit.prevent="submitForm(editedItem)">
                                 <v-card-title>
                                     <span class="headline">{{ editedItem.name }}</span>
@@ -275,6 +277,7 @@ function processForSpreadsheet(members) {
         thisMember.valid_until = members[ind].most_recent_data.valid_until;
         thisMember.valid_from = members[ind].most_recent_data.valid_from;
         thisMember.association_key = members[ind].researcher_details[0].association_key;
+        thisMember.ciencia_id = members[ind].researcher_details[0].ciencia_id;
         thisMember.ORCID = members[ind].researcher_details[0].ORCID;
 
         membersCurated.push(thisMember);

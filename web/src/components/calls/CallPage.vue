@@ -3,14 +3,10 @@
     <v-app-bar prominent app>
         <v-row align="center">
             <v-col cols="2">
-                <img src="/images/logo/ucibio-logo.png" width="40">
+                <img v-if="isLaqv" src="/images/logo/laqv-logo.png" width="80">
+                <img v-else src="/images/logo/ucibio-logo.png" width="40">
             </v-col>
-            <!--
-            <v-col>
-                <img src="/images/logo/laqv-logo.png" width="64">
-            </v-col>
-            -->
-            <v-col cols="10"
+            <v-col cols="9"
                 class="">{{data.call.call_name}}
             </v-col>
         </v-row>
@@ -77,6 +73,7 @@ export default {
                 sponsors: ''
             },
             baseURL: '/calls/',
+            isLaqv: false,
 
         }
     },
@@ -87,6 +84,16 @@ export default {
     },
     methods: {
         initialize(callSegment) {
+            if(this.$route.path.includes('/laqv/')) {
+                this.isLaqv = true;
+            } else {
+                this.isLaqv = false;
+            }
+            if (!this.isLaqv) {
+                this.baseURL = '/calls/';
+            } else {
+                this.baseURL = '/laqv/calls/';
+            }
             this.data.urlApplicants = this.baseURL + callSegment + '/applicants';
             this.data.urlReviewers = '/reviewers';
         },

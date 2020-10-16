@@ -11,30 +11,37 @@
             ></CurrentMembers>
         </v-col>
     </v-row>
-    <!--
     <v-row>
         <v-col cols="12">
-            <PastMembers></PastMembers>
+            <PastMembers
+                :segment-type="segmentType"
+                :unit-id="unitId"
+                :city-id="cityId"
+                :unit-data="unitData"
+                :city-data="cityData"
+            ></PastMembers>
         </v-col>
     </v-row>
-    -->
 </v-container>
 </template>
 
 <script>
 import CurrentMembers from './CurrentMembersList'
+import PastMembers from './PastMembersList'
+
 
 export default {
-     components: {
-        CurrentMembers,
-     },
-     props: {
-        segmentType: String,
-        unitId: Number,
-        cityId: Number,
-        unitData: Object,
-        cityData: Object,
-     }
+    components: {
+       CurrentMembers,
+       PastMembers,
+    },
+    props: {
+       segmentType: String,
+       unitId: Number,
+       cityId: Number,
+       unitData: Object,
+       cityData: Object,
+    }
 
 }
 </script>

@@ -166,7 +166,18 @@ var actionGetNuclearInfo = function (options) {
 
 module.exports.getNuclearInfo = function (req, res, next) {
     permissions.checkPermissions(
-        (options) => { actionGetNuclearInfo(options) },
+        (options) => {
+            if (req.originalUrl.includes('/api/managers/')) {
+                permissions.checkResourceLocation(
+                    (options) => {
+                        return actionGetNuclearInfo(options);
+                    },
+                    options
+                )
+            } else {
+                return actionGetNuclearInfo(options);
+            }
+        },
         { req, res, next }
     );
 };
@@ -239,29 +250,3 @@ module.exports.updateNuclearInfo = function (req, res, next) {
 };
 
 
-/* TODO:
-    // when changing to X DevAPI
-    pool.getSession()
-        .then(session => {
-            return session.getSchema(process.env.DB_DB)
-                .getTable('people')
-                .select()
-                .where('name LIKE :name')
-                .bind('name', '%Romão%')
-                .execute()
-                ;
-        })
-        .then((result) => {
-            console.log(result)
-            sendJSONResponse(res, 200,
-                {
-                    "status": "success", "statusCode": 200, "message": "Fixe!"
-                });
-
-        })
-        .catch((err) => {
-            console.log(err)
-        });
-
-    return;
-*/
