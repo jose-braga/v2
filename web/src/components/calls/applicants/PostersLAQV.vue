@@ -54,7 +54,7 @@
                     offset-y min-width="290px">
                     <template v-slot:activator="{ on }">
                         <v-text-field v-model="v.$model.date"
-                            @input="addValue"
+                            @input="v.date.$touch(); addValue()"
                             label="Date" v-on="on">
                         </v-text-field>
                     </template>
@@ -62,6 +62,9 @@
                             @input="v.$model.show_date_end = false; addValue()"
                             no-title></v-date-picker>
                 </v-menu>
+                <div v-if="v.date.$error">
+                    <p v-if="!v.date.dateFormat" class="caption red--text">Format should be<br>YYYY-MM-DD.</p>
+                </div>
             </v-col>
             <v-col cols="1" sm="1">
                 <v-btn icon @click="removeItem(data.posters, i)" class="mt-3">
@@ -136,7 +139,12 @@ export default {
                     authors_raw: { required, maxLength: maxLength(5000) },
                     title: { required, maxLength: maxLength(500) },
                     meeting_name: { required, maxLength: maxLength(500) },
-                    date: {},
+                    date: {
+                        dateFormat: (value) => {
+                            if (value === undefined || value === null || value === '') return true;
+                            return /^\d\d\d\d-\d\d-\d\d$/.test(value);
+                        }
+                    },
                 }
             },
         },

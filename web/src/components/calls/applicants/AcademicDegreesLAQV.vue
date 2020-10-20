@@ -71,6 +71,7 @@
                 </v-menu>
                 <div v-if="v.date_end.$error">
                     <p v-if="!v.date_end.required" class="caption red--text">Input required.</p>
+                    <p v-if="!v.date_end.dateFormat" class="caption red--text">Format should be<br>YYYY-MM-DD.</p>
                 </div>
             </v-col>
             <v-col cols="4" sm="2">
@@ -225,7 +226,12 @@ export default {
                     },
                     course_name: { required, maxLength: maxLength(200) },
                     institution: { required, maxLength: maxLength(200) },
-                    date_end: { required },
+                    date_end: { required,
+                        dateFormat: (value) => {
+                            if (value === undefined || value === null || value === '') return true;
+                            return /^\d\d\d\d-\d\d-\d\d$/.test(value);
+                        }
+                    },
                     grade: { decimal, required, minValue: minValue(0), maxValue: maxValue(20) },
                     certificate: { required },
                 }

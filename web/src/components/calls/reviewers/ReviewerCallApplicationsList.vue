@@ -76,6 +76,9 @@ export default {
         $route () {
             this.getReviewerCallApplications();
         },
+        reviewerName () {
+            this.getReviewerCallApplications();
+        },
     },
     methods: {
         getReviewerCallApplications () {

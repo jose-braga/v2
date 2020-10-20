@@ -54,6 +54,7 @@
                 </v-text-field>
                 <div v-if="v.start_date.$error">
                     <p v-if="!v.start_date.required" class="caption red--text">Field is required.</p>
+                    <p v-if="!v.start_date.dateFormat" class="caption red--text">Format should be<br>YYYY-MM-DD.</p>
                 </div>
             </v-col>
             <v-col cols="12" sm="2">
@@ -152,7 +153,12 @@ export default {
                     reference: { required, maxLength: maxLength(100)},
                     title: { required, maxLength: maxLength(500)},
                     institution: { required, maxLength: maxLength(200)},
-                    start_date: { required },
+                    start_date: { required,
+                        dateFormat: (value) => {
+                            if (value === undefined || value === null || value === '') return true;
+                            return /^\d\d\d\d-\d\d-\d\d$/.test(value);
+                        }
+                    },
                     duration: { maxLength: maxLength(45)},
                     additional: { maxLength: maxLength(1000) }
                 }

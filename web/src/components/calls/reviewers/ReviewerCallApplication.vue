@@ -14,7 +14,7 @@
     <v-form ref="form"
          @submit.prevent="submitForm"
     >
-        <div v-if="loggedIn" class="px-4 mt-2">
+        <div v-if="loggedIn && indTotal !== undefined" class="px-4 mt-2">
             <v-card v-if="data.isLAQV === 1" pa-2>
                 <ApplicationViewLAQV></ApplicationViewLAQV>
             </v-card>

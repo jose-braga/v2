@@ -69,30 +69,71 @@ var actionGetCallApplications = function (options) {
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'SELECT applications.*,'
-                        + ' applicants.name AS applicant_name, application_reviewer_applications.reviewed'
+                        + ' applicants.name AS applicant_name'
                         + ' FROM applications'
                         + ' JOIN applicants ON applicants.application_id = applications.id'
-                        + ' LEFT JOIN application_reviewer_applications ON application_reviewer_applications.application_id = applications.id'
                         + ' WHERE applications.call_id = ?'
                         + ' ORDER BY applicants.name;';
     places.push(call.id)
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             options.applications = resQuery;
-            return responses.sendJSONResponseOptions({
-                response: res,
-                status: 200,
-                message: {
-                    "status": "success", "statusCode": 200,
-                    "count": options.applications.length,
-                    "result": {
-                        call: options.call,
-                        applications: options.applications,
-                    }
-                }
-            });
+            options.i = 0
+            return getApplicationsReviewerStatus(options)
         },
         options);
+};
+var getApplicationsReviewerStatus = function (options) {
+    let { req, res, next, call, applications, i } = options;
+    let reviewerID = req.params.reviewerID;
+    if (applications.length > 0 ) {
+        var querySQL = '';
+        var places = [];
+        querySQL = querySQL + 'SELECT reviewed'
+                            + ' FROM application_reviewer_applications'
+                            + ' WHERE application_id = ? AND reviewer_id = ?;';
+        places.push(applications[i].id, reviewerID)
+        return sql.getSQLOperationResult(req, res, querySQL, places,
+            (resQuery, options) => {
+                if (resQuery.length === 0) {
+                    options.applications[i].reviewed = null;
+                } else {
+                    options.applications[i].reviewed = resQuery[0].reviewed;
+                }
+                if (i + 1 < applications.length) {
+                    options.i = i + 1;
+                    return getApplicationsReviewerStatus(options);
+                } else {
+                    return responses.sendJSONResponseOptions({
+                        response: res,
+                        status: 200,
+                        message: {
+                            "status": "success", "statusCode": 200,
+                            "count": options.applications.length,
+                            "result": {
+                                call: options.call,
+                                applications: options.applications,
+                            }
+                        }
+                    });
+                }
+            },
+            options);
+    } else {
+        return responses.sendJSONResponseOptions({
+            response: res,
+            status: 200,
+            message: {
+                "status": "success", "statusCode": 200,
+                "count": options.applications.length,
+                "result": {
+                    call: options.call,
+                    applications: options.applications,
+                }
+            }
+        });
+    }
+
 };
 module.exports.getCallApplications = function (req, res, next) {
     permissions.checkPermissionsReviewers(
@@ -107,18 +148,16 @@ var actionGetApplicationInfo = function (options) {
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'SELECT applications.*,'
-                        + ' applicants.name AS applicant_name, applicants.erasmus_experience,'
-                        + ' application_reviewer_applications.reviewed'
+                        + ' applicants.name AS applicant_name, applicants.erasmus_experience'
                         + ' FROM applications'
                         + ' JOIN applicants ON applicants.application_id = applications.id'
-                        + ' LEFT JOIN application_reviewer_applications ON application_reviewer_applications.application_id = applications.id'
                         + ' WHERE applications.id = ?;';
     places.push(applicationID)
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             if (resQuery.length === 1) {
                 options.application = resQuery[0];
-                return getApplicationMotivationLetter(options);
+                return getApplicationReviewerStatus(options);
             } else {
                 return responses.sendJSONResponseOptions({
                     response: res,
@@ -130,6 +169,27 @@ var actionGetApplicationInfo = function (options) {
                     }
                 });
             }
+        },
+        options);
+};
+var getApplicationReviewerStatus = function (options) {
+    let { req, res, next, application} = options;
+    let applicationID = req.params.applicationID;
+    let reviewerID = req.params.reviewerID;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT reviewed'
+                        + ' FROM application_reviewer_applications'
+                        + ' WHERE application_id = ? AND reviewer_id = ?;';
+    places.push(applicationID, reviewerID)
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            if (resQuery.length === 0) {
+                options.application.reviewed = null;
+            } else {
+                options.application.reviewed = resQuery[0].reviewed;
+            }
+            return getApplicationMotivationLetter(options);
         },
         options);
 };

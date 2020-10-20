@@ -78,6 +78,17 @@
                                     </v-expansion-panel-header>
                                     <v-expansion-panel-content>
                                         <v-expansion-panels
+                                            v-if="data.isLAQV === 1"
+                                            multiple
+                                        >
+                                            <ManagerCallApplicationsListLAQV
+                                                :scores="data.scores[ind][indRev][indTotal[ind]].children"
+                                                :application="applications[ind]"
+                                            >
+                                            </ManagerCallApplicationsListLAQV>
+                                        </v-expansion-panels>
+                                        <v-expansion-panels
+                                            v-else
                                             multiple
                                         >
                                             <v-expansion-panel
@@ -402,6 +413,7 @@
 </template>
 
 <script>
+import ManagerCallApplicationsListLAQV from './ManagerCallApplicationsListLAQV'
 import time from '@/components/common/date-utils'
 import XLSX from 'xlsx'
 
@@ -450,12 +462,16 @@ function processForSpreadsheet(items) {
 }
 
 export default {
+    components: {
+        ManagerCallApplicationsListLAQV,
+    },
     data () {
         return {
             callName: '',
             applications: [],
             data: {
                 scores: [],
+                isLAQV: false,
             },
             indTotal: [],
 
@@ -489,6 +505,7 @@ export default {
             )
             .then((result) => {
                 this.callName = result.data.result.call.call_name
+                this.data.isLAQV = result.data.result.call.is_laqv;
                 this.applications = result.data.result.applications;
                 for (let ind in this.applications) {
                     let datetime = time.moment(this.applications[ind].submitted).tz('Europe/Lisbon');

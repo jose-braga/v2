@@ -32,7 +32,6 @@
                 <v-expansion-panels
                     multiple
                 >
-                    <!-- v-for="(criteria1, key1) in data.scores[indTotal].children" -->
                     <v-expansion-panel
                         v-for="(criteria1, key1) in data.scores[indTotal].children"
                         :key="key1"
@@ -278,7 +277,7 @@
                                                 </v-card-text>
                                                 <v-container >
                                                     <v-row v-for="(answer, j) in datum.answers"
-                                                        :key="key1 + '-' + key2 + '-' + key3 + '-' + i + '-' + j"
+                                                        :key="key1 + '-' + i + '-' + j"
                                                         dense
                                                         class="pre-formatted"
                                                     >

@@ -23,6 +23,8 @@
                     Information entered will remain in this browser even if you close the window or restart the device.<br>
                     <span class="note-warning">(Exception: file inputs, should be verified before submission)</span>.<br>
                     Data you submit will be used solely for the evaluation of the application by the reviewers.
+                    <br><br>
+                    Note: When you input dates, you can click the header of the datepicker to navigate dates easily (1 click for months, 2 clicks for years).
                 </p>
                 <p class="form-note"></p>
             <!-- </v-col> -->

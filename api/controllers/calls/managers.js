@@ -163,6 +163,22 @@ var getApplicationProjects = function (options) {
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             options.applications[i].projects = resQuery;
+            return getApplicationMobility(options);
+        },
+        options);
+};
+var getApplicationMobility = function (options) {
+    let { req, res, next, applications, i } = options;
+    let application = applications[i];
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT *'
+                        + ' FROM application_mobility'
+                        + ' WHERE application_id = ?;';
+    places.push(application.id)
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            options.applications[i].mobility = resQuery;
             return getApplicationPapers(options);
         },
         options);
@@ -415,6 +431,7 @@ var getApplicationReviewerReviewed = function (options) {
     querySQL = querySQL + 'SELECT reviewed'
                         + ' FROM application_reviewer_applications'
                         + ' WHERE application_id = ? AND reviewer_id = ?;';
+
     places.push(application.id, reviewer.reviewer_id);
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
@@ -451,7 +468,7 @@ var getApplicationReviewerScores = function (options) {
             options.applications[i].reviewers[j].reviewerScores = resQuery;
             if (j + 1 < options.applications[i].reviewers.length) {
                 options.j = j + 1;
-                return getApplicationReviewerScores(options)
+                return getApplicationReviewerReviewed(options)
             } else if (i + 1 < options.applications.length) {
                 options.j = 0;
                 options.i = i + 1;
@@ -475,10 +492,6 @@ var getApplicationReviewerScores = function (options) {
         options);
 
 };
-
-
-
-
 
 module.exports.getCallApplications = function (req, res, next) {
     permissions.checkPermissionsCallManagers(

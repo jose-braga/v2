@@ -277,7 +277,10 @@ var createAcademicDegrees = function (options) {
         var querySQL = '';
         var places = [];
         let degree = data.academicDegrees[i];
-        if (degree.date_end === '') {
+        if (degree.date_end === ''
+            || degree.date_end === null
+            || degree.date_end === undefined
+        ) {
             degree.date_end = null;
         }
         querySQL = querySQL + 'INSERT INTO application_academic_degrees'
@@ -390,7 +393,9 @@ var createMobility = function (options) {
         var querySQL = '';
         var places = [];
         let mobility = data.mobility[i];
-        if (mobility.start_date === '') {
+        if (mobility.start_date === ''
+            || mobility.start_date === null
+            || mobility.start_date === undefined) {
             mobility.start_date = null;
         }
         querySQL = querySQL + 'INSERT INTO application_mobility'
@@ -503,7 +508,9 @@ var createCommunications = function (options) {
         var querySQL = '';
         var places = [];
         let communication = data.communications[i];
-        if (communication.date === '') {
+        if (communication.date === ''
+            || communication.date === null
+            || communication.date === undefined) {
             communication.date = null;
         }
         let year = null;
@@ -564,7 +571,9 @@ var createPosters = function (options) {
         var querySQL = '';
         var places = [];
         let poster = data.posters[i];
-        if (poster.date === '') {
+        if (poster.date === ''
+            || poster.date === null
+            || poster.date === undefined) {
             poster.date = null;
         }
         let year = null;
@@ -730,6 +739,16 @@ var createProfessional = function (options) {
         var querySQL = '';
         var places = [];
         let professional = data.professional[i];
+        if (professional.date_start === ''
+            || professional.date_start === null
+            || professional.date_start === undefined) {
+            professional.date = null;
+        }
+        if (professional.date_end === ''
+            || professional.date_end === null
+            || professional.date_end === undefined) {
+            professional.date = null;
+        }
         querySQL = querySQL + 'INSERT INTO application_professional_experience'
                             + ' (application_id, company, business_areas, date_start, date_end)'
                             + ' VALUES (?, ?, ?, ?, ?);';

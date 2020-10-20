@@ -21,7 +21,7 @@
                 <v-row>
                     <v-col cols="12">
                         Please answer the quick questions and write a letter of reference below.
-                        If you do not want to fill this form for this applicant please contact xx@plpl.com (mail a definir).
+                        If you do not want to fill this form for this applicant please contact josebraga@fct.unl.pt.
                     </v-col>
                 </v-row>
                 <v-row v-for="(v, i) in $v.questions.$each.$iter"
