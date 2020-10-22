@@ -11,13 +11,79 @@
     <div v-if="loggedIn" class="px-4">
         <v-card pa-2>
             <v-card-title>
-                <span class="headline">List of calls you are associated to (as a reviewer):</span>
+                <span class="headline">Under review calls:</span>
             </v-card-title>
             <v-container>
                 <v-row align="center">
                     <v-col cols="12">
                         <ul>
-                            <li v-for="(call, i) in calls"
+                            <li v-for="(call, i) in underReviewCalls"
+                                :key="i"
+                            >
+                                <router-link :to="baseURL + call.call_url_segment">
+                                    <b>{{call.call_name}}</b>
+                                </router-link> - Open from
+                                {{call.date_from_show}}, {{call.time_from_show}}
+                                to
+                                {{call.date_until_show}}, {{call.time_until_show}}.
+                                <b>Reviewer deadline: {{call.date_reviewer_deadline_show}}</b>
+                            </li>
+                        </ul>
+                    </v-col>
+                </v-row>
+            </v-container>
+            <v-card-title>
+                <span class="headline">List of open calls:</span>
+            </v-card-title>
+            <v-container>
+                <v-row align="center">
+                    <v-col cols="12">
+                        <ul>
+                            <li v-for="(call, i) in openCalls"
+                                :key="i"
+                            >
+                                <router-link :to="baseURL + call.call_url_segment">
+                                    <b>{{call.call_name}}</b>
+                                </router-link> - Open from
+                                {{call.date_from_show}}, {{call.time_from_show}}
+                                to
+                                {{call.date_until_show}}, {{call.time_until_show}}.
+                                <b>Reviewer deadline: {{call.date_reviewer_deadline_show}}</b>
+                            </li>
+                        </ul>
+                    </v-col>
+                </v-row>
+            </v-container>
+            <v-card-title>
+                <span class="headline">Past calls:</span>
+            </v-card-title>
+            <v-container>
+                <v-row align="center">
+                    <v-col cols="12">
+                        <ul>
+                            <li v-for="(call, i) in pastCalls"
+                                :key="i"
+                            >
+                                <router-link :to="baseURL + call.call_url_segment">
+                                    <b>{{call.call_name}}</b>
+                                </router-link> - Open from
+                                {{call.date_from_show}}, {{call.time_from_show}}
+                                to
+                                {{call.date_until_show}}, {{call.time_until_show}}.
+                                <b>Reviewer deadline: {{call.date_reviewer_deadline_show}}</b>
+                            </li>
+                        </ul>
+                    </v-col>
+                </v-row>
+            </v-container>
+            <v-card-title>
+                <span class="headline">Other calls:</span>
+            </v-card-title>
+            <v-container>
+                <v-row align="center">
+                    <v-col cols="12">
+                        <ul>
+                            <li v-for="(call, i) in otherCalls"
                                 :key="i"
                             >
                                 <router-link :to="baseURL + call.call_url_segment">
@@ -47,6 +113,10 @@ export default {
     data () {
         return {
             calls: [],
+            openCalls: [],
+            underReviewCalls: [],
+            pastCalls: [],
+            otherCalls: [],
             baseURL: '/reviewers/calls/',
             data: {
             }
@@ -104,6 +174,22 @@ export default {
                         this.$set(this.calls[ind], 'date_reviewer_deadline_show', '+∞');
                         this.$set(this.calls[ind], 'time_reviewer_deadline_show','');
                     }
+                    let now = time.moment().tz('Europe/Lisbon').format();
+                    if (this.calls[ind].valid_until !== null
+                        && this.calls[ind].reviewer_deadline !== null
+                        && this.calls[ind].results_deadline !== null
+                    ) {
+                        if (now <= this.calls[ind].valid_until) {
+                            this.openCalls.push(this.calls[ind]);
+                        } else if (now <= this.calls[ind].reviewer_deadline) {
+                            this.underReviewCalls.push(this.calls[ind])
+                        } else {
+                            this.pastCalls.push(this.calls[ind])
+                        }
+                    } else {
+                        this.otherCalls.push(this.calls[ind])
+                    }
+
                 }
             })
             .catch( (error) => {
