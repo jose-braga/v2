@@ -11,11 +11,18 @@ router.options('*', cors())
 var authentication = require('../controllers/authentication/authentication');
 // authentication routes
 router.post('/login', cors(corsOptions), authentication.login);
+router.put('/change-password/:userID', cors(corsOptions), authentication.changePassword);
+
+router.post('/generate-recovery', cors(corsOptions), authentication.generateRecovery);
+router.post('/recovery-login', cors(corsOptions), authentication.recoveryLogin);
+router.put('/recovery-change-password/:userID', cors(corsOptions), authentication.recoveryChangePassword);
+
 router.post('/pre-registration-login', cors(corsOptions), authentication.preRegistrationLogin);
+
 router.post('/recommendation-login', cors(corsOptions), authentication.recommendationLogin);
 router.post('/reviewer-login', cors(corsOptions), authentication.reviewerLogin);
-router.put('/change-password/:userID', cors(corsOptions), authentication.changePassword);
 router.put('/reviewer-change-password/:reviewerID', cors(corsOptions), authentication.reviewerChangePassword);
+
 
 router.use(function (req, res, next) {
   var err = new Error('Not Found');

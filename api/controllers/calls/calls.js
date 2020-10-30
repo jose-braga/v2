@@ -337,6 +337,9 @@ var createProjects = function (options) {
         var querySQL = '';
         var places = [];
         let project = data.projects[i];
+        if (project.year_end === '') {
+            project.year_end = null;
+        }
         querySQL = querySQL + 'INSERT INTO application_projects'
                             + ' (application_id, reference, title, acronym,'
                             + ' principal_investigator, participation,'
@@ -1517,7 +1520,6 @@ var computeScoreDegreesLAQV = function (options) {
         if (data.erasmus && score >= 0.0) {
             score = score + erasmusBonus;
         }
-        console.log('final:',score)
         options.criteria[indCriteria].score_auto = Math.min(score, 5.0)
 
     }

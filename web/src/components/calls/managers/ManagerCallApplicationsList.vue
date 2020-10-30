@@ -48,6 +48,15 @@
                             </div>
                         </v-expansion-panel-header>
                         <v-expansion-panel-content>
+                            <ul class="mb-8">
+                                <li><b>Email:</b> {{application.applicant.email}}</li>
+                                <li><b>Address:</b> {{application.applicant.address}},
+                                    {{application.applicant.postal_code}}, {{application.applicant.city}}
+                                </li>
+                                <li><b>ID card:</b> {{application.applicant.document_number}},
+                                        valid until: {{application.applicant.document_valid_until | formatDate}}
+                                </li>
+                            </ul>
                             <v-expansion-panels
                                 multiple
                                 class="px-2"
@@ -442,6 +451,7 @@ function processForSpreadsheet(items) {
     for (let ind in items) {
         let thisItem = {};
         thisItem.applicant_name = items[ind].applicant_name;
+        thisItem.email = items[ind].applicant.email;
         thisItem.submission_time = items[ind].date_submitted + ' ' + items[ind].time_submitted;
         thisItem.score_average = items[ind].score_average;
         for (let indRev in items[ind].reviewers) {

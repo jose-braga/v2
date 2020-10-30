@@ -1,6 +1,7 @@
 import VueRouter from 'vue-router'
 
 import myself from './sections/myself'
+import passwordRecovery from './sections/recovery'
 import onBehalf from './sections/on-behalf'
 import team from './sections/team'
 import group from './sections/group'
@@ -17,6 +18,7 @@ let routes1 = [
         redirect: '/person/personal'
     },
     myself,
+    passwordRecovery,
     onBehalf,
     team,
     group,

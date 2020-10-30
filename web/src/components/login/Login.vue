@@ -1,10 +1,49 @@
 <template>
     <v-dialog v-model="dialog"
             @input="v => v || closeDialog()"
-            max-width="400px">
+            class="pa-2"
+            max-width="470px">
         <v-form ref="form"
-                @submit.prevent="submitForm">
-            <v-card pa-2>
+                @submit.prevent="submitForm"
+        >
+            <v-card v-show="forgotPassword" class="pa-2">
+                <v-card-title>
+                    <span class="headline">I forgot my password...</span>
+                </v-card-title>
+                <v-row class="px-2">
+                    <v-col cols="12">
+                        <v-text-field
+                            v-model.trim="$v.data.recoveryString.$model"
+                            label="Email or username*">
+                        </v-text-field>
+                        <div v-if="!$v.data.recoveryString.required">
+                            <p class="caption red--text">Email or username needed.</p>
+                        </div>
+                    </v-col>
+                </v-row>
+                <v-row class="pa-2">
+                    <v-col v-if="formError" cols="12">
+                        <div>
+                            <p class="caption red--text">Unable to submit form.</p>
+                        </div>
+                    </v-col>
+                    <v-col cols="12" v-if="errorRecovery">
+                        <p class="caption red--text">{{ errorRecoveryMessage }}</p>
+                    </v-col>
+                    <v-col cols="12" v-if="recovered">
+                        <p class="caption blue--text">Success! Check your email.</p>
+                    </v-col>
+                    <v-col cols="12">
+                        <v-btn color="red darken-1" outlined
+                                @click="recover">Send recovery email</v-btn>
+                    </v-col>
+                    <v-col cols="12">
+                        <v-btn color="blue darken-1" outlined
+                                @click="showForgot">Back</v-btn>
+                    </v-col>
+                </v-row>
+            </v-card>
+            <v-card v-show="!forgotPassword" class="pa-2">
                 <v-card-title>
                     <span class="headline">Fill in login credentials</span>
                 </v-card-title>
@@ -62,48 +101,60 @@
                         </v-col>
                     </v-row>
                 </v-container>
-                <v-card-actions>
-                    <v-container>
-                        <v-row justify="center" align-content="center">
-                            <v-col v-show="!showChangePassword">
-                                <v-btn type="submit"
-                                        v-show="!showChangePassword"
-                                        color="blue darken-1" outlined>
-                                        Login</v-btn>
-                            </v-col>
-                            <v-col v-show="!showChangePassword">
-                                <v-btn color="blue darken-1" outlined
-                                        v-show="!showChangePassword"
-                                        @click="changePassword">Change Password</v-btn>
-                            </v-col>
-                            <v-col v-show="showChangePassword">
-                                <v-btn color="blue darken-1" outlined
-                                        v-show="showChangePassword"
-                                        @click="submitChange">Submit</v-btn>
-                            </v-col>
-                            <v-col cols="12" v-if="loginError">
-                                <p class="caption red--text">There was a problem with your login!</p>
-                            </v-col>
-                            <v-col cols="12" v-if="changePasswordError">
-                                <p class="caption red--text">There was a problem changing password!</p>
-                            </v-col>
-                        </v-row>
-                    </v-container>
-                </v-card-actions>
+                <v-row class="pa-2"
+                    justify="center"
+                    align-content="center"
+                >
+                    <v-col cols="5" v-show="!showChangePassword">
+                        <v-btn type="submit"
+                                v-show="!showChangePassword"
+                                color="blue darken-1" outlined>
+                                Login</v-btn>
+                    </v-col>
+                    <v-col cols="7" v-show="!showChangePassword">
+                        <v-btn color="blue darken-1" outlined
+                                v-show="!showChangePassword"
+                                @click="changePassword">Change Password</v-btn>
+                    </v-col>
+                    <v-col cols="6" v-show="showChangePassword">
+                        <v-btn color="blue darken-1" outlined
+                                v-show="showChangePassword"
+                                @click="submitChange">Submit</v-btn>
+                    </v-col>
+                    <v-col cols="12" v-if="loginError">
+                        <p class="caption red--text">There was a problem with your login!</p>
+                    </v-col>
+                    <v-col cols="12" v-if="changePasswordError">
+                        <p class="caption red--text">There was a problem changing password!</p>
+                    </v-col>
+
+                </v-row>
+                <v-row class="pa-2">
+                    <v-col cols="12">
+                        <v-btn color="red darken-1" outlined
+                                @click="showForgot()">I forgot my credentials</v-btn>
+                    </v-col>
+                </v-row>
             </v-card>
         </v-form>
     </v-dialog>
 </template>
 
 <script>
-import {required, requiredIf, sameAs} from 'vuelidate/lib/validators'
+import { requiredIf, sameAs } from 'vuelidate/lib/validators'
 
 export default {
+    components: {
+    },
     data() {
         return {
             passwordLabel: 'Password',
             showChangePassword: false,
+            forgotPassword: false,
             loginError: false,
+            errorRecovery: false,
+            errorRecoveryMessage: '',
+            recovered: false,
             changePasswordError: false,
             formError: false,
             data: {
@@ -111,6 +162,7 @@ export default {
                 password: undefined,
                 newPassword: undefined,
                 newPasswordConfirm: undefined,
+                recoveryString: '',
             }
         }
     },
@@ -176,7 +228,7 @@ export default {
                     });
             }
         },
-        submitChange: function () {
+        submitChange () {
             if (this.$v.$invalid) {
                 this.formError = true;
                 setTimeout(() => {this.formError = false;}, 3000)
@@ -218,24 +270,76 @@ export default {
             }
 
         },
-        changePassword: function () {
+        changePassword () {
             this.showChangePassword = true;
             this.passwordLabel = 'Old Password';
         },
-        closeDialog: function () {
+        recover () {
+            if (this.$v.$invalid) {
+                this.formError = true;
+                setTimeout(() => {this.formError = false;}, 3000)
+            } else {
+                const urlSubmit = 'api/generate-recovery';
+                return this.$http.post(
+                    urlSubmit,
+                    {
+                        recoveryString: this.data.recoveryString,
+                    }, {})
+                .then(() => {
+                    this.recovered = true;
+                })
+                .catch( (error) => {
+                    console.log(error);
+                    if (error.response) {
+                        this.errorRecovery = true;
+                        this.errorRecoveryMessage = error.response.data.message;
+                        setTimeout(() => {
+                            this.errorRecovery = false;
+                            this.errorRecoveryMessage = '';
+                        }, 3000)
+                    }
+                })
+
+            }
+
+
+        },
+        closeDialog () {
             this.showChangePassword = false;
             this.passwordLabel = 'Password';
-        }
+        },
+        showForgot () {
+            this.forgotPassword = !this.forgotPassword;
+        },
     },
     validations: {
         data: {
-            username: {required},
-            password: {required},
-            newPassword: {required: requiredIf(function () { return this.showChangePassword})},
+            username: {
+                required: requiredIf(function () {
+                    return !this.forgotPassword
+                })
+            },
+            password: {
+                required: requiredIf(function () {
+                    return !this.forgotPassword
+                })
+            },
+            newPassword: {
+                required: requiredIf(function () {
+                    return this.showChangePassword && !this.forgotPassword
+                })
+            },
             newPasswordConfirm: {
-                required: requiredIf(function () { return this.showChangePassword}),
+                required: requiredIf(function () {
+                    return this.showChangePassword && !this.forgotPassword
+                }),
                 confirmPassword: sameAs('newPassword')
-            }
+            },
+            recoveryString: {
+                required: requiredIf(function () {
+                    return this.forgotPassword
+                }),
+            },
         }
     }
 }
