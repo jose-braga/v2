@@ -428,7 +428,7 @@ var getApplicationReviewerReviewed = function (options) {
     let reviewer = application.reviewers[j];
     var querySQL = '';
     var places = [];
-    querySQL = querySQL + 'SELECT reviewed'
+    querySQL = querySQL + 'SELECT reviewed, ignore_score'
                         + ' FROM application_reviewer_applications'
                         + ' WHERE application_id = ? AND reviewer_id = ?;';
 
@@ -437,8 +437,16 @@ var getApplicationReviewerReviewed = function (options) {
         (resQuery, options) => {
             if (resQuery.length === 1) {
                 options.applications[i].reviewers[j].reviewed = resQuery[0].reviewed;
+                options.applications[i].reviewers[j].ignore_score = resQuery[0].ignore_score;
             } else if (resQuery.length === 0) {
                 options.applications[i].reviewers[j].reviewed = 0;
+                if (options.applications[i].reviewers[j].is_surrogate === null
+                    || options.applications[i].reviewers[j].is_surrogate === 0) {
+                    options.applications[i].reviewers[j].ignore_score = 0;
+                } else if (options.applications[i].reviewers[j].is_surrogate === 1) {
+                    options.applications[i].reviewers[j].ignore_score = 1;
+                }
+
             } else {
                 //should not happen
             }
