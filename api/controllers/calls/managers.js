@@ -507,6 +507,89 @@ module.exports.getCallApplications = function (req, res, next) {
         { req, res, next }
     );
 }
+var actionCheckReviewerExistence = function (options) {
+    let { req, res, next } = options;
+    let applicationID = req.params.applicationID;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT *'
+                        + ' FROM application_reviewer_applications'
+                        + ' WHERE application_id = ?;';
+    places.push(applicationID)
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            options.reviewers_status = resQuery;
+            if (req.body.data.application.reviewers.length > 0) {
+                options.i = 0;
+                return updateApplicationReviewers(options)
+            } else {
+                return responses.sendJSONResponseOptions({
+                    response: res,
+                    status: 200,
+                    message: "No operation performed."
+                });
+            }
+        },
+        options);
+};
+var updateApplicationReviewers = function (options) {
+    let { req, res, next, reviewers_status, i } = options;
+    let applicationID = req.params.applicationID;
+    let reviewer = req.body.data.application.reviewers[i];
+    let found = false;
+    for (let ind in reviewers_status) {
+        if(reviewers_status[ind].reviewer_id === reviewer.id) {
+            found = true;
+            break;
+        }
+    }
+    let ignore_score = 0;
+    if (reviewer.use_score !== null) {
+        if (reviewer.use_score === 0 || reviewer.use_score === false) {
+            ignore_score = 1
+        } else if (reviewer.use_score === 1 || reviewer.use_score === true) {
+            ignore_score = 0;
+        }
+    }
+    var querySQL = '';
+    var places = [];
+    if (found) {
+        querySQL = querySQL + 'UPDATE '
+                            + ' application_reviewer_applications'
+                            + ' SET ignore_score = ?'
+                            + ' WHERE application_id = ? AND reviewer_id = ?;';
+        places.push(ignore_score, applicationID, reviewer.id);
+    } else {
+        querySQL = querySQL + 'INSERT INTO application_reviewer_applications'
+                            + ' (application_id, reviewer_id, ignore_score)'
+                            + ' VALUES (?, ?, ?);';
+        places.push(applicationID, reviewer.id, ignore_score);
+    }
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            if (i + 1 < req.body.data.application.reviewers.length) {
+                options.i = i + 1;
+                return updateApplicationReviewers(options);
+            } else {
+                return responses.sendJSONResponseOptions({
+                    response: res,
+                    status: 200,
+                    message: {
+                        "status": "success", "statusCode": 200,
+                        "count": 0,
+                        "message": "All done!"
+                    }
+                });
+            }
+        },
+        options);
+};
+module.exports.updateApplicationReviewers = function (req, res, next) {
+    permissions.checkPermissionsCallManagers(
+        (options) => { actionCheckReviewerExistence(options) },
+        { req, res, next }
+    );
+}
 
 /*
     return responses.sendJSONResponseOptions({

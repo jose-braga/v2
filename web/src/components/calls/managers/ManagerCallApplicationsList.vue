@@ -57,6 +57,28 @@
                                         valid until: {{application.applicant.document_valid_until | formatDate}}
                                 </li>
                             </ul>
+                            <v-row align-content="center" justify="start">
+                                <v-col cols="3" align-self="end">
+                                    <v-row justify="end">
+                                        <v-btn
+                                            @click="submitRevInfo(application)"
+                                            class="white--text"
+                                            color="blue"
+                                            large
+                                        >
+                                            Save reviewer info
+                                        </v-btn>
+                                    </v-row>
+                                </v-col>
+                                <v-col cols="1">
+                                    <v-progress-circular indeterminate
+                                            v-show="progress"
+                                            :size="20" :width="2"
+                                            color="primary"></v-progress-circular>
+                                    <v-icon v-show="success" color="green">mdi-check</v-icon>
+                                    <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
+                                </v-col>
+                            </v-row>
                             <v-row dense
                             >
                                 <v-col cols="1"
@@ -488,6 +510,7 @@ function processForSpreadsheet(items) {
         thisItem.email = items[ind].applicant.email;
         thisItem.submission_time = items[ind].date_submitted + ' ' + items[ind].time_submitted;
         thisItem.score_average = items[ind].score_average;
+        /*
         for (let indRev in items[ind].reviewers) {
             thisItem[
                     items[ind].reviewers[indRev].name
@@ -501,6 +524,31 @@ function processForSpreadsheet(items) {
             }
         }
         itemsCurated.push(thisItem);
+        */
+        if (items[ind].reviewers.length > 0) {
+            for (let indRev in items[ind].reviewers) {
+                thisItem[
+                    items[ind].reviewers[indRev].name
+                    + '_reviewed'
+                ] = items[ind].reviewers[indRev].reviewed ? items[ind].reviewers[indRev].reviewed : 0;
+            }
+            for (let indRev in items[ind].reviewers) {
+                thisItem[
+                    items[ind].reviewers[indRev].name
+                    + '_use_score'
+                ] = items[ind].reviewers[indRev].use_score ? items[ind].reviewers[indRev].use_score : 0;
+            }
+            for (let indAuto in items[ind].reviewers[0].automaticScores) {
+                for (let indRev in items[ind].reviewers) {
+                    thisItem[
+                        items[ind].reviewers[indRev].name
+                        + '_' + items[ind].reviewers[indRev].automaticScores[indAuto].criteria_name
+                    ] = items[ind].reviewers[indRev].automaticScores[indAuto].score_final;
+                }
+            }
+        }
+
+        itemsCurated.push(thisItem);
     }
     return itemsCurated;
 }
@@ -511,6 +559,10 @@ export default {
     },
     data () {
         return {
+            error: false,
+            success: false,
+            progress: false,
+            formError: false,
             callName: '',
             applications: [],
             data: {
@@ -625,6 +677,43 @@ export default {
             })
             .catch( (error) => {
                 console.log(error);
+            })
+        },
+        submitRevInfo (application) {
+            this.progress = true;
+            let urlUpdate = [];
+            urlUpdate.push({
+                url: 'api/calls'
+                    + '/call-managers/' + this.$store.state.session.personID
+                    + '/applications/' + application.id,
+                body: {
+                    application
+                },
+            });
+            this.$http.all(
+                urlUpdate.map(el =>
+                    this.$http.put(el.url,
+                        { data: el.body, },
+                        {
+                            headers: {'Authorization': 'Bearer ' + localStorage['v2-token']},
+                        }
+                    )
+                )
+            )
+            .then(this.$http.spread( () => {
+                this.progress = false;
+                this.success = true;
+                this.submitted = true;
+                this.getManagerCallApplications();
+                setTimeout(() => {this.success = false;}, 3000)
+            }))
+            .catch((error) => {
+                this.progress = false;
+                this.error = true;
+                setTimeout(() => {this.error = false;}, 10000)
+                // eslint-disable-next-line
+                console.log(error)
+                this.getManagerCallApplications();
             })
         },
         computeNewScore (ind) {
