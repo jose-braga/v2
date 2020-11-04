@@ -14,6 +14,7 @@ module.exports.generateJWT = function (user) {
         permissionsLevel: user.permissions_level,
         permissionsEndpoints: user.permissions_endpoints,
         permissionsWebAreas: user.permissions_web_areas,
+        storeAccess: user.store,
         base_url: process.env.PATH_PREFIX,
         exp: parseInt(expiry.getTime() / 1000, 10)
     }, process.env.JWT_SECRET);

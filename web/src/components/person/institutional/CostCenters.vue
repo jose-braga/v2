@@ -2,43 +2,69 @@
 <v-card class="mt-4">
     <v-card-title primary-title>
         <div>
-            <h3 class="headline">Research Interests</h3>
+            <h3 class="headline">Cost Centers</h3>
         </div>
     </v-card-title>
     <v-card-text class="px-4">
     </v-card-text>
     <v-container>
         <v-form ref="form"
-                @submit.prevent="submitForm">
-            <p v-if="data.researchInterests.length === 0">
+            @submit.prevent="submitForm">
+            <p v-if="data.costCenters.length === 0">
                 No data.
             </p>
-            <div v-for="(interest, i) in data.researchInterests"
+            <div v-for="(cc, i) in data.costCenters"
                 :key="i">
                 <v-row align="center" class="px-2">
-                    <v-col cols="12" sm="8">
-                        <v-text-field
-                            v-model="interest.interests"
-                            label="Research Interest">
-                        </v-text-field>
+                    <v-col cols="12" sm="4">
+                        <v-select v-model="cc.cost_center_id"
+                            :items="costCenters" item-value="id" item-text="short_name"
+                            label="Cost Center">
+                        </v-select>
                     </v-col>
-                    <v-col cols="12" sm="2">
-                        <v-text-field
-                            v-model="interest.sort_order"
-                            label="Order">
-                        </v-text-field>
+                    <v-col cols="12" sm="3">
+                        <v-menu ref="cc.show_date_start" v-model="cc.show_date_start"
+                            :close-on-content-click="false"
+                            :nudge-right="10"
+                            transition="scale-transition"
+                            offset-y min-width="290px">
+                            <template v-slot:activator="{ on }">
+                                <v-text-field v-model="cc.valid_from"
+                                    label="From" v-on="on">
+                                </v-text-field>
+                            </template>
+                            <v-date-picker v-model="cc.valid_from"
+                                    @input="cc.show_date_start = false"
+                                    no-title></v-date-picker>
+                        </v-menu>
+                    </v-col>
+                    <v-col cols="12" sm="3">
+                        <v-menu ref="cc.show_date_end" v-model="cc.show_date_end"
+                            :close-on-content-click="false"
+                            :nudge-right="10"
+                            transition="scale-transition"
+                            offset-y min-width="290px">
+                            <template v-slot:activator="{ on }">
+                                <v-text-field v-model="cc.valid_until"
+                                    label="Until" v-on="on">
+                                </v-text-field>
+                            </template>
+                            <v-date-picker v-model="cc.valid_until"
+                                    @input="cc.show_date_end = false"
+                                    no-title></v-date-picker>
+                        </v-menu>
                     </v-col>
                     <v-col cols="2">
-                        <v-btn icon @click.stop="removeItem(data.researchInterests, i)">
+                        <v-btn icon @click.stop="removeItem(data.costCenters, i)">
                             <v-icon color="red darken">mdi-delete</v-icon>
                         </v-btn>
                     </v-col>
                 </v-row>
-                <v-divider v-if="i < data.researchInterests.length - 1"></v-divider>
+                <v-divider v-if="i < data.costCenters.length - 1"></v-divider>
             </div>
             <v-row class="ml-4">
                 <v-btn outlined @click="addItem()">
-                    Add an interest
+                    Add cost center
                 </v-btn>
             </v-row>
             <v-row align-content="center" justify="end">
@@ -64,11 +90,13 @@
             </v-row>
         </v-form>
     </v-container>
+
 </v-card>
 </template>
 
 <script>
 import subUtil from '@/components/common/submit-utils'
+import time from '@/components/common/date-utils'
 
 export default {
     data() {
@@ -77,28 +105,33 @@ export default {
             success: false,
             error: false,
             formError: false,
+            costCenters: [],
             data: {
-                researchInterests: [],
+                costCenters: [],
             },
             toDelete: [],
         }
     },
     mounted () {
         this.initialize();
+        this.getCostCenters();
     },
     methods: {
         initialize () {
-            this.data.researchInterests = [];
+            this.data.costCenters = [];
             if (this.$store.state.session.loggedIn) {
                 let personID = this.$store.state.session.personID;
-                subUtil.getInfoPopulate(this, 'api/people/' + personID + '/research-interests', true)
+                subUtil.getInfoPopulate(this, 'api/people/' + personID + '/cost-centers', true)
                 .then( (result) => {
                     // only works if this.data and result have the same keys
                     for (let ind in result) {
-                        this.$set(this.data.researchInterests, ind, {});
+                        this.$set(this.data.costCenters, ind, {});
                         Object.keys(result[ind]).forEach(key => {
                             let value = result[ind][key];
-                            this.$set(this.data.researchInterests[ind], key, value);
+                            if (key === 'valid_from' || key === 'valid_until') {
+                                value = time.momentToDate(value);
+                            }
+                            this.$set(this.data.costCenters[ind], key, value);
                         });
                     }
                 })
@@ -113,26 +146,26 @@ export default {
                 let urlDelete = [];
                 let urlUpdate = [];
                 let personID = this.$store.state.session.personID;
-                let researchInterests = this.data.researchInterests;
-                for (let ind in researchInterests) {
-                    if (researchInterests[ind].id === 'new') {
-                        researchInterests[ind].person_id = personID;
+                let costCenters = this.data.costCenters;
+                for (let ind in costCenters) {
+                    if (costCenters[ind].id === 'new') {
+                        costCenters[ind].person_id = personID;
                         urlCreate.push({
-                                url: 'api/people/' + personID + '/research-interests',
-                                body: researchInterests[ind],
+                                url: 'api/people/' + personID + '/cost-centers',
+                                body: costCenters[ind],
                             });
 
                     } else {
                         urlUpdate.push({
                                 url: 'api/people/' + personID
-                                        + '/research-interests/' + researchInterests[ind].id,
-                                body: researchInterests[ind],
+                                        + '/cost-centers/' + costCenters[ind].id,
+                                body: costCenters[ind],
                             });
                     }
                 }
                 for (let ind in this.toDelete) {
                     urlDelete.push('api/people/' + personID
-                                + '/research-interests/' + this.toDelete[ind].id);
+                                + '/cost-centers/' + this.toDelete[ind].id);
                 }
                 this.$http.all(
                     urlUpdate.map(el =>
@@ -176,9 +209,16 @@ export default {
                 })
             }
         },
+        getCostCenters () {
+            let vm = this;
+            if (this.$store.state.session.loggedIn) {
+                const urlSubmit = 'api/v2/' + 'cost-centers';
+                return subUtil.getPublicInfo(vm, urlSubmit, 'costCenters');
+            }
+        },
         addItem() {
-            this.data.researchInterests.push({id: 'new', interests: null,
-                sort_order: null});
+            this.data.costCenters.push({id: 'new', cost_center_id: null,
+                valid_from: null, valid_until: null});
         },
         removeItem(list, ind) {
             if (list[ind].id !== 'new') {
@@ -188,10 +228,9 @@ export default {
         },
     },
 
-
 }
 </script>
 
-<style scoped>
+<style>
 
 </style>

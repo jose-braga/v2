@@ -26,6 +26,7 @@ const addPublications = require('../controllers/people/add_publications');
 const addPubORCID = require('../controllers/people/add_pub_ORCID');
 const addPubRepository = require('../controllers/people/add_pub_repository');
 const cars = require('../controllers/people/cars');
+const costCenters = require('../controllers/people/cost_centers');
 const degrees = require('../controllers/people/degrees');
 const emergencyContacts = require('../controllers/people/emergency_contacts');
 const identifications = require('../controllers/people/identifications');
@@ -34,10 +35,13 @@ const institutionalAffiliations = require('../controllers/people/institutional_a
 const institutionalResponsibles = require('../controllers/people/institutional_responsibles');
 const nuclearInformation = require('../controllers/people/nuclear_information');
 const personalContacts = require('../controllers/people/personal_contacts');
+const personalURLs = require('../controllers/people/personal_urls');
 const photo = require('../controllers/people/photo');
 const professionalSituations = require('../controllers/people/professional_situations');
 const publicationsList = require('../controllers/people/publications_list');
 const researchIDs = require('../controllers/people/research_IDs');
+const researchInterests = require('../controllers/people/research_interests');
+const websiteTexts = require('../controllers/people/website_texts');
 const users = require('../controllers/people/users');
 
 //remove lines below???
@@ -105,6 +109,25 @@ router.post('/:personID/academic-affiliations', cors(corsOptions), academicAffil
 router.put('/:personID/academic-affiliations/:affiliationID', cors(corsOptions), academicAffiliations.updateAcademicAffiliations);
 router.delete('/:personID/academic-affiliations/:affiliationID', cors(corsOptions), academicAffiliations.deleteAcademicAffiliations);
 
+router.get('/:personID/research-interests', cors(corsOptions), researchInterests.getResearchInterests);
+router.post('/:personID/research-interests', cors(corsOptions), researchInterests.createResearchInterests);
+router.put('/:personID/research-interests/:interestID', cors(corsOptions), researchInterests.updateResearchInterests);
+router.delete('/:personID/research-interests/:interestID', cors(corsOptions), researchInterests.deleteResearchInterests);
+
+router.get('/:personID/personal-urls', cors(corsOptions), personalURLs.getPersonalURLs);
+router.post('/:personID/personal-urls', cors(corsOptions), personalURLs.createPersonalURLs);
+router.put('/:personID/personal-urls/:urlID', cors(corsOptions), personalURLs.updatePersonalURLs);
+router.delete('/:personID/personal-urls/:urlID', cors(corsOptions), personalURLs.deletePersonalURLs);
+
+router.get('/:personID/cost-centers', cors(corsOptions), costCenters.getCostCenters);
+router.post('/:personID/cost-centers', cors(corsOptions), costCenters.createCostCenters);
+router.put('/:personID/cost-centers/:costCenterID', cors(corsOptions), costCenters.updateCostCenters);
+router.delete('/:personID/cost-centers/:costCenterID', cors(corsOptions), costCenters.deleteCostCenters);
+
+router.get('/:personID/text-types/:textTypeID/website-texts', cors(corsOptions), websiteTexts.getWebsiteTexts);
+router.post('/:personID/text-types/:textTypeID/website-texts', cors(corsOptions), websiteTexts.createWebsiteTexts);
+router.put('/:personID/text-types/:textTypeID/website-texts/:textID', cors(corsOptions), websiteTexts.updateWebsiteTexts);
+
 
 // Affiliations: user can't change his/hers affiliations, only managers can do that
 router.post('/:personID/affiliation-message', cors(corsOptions), institutionalAffiliations.sendChangeMessage);
@@ -140,6 +163,10 @@ router.put('/:personID/publications/:publicationID', cors(corsOptions), publicat
 
 router.post('/:personID/journals', cors(corsOptions), addPubORCID.createJournal);
 router.post('/:personID/journals/:journalID/publications', cors(corsOptions), addPubORCID.createPublication);
+
+// Warehouse
+//router.get('/:personID/store', cors(corsOptions), store.getAuthorizations);
+
 
 router.use(function (req, res, next) {
   var err = new Error('Not Found');

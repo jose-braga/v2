@@ -9,11 +9,28 @@
             <v-expansion-panels multiple v-model="openPanel">
                 <v-expansion-panel>
                     <v-expansion-panel-header>
+                        <h3>Short CV</h3>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                        <ShortCV></ShortCV>
+                    </v-expansion-panel-content>
+                </v-expansion-panel>
+                <v-expansion-panel>
+                    <v-expansion-panel-header>
+                        <h3>Personal URLs</h3>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                        <PersonalURLs
+                        >
+                        </PersonalURLs>
+                    </v-expansion-panel-content>
+                </v-expansion-panel>
+                <v-expansion-panel>
+                    <v-expansion-panel-header>
                         <h3>Personal Contacts</h3>
                     </v-expansion-panel-header>
                     <v-expansion-panel-content>
                         <PersonalContacts
-                            v-if="openPanel.indexOf(0) !== -1"
                         >
                         </PersonalContacts>
                     </v-expansion-panel-content>
@@ -59,6 +76,8 @@
 import Authorization from './Authorization'
 import NuclearInformation from './NuclearInformation'
 import Photo from './Photo'
+const ShortCV = () => import(/* webpackChunkName: "person-personal-short-cv" */ './ShortCV')
+const PersonalURLs = () => import(/* webpackChunkName: "person-personal-personal-urls" */ './PersonalURLs')
 const PersonalContacts = () => import(/* webpackChunkName: "person-personal-personal-contacts" */ './PersonalContacts')
 const EmergencyContacts = () => import(/* webpackChunkName: "person-personal-emergency-contacts" */ './EmergencyContacts')
 const Identifications = () => import(/* webpackChunkName: "person-personal-identifications" */ './Identifications')
@@ -73,6 +92,8 @@ export default {
         Identifications,
         NuclearInformation,
         Photo,
+        ShortCV,
+        PersonalURLs,
         PersonalContacts,
         DataEditors,
     },

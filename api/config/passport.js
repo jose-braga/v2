@@ -400,7 +400,7 @@ var getUserAdministrativeOffices = function (req, done, user) {
             } else {
                 user.administrative_offices = [];
                 user.current_administrative_offices = [];
-                return getCurrentCity(req, done, user);
+                return getStoreRegularUser(req, done, user);
             }
         });
     });
@@ -428,8 +428,86 @@ var getAdministrativeUnitsInfo = function (req, done, user, administrative_offic
                 return getAdministrativeUnitsInfo(req, done, user, administrative_offices, i + 1);
             } else {
                 user = processNonResearcherUnitsData(user, administrative_offices);
-                return getCurrentCity(req, done, user);
+                return getStoreRegularUser(req, done, user);
             }
+        });
+    });
+};
+var getStoreRegularUser = function (req, done, user) {
+    var query =
+        'SELECT *' +
+        ' FROM accounts_people' +
+        ' WHERE user_id = ?;';
+    var places = [user.user_id];
+    pool.getConnection(function (err, connection) {
+        if (err) {
+            return done(err);
+        }
+        connection.query(query, places, function (err, rows) {
+            connection.release();
+            if (err) {
+                return done(err);
+            }
+            user.store = {
+                accessStore: false,
+                manageUsers: false,
+                manageOrders: false,
+                manageStock: false,
+                manageFinances: false,
+            }
+            for (let ind in rows) {
+                if (rows[ind].account_id !== null && rows[ind].account_role_id !== null) {
+                    user.store.accessStore = true;
+                    break;
+                }
+            }
+            return getStoreStockManagers(req, done, user);
+        });
+    });
+};
+var getStoreStockManagers = function (req, done, user) {
+    var query =
+        'SELECT *' +
+        ' FROM stock_managers' +
+        ' WHERE user_id = ?;';
+    var places = [user.user_id];
+    pool.getConnection(function (err, connection) {
+        if (err) {
+            return done(err);
+        }
+        connection.query(query, places, function (err, rows) {
+            connection.release();
+            if (err) {
+                return done(err);
+            }
+            if (rows.length === 1) {
+                user.store.manageStock = true;
+            }
+            return getStoreAccountManagers(req, done, user);
+        });
+    });
+};
+var getStoreAccountManagers = function (req, done, user) {
+    var query =
+        'SELECT *' +
+        ' FROM account_managers' +
+        ' WHERE user_id = ?;';
+    var places = [user.user_id];
+    pool.getConnection(function (err, connection) {
+        if (err) {
+            return done(err);
+        }
+        connection.query(query, places, function (err, rows) {
+            connection.release();
+            if (err) {
+                return done(err);
+            }
+            if (rows.length === 1) {
+                user.store.manageUsers = true;
+                user.store.manageOrders = true;
+                user.store.manageFinances = true;
+            }
+            return getCurrentCity(req, done, user);
         });
     });
 };

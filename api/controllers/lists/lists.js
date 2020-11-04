@@ -360,20 +360,22 @@ var getDepartmentLeaders = function (options) {
         },
         options);
 };
-/*
-responses.sendJSONResponseOptions({
-                response: res,
-                status: 200,
-                message: {
-                    "status": "success", "statusCode": 200,
-                    "result": resQuery,
-                }
-            });
-            return;
-
-*/
-
-
+var getPersonalURLTypes = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM personal_url_types;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getCostCenters = function (options) {
+    let { req, res, next } = options;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM cost_centers;';
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return
+};
 var getRequestMethods = function (req, res, next) {
     var querySQL = '';
     var places = [];
@@ -629,6 +631,9 @@ module.exports.listItems = function (req, res, next) {
     if (category === 'departments') {
         getDepartments(req, res, next);
     }
+    if (category === 'cost-centers') {
+        getCostCenters(req, res, next);
+    }
     if (category === 'request-methods') {
         getRequestMethods(req, res, next);
     }
@@ -661,6 +666,9 @@ module.exports.listItems = function (req, res, next) {
     }
     if (category === 'document-types') {
         getDocumentTypes(req, res, next);
+    }
+    if (category === 'personal-url-types') {
+        getPersonalURLTypes(req, res, next);
     }
     if (category === 'open-calls') {
         getOpenCalls(req, res, next);

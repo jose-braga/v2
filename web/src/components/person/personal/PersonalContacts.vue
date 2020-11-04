@@ -1,76 +1,76 @@
 <template>
-    <v-form ref="form"
-        @submit.prevent="submitForm">
-        <v-row>
-            <v-col cols="12">
-                <v-text-field
-                    v-model="$v.data.personal_addresses.address.$model"
-                    label="Current address">
-                </v-text-field>
-                <div v-if="!$v.data.personal_addresses.address.maxLength">
-                    <p class="caption red--text">Maximum characters: 150.</p>
-                </div>
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col cols="12" sm="4">
-                <v-text-field
-                    v-model="$v.data.personal_addresses.postal_code.$model"
-                    label="Postal Code">
-                </v-text-field>
-                <div v-if="!$v.data.personal_addresses.postal_code.maxLength">
-                    <p class="caption red--text">Maximum characters: 8.</p>
-                </div>
-                <div v-if="!$v.data.personal_addresses.postal_code.postalCodeValidate">
-                    <p class="caption red--text">Invalid postal code.</p>
-                </div>
-            </v-col>
-            <v-col cols="12" sm="4">
-                <v-text-field
-                    v-model="data.personal_addresses.city"
-                    label="City">
-                </v-text-field>
-            </v-col>
-        </v-row>
-        <v-row>
-            <v-col cols="12" sm="4">
-                <v-text-field
-                    v-model="data.personal_phones.phone"
-                    label="Personal Phone">
-                </v-text-field>
-            </v-col>
-            <v-col cols="12" sm="4">
-                <v-text-field
-                    v-model="$v.data.personal_emails.email.$model"
-                    label="Personal Email">
-                </v-text-field>
-                <div v-if="!$v.data.personal_emails.email.email">
-                    <p class="caption red--text">Non valid email.</p>
-                </div>
-            </v-col>
-        </v-row>
-        <v-row align-content="center" justify="end">
-            <v-col cols="3" v-if="formError">
-                <v-row justify="end">
-                    <p class="caption red--text">Unable to submit form.</p>
-                </v-row>
-            </v-col>
-            <v-col cols="2" align-self="end">
-                <v-row justify="end">
-                    <v-btn type="submit"
-                    outlined color="blue">Update</v-btn>
-                </v-row>
-            </v-col>
-            <v-col cols="1">
-                <v-progress-circular indeterminate
-                        v-show="progress"
-                        :size="20" :width="2"
-                        color="primary"></v-progress-circular>
-                <v-icon v-show="success" color="green">mdi-check</v-icon>
-                <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
-            </v-col>
-        </v-row>
-    </v-form>
+<v-form ref="form"
+    @submit.prevent="submitForm">
+    <v-row>
+        <v-col cols="12">
+            <v-text-field
+                v-model="$v.data.personal_addresses.address.$model"
+                label="Current address">
+            </v-text-field>
+            <div v-if="!$v.data.personal_addresses.address.maxLength">
+                <p class="caption red--text">Maximum characters: 150.</p>
+            </div>
+        </v-col>
+    </v-row>
+    <v-row>
+        <v-col cols="12" sm="4">
+            <v-text-field
+                v-model="$v.data.personal_addresses.postal_code.$model"
+                label="Postal Code">
+            </v-text-field>
+            <div v-if="!$v.data.personal_addresses.postal_code.maxLength">
+                <p class="caption red--text">Maximum characters: 8.</p>
+            </div>
+            <div v-if="!$v.data.personal_addresses.postal_code.postalCodeValidate">
+                <p class="caption red--text">Invalid postal code.</p>
+            </div>
+        </v-col>
+        <v-col cols="12" sm="4">
+            <v-text-field
+                v-model="data.personal_addresses.city"
+                label="City">
+            </v-text-field>
+        </v-col>
+    </v-row>
+    <v-row>
+        <v-col cols="12" sm="4">
+            <v-text-field
+                v-model="data.personal_phones.phone"
+                label="Personal Phone">
+            </v-text-field>
+        </v-col>
+        <v-col cols="12" sm="4">
+            <v-text-field
+                v-model="$v.data.personal_emails.email.$model"
+                label="Personal Email">
+            </v-text-field>
+            <div v-if="!$v.data.personal_emails.email.email">
+                <p class="caption red--text">Non valid email.</p>
+            </div>
+        </v-col>
+    </v-row>
+    <v-row align-content="center" justify="end">
+        <v-col cols="3" v-if="formError">
+            <v-row justify="end">
+                <p class="caption red--text">Unable to submit form.</p>
+            </v-row>
+        </v-col>
+        <v-col cols="2" align-self="end">
+            <v-row justify="end">
+                <v-btn type="submit"
+                outlined color="blue">Update</v-btn>
+            </v-row>
+        </v-col>
+        <v-col cols="1">
+            <v-progress-circular indeterminate
+                    v-show="progress"
+                    :size="20" :width="2"
+                    color="primary"></v-progress-circular>
+            <v-icon v-show="success" color="green">mdi-check</v-icon>
+            <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
+        </v-col>
+    </v-row>
+</v-form>
 </template>
 
 <script>

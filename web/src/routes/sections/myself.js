@@ -15,6 +15,17 @@ const AddPublicationsTab = () => import(/* webpackChunkName: "add-publications-t
 const AddPublicationsTabHelp = () => import(/* webpackChunkName: "add-publication-tab-help" */ '@/components/person/productivity/AddPublicationsTabHelp.vue')
 const OtherProductivityTab = () => import(/* webpackChunkName: "other-productivity-tab" */ '@/components/person/productivity/OtherProductivityTab.vue')
 const OtherProductivityTabHelp = () => import(/* webpackChunkName: "other-productivity-tab-help" */ '@/components/person/productivity/OtherProductivityTabHelp.vue')
+const WarehouseTab = () => import(/* webpackChunkName: "warehouse-tab" */ '@/components/person/warehouse/WarehouseTab.vue')
+const StoreTab = () => import(/* webpackChunkName: "warehouse-store-tab" */ '@/components/person/warehouse/StoreTab.vue')
+const StoreTabHelp = () => import(/* webpackChunkName: "warehouse-store-tab-help" */ '@/components/person/warehouse/StoreTabHelp.vue')
+const UserManagementTab = () => import(/* webpackChunkName: "warehouse-user-management-tab" */ '@/components/person/warehouse/UserManagementTab.vue')
+const UserManagementTabHelp = () => import(/* webpackChunkName: "warehouse-user-management-tab-help" */ '@/components/person/warehouse/UserManagementTabHelp.vue')
+const StockManagementTab = () => import(/* webpackChunkName: "warehouse-stock-management-tab" */ '@/components/person/warehouse/StockManagementTab.vue')
+const StockManagementTabHelp = () => import(/* webpackChunkName: "warehouse-stock-management-tab-help" */ '@/components/person/warehouse/StockManagementTabHelp.vue')
+const OrderManagementTab = () => import(/* webpackChunkName: "warehouse-order-management-tab" */ '@/components/person/warehouse/OrderManagementTab.vue')
+const OrderManagementTabHelp = () => import(/* webpackChunkName: "warehouse-order-management-tab-help" */ '@/components/person/warehouse/OrderManagementTabHelp.vue')
+const FinancialManagementTab = () => import(/* webpackChunkName: "warehouse-financial-management-tab" */ '@/components/person/warehouse/FinancialManagementTab.vue')
+const FinancialManagementTabHelp = () => import(/* webpackChunkName: "warehouse-financial-management-tab-help" */ '@/components/person/warehouse/FinancialManagementTabHelp.vue')
 
 const routes = {
     path: '/person',
@@ -74,6 +85,48 @@ const routes = {
                     }
                 },
                 { path: '', redirect: 'publications' }
+            ]
+        },
+        {
+            path: 'warehouse',
+            component: WarehouseTab,
+            children: [
+                {
+                    path: 'store',
+                    components: {
+                        default: StoreTab,
+                        help: StoreTabHelp
+                    }
+                },
+                {
+                    path: 'stock-management',
+                    components: {
+                        default: StockManagementTab,
+                        help: StockManagementTabHelp
+                    }
+                },
+                {
+                    path: 'order-management',
+                    components: {
+                        default: OrderManagementTab,
+                        help: OrderManagementTabHelp
+                    }
+                },
+                {
+                    path: 'user-management',
+                    components: {
+                        default: UserManagementTab,
+                        help: UserManagementTabHelp
+                    }
+                },
+                {
+                    path: 'financial-management',
+                    components: {
+                        default: FinancialManagementTab,
+                        help: FinancialManagementTabHelp
+                    }
+                },
+                { path: '', redirect: 'store' }
             ]
         },
         { path: '', redirect: 'personal' }

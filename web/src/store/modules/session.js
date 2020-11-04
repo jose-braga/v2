@@ -18,6 +18,7 @@ const session = {
         permissionsLevel: undefined,
         permissionsEndpoints: [],
         permissionsWebAreas: [],
+        storeAccess: {},
         baseURL: undefined,
 
     },
@@ -42,6 +43,7 @@ const session = {
                         state.permissionsEndpoints[ind].decomposedPath = decomposedPath;
                     }
                     state.permissionsWebAreas = token_json.permissionsWebAreas;
+                    state.storeAccess = token_json.storeAccess;
                     state.baseURL = token_json.base_url;
                     state.loggedIn = true;
                     if (router.currentRoute.path === '/call-managers') {
@@ -89,6 +91,7 @@ const session = {
                 state.permissionsEndpoints[ind].decomposedPath = decomposedPath;
             }
             state.permissionsWebAreas = token_json.permissionsWebAreas;
+            state.storeAccess = token_json.storeAccess;
             state.baseURL = token_json.base_url;
         },
         logoutProcedure(state, payload) {
@@ -103,6 +106,7 @@ const session = {
             state.permissionsLevel = undefined;
             state.permissionsEndpoints = [];
             state.permissionsWebAreas = [];
+            state.storeAccess = {};
             state.baseURL = undefined;
             if (payload === undefined) {
                 router.push({ path: '/' });

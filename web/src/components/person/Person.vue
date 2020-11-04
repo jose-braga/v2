@@ -19,6 +19,9 @@
         <v-tab to="/person/productivity">
             Productivity
         </v-tab>
+        <v-tab v-if="accessWarehouse" to="/person/warehouse">
+            Warehouse
+        </v-tab>
        <v-tabs-items>
             <!-- use :max="N" in keep-alive if necessary-->
             <keep-alive>
@@ -58,6 +61,14 @@ export default {
     computed: {
         loggedIn () {
             return this.$store.state.session.loggedIn;
+        },
+        accessWarehouse () {
+            return this.$store.state.session.storeAccess.accessStore
+                || this.$store.state.session.storeAccess.manageUsers
+                || this.$store.state.session.storeAccess.manageOrders
+                || this.$store.state.session.storeAccess.manageStock
+                || this.$store.state.session.storeAccess.manageFinances
+            ;
         },
         showHelp: {
             get() {
