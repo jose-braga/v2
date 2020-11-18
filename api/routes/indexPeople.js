@@ -41,6 +41,11 @@ const professionalSituations = require('../controllers/people/professional_situa
 const publicationsList = require('../controllers/people/publications_list');
 const researchIDs = require('../controllers/people/research_IDs');
 const researchInterests = require('../controllers/people/research_interests');
+const store = require('../controllers/store/store');
+const manageUsers = require('../controllers/store/manage_users');
+const manageOrders = require('../controllers/store/manage_orders');
+const manageStock = require('../controllers/store/manage_stock');
+const manageFinances = require('../controllers/store/manage_finances');
 const websiteTexts = require('../controllers/people/website_texts');
 const users = require('../controllers/people/users');
 
@@ -165,7 +170,24 @@ router.post('/:personID/journals', cors(corsOptions), addPubORCID.createJournal)
 router.post('/:personID/journals/:journalID/publications', cors(corsOptions), addPubORCID.createPublication);
 
 // Warehouse
-//router.get('/:personID/store', cors(corsOptions), store.getAuthorizations);
+router.get('/:personID/store', cors(corsOptions), store.getStoreProfile);
+router.get('/:personID/store/inventory', cors(corsOptions), store.getStoreInventory);
+router.get('/:personID/store/accounts/:accountID/orders', cors(corsOptions), store.getOrdersHistory);
+router.get('/:personID/store/accounts/:accountID/finances', cors(corsOptions), store.getFinances);
+router.post('/:personID/store/accounts/:accountID', cors(corsOptions), store.createOrder);
+
+router.get('/:personID/order-management/orders', cors(corsOptions), manageOrders.getOrders);
+router.put('/:personID/order-management/orders/:orderID', cors(corsOptions), manageOrders.modifyOrder);
+
+router.get('/:personID/stock-management/inventory', cors(corsOptions), manageStock.getStockItems);
+router.post('/:personID/stock-management/inventory', cors(corsOptions), manageStock.createStockItem);
+router.put('/:personID/stock-management/inventory/:stockItemID', cors(corsOptions), manageStock.updateStockItem);
+router.delete('/:personID/stock-management/inventory/:stockItemID', cors(corsOptions), manageStock.deleteStockItem);
+
+router.get('/:personID/users-management/users', cors(corsOptions), manageUsers.getUsers);
+router.post('/:personID/users-management/users', cors(corsOptions), manageUsers.createUser);
+router.put('/:personID/users-management/users/:accountPeopleID', cors(corsOptions), manageUsers.updateUser);
+router.delete('/:personID/users-management/users/:accountPeopleID', cors(corsOptions), manageUsers.deleteUser);
 
 
 router.use(function (req, res, next) {

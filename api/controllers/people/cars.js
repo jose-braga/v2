@@ -118,7 +118,9 @@ var getRecipientsGroups = function (options, email_type_id, is_local) {
         options);
 };
 async function actionSendChangeMessage(options, recipientEmails) {
-    options.recipientGroup = recipientEmails[0].id;
+    if (recipientEmails.length > 0) {
+        options.recipientGroup = recipientEmails[0].id;
+    }
     let recipients = '';
     for (let el in recipientEmails) {
         recipients = recipients + recipientEmails[el].email + ', ';

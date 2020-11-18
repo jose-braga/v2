@@ -1,8 +1,8 @@
 const sql = require('../utilities/sql')
 const responses = require('../utilities/responses');
-//const { options } = require('../../routes/indexPeople');
 
-// Alphabetically ordered
+
+// (was) Alphabetically ordered
 var getCountries = function(req, res, next) {
     var querySQL = '';
     var places = [];
@@ -566,6 +566,100 @@ var getApplicationDegrees = function (req, res, next) {
     sql.makeSQLOperation(req, res, querySQL, places);
     return;
 };
+var getProductTypes = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * from list_categories;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getProductUnits = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * from quantity_types;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getProductStatus = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * from stock_item_statuses;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getWarehouseCostCenters = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM cost_centers_orders;';
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            options.costCenters = resQuery;
+            if (resQuery.length > 0) {
+                options.i = 0;
+                return getCostCenterAccounts(options);
+            } else {
+                responses.sendJSONResponseOptions({
+                    response: res,
+                    status: 200,
+                    message: {
+                        "status": "success", "statusCode": 200,
+                        "result":  [],
+                    }
+                });
+                return;
+
+            }
+        },
+        { req, res, next }
+    );
+};
+var getCostCenterAccounts = function (options) {
+    let { req, res, next, costCenters, i } = options;
+    let costCenter = costCenters[i];
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM accounts WHERE cost_center_id = ?;';
+    places.push(costCenter.id)
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            //options.req.body.data.posters[i].poster_id = resQuery.insertId;
+            options.costCenters[i].accounts = resQuery;
+            if (i + 1 < costCenters.length) {
+                options.i = i + 1;
+                return getCostCenterAccounts(options);
+            } else {
+                responses.sendJSONResponseOptions({
+                    response: res,
+                    status: 200,
+                    message: {
+                        "status": "success", "statusCode": 200,
+                        "result":  options.costCenters,
+                    }
+                });
+                return;
+            }
+        },
+        options);
+};
+var getWarehouseAccountsOnly = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * from accounts;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getWarehouseAccountsRoles = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM account_roles;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
 module.exports.listItems = function (req, res, next) {
     let category = req.params.listCategory;
     if (category === 'countries') {
@@ -675,6 +769,24 @@ module.exports.listItems = function (req, res, next) {
     }
     if (category === 'application-degrees') {
         getApplicationDegrees(req, res, next);
+    }
+    if (category === 'warehouse-product-types') {
+        getProductTypes(req, res, next);
+    }
+    if (category === 'warehouse-quantity-units') {
+        getProductUnits(req, res, next);
+    }
+    if (category === 'warehouse-item-status') {
+        getProductStatus(req, res, next);
+    }
+    if (category === 'warehouse-cost-centers') {
+        getWarehouseCostCenters(req, res, next);
+    }
+    if (category === 'warehouse-accounts') {
+        getWarehouseAccountsOnly(req, res, next);
+    }
+    if (category === 'warehouse-accounts-roles') {
+        getWarehouseAccountsRoles(req, res, next);
     }
 
 };

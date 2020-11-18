@@ -454,11 +454,12 @@ var getStoreRegularUser = function (req, done, user) {
                 manageOrders: false,
                 manageStock: false,
                 manageFinances: false,
+                accounts: [],
             }
             for (let ind in rows) {
                 if (rows[ind].account_id !== null && rows[ind].account_role_id !== null) {
                     user.store.accessStore = true;
-                    break;
+                    user.store.accounts.push(rows[ind].account_id);
                 }
             }
             return getStoreStockManagers(req, done, user);

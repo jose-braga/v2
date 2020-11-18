@@ -1,17 +1,17 @@
 <template>
 <div class="px-4">
-    <v-tabs v-model="currentTab">
+    <v-tabs>
         <v-tab v-if="accessStore" to="/person/warehouse/store">
             Store
         </v-tab>
-        <v-tab v-if="manageUsers" to="/person/warehouse/user-management">
-            Manage Users
+        <v-tab v-if="manageOrders" to="/person/warehouse/order-management">
+            Manage Orders
         </v-tab>
         <v-tab v-if="manageStock" to="/person/warehouse/stock-management">
             Manage Stock
         </v-tab>
-        <v-tab v-if="manageOrders" to="/person/warehouse/order-management">
-            Manage Orders
+        <v-tab v-if="manageUsers" to="/person/warehouse/user-management">
+            Manage Users
         </v-tab>
         <v-tab v-if="manageFinances" to="/person/warehouse/financial-management">
             Manage Finances
@@ -20,7 +20,6 @@
             <!-- use :max="N" in keep-alive if necessary-->
             <keep-alive>
                 <router-view
-                        :current-tab="currentTab"
                 ></router-view>
             </keep-alive>
         </v-tabs-items>
