@@ -189,6 +189,17 @@ router.post('/:personID/users-management/users', cors(corsOptions), manageUsers.
 router.put('/:personID/users-management/users/:accountPeopleID', cors(corsOptions), manageUsers.updateUser);
 router.delete('/:personID/users-management/users/:accountPeopleID', cors(corsOptions), manageUsers.deleteUser);
 
+router.get('/:personID/financial-management/cost-centers', cors(corsOptions), manageFinances.getCostCenters);
+router.post('/:personID/financial-management/cost-centers', cors(corsOptions), manageFinances.createCostCenter);
+router.put('/:personID/financial-management/cost-centers/:costCenterID', cors(corsOptions), manageFinances.updateCostCenter);
+router.delete('/:personID/financial-management/cost-centers/:costCenterID', cors(corsOptions), manageFinances.deleteCostCenter);
+router.post('/:personID/financial-management/cost-centers/:costCenterID/accounts', cors(corsOptions), manageFinances.createCostCenterAccount);
+router.put('/:personID/financial-management/cost-centers/:costCenterID/accounts/:accountID', cors(corsOptions), manageFinances.updateCostCenterAccount);
+router.delete('/:personID/financial-management/cost-centers/:costCenterID/accounts/:accountID', cors(corsOptions), manageFinances.deleteCostCenterAccount);
+router.post('/:personID/financial-management/cost-centers/:costCenterID/accounts/:accountID/finances', cors(corsOptions), manageFinances.createCostCenterAccountFinance);
+router.put('/:personID/financial-management/cost-centers/:costCenterID/accounts/:accountID/finances/:financesID', cors(corsOptions), manageFinances.updateCostCenterAccountFinance);
+
+
 
 router.use(function (req, res, next) {
   var err = new Error('Not Found');
