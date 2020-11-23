@@ -982,6 +982,7 @@ export default {
                 console.log(error)
                 this.getManagerCallApplications();
             })
+
         },
         computeNewScore (ind) {
             let score_total = 0;

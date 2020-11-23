@@ -538,7 +538,7 @@ var updateApplicationReviewers = function (options) {
     let reviewer = req.body.data.application.reviewers[i];
     let found = false;
     for (let ind in reviewers_status) {
-        if(reviewers_status[ind].reviewer_id === reviewer.id) {
+        if(reviewers_status[ind].reviewer_id === reviewer.reviewer_id) {
             found = true;
             break;
         }
@@ -558,12 +558,12 @@ var updateApplicationReviewers = function (options) {
                             + ' application_reviewer_applications'
                             + ' SET ignore_score = ?'
                             + ' WHERE application_id = ? AND reviewer_id = ?;';
-        places.push(ignore_score, applicationID, reviewer.id);
+        places.push(ignore_score, applicationID, reviewer.reviewer_id);
     } else {
         querySQL = querySQL + 'INSERT INTO application_reviewer_applications'
                             + ' (application_id, reviewer_id, ignore_score)'
                             + ' VALUES (?, ?, ?);';
-        places.push(applicationID, reviewer.id, ignore_score);
+        places.push(applicationID, reviewer.reviewer_id, ignore_score);
     }
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
@@ -590,18 +590,3 @@ module.exports.updateApplicationReviewers = function (req, res, next) {
         { req, res, next }
     );
 }
-
-/*
-    return responses.sendJSONResponseOptions({
-        response: res,
-        status: 200,
-        message: {
-            "status": "success", "statusCode": 200,
-            "count": options.applications.length,
-            "result": {
-                call: options.call,
-                applications: options.applications,
-            }
-        }
-    });
-    */
