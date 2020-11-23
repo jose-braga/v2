@@ -148,7 +148,7 @@
                                                     </ManagerCallApplicationsListLAQV>
                                                 </v-expansion-panels>
                                                 <v-expansion-panels
-                                                    v-else
+                                                    v-else-if="data.isPorto !== 1"
                                                     multiple
                                                 >
                                                     <v-expansion-panel
@@ -436,6 +436,269 @@
                                                         </v-expansion-panel-content>
                                                     </v-expansion-panel>
                                                 </v-expansion-panels>
+                                                <v-expansion-panels
+                                                    v-else-if="data.isPorto === 1"
+                                                    multiple
+                                                >
+                                                    <v-expansion-panel
+                                                        v-for="(criteria1, key1) in data.scores[ind][indRev][indTotal[ind]].children"
+                                                        :key="ind + '-' + indRev + '-' + key1"
+                                                    >
+                                                        <v-expansion-panel-header>
+                                                            <span class="title-level-1">
+                                                                {{criteria1.criteria_name}}
+                                                                <span class="score"> - Score: {{criteria1.score_final}}</span>
+                                                                <span class="weight ml-2">(Weight: {{criteria1.weight * 100}}%)</span>
+                                                            </span>
+                                                        </v-expansion-panel-header>
+                                                        <v-expansion-panel-content>
+                                                            <div v-if="criteria1.criteria_name === 'Academic Curriculum'">
+                                                                <ol>
+                                                                    <li v-for="(datum, i) in applications[ind].academicDegrees"
+                                                                        :key="key1 + '-' + i"
+                                                                        class="mb-2"
+                                                                    >
+                                                                        <v-row class="pl-2" align="center">
+                                                                            <span class="highlight">{{datum.degree_name}}</span>
+                                                                            <span class="standard-text">, {{datum.course_name}}</span>
+                                                                            <span class="standard-text">, {{datum.institution}}.</span>
+                                                                            <span class="standard-text"> ({{datum.date_end | formatDate}}).</span>
+                                                                            <span class="highlight"> Grade: ({{datum.grade}})</span>
+                                                                        </v-row>
+                                                                    </li>
+                                                                </ol>
+                                                            </div>
+                                                            <div v-if="criteria1.criteria_name === 'Motivation Letter'">
+                                                                <v-card>
+                                                                    <v-card-text class="pre-formatted">{{applications[ind].motivationLetter.motivation_letter}}</v-card-text>
+                                                                </v-card>
+                                                            </div>
+                                                            <v-expansion-panels
+                                                                multiple
+                                                                class="px-10"
+                                                            >
+                                                                <v-expansion-panel
+                                                                    v-for="(criteria2, key2) in criteria1.children"
+                                                                    :key="ind + '-' + indRev + '-' + key1 + '-' + key2"
+                                                                    multiple
+                                                                >
+                                                                    <v-expansion-panel-header>
+                                                                        <span class="title-level-2">
+                                                                            {{criteria2.criteria_name}}
+                                                                            <span class="score"> - Score: {{criteria2.score_final}}</span>
+                                                                            <span class="weight ml-2">(Weight: {{criteria2.weight * 100}}%)</span>
+                                                                        </span>
+                                                                    </v-expansion-panel-header>
+                                                                    <v-expansion-panel-content>
+                                                                        <div v-if="criteria2.criteria_name === 'Projects'">
+                                                                            <ol>
+                                                                                <li v-for="(datum, i) in applications[ind].projects"
+                                                                                    :key="ind + '-' + indRev + '-' + key1 + '-' + key2 + '-' + i"
+                                                                                >
+                                                                                    <span class="highlight">{{datum.title}}</span>
+                                                                                    <span class="standard-text"> ({{datum.acronym}}, {{datum.reference}}),</span>
+                                                                                    <span class="standard-text"> PI: {{datum.principal_investigator}}</span>
+                                                                                    <span class="standard-text">. Started: {{datum.year_start}}, Ended:{{datum.year_end}} </span>
+                                                                                    <br><span class="standard-text">Participation: {{datum.participation}}</span>
+                                                                                    <br><span class="standard-text">Applicant comments: {{datum.additional_data}}</span>
+                                                                                </li>
+                                                                            </ol>
+                                                                        </div>
+                                                                        <div v-if="criteria2.criteria_name === 'Papers'">
+                                                                            <ol>
+                                                                                <li v-for="(datum, i) in applications[ind].papers"
+                                                                                    :key="ind + '-' + indRev + '-' + key1 + '-' + key2 + '-' + i"
+                                                                                >
+                                                                                    <v-row class="pl-2" align="center">
+                                                                                        <span class="standard-text">{{datum.authors_raw}}</span>
+                                                                                        <span class="standard-text"> ({{datum.year}}).</span>
+                                                                                        <span class="standard-text"> "{{datum.title}}". </span>
+                                                                                        <span class="highlight"> {{datum.journal_name}},</span>
+                                                                                        <span class="standard-text"> {{datum.volume}},</span>
+                                                                                        <span class="standard-text"> {{datum.pages}}.</span>
+                                                                                        <span class="highlight">Quartile:  Q{{datum.journal_quartile}}.</span>
+                                                                                        <span class="standard-text"> DOI:
+                                                                                            <a :href="'https://doi.org/' + datum.doi"
+                                                                                                target="_blank"
+                                                                                            >
+                                                                                                {{datum.doi}}.
+                                                                                            </a>
+                                                                                        </span>
+                                                                                        <span class="ml-2">
+                                                                                            <v-checkbox
+                                                                                                v-model="datum.first_author"
+                                                                                                readonly
+                                                                                                label="First author"
+                                                                                            ></v-checkbox>
+                                                                                        </span>
+                                                                                    </v-row>
+                                                                                </li>
+                                                                            </ol>
+                                                                        </div>
+                                                                        <div v-if="criteria2.criteria_name === 'Communications'">
+                                                                            <ol>
+                                                                                <li v-for="(datum, i) in applications[ind].communications"
+                                                                                    :key="ind + '-' + indRev + '-' + key1 + '-' + key2 + '-' + i"
+                                                                                >
+                                                                                    <v-row class="pl-2" align="center">
+                                                                                        <span class="standard-text">{{datum.authors_raw}}</span>
+                                                                                        <span class="standard-text">, "{{datum.title}}"</span>
+                                                                                        <span class="highlight">. {{datum.meeting_name}}</span>
+                                                                                        <span class="standard-text">, {{datum.date | formatDate}}.</span>
+                                                                                        <span class="ml-2">
+                                                                                            <v-checkbox
+                                                                                                v-model="datum.first_author"
+                                                                                                readonly
+                                                                                                dense
+                                                                                                label="First author"
+                                                                                            ></v-checkbox>
+                                                                                        </span>
+                                                                                        <span class="ml-2">
+                                                                                            <v-checkbox
+                                                                                                v-model="datum.international"
+                                                                                                readonly
+                                                                                                dense
+                                                                                                label="International"
+                                                                                            ></v-checkbox>
+                                                                                        </span>
+                                                                                    </v-row>
+                                                                                </li>
+                                                                            </ol>
+                                                                        </div>
+                                                                        <div v-if="criteria2.criteria_name === 'Posters'">
+                                                                            <ol>
+                                                                                <li v-for="(datum, i) in applications[ind].posters"
+                                                                                    :key="ind + '-' + indRev + '-' + key1 + '-' + key2 + '-' + i"
+                                                                                >
+                                                                                    <v-row class="pl-2" align="center">
+                                                                                        <span class="standard-text">{{datum.authors_raw}}</span>
+                                                                                        <span class="standard-text">, "{{datum.title}}"</span>
+                                                                                        <span class="highlight">. {{datum.meeting_name}}</span>
+                                                                                        <span class="standard-text">, {{datum.date | formatDate}}.</span>
+                                                                                        <span class="ml-2">
+                                                                                            <v-checkbox
+                                                                                                v-model="datum.first_author"
+                                                                                                readonly
+                                                                                                dense
+                                                                                                label="First author"
+                                                                                            ></v-checkbox>
+                                                                                        </span>
+                                                                                        <span class="ml-2">
+                                                                                            <v-checkbox
+                                                                                                v-model="datum.international"
+                                                                                                readonly
+                                                                                                dense
+                                                                                                label="International"
+                                                                                            ></v-checkbox>
+                                                                                        </span>
+                                                                                    </v-row>
+                                                                                </li>
+                                                                            </ol>
+                                                                        </div>
+                                                                        <div v-if="criteria2.criteria_name === 'Patents/Prizes/Professional Experience'">
+                                                                            <v-row class="pl-2 mb-2" align="center">
+                                                                                <span class="highlight">Patents</span>
+                                                                            </v-row>
+                                                                            <ol>
+                                                                                <li v-for="(datum, i) in applications[ind].patents"
+                                                                                    :key="ind + '-' + indRev + '-' + key1 + '-' + key2 + '-' + i"
+                                                                                >
+                                                                                    <v-row class="pl-2" align="center">
+                                                                                        <span class="standard-text">{{datum.authors_raw}}</span>
+                                                                                        <span class="standard-text"> ({{datum.year}})</span>
+                                                                                        <span class="standard-text">, "{{datum.title}}"</span>
+                                                                                        <span class="standard-text">. Reference: {{datum.reference}}</span>
+                                                                                        <span class="standard-text">. Status: {{datum.status}}</span>
+                                                                                    </v-row>
+                                                                                </li>
+                                                                            </ol>
+                                                                            <v-row class="pl-2 my-2" align="center">
+                                                                                <span class="highlight">Prizes</span>
+                                                                            </v-row>
+                                                                            <ol>
+                                                                                <li v-for="(datum, i) in applications[ind].prizes"
+                                                                                    :key="ind + '-' + indRev + '-' + key1 + '-' + key2 + '-' + i"
+                                                                                >
+                                                                                    <v-row class="pl-2" align="center">
+                                                                                        <span class="standard-text">{{datum.prize_name}}</span>
+                                                                                        <span class="standard-text"> ({{datum.year}})</span>
+                                                                                        <span class="standard-text">, Comments: {{datum.additional_data}}</span>
+                                                                                    </v-row>
+                                                                                </li>
+                                                                            </ol>
+                                                                            <v-row class="pl-2 my-2" align="center">
+                                                                                <span class="highlight">Professional Experience</span>
+                                                                            </v-row>
+                                                                            <ol>
+                                                                                <li v-for="(datum, i) in applications[ind].professionalExperience"
+                                                                                    :key="ind + '-' + indRev + '-' + key1 + '-' + key2 + '-' + i"
+                                                                                >
+                                                                                    <v-row class="pl-2" align="center">
+                                                                                        <span class="standard-text">{{datum.date_start | formatDate}}-{{datum.date_end | formatDate}}</span>
+                                                                                        <span class="standard-text">  - {{datum.company}}</span>
+                                                                                        <span class="standard-text">. Business Areas: {{datum.business_areas}}</span>
+                                                                                    </v-row>
+                                                                                </li>
+                                                                            </ol>
+                                                                        </div>
+                                                                        <div v-if="criteria2.criteria_name === 'Reference Letters'">
+                                                                            <v-row>
+
+                                                                                <v-col cols="12" md="6" v-for="(datum, i) in applications[ind].recommenders"
+                                                                                    :key="ind + '-' + indRev + '-' + key1 + '-' + key2 + '-' + i"
+                                                                                >
+                                                                                    <v-card>
+                                                                                        <v-card-title>
+                                                                                            <span class="highlight">{{datum.name}}</span>
+                                                                                            <span class="standard-text">, ({{datum.role}}, {{datum.institution}}):</span>
+                                                                                        </v-card-title>
+                                                                                        <v-card-text>
+                                                                                            <div class="pre-formatted">{{datum.referenceLetter.text}}</div>
+                                                                                        </v-card-text>
+                                                                                        <v-container >
+                                                                                            <v-row v-for="(answer, j) in datum.answers"
+                                                                                                :key="ind + '-' + indRev + '-' + key1 + '-' + key2 + '-' + i + '-' + j"
+                                                                                                dense
+                                                                                                class="pre-formatted"
+                                                                                            >
+                                                                                                <v-col v-if="answer.answer_type === 'text'" cols="12">
+                                                                                                    <span class="question">{{answer.question}}</span>
+                                                                                                </v-col>
+                                                                                                <v-col v-if="answer.answer_type === 'text'" cols="12">
+                                                                                                    <span class="answer">- {{answer.answer}}
+                                                                                                    </span>
+                                                                                                </v-col>
+                                                                                                <v-col v-if="answer.answer_type === 'grade'" cols="10">
+                                                                                                    <span class="question">{{answer.question}}</span>
+                                                                                                </v-col>
+                                                                                                <v-col  v-if="answer.answer_type === 'grade'" cols="2">
+                                                                                                    <span class="answer">{{answer.score}}
+                                                                                                    </span>
+                                                                                                </v-col>
+                                                                                            </v-row>
+                                                                                        </v-container>
+                                                                                    </v-card>
+                                                                                </v-col>
+                                                                            </v-row>
+                                                                        </div>
+                                                                        <div v-if="Object.keys(criteria2.children).length === 0">
+                                                                            <v-divider class="my-2"></v-divider>
+                                                                            <p>Automatic score: {{criteria2.score}}</p>
+                                                                            <p>Reviewer score: {{criteria2.score_manual}}</p>
+                                                                            <p>Reviewer comments: {{criteria2.comments}}</p>
+                                                                        </div>
+                                                                    </v-expansion-panel-content>
+                                                                </v-expansion-panel>
+                                                            </v-expansion-panels>
+                                                            <div v-if="Object.keys(criteria1.children).length === 0">
+                                                                <v-divider class="my-2"></v-divider>
+                                                                <p>Automatic score: {{criteria1.score}}</p>
+                                                                <p>Reviewer score: {{criteria1.score_manual}}</p>
+                                                                <p>Reviewer comments: {{criteria1.comments}}</p>
+                                                            </div>
+                                                        </v-expansion-panel-content>
+                                                    </v-expansion-panel>
+                                                </v-expansion-panels>
                                             </v-expansion-panel-content>
                                         </v-expansion-panel>
                                     </v-expansion-panels>
@@ -568,6 +831,7 @@ export default {
             data: {
                 scores: [],
                 isLAQV: false,
+                isPorto: false,
             },
             indTotal: [],
 
@@ -603,6 +867,9 @@ export default {
                 this.callName = result.data.result.call.call_name
                 this.data.isLAQV = result.data.result.call.is_laqv;
                 this.applications = result.data.result.applications;
+                if (result.data.result.call.call_url_segment.includes('-porto-')) {
+                    this.data.isPorto = 1;
+                }
                 for (let ind in this.applications) {
                     let datetime = time.moment(this.applications[ind].submitted).tz('Europe/Lisbon');
                     this.$set(this.applications[ind], 'date_submitted',
