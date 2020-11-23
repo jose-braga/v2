@@ -1078,12 +1078,15 @@ var actionGetApplicationCriteria = function (options) {
     places.push(data.callID);
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
+            options.criteria = resQuery;
             if (isLAQV) {
-                options.criteria = resQuery;
                 return computeScoreDegreesLAQV(options);
             } else {
-                options.criteria = resQuery;
-                return computeScoreDegrees(options);
+                if (req.params.callSegment.includes('-porto-')) {
+                    return computeScoreDegreesUCIBIOPorto(options);
+                } else {
+                    return computeScoreDegrees(options);
+                }
             }
         },
         options);
@@ -1402,7 +1405,7 @@ var computeGlobalAutomaticScores = function (options) {
     } else {
         return writeAutomaticScoresDB(options);
     }
-}
+};
 var writeAutomaticScoresDB = function (options) {
     let { req, res, next, i } = options;
     let data = req.body.data;
@@ -1458,7 +1461,297 @@ var writeAutomaticScoresDB = function (options) {
             }
         });
     }
-}
+};
+
+var computeScoreDegreesUCIBIOPorto = function (options) {
+    console.log('I was here!')
+    let { req, res, next } = options;
+    let data = req.body.data;
+    // the algorithm is dependent on specific names in the criteria, change???
+    let indCriteria;
+    for (let ind in options.criteria) {
+        if (options.criteria[ind].name_en === 'Academic Curriculum') {
+            indCriteria = ind;
+            break;
+        }
+    }
+    if (indCriteria === undefined) {
+        console.log(' Error in scores computation - Degrees.',
+            'Call Id:', data.callID ,
+            'Application ID:', data.applicationID)
+    } else {
+        if (data.academicDegrees.length === 1) {
+            if (data.academicDegrees[0].academic_degree_id === 1) {
+                // Integrated Master
+                if (Math.round(data.academicDegrees[0].grade) >= 18) {
+                    options.criteria[indCriteria].score_auto = 5.0;
+                } else if (Math.round(data.academicDegrees[0].grade) >= 17) {
+                    options.criteria[indCriteria].score_auto = 4.5;
+                } else if (Math.round(data.academicDegrees[0].grade) >= 16) {
+                    options.criteria[indCriteria].score_auto = 4.0;
+                } else if (Math.round(data.academicDegrees[0].grade) >= 15) {
+                    options.criteria[indCriteria].score_auto = 3.5;
+                } else if (Math.round(data.academicDegrees[0].grade) >= 14) {
+                    options.criteria[indCriteria].score_auto = 3.0;
+                } else if (Math.round(data.academicDegrees[0].grade) < 14) {
+                    options.criteria[indCriteria].score_auto = 2.5;
+                }
+            } else if (data.academicDegrees[0].academic_degree_id === 2) {
+                // Master
+                if (Math.round(data.academicDegrees[0].grade) >= 17) {
+                    options.criteria[indCriteria].score_auto = 3.0;
+                } else if (Math.round(data.academicDegrees[0].grade) >= 16) {
+                    options.criteria[indCriteria].score_auto = 2.5;
+                } else if (Math.round(data.academicDegrees[0].grade) >= 15) {
+                    options.criteria[indCriteria].score_auto = 2.0;
+                } else if (Math.round(data.academicDegrees[0].grade) >= 14) {
+                    options.criteria[indCriteria].score_auto = 1.5;
+                } else if (Math.round(data.academicDegrees[0].grade) < 14) {
+                    options.criteria[indCriteria].score_auto = 1.0;
+                }
+            } else if (data.academicDegrees[0].academic_degree_id === 3) {
+                // Bachelor
+                if (Math.round(data.academicDegrees[0].grade) >= 17) {
+                    options.criteria[indCriteria].score_auto = 3.5;
+                } else if (Math.round(data.academicDegrees[0].grade) >= 16) {
+                    options.criteria[indCriteria].score_auto = 3.0;
+                } else if (Math.round(data.academicDegrees[0].grade) >= 15) {
+                    options.criteria[indCriteria].score_auto = 2.5;
+                } else if (Math.round(data.academicDegrees[0].grade) >= 14) {
+                    options.criteria[indCriteria].score_auto = 2.0;
+                } else if (Math.round(data.academicDegrees[0].grade) < 14) {
+                    options.criteria[indCriteria].score_auto = 1.5;
+                }
+            }
+        } else if (data.academicDegrees.length === 2) {
+            if (data.academicDegrees[0].academic_degree_id === 1
+                    || data.academicDegrees[1].academic_degree_id === 1) {
+                console.log(' Error (2) in scores computation - Degrees.',
+                        'Call Id:', data.callID ,
+                        'Application ID:', data.applicationID)
+            } else if (data.academicDegrees[0].academic_degree_id ===
+            data.academicDegrees[1].academic_degree_id) {
+                console.log(' Error (3) in scores computation - Degrees.',
+                    'Call Id:', data.callID ,
+                    'Application ID:', data.applicationID)
+            } else {
+                let average = (data.academicDegrees[0].grade * 1.0
+                             + data.academicDegrees[1].grade * 1.0) / 2.0;
+                if (Math.round(average) >= 18) {
+                    options.criteria[indCriteria].score_auto = 5.0;
+                } else if (Math.round(average) >= 17) {
+                    options.criteria[indCriteria].score_auto = 4.5;
+                } else if (Math.round(average) >= 16) {
+                    options.criteria[indCriteria].score_auto = 4.0;
+                } else if (Math.round(average) >= 15) {
+                    options.criteria[indCriteria].score_auto = 3.5;
+                } else if (Math.round(average) >= 14) {
+                    options.criteria[indCriteria].score_auto = 3.0;
+                } else if (Math.round(average) < 14) {
+                    options.criteria[indCriteria].score_auto = 2.5;
+                }
+            }
+        } else {
+            console.log(' Error (4) in scores computation - Degrees.',
+                        'Call Id:', data.callID ,
+                        'Application ID:', data.applicationID)
+        }
+    }
+    return computeScoreProjectsUCIBIOPorto(options);
+
+};
+var computeScoreProjectsUCIBIOPorto = function (options) {
+    let { req, res, next } = options;
+    let data = req.body.data;
+    let pointsProject = 5;
+    // the algorithm is dependent on specific names in the criteria, change???
+    let indCriteria;
+    for (let ind in options.criteria) {
+        if (options.criteria[ind].name_en === 'Projects') {
+            indCriteria = ind;
+            break;
+        }
+    }
+    if (indCriteria === undefined) {
+        console.log(' Error in scores computation - Projects.',
+            'Call Id:', data.callID ,
+            'Application ID:', data.applicationID)
+    } else {
+        // it suffices to have a single project
+        if (data.projects.length > 0) {
+            for (let ind in data.projects) {
+                if (data.projects[ind].title && data.projects[ind].participation) {
+                    // the user participated in project
+                    options.criteria[indCriteria].score_auto = pointsProject;
+                    break;
+                }
+            }
+        }
+    }
+    return computeScorePapersUCIBIOPorto(options);
+};
+var computeScorePapersUCIBIOPorto = function (options) {
+    let { req, res, next } = options;
+    let data = req.body.data;
+    let q1Points = 1.667;
+    let q2Points = 1.333;
+    let q3Points = 1;
+    let q4Points = 1;
+    let firstAuthorPoints = 0.333;
+    let maxPoints = 5.0;
+
+    let indCriteria;
+    for (let ind in options.criteria) {
+        if (options.criteria[ind].name_en === 'Papers') {
+            indCriteria = ind;
+            break;
+        }
+    }
+    if (indCriteria === undefined) {
+        console.log(' Error in scores computation - Papers.',
+            'Call Id:', data.callID ,
+            'Application ID:', data.applicationID)
+    } else {
+        if (data.papers.length > 0) {
+            let sum = 0.0;
+            for (let ind in data.papers) {
+                if (data.papers[ind].journal_quartile === 1) {
+                    sum = sum + q1Points;
+                } else if (data.papers[ind].journal_quartile === 2) {
+                    sum = sum + q2Points;
+                } else if (data.papers[ind].journal_quartile === 3) {
+                    sum = sum + q3Points;
+                } else if (data.papers[ind].journal_quartile === 4) {
+                    sum = sum + q4Points;
+                }
+                if (data.papers[ind].first_author) {
+                    sum = sum + firstAuthorPoints;
+                }
+            }
+            options.criteria[indCriteria].score_auto = Math.min(sum, maxPoints);
+        }
+    }
+    return computeScoreCommunicationsUCIBIOPorto(options);
+};
+var computeScoreCommunicationsUCIBIOPorto = function (options) {
+    let { req, res, next } = options;
+    let data = req.body.data;
+    let nationalPoints = 2;
+    let internationalPoints = 2.5;
+    let firstAuthorPoints = 0.5;
+    let maxPoints = 5;
+
+    let indCriteria;
+    for (let ind in options.criteria) {
+        if (options.criteria[ind].name_en === 'Communications') {
+            indCriteria = ind;
+            break;
+        }
+    }
+    if (indCriteria === undefined) {
+        console.log(' Error in scores computation - Communications.',
+            'Call Id:', data.callID ,
+            'Application ID:', data.applicationID)
+    } else {
+        if (data.communications.length > 0) {
+            let sum = 0.0;
+            for (let ind in data.communications) {
+                if (data.communications[ind].international) {
+                    sum = sum + internationalPoints;
+                } else {
+                    sum = sum + nationalPoints;
+                }
+                if (data.communications[ind].first_author) {
+                    sum = sum + firstAuthorPoints;
+                }
+            }
+            options.criteria[indCriteria].score_auto = Math.min(sum, maxPoints);
+        }
+    }
+    return computeScorePostersUCIBIOPorto(options);
+};
+var computeScorePostersUCIBIOPorto = function (options) {
+    let { req, res, next } = options;
+    let data = req.body.data;
+    let nationalPoints = 1.667;
+    let internationalPoints = 2.5;
+    let firstAuthorPoints = 0.833;
+    let maxPoints = 5;
+
+    let indCriteria;
+    for (let ind in options.criteria) {
+        if (options.criteria[ind].name_en === 'Posters') {
+            indCriteria = ind;
+            break;
+        }
+    }
+    if (indCriteria === undefined) {
+        console.log(' Error in scores computation - Posters.',
+            'Call Id:', data.callID ,
+            'Application ID:', data.applicationID)
+    } else {
+        if (data.posters.length > 0) {
+            let sum = 0.0;
+            for (let ind in data.posters) {
+                if (data.posters[ind].international) {
+                    sum = sum + internationalPoints;
+                } else {
+                    sum = sum + nationalPoints;
+                }
+                if (data.posters[ind].first_author) {
+                    sum = sum + firstAuthorPoints;
+                }
+            }
+            options.criteria[indCriteria].score_auto = Math.min(sum, maxPoints);
+        }
+    }
+    return computeScorePatentsPrizesProfessionalUCIBIOPorto(options);
+};
+var computeScorePatentsPrizesProfessionalUCIBIOPorto = function (options) {
+    let { req, res, next } = options;
+    let data = req.body.data;
+    let patentsEtcPoints = 5;
+
+    let indCriteria;
+    for (let ind in options.criteria) {
+        if (options.criteria[ind].name_en === 'Patents/Prizes/Professional Experience') {
+            indCriteria = ind;
+            break;
+        }
+    }
+    if (indCriteria === undefined) {
+        console.log(' Error in scores computation - Patents/etc.',
+            'Call Id:', data.callID ,
+            'Application ID:', data.applicationID)
+    } else {
+        if (data.prizes.length > 0) {
+            for (let ind in data.prizes) {
+                if (data.prizes[ind].prize_name) {
+                    options.criteria[indCriteria].score_auto = patentsEtcPoints;
+                    break;
+                }
+            }
+        }
+        if (data.patents.length > 0) {
+            for (let ind in data.patents) {
+                if (data.patents[ind].title) {
+                    options.criteria[indCriteria].score_auto = patentsEtcPoints;
+                    break;
+                }
+            }
+        }
+        if (data.professional.length > 0) {
+            for (let ind in data.professional) {
+                if (data.professional[ind].company) {
+                    options.criteria[indCriteria].score_auto = patentsEtcPoints;
+                    break;
+                }
+            }
+        }
+    }
+    options.i = 0;
+    return computeGlobalAutomaticScores(options);
+};
 
 var computeScoreDegreesLAQV = function (options) {
     let { req, res, next } = options;

@@ -1,6 +1,11 @@
 <template>
 <v-row class="pa-4">
     <v-col cols="12">
+        <AuthorNames
+                :current-tab="currentTab"
+        ></AuthorNames>
+    </v-col>
+    <v-col cols="12">
         <PublicationsList
                 :current-tab="currentTab"
         ></PublicationsList>
@@ -10,10 +15,12 @@
 
 <script>
 import PublicationsList from './publications/PublicationsList'
+import AuthorNames from './publications/AuthorNames'
 
 export default {
     components: {
-        PublicationsList
+        PublicationsList,
+        AuthorNames,
     },
     props: {
         currentTab: String,

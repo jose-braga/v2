@@ -25,6 +25,7 @@ const academicAffiliations = require('../controllers/people/academic_affiliation
 const addPublications = require('../controllers/people/add_publications');
 const addPubORCID = require('../controllers/people/add_pub_ORCID');
 const addPubRepository = require('../controllers/people/add_pub_repository');
+const authorNames = require('../controllers/people/author_names');
 const cars = require('../controllers/people/cars');
 const costCenters = require('../controllers/people/cost_centers');
 const degrees = require('../controllers/people/degrees');
@@ -165,6 +166,12 @@ router.post('/:personID/people-publications/:publicationID', cors(corsOptions), 
 router.put('/:personID/people-publications/:publicationID', cors(corsOptions), publicationsList.updatePersonPublicationAssociation);
 router.delete('/:personID/people-publications/:publicationID', cors(corsOptions), publicationsList.deletePersonPublicationAssociation);
 router.put('/:personID/publications/:publicationID', cors(corsOptions), publicationsList.updatePublication);
+
+router.get('/:personID/author-names', cors(corsOptions), authorNames.getAuthorNames);
+router.post('/:personID/author-names', cors(corsOptions), authorNames.createAuthorName);
+router.put('/:personID/author-names/:authorID', cors(corsOptions), authorNames.updateAuthorName);
+router.delete('/:personID/author-names/:authorID', cors(corsOptions), authorNames.deleteAuthorName);
+
 
 router.post('/:personID/journals', cors(corsOptions), addPubORCID.createJournal);
 router.post('/:personID/journals/:journalID/publications', cors(corsOptions), addPubORCID.createPublication);
