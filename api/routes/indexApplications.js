@@ -31,7 +31,11 @@ router.put('/:callSegment/applications/:applicationID/reviewers/:reviewerID/tag-
 router.post('/:callSegment/applications/:applicationID/reviewers/:reviewerID/tag-reviewed', cors(corsOptions), reviewers.createTagReviewed);
 
 router.get('/call-managers/:personID', cors(corsOptions), managers.getCalls);
+router.put('/call-managers/:personID'
+            + '/applications/:applicationID'
+            , cors(corsOptions), managers.updateApplicationReviewers);
 router.get('/:callSegment/applications/call-managers/:personID', cors(corsOptions), managers.getCallApplications);
+
 
 router.use(function (req, res, next) {
     var err = new Error('Not Found');
