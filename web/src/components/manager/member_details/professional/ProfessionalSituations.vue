@@ -304,6 +304,9 @@ export default {
             error: false,
             formError: false,
             situationsCategories : {},
+            fellowshipTypes: [],
+            managementEntities: [],
+            fundingAgencies: [],
             data: {
                 situations: [],
             },

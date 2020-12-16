@@ -1,5 +1,6 @@
 const sql = require('../utilities/sql');
 const permissions = require('../utilities/permissions');
+const responses = require('../utilities/responses');
 const notifications = require('../utilities/notifications');
 
 var actionGetResearchInterests = function (options) {
@@ -53,6 +54,7 @@ module.exports.createResearchInterests = function (req, res, next) {
 };
 var actionUpdateResearchInterests = function (options) {
     let { req, res, next } = options;
+    let personID = req.params.personID;
     let interestID = req.params.interestID;
     let data = req.body.data;
     var querySQL = '';
@@ -85,6 +87,7 @@ module.exports.updateResearchInterests = function (req, res, next) {
 };
 var actionDeleteResearchInterests = function (options) {
     let { req, res, next } = options;
+    let personID = req.params.personID;
     let interestID = req.params.interestID;
     var querySQL = '';
     var places = [];

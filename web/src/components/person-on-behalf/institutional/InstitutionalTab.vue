@@ -2,6 +2,8 @@
     <v-row class="pa-4">
         <v-col cols="12" md="6">
             <Roles :other-person-id="otherPersonId"></Roles>
+            <ResearchInterests :other-person-id="otherPersonId"></ResearchInterests>
+            <CostCenters :other-person-id="otherPersonId"></CostCenters>
         </v-col>
         <v-col cols="12" md="6">
             <Identifications :other-person-id="otherPersonId"></Identifications>
@@ -17,6 +19,8 @@ const AcademicAffiliations = () => import(/* webpackChunkName: "person-on-behalf
 const Identifications = () => import(/* webpackChunkName: "person-on-behalf-institutional-identifications" */ './Identifications')
 const InstitutionalContacts = () => import(/* webpackChunkName: "person-on-behalf-institutional-institutional-contacts" */ './InstitutionalContacts')
 const Roles = () => import(/* webpackChunkName: "person-on-behalf-institutional-roles" */ './roles/Roles')
+const ResearchInterests = () => import(/* webpackChunkName: "person-on-behalf-research-interests" */ './ResearchInterests')
+const CostCenters = () => import(/* webpackChunkName: "person-on-behalf-cost-centers" */ './CostCenters')
 
 export default {
     components: {
@@ -24,6 +28,8 @@ export default {
         Identifications,
         InstitutionalContacts,
         Roles,
+        ResearchInterests,
+        CostCenters,
     },
     props: {
     },

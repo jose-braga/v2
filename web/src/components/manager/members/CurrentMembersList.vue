@@ -6,6 +6,42 @@
             </div>
         </v-card-title>
         <v-card-text></v-card-text>
+        <v-row justify="center" v-if="unitId || cityId">
+            <v-dialog
+                v-model="dialogNewMember"
+                scrollable
+                max-width="600px"
+            >
+            <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                    color="primary"
+                    dark
+                    large
+                    v-bind="attrs"
+                    v-on="on"
+                >
+                    Add new member
+                </v-btn>
+            </template>
+            <v-card>
+                <v-card-title>Fill in new member data</v-card-title>
+                <v-divider></v-divider>
+                <v-card-text >
+                    <AddMember
+                        :segment-type="segmentType"
+                        :unit-id="unitId"
+                        :city-id="cityId"
+                        :unit-data="unitData"
+                        :city-data="cityData"
+                        :manager-id="managerID"
+                        :endpoint="endpoint"
+                    >
+                    </AddMember>
+                </v-card-text>
+                <v-divider></v-divider>
+            </v-card>
+            </v-dialog>
+        </v-row>
         <v-row>
             <v-col cols="12" sm="4">
                 <v-text-field
@@ -95,6 +131,7 @@
 import time from '@/components/common/date-utils'
 import subUtil from '@/components/common/submit-utils'
 import MemberDetails from '../member_details/MemberDetails'
+import AddMember from './AddMember'
 import {debounce} from 'lodash'
 import XLSX from 'xlsx'
 
@@ -312,9 +349,9 @@ function processForSpreadsheet(members) {
     return membersCurated;
 }
 
-
 export default {
     components: {
+        AddMember,
         MemberDetails,
     },
     props: {
@@ -330,6 +367,7 @@ export default {
             success: false,
             error: false,
             dialog: false,
+            dialogNewMember: false,
             currentPage: 1,
             options: {},
             loading: true,

@@ -33,7 +33,7 @@
                     <p v-if="!$v.data.emails.email.required"
                         class="caption red--text">Required.</p>
                     <p v-if="!$v.data.emails.email.email"
-                        class="caption red--text">Non valid email.</p>
+                        class="caption red--text">Invalid email.</p>
                 </div>
                 <v-checkbox
                     v-model="data.emails.requestEmail"

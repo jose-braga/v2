@@ -1464,7 +1464,6 @@ var writeAutomaticScoresDB = function (options) {
 };
 
 var computeScoreDegreesUCIBIOPorto = function (options) {
-    console.log('I was here!')
     let { req, res, next } = options;
     let data = req.body.data;
     // the algorithm is dependent on specific names in the criteria, change???

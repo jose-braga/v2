@@ -91,20 +91,25 @@ export default {
             )
             .then((result) => {
                 this.callName = result.data.result.call.call_name
-                this.applications = result.data.result.applications;
-                for (let ind in this.applications) {
-                    this.$set(this.applications[ind], 'url',
-                        '/reviewers/calls/'
-                        + this.$route.params.callSegment
-                        + '/applications/'
-                        + this.applications[ind].id
-                    )
-                    let datetime = time.moment(this.applications[ind].submitted).tz('Europe/Lisbon');
-                    this.$set(this.applications[ind], 'date_submitted',
-                        datetime.format('YYYY-MM-DD'));
-                    this.$set(this.applications[ind], 'time_submitted',
-                        datetime.format('HH:mm:ss'));
+                let unfilteredList = result.data.result.applications;
+                let filteredList = [];
+                for (let ind in unfilteredList) {
+                    if (unfilteredList[ind].ignore_score === 0) {
+                        this.$set(unfilteredList[ind], 'url',
+                            '/reviewers/calls/'
+                            + this.$route.params.callSegment
+                            + '/applications/'
+                            + unfilteredList[ind].id
+                        )
+                        let datetime = time.moment(unfilteredList[ind].submitted).tz('Europe/Lisbon');
+                        this.$set(unfilteredList[ind], 'date_submitted',
+                            datetime.format('YYYY-MM-DD'));
+                        this.$set(unfilteredList[ind], 'time_submitted',
+                            datetime.format('HH:mm:ss'));
+                        filteredList.push(unfilteredList[ind]);
+                    }
                 }
+                this.applications = filteredList;
             })
             .catch( (error) => {
                 console.log(error);

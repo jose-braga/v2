@@ -27,7 +27,7 @@
                         label="Institutional Email">
                     </v-text-field>
                     <div v-if="!$v.data.emails.email.email">
-                        <p class="caption red--text">Non valid email.</p>
+                        <p class="caption red--text">Invalid email.</p>
                     </div>
                 </v-col>
             </v-row>

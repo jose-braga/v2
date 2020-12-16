@@ -5,13 +5,31 @@
                 :other-person-id="otherPersonId"
                 :current-person="currentPerson"
             ></NuclearInformation>
-        </v-col>
-        <v-col cols="12" md="6">
-            <Photo
-                :other-person-id="otherPersonId"
-                :current-person="currentPerson"
-            ></Photo>
-            <v-expansion-panels multiple v-model="openPanel">
+            <v-expansion-panels class="mt-4" multiple v-model="openPanel">
+                <v-expansion-panel>
+                    <v-expansion-panel-header>
+                        <h3>Short CV</h3>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                        <ShortCV
+                            :other-person-id="otherPersonId"
+                            :current-person="currentPerson"
+                        >
+                        </ShortCV>
+                    </v-expansion-panel-content>
+                </v-expansion-panel>
+                <v-expansion-panel>
+                    <v-expansion-panel-header>
+                        <h3>Personal URLs</h3>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                        <PersonalURLs
+                            :other-person-id="otherPersonId"
+                            :current-person="currentPerson"
+                        >
+                        </PersonalURLs>
+                    </v-expansion-panel-content>
+                </v-expansion-panel>
                 <v-expansion-panel>
                     <v-expansion-panel-header>
                         <h3>Personal Contacts</h3>
@@ -20,7 +38,6 @@
                         <PersonalContacts
                             :other-person-id="otherPersonId"
                             :current-person="currentPerson"
-                            v-if="openPanel.indexOf(0) !== -1"
                         >
                         </PersonalContacts>
                     </v-expansion-panel-content>
@@ -59,7 +76,12 @@
                     </v-expansion-panel-content>
                 </v-expansion-panel>
             </v-expansion-panels>
-
+        </v-col>
+        <v-col cols="12" md="6">
+            <Photo
+                :other-person-id="otherPersonId"
+                :current-person="currentPerson"
+            ></Photo>
         </v-col>
     </v-row>
 </template>
@@ -68,6 +90,8 @@
 import NuclearInformation from './NuclearInformation'
 import Photo from './Photo'
 import PersonalContacts from './PersonalContacts'
+import PersonalURLs from './PersonalURLs'
+import ShortCV from './ShortCV'
 import EmergencyContacts from './EmergencyContacts'
 import Identifications from './Identifications'
 import Cars from './Cars'
@@ -77,6 +101,8 @@ export default {
         NuclearInformation,
         Photo,
         PersonalContacts,
+        PersonalURLs,
+        ShortCV,
         EmergencyContacts,
         Identifications,
         Cars,

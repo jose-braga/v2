@@ -89,7 +89,7 @@ var getApplicationsReviewerStatus = function (options) {
     if (applications.length > 0 ) {
         var querySQL = '';
         var places = [];
-        querySQL = querySQL + 'SELECT reviewed'
+        querySQL = querySQL + 'SELECT reviewed, ignore_score'
                             + ' FROM application_reviewer_applications'
                             + ' WHERE application_id = ? AND reviewer_id = ?;';
         places.push(applications[i].id, reviewerID)
@@ -97,8 +97,10 @@ var getApplicationsReviewerStatus = function (options) {
             (resQuery, options) => {
                 if (resQuery.length === 0) {
                     options.applications[i].reviewed = null;
+                    options.applications[i].ignore_score = 0;
                 } else {
                     options.applications[i].reviewed = resQuery[0].reviewed;
+                    options.applications[i].ignore_score = resQuery[0].ignore_score;
                 }
                 if (i + 1 < applications.length) {
                     options.i = i + 1;

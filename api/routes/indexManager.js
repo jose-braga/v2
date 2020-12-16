@@ -16,6 +16,7 @@ var corsOptions = {
 
 router.options('*', cors())
 
+const addMember = require('../controllers/manager/addMember');
 const membersAll = require('../controllers/manager/all/members');
 const membersUnit = require('../controllers/manager/unit/members');
 const membersUnitValidate = require('../controllers/manager/unit/members_validate');
@@ -48,6 +49,11 @@ router.get('/:userID/units/:unitID/cities/:cityID', cors(corsOptions), membersUn
 router.get('/:userID/cities/:cityID', cors(corsOptions), membersCity.getCityInfo);
 router.get('/:userID/units/:unitID/', cors(corsOptions), membersUnit.getUnitInfo);
 // when unsegmented there's no additional info to retrieve (no specific city/unit)
+
+// Manager adds new member
+router.post('/:userID/units/:unitID/cities/:cityID/members', cors(corsOptions), addMember.addMember);
+router.post('/:userID/cities/:cityID/members', cors(corsOptions), addMember.addMember);
+router.post('/:userID/units/:unitID/members', cors(corsOptions), addMember.addMember);
 
 
 /* Units & Cities*/

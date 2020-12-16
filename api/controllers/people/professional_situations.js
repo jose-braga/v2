@@ -816,6 +816,7 @@ var deleteContractFundingAgencies = function (options) {
 };
 var deleteContractManagementEntities = function (options) {
     let { req, res, next } = options;
+    let personID = req.params.personID;
     let contractID = req.params.contractID;
     let data;
     if (req.body !== undefined) {

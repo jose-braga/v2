@@ -89,3 +89,4 @@ web/public/applications/
 
 # ignore test files
 test*.*
+*.sh

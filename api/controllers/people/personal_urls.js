@@ -1,5 +1,6 @@
 const sql = require('../utilities/sql');
 const permissions = require('../utilities/permissions');
+const responses = require('../utilities/responses');
 const notifications = require('../utilities/notifications');
 
 var actionGetPersonalURLs = function (options) {
@@ -52,6 +53,7 @@ module.exports.createPersonalURLs = function (req, res, next) {
 };
 var actionUpdatePersonalURLs = function (options) {
     let { req, res, next } = options;
+    let personID = req.params.personID;
     let urlID = req.params.urlID;
     let data = req.body.data;
     var querySQL = '';
@@ -85,6 +87,7 @@ module.exports.updatePersonalURLs = function (req, res, next) {
 };
 var actionDeletePersonalURLs = function (options) {
     let { req, res, next } = options;
+    let personID = req.params.personID;
     let urlID = req.params.urlID;
     var querySQL = '';
     var places = [];
