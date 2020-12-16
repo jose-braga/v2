@@ -94,7 +94,7 @@ export default {
                 let unfilteredList = result.data.result.applications;
                 let filteredList = [];
                 for (let ind in unfilteredList) {
-                    if (unfilteredList[ind].ignore_score === 0) {
+                    if (unfilteredList[ind].ignore_score !== 1) {
                         this.$set(unfilteredList[ind], 'url',
                             '/reviewers/calls/'
                             + this.$route.params.callSegment
