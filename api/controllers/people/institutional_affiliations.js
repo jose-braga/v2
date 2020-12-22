@@ -238,8 +238,28 @@ var actionGetLabGroups = function (positions, options, i) {
         );
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
-            positions[i].groups = resQuery;
-            actionGetGroupsUnits(positions, options, i, 0)
+            console.log(positions[i])
+            console.log(resQuery)
+            if (resQuery.length > 0) {
+                positions[i].groups = resQuery;
+                actionGetGroupsUnits(positions, options, i, 0);
+            } else {
+                positions[i].groups = [{units: [{}]}];
+                if (i + 1 < positions.length) {
+                    actionGetLabGroups(positions, options, i + 1);
+                } else {
+                    responses.sendJSONResponseOptions({
+                        response: res,
+                        status: 200,
+                        message: {
+                            "status": "success", "statusCode": 200,
+                            "count": positions.length,
+                            "result": positions
+                        }
+                    });
+                    return;
+                }
+            }
         },
         options);
 };

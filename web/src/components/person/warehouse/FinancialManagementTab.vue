@@ -503,8 +503,6 @@ export default {
                     }
                 }
             }
-            console.log(urlUpdate)
-            console.log(urlCreate)
             this.$http.all(
                 urlUpdate.map(el =>
                     this.$http.put(el.url,

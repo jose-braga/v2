@@ -112,10 +112,12 @@ export default {
                 subUtil.getInfoPopulate(this, 'api/people/' + this.otherPersonId + '/researcher-ids', false)
                 .then( (result) => {
                     // only works if this.data and result have the same keys
-                    Object.keys(result).forEach(key => {
-                        let value = result[key];
-                        this.$set(this.data.researcherIDs, key, value);
-                    });
+                    if (result !== undefined) {
+                        Object.keys(result).forEach(key => {
+                            let value = result[key];
+                            this.$set(this.data.researcherIDs, key, value);
+                        });
+                    }
                 })
             } else {
                 this.$refs.form.reset();

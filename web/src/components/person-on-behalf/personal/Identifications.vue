@@ -114,15 +114,17 @@ export default {
                         + '/identifications', true)
                 .then( (result) => {
                     // only works if this.data and result have the same keys
-                    for (let ind in result) {
-                        this.$set(this.data.identifications, ind, {});
-                        Object.keys(result[ind]).forEach(key => {
-                            let value = result[ind][key];
-                            if (key === 'valid_until') {
-                                value = time.momentToDate(value);
-                            }
-                            this.$set(this.data.identifications[ind], key, value);
-                        });
+                    if (result !== undefined) {
+                        for (let ind in result) {
+                            this.$set(this.data.identifications, ind, {});
+                            Object.keys(result[ind]).forEach(key => {
+                                let value = result[ind][key];
+                                if (key === 'valid_until') {
+                                    value = time.momentToDate(value);
+                                }
+                                this.$set(this.data.identifications[ind], key, value);
+                            });
+                        }
                     }
                 })
             } else {

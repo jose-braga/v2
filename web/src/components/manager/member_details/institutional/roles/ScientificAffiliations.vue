@@ -70,7 +70,7 @@
                     offset-y min-width="290px">
                     <template v-slot:activator="{ on }">
                         <v-text-field v-model="pos.valid_until"
-                            label="From" v-on="on">
+                            label="Until" v-on="on">
                         </v-text-field>
                     </template>
                     <v-date-picker v-model="pos.valid_until"
@@ -98,14 +98,14 @@
                 outlined color="blue">Update</v-btn>
             </v-row>
         </v-col>
-         <v-col cols="1">
-                <v-progress-circular indeterminate
-                        v-show="progress"
-                        :size="20" :width="2"
-                        color="primary"></v-progress-circular>
-                <v-icon v-show="success" color="green">mdi-check</v-icon>
-                <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
-            </v-col>
+        <v-col cols="1">
+            <v-progress-circular indeterminate
+                    v-show="progress"
+                    :size="20" :width="2"
+                    color="primary"></v-progress-circular>
+            <v-icon v-show="success" color="green">mdi-check</v-icon>
+            <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
+        </v-col>
     </v-row>
 </v-form>
 </template>

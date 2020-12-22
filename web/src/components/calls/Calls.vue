@@ -59,7 +59,6 @@ export default {
         }
     },
     created () {
-        console.log(this.isLaqv)
         this.initialize();
         this.getOpenCalls();
     },

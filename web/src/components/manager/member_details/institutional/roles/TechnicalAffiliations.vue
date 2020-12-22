@@ -57,7 +57,7 @@
                     offset-y min-width="290px">
                     <template v-slot:activator="{ on }">
                         <v-text-field v-model="pos.valid_until"
-                            label="From" v-on="on">
+                            label="Until" v-on="on">
                         </v-text-field>
                     </template>
                     <v-date-picker v-model="pos.valid_until"

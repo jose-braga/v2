@@ -16,6 +16,9 @@
                 Members@{{segment.city[0].city}}&{{segment.unit[0].short_name}}
             </div>
         </v-tab>
+        <v-tab to="/manager/people-no-association">
+            Undefined associations
+        </v-tab>
         <v-tab to="/manager/validate">
             To validate
         </v-tab>

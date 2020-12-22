@@ -122,10 +122,12 @@ export default {
                         + '/personal-address', false)
                 .then( (result) => {
                     // only works if this.data and result have the same keys
-                    Object.keys(result).forEach(key => {
-                        let value = result[key];
-                        this.$set(this.data.personal_addresses, key, value);
-                    });
+                    if (result !== undefined) {
+                        Object.keys(result).forEach(key => {
+                            let value = result[key];
+                            this.$set(this.data.personal_addresses, key, value);
+                        });
+                    }
                 })
                 subUtil.getInfoPopulate(this,
                         'api/people/'
@@ -133,10 +135,12 @@ export default {
                         + '/personal-phone', false)
                 .then( (result) => {
                     // only works if this.data and result have the same keys
-                    Object.keys(result).forEach(key => {
-                        let value = result[key];
-                        this.$set(this.data.personal_phones, key, value);
-                    });
+                    if (result !== undefined) {
+                        Object.keys(result).forEach(key => {
+                            let value = result[key];
+                            this.$set(this.data.personal_phones, key, value);
+                        });
+                    }
                 })
                 subUtil.getInfoPopulate(this,
                         'api/people/'
@@ -144,10 +148,12 @@ export default {
                         + '/personal-email', false)
                 .then( (result) => {
                     // only works if this.data and result have the same keys
-                    Object.keys(result).forEach(key => {
-                        let value = result[key];
-                        this.$set(this.data.personal_emails, key, value);
-                    });
+                    if (result !== undefined) {
+                        Object.keys(result).forEach(key => {
+                            let value = result[key];
+                            this.$set(this.data.personal_emails, key, value);
+                        });
+                    }
                 })
 
             } else {

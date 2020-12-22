@@ -313,31 +313,33 @@ export default {
             this.data.isScienceManagement= false;
             this.data.isAdministrative= false;
             for (let el in this.data.roles) {
-                if (typeof this.data.roles[el] === 'number') {
-                    if (this.data.roles[el] === 1) {
-                        this.data.isScientific = true;
-                    }
-                    if (this.data.roles[el] === 2) {
-                        this.data.isTechnical = true;
-                    }
-                    if (this.data.roles[el] === 3) {
-                        this.data.isScienceManagement = true;
-                    }
-                    if (this.data.roles[el] === 4) {
-                        this.data.isAdministrative = true;
-                    }
-                } else {
-                    if (this.data.roles[el].role_id === 1) {
-                        this.data.isScientific = true;
-                    }
-                    if (this.data.roles[el].role_id === 2) {
-                        this.data.isTechnical = true;
-                    }
-                    if (this.data.roles[el].role_id === 3) {
-                        this.data.isScienceManagement = true;
-                    }
-                    if (this.data.roles[el].role_id === 4) {
-                        this.data.isAdministrative = true;
+                if (this.data.roles[el] !== null) {
+                    if (typeof this.data.roles[el] === 'number') {
+                        if (this.data.roles[el] === 1) {
+                            this.data.isScientific = true;
+                        }
+                        if (this.data.roles[el] === 2) {
+                            this.data.isTechnical = true;
+                        }
+                        if (this.data.roles[el] === 3) {
+                            this.data.isScienceManagement = true;
+                        }
+                        if (this.data.roles[el] === 4) {
+                            this.data.isAdministrative = true;
+                        }
+                    } else {
+                        if (this.data.roles[el].role_id === 1) {
+                            this.data.isScientific = true;
+                        }
+                        if (this.data.roles[el].role_id === 2) {
+                            this.data.isTechnical = true;
+                        }
+                        if (this.data.roles[el].role_id === 3) {
+                            this.data.isScienceManagement = true;
+                        }
+                        if (this.data.roles[el].role_id === 4) {
+                            this.data.isAdministrative = true;
+                        }
                     }
                 }
             }
