@@ -143,6 +143,10 @@ var actionGetCallID = function (options) {
                 options.callID = resQuery[0].id;
                 if (options.type === 'update') {
                     return actionUpdateApplication(options);
+                } else if (options.type === 'email-applicant') {
+                    return sendApplicantMessage(options);
+                } else if (options.type === 'email-applicant-update') {
+                    return sendApplicantMessage(options);
                 }
                 return actionCreateApplication(options);
             } else {
@@ -188,11 +192,14 @@ var actionCreateApplicant = function (options) {
     if (data.identification_valid_until === '') {
         data.identification_valid_until = null;
     }
+    if (data.countries === null) {
+        data.countries = {};
+    }
     if (isLAQV) {
         querySQL = querySQL + 'INSERT INTO applicants'
                             + ' (application_id, name, document_type_id, document_number, document_valid_until,'
-                            + ' gender, email, birth_date, address, postal_code, city, id_country, phone, erasmus_experience)'
-                            + ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+                            + ' gender, email, birth_date, address, postal_code, city, id_country, phone, erasmus_experience, msc_abstract)'
+                            + ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         places.push( applicationID,
             data.name,
             data.identification_type_id,
@@ -204,9 +211,10 @@ var actionCreateApplicant = function (options) {
             data.address,
             data.postal_code,
             data.city,
-            data.id_country,
+            data.countries.id,
             data.phone,
-            data.erasmus
+            data.erasmus,
+            data.msc_abstract
         )
     } else {
         querySQL = querySQL + 'INSERT INTO applicants'
@@ -224,7 +232,7 @@ var actionCreateApplicant = function (options) {
             data.address,
             data.postal_code,
             data.city,
-            data.id_country,
+            data.countries.id,
             data.phone
         )
     }
@@ -1069,7 +1077,7 @@ module.exports.uploadApplicationDocuments = function (req, res, next) {
 var actionGetApplicationCriteria = function (options) {
     let { req, res, next } = options;
     let data = req.body.data;
-    let isLAQV = data.isLAQV
+    let isLAQV = req.body.isLAQV
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'SELECT *'
@@ -1895,8 +1903,8 @@ var computeScoreCommunicationsLAQV = function (options) {
     let { req, res, next } = options;
     let data = req.body.data;
     let score = 0.0;
-    let communicationsPoints = 1.0;
-    let postersPoints = 0.5;
+    let communicationsPoints = 2.0;
+    let postersPoints = 1.0;
     let maxScore = 5.0;
 
     let indCriteria;
@@ -1917,7 +1925,7 @@ var computeScoreCommunicationsLAQV = function (options) {
             }
         }
         if (data.posters.length > 0) {
-            for (let ind in data.communications) {
+            for (let ind in data.posters) {
                 score = score + postersPoints;
             }
         }
@@ -1927,8 +1935,6 @@ var computeScoreCommunicationsLAQV = function (options) {
     options.i = 0;
     return computeGlobalAutomaticScores(options);
 };
-
-
 module.exports.computeScores = function (req, res, next) {
     let options = {
         req,
@@ -1938,6 +1944,132 @@ module.exports.computeScores = function (req, res, next) {
     return actionGetApplicationCriteria(options);
 }
 
+async function sendApplicantMessage(options) {
+    let { req, res, next, call } = options;
+    let data = req.body.data;
+
+    let recipients = data.email;
+    let mailOptions;
+    let subjectText;
+    let emailBody;
+    let emailBodyHtml;
+    if (options.type !== 'email-applicant-update') {
+        subjectText = call.call_name + ': Application submission was successful';
+        emailBody = 'Dear ' + data.name + ',\n\n'
+            + 'Your application submission for the ' + call.call_name + ' call was successful.'
+            + '\n\n'
+            + ' Best regards,\n'
+            + ' The ' + call.call_name + ' Scientific Committee';
+        emailBodyHtml = '<p>' + 'Dear ' + data.name + ',</p>'
+            + '<p>Your application submission for the <b>' + call.call_name
+            + '</b> call was successful.'
+            + ' <p>Best regards,<br>'
+            + ' The ' + call.call_name + ' Scientific Committee</p>';
+
+    } else {
+        subjectText = call.call_name + ': Application was updated';
+        emailBody = 'Dear ' + data.name + ',\n\n'
+            + 'Update of your application for the ' + call.call_name + ' call was successful.'
+            + '\n\n'
+            + ' Best regards,\n'
+            + ' The ' + call.call_name + ' Scientific Committee';
+        emailBodyHtml = '<p>' + 'Dear ' + data.name + ',</p>'
+            + '<p>Update of your application for the <b>' + call.call_name
+            + '</b> call was successful.'
+            + ' <p>Best regards,<br>'
+            + ' The ' + call.call_name + ' Scientific Committee</p>';
+    }
+    options.req.body.data.applicantMessage = {};
+    options.req.body.data.applicantMessage.subjectText = subjectText;
+    options.req.body.data.applicantMessage.emailBody = emailBody;
+    options.req.body.data.applicantMessage.email = recipients;
+
+    if (process.env.NODE_ENV === 'production') {
+        mailOptions = {
+            from: '"Admin" <admin@laqv-ucibio.info>', // sender address
+            to: recipients, // list of receivers (comma-separated)
+            subject: subjectText, // Subject line
+            text: emailBody,
+            html: emailBodyHtml,
+        };
+        // send mail with defined transport object
+        let info = await transporter.sendMail(mailOptions);
+        console.log('Message %s sent: %s', info.messageId, info.response);
+        options.req.body.data.applicantMessage.sent = time.momentToDate(time.moment(), undefined, 'YYYY-MM-DD HH:mm:ss');
+        return writeApplicantMessageDB(options);
+    } else {
+        // just for testing purposes
+        mailOptions = {
+            from: '"Admin" <admin@laqv-ucibio.info>', // sender address
+            to: recipients, // list of receivers (comma-separated)
+            subject: 'TESTING: ' + subjectText, // Subject line
+            text: emailBody,
+            html: emailBodyHtml,
+        };
+        // send mail with defined transport object
+        let info = await transporter.sendMail(mailOptions);
+        console.log('Message %s sent: %s', info.messageId, info.response);
+        options.req.body.data.applicantMessage.sent = time.momentToDate(time.moment(), undefined, 'YYYY-MM-DD HH:mm:ss');
+        return writeApplicantMessageDB(options);
+    }
+};
+var writeApplicantMessageDB = function (options, error) {
+    let { req, res, next, call } = options;
+    let data = req.body.data;
+    applicationID = req.params.applicationID;
+    var querySQL = '';
+    var places = [];
+    let applicantMessage = data.applicantMessage;
+    if (error) {
+        applicantMessage.sent = null;
+    }
+    querySQL = querySQL + 'INSERT INTO application_emails_sent'
+                        + ' (`application_id`, `to`, `subject`, `body`, `sent`)'
+                        + ' VALUES (?, ?, ?, ?, ?);';
+    places.push( applicationID,
+        applicantMessage.email,
+        applicantMessage.subjectText,
+        applicantMessage.emailBody,
+        applicantMessage.sent
+    );
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            responses.sendJSONResponseOptions({
+                response: res,
+                status: 200,
+                message: {
+                    "status": "success",
+                    "statusCode": 200,
+                    data,
+                    "result": {
+                        applicationID: applicationID,
+                        callID: call.id
+                    },
+                }
+            });
+            return;
+        },
+        options);
+};
+
+module.exports.emailApplicant = function (req, res, next) {
+    let options = {
+        req,
+        res,
+        next,
+    }
+    options.type = 'email-applicant';
+    return actionGetCallID(options);
+}
+module.exports.emailApplicantUpdate = function (req, res, next) {
+    let options = {
+        req,
+        res,
+        next,
+    }
+    options.type = 'email-applicant-update';
+    return actionGetCallID(options);
+}
 
 var actionUpdateApplication = function (options) {
     let { req, res, next, call } = options;
@@ -1970,6 +2102,9 @@ var updateApplicant = function (options) {
     if (data.identification_valid_until === '') {
         data.identification_valid_until = null;
     }
+    if (data.countries === null) {
+        data.countries = {};
+    }
     if (isLAQV) {
         querySQL = querySQL + 'UPDATE applicants'
                             + ' SET name = ?,'
@@ -1998,7 +2133,7 @@ var updateApplicant = function (options) {
             data.address,
             data.postal_code,
             data.city,
-            data.id_country,
+            data.countries.id,
             data.phone,
             data.erasmus,
             applicationID
@@ -2031,12 +2166,11 @@ var updateApplicant = function (options) {
             data.address,
             data.postal_code,
             data.city,
-            data.id_country,
+            data.countries.id,
             data.phone,
             applicationID
         )
     }
-    // TODO: create url_access for applicant in the end if is successfull
 
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {

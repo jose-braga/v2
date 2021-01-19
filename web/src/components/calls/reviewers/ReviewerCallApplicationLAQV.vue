@@ -111,7 +111,7 @@
                                         </v-expansion-panels>
                                         <div v-if="Object.keys(criteria2.children).length === 0">
                                             <div v-if="criteria2.criteria_name === 'Master thesis'">
-                                                <p>Check CV in <b>"Application Documents"</b> below.</p>
+                                                <p class="mt-2"><b>MSc thesis abstract:</b> <br> <span class="pre-formatted">{{data.application.msc_abstract}}</span> </p>
                                             </div>
                                             <div v-if="criteria2.criteria_name === 'Papers'">
                                                 <ol>

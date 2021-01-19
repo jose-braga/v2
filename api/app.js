@@ -16,6 +16,7 @@ var routesAPIAreas = require('./routes/indexUnitAreas');
 var routesAPIPreRegister = require('./routes/indexPreRegister');
 var routesAPIApplications = require('./routes/indexApplications');
 var routesAPIApplicationsLAQV = require('./routes/indexApplicationsLAQV');
+var routesAPIPolls = require('./routes/indexPolls');
 var routesAPIAuth = require('./routes/indexAuth');
 
 var app = express();
@@ -39,6 +40,7 @@ app.use('/api/admins', routesAPIAdmins);
 app.use('/api/unit-areas', routesAPIAreas);
 app.use('/api/pre-register/people', routesAPIPreRegister);
 app.use('/api/calls', routesAPIApplications); // for UCIBIO
+app.use('/api/polls', routesAPIPolls);
 app.use('/api/laqv/calls', routesAPIApplicationsLAQV);
 app.use('/api', routesAPIAuth);
 

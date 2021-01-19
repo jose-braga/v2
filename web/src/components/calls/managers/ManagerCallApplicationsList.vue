@@ -12,10 +12,10 @@
         </v-row>
     </v-app-bar>
     <div v-if="loggedIn" class="px-4">
-        <v-row justify="center" align="center" class="mt-1">
-            <v-col cols="12" align="center">
-                <v-row justify="center" align="center">
-                    <span class="mr-4">Export to spreadsheet</span>
+        <v-row class="mt-1">
+            <v-col cols="10" md="6" align="end">
+                <v-row justify="end" align="center">
+                    <span class="mr-4">Export grades to spreadsheet</span>
                     <v-btn fab color="green" @click="generateSpreadsheet(applications)">
                         <v-icon color="white" x-large>mdi-file-excel</v-icon>
                     </v-btn>
@@ -703,10 +703,7 @@
                                         </v-expansion-panel>
                                     </v-expansion-panels>
                                 </v-col>
-
-
                             </v-row>
-
                             <v-expansion-panels class="mt-3 px-2">
                                 <v-expansion-panel>
                                     <v-expansion-panel-header>
@@ -727,10 +724,19 @@
                                                 </span>
                                             </li>
                                         </ol>
-
                                     </v-expansion-panel-content>
                                 </v-expansion-panel>
                             </v-expansion-panels>
+                            <v-row class="mt-1">
+                                <v-col cols="10" md="6" align="end">
+                                    <v-row justify="end" align="center">
+                                        <span class="mr-4">Export candidate documentation</span>
+                                        <v-btn fab color="blue" @click="exportDocumentation(application)">
+                                            <v-icon color="white" x-large>mdi-file-document-multiple</v-icon>
+                                        </v-btn>
+                                    </v-row>
+                                </v-col>
+                            </v-row>
                         </v-expansion-panel-content>
                     </v-expansion-panel>
                 </v-expansion-panels>
@@ -742,8 +748,15 @@
 
 <script>
 import ManagerCallApplicationsListLAQV from './ManagerCallApplicationsListLAQV'
+import subUtil from '@/components/common/submit-utils'
 import time from '@/components/common/date-utils'
 import XLSX from 'xlsx'
+import { PDFDocument, PageSizes,
+    StandardFonts,
+    rgb
+//, PDFName, PDFBool, PDFString, PDFNumber
+} from 'pdf-lib'
+import download from 'downloadjs'
 
 const scoreSum = (obj, sum) => {
     if (sum === undefined) sum = 0;
@@ -815,6 +828,89 @@ function processForSpreadsheet(items) {
     }
     return itemsCurated;
 }
+function makeList(pdfDoc, page, options, text, currentLine, newYStartPosition, type) {
+    let { maxLineLength, lineSpacing, yRectMargin,
+        yStartPositionTitle, listIndentFirst, listIndentOther,
+        textFont, textFontBold, textFontOblique, fontSizeNormal, colorNormal
+    } = options;
+    let words = text.split(' ');
+    let textLine = '';
+    let listLine = 1;
+    for (let indWord in words) {
+        let wordLength = words[indWord].length;
+        let currentTextLength = textLine.length;
+        // + 1 because we add a space
+        if (currentTextLength + wordLength + 1 <= maxLineLength) {
+            textLine = textLine + words[indWord] + ' ';
+        } else {
+        if ( newYStartPosition - currentLine * lineSpacing < yRectMargin * 3) {
+                page = pdfDoc.addPage(PageSizes.A4);
+                newYStartPosition = yStartPositionTitle;
+                currentLine = 1;
+            }
+            if (type === 'bold') {
+                page.drawText(textLine, {
+                    x: listLine === 1 ? listIndentFirst : listIndentOther,
+                    y: newYStartPosition - currentLine * lineSpacing,
+                    size: fontSizeNormal,
+                    font: textFontBold,
+                    color: colorNormal,
+                })
+            } else if (type === 'oblique') {
+                page.drawText(textLine, {
+                    x: listLine === 1 ? listIndentFirst : listIndentOther,
+                    y: newYStartPosition - currentLine * lineSpacing,
+                    size: fontSizeNormal,
+                    font: textFontOblique,
+                    color: colorNormal,
+                })
+            } else {
+                page.drawText(textLine, {
+                    x: listLine === 1 ? listIndentFirst : listIndentOther,
+                    y: newYStartPosition - currentLine * lineSpacing,
+                    size: fontSizeNormal,
+                    font: textFont,
+                    color: colorNormal,
+                })
+            }
+            textLine = words[indWord] + ' ';
+            listLine++;
+            currentLine++;
+        }
+    }
+    if ( newYStartPosition - currentLine * lineSpacing < yRectMargin * 3) {
+        page = pdfDoc.addPage(PageSizes.A4);
+        newYStartPosition = yStartPositionTitle;
+        currentLine = 1;
+    }
+    if (type === 'bold') {
+        page.drawText(textLine, {
+            x: listLine === 1 ? listIndentFirst : listIndentOther,
+            y: newYStartPosition - currentLine * lineSpacing,
+            size: fontSizeNormal,
+            font: textFontBold,
+            color: colorNormal,
+        })
+    } else if (type === 'oblique') {
+        page.drawText(textLine, {
+            x: listLine === 1 ? listIndentFirst : listIndentOther,
+            y: newYStartPosition - currentLine * lineSpacing,
+            size: fontSizeNormal,
+            font: textFontOblique,
+            color: colorNormal,
+        })
+    } else {
+        page.drawText(textLine, {
+            x: listLine === 1 ? listIndentFirst : listIndentOther,
+            y: newYStartPosition - currentLine * lineSpacing,
+            size: fontSizeNormal,
+            font: textFont,
+            color: colorNormal,
+        })
+    }
+    currentLine++;
+    return { pdfDoc, page, currentLine, newYStartPosition };
+}
 
 export default {
     components: {
@@ -834,6 +930,8 @@ export default {
                 isPorto: false,
             },
             indTotal: [],
+            countries: [],
+            cardTypes: [],
 
         }
     },
@@ -847,6 +945,8 @@ export default {
     },
     mounted() {
         this.$store.commit('checkExistingSession', { path: '/call-managers'});
+        this.getCountries();
+        this.getCardTypes();
         this.getManagerCallApplications();
     },
     watch: {
@@ -997,6 +1097,24 @@ export default {
             this.$set(this.applications[ind], 'score_average', score_average.toFixed(2));
 
         },
+        getCardTypes () {
+            let this_vm = this;
+            const urlSubmit = 'api/v2/' + 'card-types';
+            subUtil.getPublicInfo(this_vm, urlSubmit, 'cardTypes')
+            .then(() => {
+                this.cardTypes = this.cardTypes.filter(
+                    (el) => {
+                        return el.name_en !== "Fiscal Number"
+                            && el.name_en !== "Social Security Number"
+                    }
+                );
+            });
+        },
+        getCountries() {
+            var this_vm = this;
+            const urlSubmit = 'api/v2/' + 'countries';
+            subUtil.getPublicInfo(this_vm, urlSubmit, 'countries');
+        },
         generateSpreadsheet(items) {
             let today = time.moment();
             let dateFile = time.momentToDate(today, 'Europe/Lisbon', 'YYYY-MM-DDTHHmmss')
@@ -1009,6 +1127,759 @@ export default {
             XLSX.writeFile(wb, username
                     + '_' + this.callName
                     + '_applicants_' + dateFile + '.xlsx');
+        },
+        async exportDocumentation (application) {
+            let pdfDoc = await PDFDocument.create();
+            const textFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+            const textFontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+            const textFontOblique = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
+            //const textFontBoldOblique = await pdfDoc.embedFont(StandardFonts.HelveticaBoldOblique);
+            let page = pdfDoc.addPage(PageSizes.A4);
+            const { width, height } = page.getSize();
+            const fontSizeHeader = 9;
+            const fontSizeTitle = 20;
+            const fontSizeNormal = 11;
+            const maxLineLength = 90;
+            let listIndentFirst = 60;
+            let listIndentOther = 80;
+            let currentLine = 1;
+            let lineSpacing = 1.4 * fontSizeNormal
+            let yStartPositionHeader = height - 3 * fontSizeHeader
+            let yStartPositionTitle = yStartPositionHeader - 2 * fontSizeTitle
+            let yStartPosition = yStartPositionTitle - 4 * lineSpacing;
+            const xRectMargin = 30;
+            const yRectMargin = 10;
+            const colorHeader = rgb(0.1, 0.1, 0.1)
+            const colorTitle = rgb(0, 0, 0.5)
+            const colorNormal = rgb(0, 0, 0)
+            const xImageSize = 120;
+            const year = '2021'
+            let options = {
+                textFont, textFontBold, textFontOblique,
+                fontSizeHeader, fontSizeTitle, fontSizeNormal, colorHeader, colorTitle, colorNormal,
+                width, height, maxLineLength, listIndentFirst, listIndentOther,
+                lineSpacing, yStartPositionHeader, yStartPositionTitle, yStartPosition,
+                xRectMargin, yRectMargin,
+                xImageSize
+            }
+            page.drawText(this.callName + ' - ' + year, {
+                x: 50,
+                y: yStartPositionHeader - fontSizeHeader,
+                size: fontSizeHeader,
+                font: textFont,
+                color: colorHeader,
+            })
+            for (let ind in application.documents) {
+                if (application.documents[ind].document_type_id === 6) {
+                    let url = application.documents[ind].url;
+                    let photo = await this.$http.get(url,
+                        {
+                            responseType: 'arraybuffer'
+                        })
+                    .then(result => result.data )
+                    let urlSplit = url.split('.');
+                    let extension = urlSplit[urlSplit.length - 1];
+                    let image;
+                    //let imageSize;
+                    if (extension === 'jpg' || extension === 'jpeg') {
+                        image = await pdfDoc.embedJpg(photo);
+                    } else if (extension === 'png') {
+                        image = await pdfDoc.embedPng(photo);
+                    }
+                    if (image !== undefined) {
+                        let scaleImage = image.scale(1);
+                        let factor = xImageSize / scaleImage.width
+                        let imageSize = image.scale(factor);
+                        page.drawImage(
+                            image,
+                            {
+                                x: width - imageSize.width - xRectMargin,
+                                y: yStartPositionHeader - imageSize.height,
+                                width: imageSize.width,
+                                height: imageSize.height,
+                            }
+                        )
+                    }
+                }
+            }
+            page.drawText('Documentation for candidate: ', {
+                x: 50,
+                y: yStartPositionTitle - fontSizeTitle,
+                size: fontSizeTitle,
+                font: textFont,
+                color: colorTitle,
+            })
+            page.drawText(application.applicant_name, {
+                x: 50,
+                y: yStartPositionTitle - 2 * fontSizeTitle,
+                size: fontSizeTitle,
+                font: textFont,
+                color: colorTitle,
+            })
+            page.drawLine( {
+                start: {x: xRectMargin, y: yStartPosition - currentLine * lineSpacing - yRectMargin},
+                end: {x: width - xRectMargin, y: yStartPosition - currentLine * lineSpacing - yRectMargin},
+            })
+
+            page.drawText('Candidate Personal Data:', {
+                x: 50,
+                y: yStartPosition - currentLine * lineSpacing,
+                size: fontSizeNormal,
+                font: textFontBold,
+                color: colorNormal,
+            })
+            currentLine++; currentLine++;
+            page.drawText('Name:', {
+                x: 50,
+                y: yStartPosition - currentLine * lineSpacing,
+                size: fontSizeNormal,
+                font: textFontBold,
+                color: colorNormal,
+            })
+            page.drawText(application.applicant_name, {
+                x: 100,
+                y: yStartPosition - currentLine * lineSpacing,
+                size: fontSizeNormal,
+                font: textFont,
+                color: colorNormal,
+            })
+            currentLine++;
+            page.drawText('Email:', {
+                x: 50,
+                y: yStartPosition - currentLine * lineSpacing,
+                size: fontSizeNormal,
+                font: textFontBold,
+                color: colorNormal,
+            })
+            page.drawText(application.applicant.email, {
+                x: 100,
+                y: yStartPosition - currentLine * lineSpacing,
+                size: fontSizeNormal,
+                font: textFont,
+                color: colorNormal,
+            })
+            page.drawText('Phone:', {
+                x: 290,
+                y: yStartPosition - currentLine * lineSpacing,
+                size: fontSizeNormal,
+                font: textFontBold,
+                color: colorNormal,
+            })
+            page.drawText(application.applicant.phone, {
+                x: 340,
+                y: yStartPosition - currentLine * lineSpacing,
+                size: fontSizeNormal,
+                font: textFont,
+                color: colorNormal,
+            })
+            currentLine++;
+            page.drawText('Gender:', {
+                x: 50,
+                y: yStartPosition - currentLine * lineSpacing,
+                size: fontSizeNormal,
+                font: textFontBold,
+                color: colorNormal,
+            })
+            page.drawText(application.applicant.gender, {
+                x: 100,
+                y: yStartPosition - currentLine * lineSpacing,
+                size: fontSizeNormal,
+                font: textFont,
+                color: colorNormal,
+            })
+            page.drawText('Birth date:', {
+                x: 150,
+                y: yStartPosition - currentLine * lineSpacing,
+                size: fontSizeNormal,
+                font: textFontBold,
+                color: colorNormal,
+            })
+            let birth_date = ''
+            if (application.applicant.birth_date !== null
+                && application.applicant.birth_date !== null
+                && application.applicant.birth_date !== '') {
+                birth_date = time.moment(application.applicant.birth_date)
+                                .format('YYYY-MM-DD');
+            }
+            page.drawText(birth_date, {
+                x: 210,
+                y: yStartPosition - currentLine * lineSpacing,
+                size: fontSizeNormal,
+                font: textFont,
+                color: colorNormal,
+            })
+            page.drawText('Nationality:', {
+                x: 290,
+                y: yStartPosition - currentLine * lineSpacing,
+                size: fontSizeNormal,
+                font: textFontBold,
+                color: colorNormal,
+            })
+            let nation = ''
+            for (let ind in this.countries) {
+                if (this.countries[ind].id === application.applicant.id_country) {
+                    nation = this.countries[ind].name;
+                    break;
+                }
+            }
+            page.drawText(nation, {
+                x: 355,
+                y: yStartPosition - currentLine * lineSpacing,
+                size: fontSizeNormal,
+                font: textFont,
+                color: colorNormal,
+            })
+            currentLine++;
+            page.drawText('ID card type:', {
+                x: 50,
+                y: yStartPosition - currentLine * lineSpacing,
+                size: fontSizeNormal,
+                font: textFontBold,
+                color: colorNormal,
+            })
+            let cardType = ''
+            for (let ind in this.cardTypes) {
+                if (this.cardTypes[ind].id === application.applicant.document_type_id) {
+                    cardType = this.cardTypes[ind].name_en;
+                    break;
+                }
+            }
+            page.drawText(cardType, {
+                x: 120,
+                y: yStartPosition - currentLine * lineSpacing,
+                size: fontSizeNormal,
+                font: textFont,
+                color: colorNormal,
+            })
+            page.drawText('ID card number:', {
+                x: 220,
+                y: yStartPosition - currentLine * lineSpacing,
+                size: fontSizeNormal,
+                font: textFontBold,
+                color: colorNormal,
+            })
+            page.drawText(application.applicant.document_number, {
+                x: 308,
+                y: yStartPosition - currentLine * lineSpacing,
+                size: fontSizeNormal,
+                font: textFont,
+                color: colorNormal,
+            })
+            page.drawText('Valid until:', {
+                x: 400,
+                y: yStartPosition - currentLine * lineSpacing,
+                size: fontSizeNormal,
+                font: textFontBold,
+                color: colorNormal,
+            })
+            let validity = ''
+            if (application.applicant.document_valid_until !== null
+                && application.applicant.document_valid_until !== null
+                && application.applicant.document_valid_until !== '') {
+                validity = time.moment(application.applicant.document_valid_until)
+                                .format('YYYY-MM-DD');
+            }
+            page.drawText(validity, {
+                x: 460,
+                y: yStartPosition - currentLine * lineSpacing,
+                size: fontSizeNormal,
+                font: textFont,
+                color: colorNormal,
+            })
+            currentLine++;
+            page.drawText('Address:', {
+                x: 50,
+                y: yStartPosition - currentLine * lineSpacing,
+                size: fontSizeNormal,
+                font: textFontBold,
+                color: colorNormal,
+            })
+            let addressLines = application.applicant.address.split('\n')
+            for (let ind in addressLines) {
+                page.drawText(addressLines[ind], {
+                    x: 100,
+                    y: yStartPosition - currentLine * lineSpacing,
+                    size: fontSizeNormal,
+                    font: textFont,
+                    color: colorNormal,
+                })
+                currentLine++;
+            }
+            page.drawText(application.applicant.postal_code + ' ' + application.applicant.city, {
+                x: 100,
+                y: yStartPosition - currentLine * lineSpacing,
+                size: fontSizeNormal,
+                font: textFont,
+                color: colorNormal,
+            })
+            let newYStartPosition = yStartPosition - currentLine * lineSpacing - yRectMargin
+            newYStartPosition = newYStartPosition - 2 * yRectMargin - lineSpacing;
+            page.drawText('Academic Curriculum:', {
+                x: 50,
+                y: newYStartPosition,
+                size: fontSizeNormal,
+                font: textFontBold,
+                color: colorNormal,
+            })
+            page.drawLine( {
+                start: {x: xRectMargin, y: newYStartPosition - yRectMargin},
+                end: {x: width - xRectMargin, y: newYStartPosition - yRectMargin},
+            })
+            currentLine = 2; // refers to the start of the block
+            for (let ind in application.academicDegrees) {
+                let text = (parseInt(ind,10) + 1)
+                    + '. ' + application.academicDegrees[ind].degree_name
+                    + ' - ' + application.academicDegrees[ind].course_name
+                    + ' (' + application.academicDegrees[ind].institution + ')'
+                    + '. Grade:' + application.academicDegrees[ind].grade;
+                let words = text.split(' ');
+                let textLine = '';
+                let listLine = 1;
+                for (let indWord in words) {
+                    let wordLength = words[indWord].length;
+                    let currentTextLength = textLine.length;
+                    // + 1 because we add a space
+                    if (currentTextLength + wordLength + 1 <= maxLineLength) {
+                        textLine = textLine + words[indWord] + ' ';
+                    } else {
+                        page.drawText(textLine, {
+                            x: listLine === 1 ? listIndentFirst : listIndentOther,
+                            y: newYStartPosition - currentLine * lineSpacing,
+                            size: fontSizeNormal,
+                            font: textFont,
+                            color: colorNormal,
+                        })
+                        textLine = words[indWord] + ' ';
+                        listLine++;
+                        currentLine++;
+                    }
+                }
+                page.drawText(textLine, {
+                    x: listLine === 1 ? listIndentFirst : listIndentOther,
+                    y: newYStartPosition - currentLine * lineSpacing,
+                    size: fontSizeNormal,
+                    font: textFont,
+                    color: colorNormal,
+                })
+                currentLine++;
+            }
+            currentLine++;
+            if (application.applicant.erasmus_experience === 1) {
+                page.drawText('Candidate participated in Erasmus Programme', {
+                    x: listIndentFirst,
+                    y: newYStartPosition - currentLine * lineSpacing,
+                    size: fontSizeNormal,
+                    font: textFontOblique,
+                    color: colorNormal,
+                })
+                currentLine++;
+            }
+            currentLine++;
+            page.drawText('MSc Thesis Abstract:', {
+                x: listIndentFirst,
+                y: newYStartPosition - currentLine * lineSpacing,
+                size: fontSizeNormal,
+                font: textFontOblique,
+                color: colorNormal,
+            })
+            currentLine++;
+            let abstractLines = application.applicant.msc_abstract.split('\n')
+            for (let ind in abstractLines) {
+                let text = abstractLines[ind];
+                // object destructuring requires the parenthesis
+                ({ pdfDoc, page, currentLine, newYStartPosition }
+                    = makeList(pdfDoc, page, options, text, currentLine, newYStartPosition))
+            }
+
+            currentLine++;
+            newYStartPosition = newYStartPosition - (currentLine - 1) * lineSpacing - yRectMargin
+            newYStartPosition = newYStartPosition - 2 * yRectMargin - lineSpacing;
+            page.drawText('Scientific Curriculum:', {
+                x: 50,
+                y: newYStartPosition,
+                size: fontSizeNormal,
+                font: textFontBold,
+                color: colorNormal,
+            })
+            page.drawLine( {
+                start: {x: xRectMargin, y: newYStartPosition - yRectMargin},
+                end: {x: width - xRectMargin, y: newYStartPosition - yRectMargin},
+            })
+            currentLine = 2; // refers to the start of the block
+            page.drawText('Publications', {
+                x: 50,
+                y: newYStartPosition - currentLine * lineSpacing,
+                size: fontSizeNormal,
+                font: textFontOblique,
+                color: colorNormal,
+            })
+            currentLine++;
+            for (let ind in application.papers) {
+                let text = (parseInt(ind,10) + 1)
+                    + '. ' + application.papers[ind].authors_raw
+                    + ' (' + application.papers[ind].year + ').'
+                    + ' "' + application.papers[ind].title + '"'
+                    + '. ' + application.papers[ind].journal_name
+                    + ', ' + application.papers[ind].volume
+                    + ', ' + application.papers[ind].pages;
+                let words = text.split(' ');
+                let textLine = '';
+                let listLine = 1;
+                for (let indWord in words) {
+                    let wordLength = words[indWord].length;
+                    let currentTextLength = textLine.length;
+                    // + 1 because we add a space, - 5 (an adjustment for publications)
+                    if (currentTextLength + wordLength + 1 <= maxLineLength - 5) {
+                        textLine = textLine + words[indWord] + ' ';
+                    } else {
+                        if ( newYStartPosition - currentLine * lineSpacing < yRectMargin * 3) {
+                            page = pdfDoc.addPage(PageSizes.A4);
+                            newYStartPosition = yStartPositionTitle;
+                            currentLine = 1;
+                        }
+                        page.drawText(textLine, {
+                            x: listLine === 1 ? listIndentFirst : listIndentOther,
+                            y: newYStartPosition - currentLine * lineSpacing,
+                            size: fontSizeNormal,
+                            font: textFont,
+                            color: colorNormal,
+                        })
+                        textLine = words[indWord] + ' ';
+                        listLine++;
+                        currentLine++;
+                    }
+                }
+                if ( newYStartPosition - currentLine * lineSpacing < yRectMargin * 3) {
+                    page = pdfDoc.addPage(PageSizes.A4);
+                    newYStartPosition = yStartPositionTitle;
+                    currentLine = 1;
+                }
+                page.drawText(textLine, {
+                    x: listLine === 1 ? listIndentFirst : listIndentOther,
+                    y: newYStartPosition - currentLine * lineSpacing,
+                    size: fontSizeNormal,
+                    font: textFont,
+                    color: colorNormal,
+                })
+                currentLine++;
+                if ( newYStartPosition - currentLine * lineSpacing < yRectMargin * 3) {
+                    page = pdfDoc.addPage(PageSizes.A4);
+                    newYStartPosition = yStartPositionTitle;
+                    currentLine = 1;
+                }
+                page.drawText('DOI: ' + application.papers[ind].doi, {
+                    x: listIndentOther,
+                    y: newYStartPosition - currentLine * lineSpacing,
+                    size: fontSizeNormal,
+                    font: textFont,
+                    color: colorNormal,
+                })
+                currentLine++;
+            }
+            currentLine++;
+            if ( newYStartPosition - currentLine * lineSpacing < yRectMargin * 3) {
+                page = pdfDoc.addPage(PageSizes.A4);
+                newYStartPosition = yStartPositionTitle;
+                currentLine = 1;
+            }
+            page.drawText('Participation in Projects', {
+                x: 50,
+                y: newYStartPosition - currentLine * lineSpacing,
+                size: fontSizeNormal,
+                font: textFontOblique,
+                color: colorNormal,
+            })
+            currentLine++;
+            for (let ind in application.projects) {
+                let text = (parseInt(ind,10) + 1)
+                    + '. ' + application.projects[ind].title
+                    + ' (' + application.projects[ind].acronym
+                    + ', ' + application.projects[ind].reference + ').'
+                    + ' PI: ' + application.projects[ind].principal_investigator
+                    + '. Start: ' + application.projects[ind].year_start
+                    + ', End: ' + application.projects[ind].year_end;
+                // object destructuring requires the parenthesis
+                ({ pdfDoc, page, currentLine, newYStartPosition }
+                    = makeList(pdfDoc, page, options, text, currentLine, newYStartPosition))
+            }
+            currentLine++;
+            if ( newYStartPosition - currentLine * lineSpacing < yRectMargin * 3) {
+                page = pdfDoc.addPage(PageSizes.A4);
+                newYStartPosition = yStartPositionTitle;
+                currentLine = 1;
+            }
+            page.drawText('Mobility in the scope of Projects', {
+                x: 50,
+                y: newYStartPosition - currentLine * lineSpacing,
+                size: fontSizeNormal,
+                font: textFontOblique,
+                color: colorNormal,
+            })
+            currentLine++;
+            for (let ind in application.mobility) {
+                let start_date = ''
+                if (application.mobility[ind].start_date !== null
+                    && application.mobility[ind].start_date !== null
+                    && application.mobility[ind].start_date !== '') {
+                    start_date = time.moment(application.mobility[ind].start_date)
+                                    .format('YYYY-MM-DD');
+                }
+                let text = (parseInt(ind,10) + 1)
+                    + '. ' + application.mobility[ind].title
+                    + ' (' + application.mobility[ind].reference + ').'
+                    + ' Institution: ' + application.mobility[ind].institution
+                    + '. Start: ' + start_date
+                    + ', Duration: ' + application.mobility[ind].duration;
+                // object destructuring requires the parenthesis
+                ({ pdfDoc, page, currentLine, newYStartPosition }
+                    = makeList(pdfDoc, page, options, text, currentLine, newYStartPosition))
+            }
+            currentLine++;
+            if ( newYStartPosition - currentLine * lineSpacing < yRectMargin * 3) {
+                page = pdfDoc.addPage(PageSizes.A4);
+                newYStartPosition = yStartPositionTitle;
+                currentLine = 1;
+            }
+            page.drawText('Oral Communications', {
+                x: 50,
+                y: newYStartPosition - currentLine * lineSpacing,
+                size: fontSizeNormal,
+                font: textFontOblique,
+                color: colorNormal,
+            })
+            currentLine++;
+            for (let ind in application.communications) {
+                let date = ''
+                if (application.communications[ind].date !== null
+                    && application.communications[ind].date !== null
+                    && application.communications[ind].date !== '') {
+                    date = time.moment(application.communications[ind].date)
+                                    .format('YYYY-MM-DD');
+                }
+                let text = (parseInt(ind,10) + 1)
+                    + '. ' + application.communications[ind].authors_raw
+                    + ' "' + application.communications[ind].title + '"'
+                    + '. ' + application.communications[ind].meeting_name
+                    + ' (' + date + ')';
+                // object destructuring requires the parenthesis
+                ({ pdfDoc, page, currentLine, newYStartPosition } =
+                    makeList(pdfDoc, page, options, text, currentLine, newYStartPosition))
+            }
+            currentLine++;
+            if ( newYStartPosition - currentLine * lineSpacing < yRectMargin * 3) {
+                page = pdfDoc.addPage(PageSizes.A4);
+                newYStartPosition = yStartPositionTitle;
+                currentLine = 1;
+            }
+            page.drawText('Poster Communications', {
+                x: 50,
+                y: newYStartPosition - currentLine * lineSpacing,
+                size: fontSizeNormal,
+                font: textFontOblique,
+                color: colorNormal,
+            })
+            currentLine++;
+            for (let ind in application.posters) {
+                let date = ''
+                if (application.posters[ind].date !== null
+                    && application.posters[ind].date !== null
+                    && application.posters[ind].date !== '') {
+                    date = time.moment(application.posters[ind].date)
+                                    .format('YYYY-MM-DD');
+                }
+                let text = (parseInt(ind,10) + 1)
+                    + '. ' + application.posters[ind].authors_raw
+                    + ' "' + application.posters[ind].title + '"'
+                    + '. ' + application.posters[ind].meeting_name
+                    + ' (' + date + ')';
+                // object destructuring requires the parenthesis
+                ({ pdfDoc, page, currentLine, newYStartPosition } =
+                    makeList(pdfDoc, page, options, text, currentLine, newYStartPosition))
+            }
+            page = pdfDoc.addPage(PageSizes.A4);
+            newYStartPosition = yStartPositionTitle;
+            currentLine = 1;
+            page.drawText('Motivation Letter:', {
+                x: 50,
+                y: newYStartPosition,
+                size: fontSizeNormal,
+                font: textFontBold,
+                color: colorNormal,
+            })
+            page.drawLine( {
+                start: {x: xRectMargin, y: newYStartPosition - yRectMargin},
+                end: {x: width - xRectMargin, y: newYStartPosition - yRectMargin},
+            })
+            currentLine++;
+            let motivationLines = application.motivationLetter.motivation_letter.split('\n')
+            for (let ind in motivationLines) {
+                let text = motivationLines[ind];
+                // object destructuring requires the parenthesis
+                ({ pdfDoc, page, currentLine, newYStartPosition }
+                    = makeList(pdfDoc, page, options, text, currentLine, newYStartPosition))
+            }
+            page = pdfDoc.addPage(PageSizes.A4);
+            newYStartPosition = yStartPositionTitle;
+            currentLine = 1;
+            page.drawText('Recommendation Letters:', {
+                x: 50,
+                y: newYStartPosition,
+                size: fontSizeNormal,
+                font: textFontBold,
+                color: colorNormal,
+            })
+            page.drawLine( {
+                start: {x: xRectMargin, y: newYStartPosition - yRectMargin},
+                end: {x: width - xRectMargin, y: newYStartPosition - yRectMargin},
+            })
+            currentLine++;
+            for (let indRec in application.recommenders) {
+                let textRef = application.recommenders[indRec].name
+                    + ', ' + application.recommenders[indRec].role
+                    + ' (' + application.recommenders[indRec].institution + ')'
+                    + '. Email: ' + application.recommenders[indRec].email;
+                ({ pdfDoc, page, currentLine, newYStartPosition }
+                    = makeList(pdfDoc, page, options, textRef, currentLine, newYStartPosition, 'bold')) ;
+                currentLine++;
+                for (let indAnswer in application.recommenders[indRec].answers) {
+                    let textAns = application.recommenders[indRec].answers[indAnswer].question;
+
+                    if (application.recommenders[indRec].answers[indAnswer].answer_type === 'text') {
+                        textAns = textAns + ' - ' + application.recommenders[indRec].answers[indAnswer].answer;
+                    } else {
+                        textAns = textAns + ' - ' + application.recommenders[indRec].answers[indAnswer].score;
+                    }
+                    ({ pdfDoc, page, currentLine, newYStartPosition }
+                        = makeList(pdfDoc, page, options, textAns, currentLine, newYStartPosition)) ;
+                }
+                currentLine++;
+                let referenceLines = application.recommenders[indRec].referenceLetter.text;
+                if (referenceLines !== null && referenceLines !== undefined) {
+                    referenceLines = referenceLines.split('\n')
+                    for (let ind in referenceLines) {
+                        let text = referenceLines[ind];
+                        // object destructuring requires the parenthesis
+                        ({ pdfDoc, page, currentLine, newYStartPosition }
+                            = makeList(pdfDoc, page, options, text, currentLine, newYStartPosition))
+                    }
+                }
+                currentLine++;
+            }
+            // first university diplomas
+            for (let ind in application.documents) {
+                if (application.documents[ind].document_type_id === 2) {
+                    let url = application.documents[ind].url;
+                    // only pdf accepted
+                    let diploma = await this.$http.get(url,
+                        {
+                            responseType: 'arraybuffer'
+                        })
+                    .then(result => result.data )
+                    let diplomaPDF = await PDFDocument.load(diploma);
+                    let copyDiplomaPDF = await pdfDoc.copyPages(diplomaPDF, diplomaPDF.getPageIndices());
+                    copyDiplomaPDF.forEach((page) => pdfDoc.addPage(page));
+
+                }
+            }
+            // then CV
+            for (let ind in application.documents) {
+                if (application.documents[ind].document_type_id === 1) {
+                    let url = application.documents[ind].url;
+                    // only pdf accepted
+                    let cv = await this.$http.get(url,
+                        {
+                            responseType: 'arraybuffer'
+                        })
+                    .then(result => result.data )
+                    let cvPDF = await PDFDocument.load(cv);
+                    let copyCvPDF = await pdfDoc.copyPages(cvPDF, cvPDF.getPageIndices());
+                    copyCvPDF.forEach((page) => pdfDoc.addPage(page));
+                }
+            }
+            // then ID and residence certificate
+            for (let ind in application.documents) {
+                if (application.documents[ind].document_type_id === 4) {
+                    let url = application.documents[ind].url;
+                    let photo = await this.$http.get(url,
+                        {
+                            responseType: 'arraybuffer'
+                        })
+                    .then(result => result.data )
+                    let urlSplit = url.split('.');
+                    let extension = urlSplit[urlSplit.length - 1];
+                    let image;
+                    //let imageSize;
+                    if (extension === 'jpg' || extension === 'jpeg') {
+                        image = await pdfDoc.embedJpg(photo);
+                    } else if (extension === 'png') {
+                        image = await pdfDoc.embedPng(photo);
+                    } else if (extension === 'pdf') {
+                        let idPDF = await PDFDocument.load(photo);
+                        let copyIdPDF = await pdfDoc.copyPages(idPDF, idPDF.getPageIndices());
+                        copyIdPDF.forEach((page) => pdfDoc.addPage(page));
+                    }
+                    if (image !== undefined) {
+                        page = pdfDoc.addPage(PageSizes.A4);
+                        let scaleImage = image.scale(1);
+                        let factor = (width - 2 * xRectMargin) / scaleImage.width
+                        let imageSize = image.scale(factor);
+                        page.drawImage(
+                            image,
+                            {
+                                x: page.getWidth() / 2 - imageSize.width / 2,
+                                y: page.getHeight() / 2 - imageSize.height / 2,
+                                width: imageSize.width,
+                                height: imageSize.height,
+                            }
+                        )
+                    }
+                }
+            }
+            for (let ind in application.documents) {
+                if (application.documents[ind].document_type_id === 5) {
+                    let url = application.documents[ind].url;
+                    let photo = await this.$http.get(url,
+                        {
+                            responseType: 'arraybuffer'
+                        })
+                    .then(result => result.data )
+                    let urlSplit = url.split('.');
+                    let extension = urlSplit[urlSplit.length - 1];
+                    let image;
+                    //let imageSize;
+                    if (extension === 'jpg' || extension === 'jpeg') {
+                        image = await pdfDoc.embedJpg(photo);
+                    } else if (extension === 'png') {
+                        image = await pdfDoc.embedPng(photo);
+                    } else if (extension === 'pdf') {
+                        let certificatePDF = await PDFDocument.load(photo);
+                        let copyCertificatePDF = await pdfDoc.copyPages(certificatePDF, certificatePDF.getPageIndices());
+                        copyCertificatePDF.forEach((page) => pdfDoc.addPage(page));
+                    }
+                    if (image !== undefined) {
+                        page = pdfDoc.addPage(PageSizes.A4);
+                        let scaleImage = image.scale(1);
+                        let factor = (width - 2 * xRectMargin) / scaleImage.width
+                        let imageSize = image.scale(factor);
+                        page.drawImage(
+                            image,
+                            {
+                                x: page.getWidth() / 2 - imageSize.width / 2,
+                                y: page.getHeight() / 2 - imageSize.height / 2,
+                                width: imageSize.width,
+                                height: imageSize.height,
+                            }
+                        )
+                    }
+                }
+            }
+            let now = time.moment().format('YYYY-MM-DD_HH-mm-ss');
+            const savedPDF = await pdfDoc.save();
+            download(savedPDF,
+                'Documentation_'
+                + application.applicant_name
+                + '_' + now + '.pdf',
+                'application/pdf');
         },
     },
 

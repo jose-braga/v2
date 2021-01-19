@@ -150,7 +150,7 @@ var actionGetApplicationInfo = function (options) {
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'SELECT applications.*,'
-                        + ' applicants.name AS applicant_name, applicants.erasmus_experience'
+                        + ' applicants.name AS applicant_name, applicants.erasmus_experience, applicants.msc_abstract'
                         + ' FROM applications'
                         + ' JOIN applicants ON applicants.application_id = applications.id'
                         + ' WHERE applications.id = ?;';

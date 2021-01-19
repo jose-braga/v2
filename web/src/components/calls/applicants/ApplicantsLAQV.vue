@@ -22,7 +22,8 @@
                     <span class="note-warning">(*=required)</span>.<br>
                     Information entered will remain in this browser even if you close the window or restart the device.<br>
                     <span class="note-warning">(Exception: file inputs, should be verified before submission)</span>.<br>
-                    Data you submit will be used solely for the evaluation of the application by the reviewers.
+                    Data you submit will be used solely for administrative purposes and for the evaluation of the application by the reviewers.<br>
+                    If you experience problems submitting the application contact <span class="blue--text">josebraga@fct.unl.pt</span>.
                     <br><br>
                     Note: When you input dates, you can click the header of the datepicker to navigate dates easily (1 click for months, 2 clicks for years).
                 </p>
@@ -139,7 +140,9 @@
                         :size="20" :width="2"
                         color="primary"></v-progress-circular>
                 <v-icon v-show="success" color="green">mdi-check</v-icon>
+                <span v-show="success" class="green--text">Your submission was succesful</span>
                 <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
+                <span v-show="error" class="red--text">A problem occurred</span>
             </v-col>
         </v-row>
 
@@ -348,6 +351,44 @@ export default {
                             url,
                             body: formDataCV,
                         })
+                        let formDataID = new FormData();
+                        formDataID.append('doc_type_id', 4); // ID card doc type
+                        formDataID.append('application_id', data.applicationID);
+                        formDataID.append('file_name', this.applicationData.application.identification_image.name);
+                        formDataID.append('file', this.applicationData.application.identification_image);
+                        url = 'api/v2/calls/' + callSegment
+                                + '/applications/' + data.applicationID
+                                + '/documents';
+                        uploadDocuments.push({
+                            url,
+                            body: formDataID,
+                        })
+                        if (this.applicationData.application.residence_certificate !== null && this.applicationData.application.residence_certificate !== undefined) {
+                            let formDataResidence = new FormData();
+                            formDataResidence.append('doc_type_id', 5); // residence certificate
+                            formDataResidence.append('application_id', data.applicationID);
+                            formDataResidence.append('file_name', this.applicationData.application.residence_certificate.name);
+                            formDataResidence.append('file', this.applicationData.application.residence_certificate);
+                            url = 'api/v2/calls/' + callSegment
+                                    + '/applications/' + data.applicationID
+                                    + '/documents';
+                            uploadDocuments.push({
+                                url,
+                                body: formDataResidence,
+                            });
+                        }
+                        let formDataPhoto = new FormData();
+                        formDataPhoto.append('doc_type_id', 6); // personal photo
+                        formDataPhoto.append('application_id', data.applicationID);
+                        formDataPhoto.append('file_name', this.applicationData.application.personal_photo.name);
+                        formDataPhoto.append('file', this.applicationData.application.personal_photo);
+                        url = 'api/v2/calls/' + callSegment
+                                + '/applications/' + data.applicationID
+                                + '/documents';
+                        uploadDocuments.push({
+                            url,
+                            body: formDataPhoto,
+                        });
                         for (let ind in this.applicationData.application.academicDegrees) {
                             let formDataDegree = new FormData();
                             formDataDegree.append('doc_type_id', 2); // degree doc type
@@ -379,7 +420,19 @@ export default {
                     return this.$http.post('api/v2/calls/' + callSegment
                                     + '/applications/' + data.applicationID
                                     + '/scores',
-                            { data },
+                            {
+                                data,
+                                isLAQV: true,
+                            },
+                            { }
+                        )
+                    }
+                ))
+                .then(this.$http.spread( () => {
+                    return this.$http.post('api/v2/calls/' + callSegment
+                                    + '/applications/' + data.applicationID
+                                    + '/email-applicant',
+                            { data: this.applicationData.application },
                             { }
                         )
                     }
@@ -392,6 +445,7 @@ export default {
                             this.buttonDisabled = false;
                         }
                     , 1500)
+                    console.log(result.data.result)
                     this.$store.dispatch('setApplicationSubmitted',
                         {
                             submitted: true,
@@ -436,6 +490,46 @@ export default {
                             url,
                             body: formDataCV,
                         })
+                        let formDataID = new FormData();
+                        formDataID.append('doc_type_id', 4); // ID card type
+                        formDataID.append('application_id', this.applicationData.application.applicationID);
+                        formDataID.append('file_name', this.applicationData.application.identification_image.name);
+                        formDataID.append('file', this.applicationData.application.identification_image);
+                        url = 'api/v2/calls/' + callSegment
+                                + '/applications/' + this.applicationData.application.applicationID
+                                + '/documents';
+                        uploadDocuments.push({
+                            url,
+                            body: formDataID,
+                        })
+                        if (this.applicationData.application.residence_certificate !== null
+                                && this.applicationData.application.residence_certificate !== undefined) {
+                            let formDataResidence = new FormData();
+                            formDataResidence.append('doc_type_id', 5); // residence certificate
+                            formDataResidence.append('application_id', this.applicationData.application.applicationID);
+                            formDataResidence.append('file_name', this.applicationData.application.residence_certificate.name);
+                            formDataResidence.append('file', this.applicationData.application.residence_certificate);
+                            url = 'api/v2/calls/' + callSegment
+                                    + '/applications/' + this.applicationData.application.applicationID
+                                    + '/documents';
+                            uploadDocuments.push({
+                                url,
+                                body: formDataResidence,
+                            });
+                        }
+                        let formDataPhoto = new FormData();
+                        formDataPhoto.append('doc_type_id', 6); // personal photo
+                        formDataPhoto.append('application_id', this.applicationData.application.applicationID);
+                        formDataPhoto.append('file_name', this.applicationData.application.personal_photo.name);
+                        formDataPhoto.append('file', this.applicationData.application.personal_photo);
+                        url = 'api/v2/calls/' + callSegment
+                                + '/applications/' + this.applicationData.application.applicationID
+                                + '/documents';
+                        uploadDocuments.push({
+                            url,
+                            body: formDataPhoto,
+                        });
+
                         for (let ind in this.applicationData.application.academicDegrees) {
                             let formDataDegree = new FormData();
                             formDataDegree.append('doc_type_id', 2); // degree doc type
@@ -465,6 +559,18 @@ export default {
                     return this.$http.put('api/v2/calls/' + callSegment
                                     + '/applications/' + this.applicationData.application.applicationID
                                     + '/scores',
+                            {
+                                data: this.applicationData.application,
+                                isLAQV: true
+                            },
+                            { }
+                        )
+                    }
+                ))
+                .then(this.$http.spread( () => {
+                    return this.$http.put('api/v2/calls/' + callSegment
+                                    + '/applications/' + this.applicationData.application.applicationID
+                                    + '/email-applicant',
                             { data: this.applicationData.application },
                             { }
                         )
@@ -497,7 +603,6 @@ export default {
             }
         },
     }
-
 }
 </script>
 

@@ -4,25 +4,25 @@ const PollsVoteHelp = () => import(/* webpackChunkName: "polls-vote-help" */ '@/
 const PollsManage = () => import(/* webpackChunkName: "polls-manage" */ '@/components/polls/PollsManage.vue')
 const PollsManageHelp = () => import(/* webpackChunkName: "polls-manage-help" */ '@/components/polls/PollsManageHelp.vue')
 
-const routes = {
-    path: '/polls',
-    component: Polls,
-    children: [
-        {
-            path: 'vote',
-            components: {
-                default: PollsVote,
-                help: PollsVoteHelp,
-            },
+const routes = [
+    {
+        path: '/polls',
+        component: Polls,
+    },
+    {
+        path: '/polls/:pollId',
+        components: {
+            default: PollsVote,
+            help: PollsVoteHelp,
         },
-        {
-            path: 'manage',
-            components: {
-                default: PollsManage,
-                help: PollsManageHelp,
-            }
-        },
-    ]
-}
+    },
+    {
+        path: '/polls/manage',
+        components: {
+            default: PollsManage,
+            help: PollsManageHelp,
+        }
+    },
+]
 
 export default routes

@@ -105,6 +105,56 @@
                 </div>
             </v-col>
         </v-row>
+        <v-row>
+            <v-col cols="12" sm="12">
+                <v-file-input
+                    v-model="$v.data.identification_image.$model"
+                    :error="$v.data.identification_image.$error"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    show-size
+                    name
+                    @change="addValue()"
+                    @input="addValue()"
+                    label="ID image (front and back)*">
+                </v-file-input>
+            </v-col>
+            <div v-if="$v.data.identification_image.$error">
+                <p v-if="!$v.data.identification_image.required" class="caption red--text">Field is required.</p>
+            </div>
+        </v-row>
+        <v-row>
+            <v-col cols="12" sm="12">
+                <v-file-input
+                    v-model="$v.data.residence_certificate.$model"
+                    :error="$v.data.residence_certificate.$error"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    show-size
+                    name
+                    @change="addValue()"
+                    @input="addValue()"
+                    label="Residence certificate (required for foreigners)">
+                </v-file-input>
+            </v-col>
+            <div v-if="$v.data.residence_certificate.$error">
+            </div>
+        </v-row>
+        <v-row>
+            <v-col cols="12" sm="12">
+                <v-file-input
+                    v-model="$v.data.personal_photo.$model"
+                    :error="$v.data.personal_photo.$error"
+                    accept=".jpg,.jpeg,.png"
+                    show-size
+                    name
+                    @change="addValue()"
+                    @input="addValue()"
+                    label="Personal Photo*">
+                </v-file-input>
+            </v-col>
+            <div v-if="$v.data.personal_photo.$error">
+                <p v-if="!$v.data.personal_photo.required" class="caption red--text">Field is required.</p>
+            </div>
+        </v-row>
     </v-container>
     <v-card-title primary-title>
         <div>
@@ -194,7 +244,7 @@
                 <v-file-input
                     v-model="$v.data.cv.$model"
                     :error="$v.data.cv.$error"
-                    accept=".doc,.docx,.pdf,.odt"
+                    accept=".pdf"
                     show-size
                     name
                     @change="addValue()"
@@ -226,11 +276,15 @@ export default {
                 identification_type_id: null,
                 identification_number: null,
                 identification_valid_until: null,
+                identification_image: null,
+                residence_certificate: null,
+                personal_photo: null,
                 phone: null,
                 email: null,
                 address: null,
                 postal_code: null,
                 city: null,
+                cv: null,
             },
             genders: [
                 {id: 'M', value: 'Male'},
@@ -300,6 +354,9 @@ export default {
                     return /^\d\d\d\d-\d\d-\d\d$/.test(value);
                 }
             },
+            identification_image: { required },
+            residence_certificate: { },
+            personal_photo: { required },
             email: { required, email, maxLength: maxLength(200) },
             address: { required, maxLength: maxLength(500) },
             postal_code: { required, maxLength: maxLength(45) },

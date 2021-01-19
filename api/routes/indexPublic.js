@@ -17,9 +17,11 @@ router.get('/calls/:callSegment', cors(corsOptions), calls.getCallInfo);
 router.post('/calls/:callSegment/applications', cors(corsOptions), calls.createApplication);
 router.post('/calls/:callSegment/applications/:applicationID/documents', cors(corsOptions), calls.uploadApplicationDocuments);
 router.post('/calls/:callSegment/applications/:applicationID/scores', cors(corsOptions), calls.computeScores);
+router.post('/calls/:callSegment/applications/:applicationID/email-applicant', cors(corsOptions), calls.emailApplicant);
 router.put('/calls/:callSegment/applications/:applicationID', cors(corsOptions), calls.updateApplication);
 router.delete('/calls/:callSegment/applications/:applicationID/documents', cors(corsOptions), calls.deleteApplicationDocuments); //to delete previous information in DB
 router.put('/calls/:callSegment/applications/:applicationID/scores', cors(corsOptions), calls.updateComputeScores);
+router.put('/calls/:callSegment/applications/:applicationID/email-applicant', cors(corsOptions), calls.emailApplicantUpdate);
 
 // Public API requests
 router.get('/people', cors(corsOptions), people.searchPeople);

@@ -65,6 +65,8 @@ var actionWriteAnswers = function (options) {
             },
             options
         );
+    } else {
+        writeReferenceLetter(options)
     }
 };
 var writeReferenceLetter = function (options) {

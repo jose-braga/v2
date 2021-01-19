@@ -10,6 +10,7 @@ import admin from './sections/admin'
 import unitArea from './sections/unit-area' // area for documents: MyLAQV, MyUCIBIO
 import preRegister from './sections/pre-register'
 import calls from './sections/calls'
+import polls from './sections/polls'
 
 
 let routes1 = [
@@ -31,6 +32,7 @@ let routes1 = [
 
 const routes = routes1
         .concat(calls)
+        .concat(polls)
         .concat([{ path: '*', redirect: '/' }])
 
 

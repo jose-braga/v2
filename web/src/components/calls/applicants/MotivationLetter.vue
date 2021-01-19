@@ -6,7 +6,7 @@
         </div>
     </v-card-title>
     <v-card-text>Why do you want to apply to this PhD program?
-        What are your main strengths as a candidate? (2000 characters max)
+        What are your main strengths as a candidate? (5000 characters max)
     </v-card-text>
     <v-container class="px-6">
         <v-row>
@@ -15,7 +15,7 @@
                     v-model="$v.data.motivation.$model"
                     :error="$v.data.motivation.$error"
                     @input="addValue"
-                    rows="27"
+                    rows="38"
                     counter
                     label="Motivation Letter*">
                 </v-textarea>
@@ -65,7 +65,7 @@ export default {
     },
     validations: {
         data: {
-            motivation: { maxLength: maxLength(2000), required },
+            motivation: { maxLength: maxLength(5000), required },
         }
     },
 

@@ -92,7 +92,7 @@
                 <v-file-input
                     v-model="v.$model.certificate"
                     :error="v.certificate.$error"
-                    accept=".doc,.docx,.pdf,.odt"
+                    accept=".pdf"
                     show-size
                     name
                     @change="addValue()"
@@ -130,6 +130,25 @@
                 ></v-checkbox>
             </v-col>
         </v-row>
+        <v-row>
+            <v-col cols="12">
+                <v-divider></v-divider>
+            </v-col>
+            <v-col cols="12">
+                <v-textarea
+                    v-model="$v.data.msc_abstract.$model"
+                    :error="$v.data.msc_abstract.$error"
+                    @input="addValue"
+                    rows="5"
+                    counter
+                    label="MSc Thesis abstract*">
+                </v-textarea>
+                <div v-if="$v.data.msc_abstract.$error">
+                    <p v-if="!$v.data.msc_abstract.maxLength" class="caption red--text">Maximum length is 2000 characters.</p>
+                    <p v-if="!$v.data.msc_abstract.required" class="caption red--text">MsC Degree Abstract is required.</p>
+                </div>
+            </v-col>
+        </v-row>
     </v-container>
 </v-card>
 
@@ -150,6 +169,7 @@ export default {
             data: {
                 academicDegrees: [],
                 erasmus: undefined,
+                msc_abstract: null,
             },
             degrees: [],
         }
@@ -237,6 +257,7 @@ export default {
                 }
             },
             erasmus: {},
+            msc_abstract: { required, maxLength: maxLength(2000) },
         },
     },
 
