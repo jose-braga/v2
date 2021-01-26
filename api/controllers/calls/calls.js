@@ -425,7 +425,7 @@ var createMobility = function (options) {
         return sql.getSQLOperationResult(req, res, querySQL, places,
             (resQuery, options) => {
                 options.req.body.data.mobility[i].mobility_id = resQuery.insertId;
-                if (i + 1 < data.projects.length) {
+                if (i + 1 < data.mobility.length) {
                     options.i = i + 1;
                     return createMobility(options);
                 } else {
