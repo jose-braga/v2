@@ -1,5 +1,16 @@
 <template>
 <div>
+    <div  v-if="data.isManager">
+        <router-link :to="baseURL + 'managers'">
+            <v-btn
+                class="ma-4"
+                outlined
+                color="red"
+            >
+                Manage Polls
+            </v-btn>
+        </router-link>
+    </div>
     <v-card>
         <v-card-title primary-title>
             <div>
@@ -77,8 +88,6 @@
             </v-row>
         </v-container>
     </v-card>
-
-
 </div>
 </template>
 
@@ -95,19 +104,41 @@ export default {
                 pastPolls: [],
                 currentPolls: [],
                 futurePolls: [],
+                isManager: false,
             },
             polls: [],
             baseURL: '/polls/',
         }
     },
+    mounted: function () {
+        this.$store.commit('setActiveTile', {
+            newTile: 9,
+            newToolbarText: 'Choose a poll'
+        });
+    },
     created () {
         this.initialize();
     },
+
     methods: {
         initialize() {
             if (this.$store.state.session.loggedIn) {
                 this.getPolls();
+                this.checkManager();
             }
+        },
+        checkManager () {
+            let personID = this.$store.state.session.personID;
+            let urlSubmit = 'api/polls/' + 'managers/'+ personID;
+            subUtil.getInfoPopulate(this, urlSubmit, true)
+            .then( (result) => {
+                if (result !== undefined && result !== null) {
+                    this.data.isManager = true;
+                }
+            })
+            .catch((error) => {
+                console.log(error)
+            })
         },
         getPolls () {
             let personID = this.$store.state.session.personID;

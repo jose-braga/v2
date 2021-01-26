@@ -400,7 +400,7 @@ var deleteMobility = function (options) {
 var createMobility = function (options) {
     let { req, res, next, applicationID, i } = options;
     let data = req.body.data;
-    if (data.mobility !== undefined && data.mobility.length > 0) {
+    if (data.mobility !== undefined && data.mobility !== null && data.mobility.length > 0) {
         var querySQL = '';
         var places = [];
         let mobility = data.mobility[i];

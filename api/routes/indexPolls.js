@@ -27,15 +27,26 @@ router.post('/:pollID/people/:personID', cors(corsOptions), polls_vote.writeUser
 // specific to vote management
 router.get('/managers/:managerID', cors(corsOptions), polls_manage.getPollsList);
 router.post('/managers/:managerID', cors(corsOptions), polls_manage.createPoll);
+router.get('/:pollID/managers/:managerID', cors(corsOptions), polls_manage.getPollInfo);
+router.put('/:pollID/managers/:managerID', cors(corsOptions), polls_manage.updatePollSettings);
 router.delete('/:pollID/managers/:managerID', cors(corsOptions), polls_manage.deletePoll);
+
 router.post('/:pollID/managers/:managerID/questions', cors(corsOptions), polls_manage.addNewQuestion);
 router.put('/:pollID/managers/:managerID/questions/:questionID', cors(corsOptions), polls_manage.updateQuestion);
 router.delete('/:pollID/managers/:managerID/questions/:questionID', cors(corsOptions), polls_manage.deleteQuestion);
+router.post('/:pollID/managers/:managerID/questions/:questionID/options', cors(corsOptions), polls_manage.addNewQuestionOption);
+router.put('/:pollID/managers/:managerID/questions/:questionID/options/:optionID', cors(corsOptions), polls_manage.updateQuestionOption);
+router.delete('/:pollID/managers/:managerID/questions/:questionID/options/:optionID', cors(corsOptions), polls_manage.deleteQuestionOption);
+
+
 router.post('/:pollID/managers/:managerID/texts', cors(corsOptions), polls_manage.addNewText);
 router.put('/:pollID/managers/:managerID/texts/:textID', cors(corsOptions), polls_manage.updateText);
 router.delete('/:pollID/managers/:managerID/texts/:textID', cors(corsOptions), polls_manage.deleteText);
+
+router.get('/:pollID/managers/:managerID/people-list', cors(corsOptions), polls_manage.getPeopleList);
+router.get('/:pollID/managers/:managerID/people', cors(corsOptions), polls_manage.getPeoplePoll);
 router.post('/:pollID/managers/:managerID/people', cors(corsOptions), polls_manage.addUserPoll);
-router.delete('/:pollID/managers/:managerID/texts/:textID', cors(corsOptions), polls_manage.deleteUserPoll);
+router.delete('/:pollID/managers/:managerID/people/:personID', cors(corsOptions), polls_manage.deleteUserPoll);
 
 
 

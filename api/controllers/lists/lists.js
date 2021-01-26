@@ -660,6 +660,22 @@ var getWarehouseAccountsRoles = function (req, res, next) {
     sql.makeSQLOperation(req, res, querySQL, places);
     return;
 };
+var getPollsTextTypes = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM polls_text_types;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getPollsQuestionTypes = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM polls_question_types;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
 module.exports.listItems = function (req, res, next) {
     let category = req.params.listCategory;
     if (category === 'countries') {
@@ -787,6 +803,12 @@ module.exports.listItems = function (req, res, next) {
     }
     if (category === 'warehouse-accounts-roles') {
         getWarehouseAccountsRoles(req, res, next);
+    }
+    if (category === 'polls-text-types') {
+        getPollsTextTypes(req, res, next);
+    }
+    if (category === 'polls-question-types') {
+        getPollsQuestionTypes(req, res, next);
     }
 
 };

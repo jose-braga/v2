@@ -80,7 +80,7 @@
                 </div>
             </v-col>
             <v-col cols="1" sm="1">
-                <v-btn icon @click="removeItem(data.projects, i)" class="mt-3">
+                <v-btn icon @click="removeItem(data.mobility, i)" class="mt-3">
                     <v-icon color="red darken">mdi-delete</v-icon>
                 </v-btn>
             </v-col>

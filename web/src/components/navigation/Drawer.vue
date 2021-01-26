@@ -161,7 +161,14 @@ export default {
                 image: '/images/logo/laqv-logo.png',
                 link: '/unit-area/LAQV',
                 isActive: false,
-            }
+            },
+            {
+                text: 'Polls',
+                icon: 'mdi-poll',
+                image: false,
+                link: '/polls',
+                isActive: false,
+            },
         ]
     })
 }

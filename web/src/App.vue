@@ -29,6 +29,9 @@
     <v-main>
         <v-container fluid>
             <router-view></router-view>
+            <v-dialog v-if="pollsPath" v-model="showHelp" content-class="help">
+                <router-view name="help"></router-view>
+            </v-dialog>
         </v-container>
     </v-main>
   </v-app>
@@ -49,6 +52,7 @@ export default {
     data () {
         return {
             standardPath: false,
+            pollsPath: false,
             showAdminMessages: false,
             timeout: -1,
             messages: [],
@@ -67,10 +71,26 @@ export default {
             } else if (this.$route.path.includes('/call-managers')) {
                 this.standardPath = false;
             } else { this.standardPath = true; }
+            if (this.$route.path.includes('/polls')) {
+                this.pollsPath = true;
+            }
         }
     },
     created () {
         this.initialize()
+    },
+    computed: {
+        showHelp: {
+            get() {
+                return this.$store.state.navigation.showHelp;
+            },
+            set(state) {
+                if (state !== this.$store.state.navigation.showHelp) {
+                    this.$store.dispatch('showHelp')
+                }
+            }
+
+        },
     },
     methods: {
         initialize () {

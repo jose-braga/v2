@@ -2,7 +2,7 @@
 <v-card>
     <v-card-title primary-title>
         <div>
-            <h3 class="headline">General Help for Polls</h3>
+            <h3 class="headline">Help for Polls Edit Tab</h3>
         </div>
     </v-card-title>
     <v-card-text>
