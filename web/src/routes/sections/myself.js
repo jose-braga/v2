@@ -9,8 +9,11 @@ const InstitutionalTabHelp = () => import(/* webpackChunkName: "institutional-ta
 const ProfessionalTab = () => import(/* webpackChunkName: "professional-tab" */ '@/components/person/professional/ProfessionalTab.vue')
 const ProfessionalTabHelp = () => import(/* webpackChunkName: "professional-tab-help" */ '@/components/person/professional/ProfessionalTabHelp.vue')
 const ProductivityTab = () => import(/* webpackChunkName: "productivity-tab" */ '@/components/person/productivity/ProductivityTab.vue')
+const SupervisorTab = () => import(/* webpackChunkName: "supervisor-tab" */ '@/components/person/productivity/SupervisorTab.vue')
+const SupervisorTabHelp = () => import(/* webpackChunkName: "supervisor-tab-help" */ '@/components/person/productivity/SupervisorTabHelp.vue')
 const PublicationsTab = () => import(/* webpackChunkName: "publications-tab" */ '@/components/person/productivity/PublicationsTab.vue')
 const PublicationsTabHelp = () => import(/* webpackChunkName: "publications-tab-help" */ '@/components/person/productivity/PublicationsTabHelp.vue')
+
 const AddPublicationsTab = () => import(/* webpackChunkName: "add-publications-tab" */ '@/components/person/productivity/AddPublicationsTab.vue')
 const AddPublicationsTabHelp = () => import(/* webpackChunkName: "add-publication-tab-help" */ '@/components/person/productivity/AddPublicationsTabHelp.vue')
 const OtherProductivityTab = () => import(/* webpackChunkName: "other-productivity-tab" */ '@/components/person/productivity/OtherProductivityTab.vue')
@@ -63,6 +66,13 @@ const routes = {
             path: 'productivity',
             component: ProductivityTab,
             children: [
+                {
+                    path: 'supervisor',
+                    components: {
+                        default: SupervisorTab,
+                        help: SupervisorTabHelp
+                    }
+                },
                 {
                     path: 'publications',
                     components: {

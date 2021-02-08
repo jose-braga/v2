@@ -7,15 +7,12 @@
         <v-col cols="12" md="6">
             <Identifications></Identifications>
             <InstitutionalContacts></InstitutionalContacts>
-            <AcademicAffiliations></AcademicAffiliations>
             <CostCenters></CostCenters>
         </v-col>
     </v-row>
 </template>
 
 <script>
-
-const AcademicAffiliations = () => import(/* webpackChunkName: "person-academic-affiliations" */ './AcademicAffiliations')
 const CostCenters = () => import(/* webpackChunkName: "person-cost-centers" */ './CostCenters')
 const Identifications = () => import(/* webpackChunkName: "person-identifications" */ './Identifications')
 const ResearchInterests = () => import(/* webpackChunkName: "person-research-interests" */ './ResearchInterests')
@@ -24,7 +21,6 @@ const Roles = () => import(/* webpackChunkName: "person-roles" */ './roles/Roles
 
 export default {
     components: {
-        AcademicAffiliations,
         CostCenters,
         Identifications,
         InstitutionalContacts,

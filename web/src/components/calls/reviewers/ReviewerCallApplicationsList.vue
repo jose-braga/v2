@@ -2,7 +2,10 @@
 <div>
     <v-app-bar prominent app>
         <v-row  align="center">
-            <v-col cols="1">
+            <v-col cols="1" v-if="isLAQV">
+                <img src="/images/logo/laqv-logo.png" width="70">
+            </v-col>
+            <v-col cols="1" v-else>
                 <img src="/images/logo/ucibio-logo.png" width="40">
             </v-col>
             <v-col cols="10" class="ml-auto call-title">
@@ -17,6 +20,14 @@
                 <span class="headline">List of applications in this call:</span>
             </v-card-title>
             <v-container>
+                <v-row align="center" v-if="isLAQV">
+                    <v-col cols="12">
+                        Review of applications must be completed <b>before 2021-02-11 17:00:00</b>.
+                    </v-col>
+                    <v-col cols="12" v-if="timeUp">
+                        <b class="red--text">Your reviewing time is up! You might ask josebraga@fct.unl.pt for an extension.</b>
+                    </v-col>
+                </v-row>
                 <v-row align="center">
                     <v-col cols="12">
                         <ol class="applications-list">
@@ -56,6 +67,8 @@ export default {
         return {
             callName: '',
             applications: [],
+            isLAQV: false,
+            timeUp: false,
             data: {
             }
         }
@@ -71,6 +84,10 @@ export default {
     mounted() {
         this.$store.commit('checkExistingSessionReviewer');
         this.getReviewerCallApplications();
+        this.checkTime = setInterval(this.getNow, 5000)
+    },
+    beforeDestroy() {
+        clearInterval(this.checkTime)
     },
     watch: {
         $route () {
@@ -91,6 +108,10 @@ export default {
             )
             .then((result) => {
                 this.callName = result.data.result.call.call_name
+                if (result.data.result.call.is_laqv === 1) {
+                    this.isLAQV = true
+                }
+
                 let unfilteredList = result.data.result.applications;
                 let filteredList = [];
                 for (let ind in unfilteredList) {
@@ -114,6 +135,12 @@ export default {
             .catch( (error) => {
                 console.log(error);
             })
+        },
+        getNow () {
+            const now = new Date();
+            if (now.toISOString() > '2021-02-11T16:59:59') {
+                this.timeUp = true;
+            }
         },
     },
 }

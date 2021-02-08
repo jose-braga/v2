@@ -316,6 +316,78 @@ module.exports.checkPermissionsRecommendations = function (callback, callbackOpt
     }
 };
 
+var getCallUnit = function (callback, callbackOptions) {
+    let { req, res, next } = callbackOptions;
+    let callSegment = req.params.callSegment;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT *'
+                        + ' FROM call_applications'
+                        + ' WHERE call_url_segment = ?;';
+    places.push(callSegment)
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, callbackOptions) => {
+            if (resQuery.length === 1) {
+                callbackOptions.call = resQuery[0];
+                if (callbackOptions.call.is_laqv === 1) {
+                    return getReviewerValidity(callback, callbackOptions);
+                } else {
+                    return callback(callbackOptions);
+                }
+            } else {
+                responses.sendJSONResponse(res, 403, {
+                    "status": "error",
+                    "statusCode": 403,
+                    "error": "User is not authorized to this operation (4)."
+                });
+                return;
+            }
+        },
+        callbackOptions
+    )
+
+}
+
+var getReviewerValidity = function (callback, callbackOptions) {
+    //for LAQV only
+    let { req, res, next, call } = callbackOptions;
+    let reviewerID = req.params.reviewerID;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT *, NOW() AS `current_time`'
+                        + ' FROM application_call_reviewers'
+                        + ' WHERE call_id = ? AND reviewer_id = ?;';
+    places.push(call.id, reviewerID)
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, callbackOptions) => {
+            if (resQuery.length === 1) {
+                let valid_from = resQuery[0].valid_from;
+                let valid_until = resQuery[0].valid_until;
+                let current_time = resQuery[0].current_time;
+                if ((valid_from === null || valid_from <= current_time)
+                    && (valid_until === null || current_time <= valid_until )) {
+                    return callback(callbackOptions);
+                } else {
+                    responses.sendJSONResponse(res, 403, {
+                        "status": "error",
+                        "statusCode": 403,
+                        "error": "User is not authorized to this operation (5)."
+                    });
+                    return;
+                }
+            } else {
+                responses.sendJSONResponse(res, 403, {
+                    "status": "error",
+                    "statusCode": 403,
+                    "error": "User is not authorized to this operation (4a)."
+                });
+                return;
+            }
+        },
+        callbackOptions
+    )
+}
+
 module.exports.checkPermissionsReviewers = function (callback, callbackOptions) {
     let { req, res, next } = callbackOptions; // should contain always these 3
     // get requester permission data
@@ -326,7 +398,13 @@ module.exports.checkPermissionsReviewers = function (callback, callbackOptions) 
     let requestReviewerID = parseInt(req.params.reviewerID, 10);
 
     if (reviewerID === requestReviewerID) {
-        return callback(callbackOptions);
+        let callSegment = req.params.callSegment;
+        if (callSegment === undefined || callSegment === null) {
+            return callback(callbackOptions);
+        } else {
+            return getCallUnit(callback, callbackOptions);
+        }
+        //return callback(callbackOptions);
     } else {
         responses.sendJSONResponse(res, 403, {
             "status": "error",

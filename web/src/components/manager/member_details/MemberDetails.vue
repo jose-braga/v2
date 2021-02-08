@@ -4,8 +4,6 @@
         <v-card-title>
             <span class="headline">Data for <b>{{personName}}</b> (ID: {{personId}})</span>
         </v-card-title>
-        {{managerId}}-------------
-        {{endpoint}}
         <v-tabs v-model="activeTab">
             <v-tab>Permissions</v-tab>
             <v-tab>User</v-tab>

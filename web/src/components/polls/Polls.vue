@@ -1,7 +1,9 @@
 <template>
 <div>
     <div  v-if="data.isManager">
-        <router-link :to="baseURL + 'managers'">
+        <router-link :to="baseURL + 'managers'"
+            class="no-underline"
+        >
             <v-btn
                 class="ma-4"
                 outlined
@@ -184,6 +186,10 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+
+a.no-underline  {
+    text-decoration: none;
+}
 
 </style>

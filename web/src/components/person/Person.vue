@@ -8,14 +8,16 @@
             Personal
         </v-tab>
         <v-tab to="/person/academic">
-            Academic
+            Academic & Professional
         </v-tab>
         <v-tab to="/person/institutional">
-            Institutional
+            Institutional & Scientific
         </v-tab>
+        <!--
         <v-tab to="/person/professional">
             Professional
         </v-tab>
+        -->
         <v-tab to="/person/productivity">
             Productivity
         </v-tab>

@@ -31,7 +31,7 @@ app.use(cookieParser());
 app.use('/api/v1', routesPublicLegacyAPI);
 app.use('/api/v1.1', routesPublicLegacyAPI_LAQV);
 app.use('/api/v2', routesPublicAPI);
-// Interal API routes below
+// Internal API routes below
 app.use('/api/people', routesAPIPeople);
 app.use('/api/labs', routesAPILabs);
 // TODO: create API routes for facilities, science mngmt offices and administrative

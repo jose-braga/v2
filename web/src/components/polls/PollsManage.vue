@@ -134,7 +134,6 @@ export default {
                         }))
                 )
                 .then(this.$http.spread( (...result) => {
-                    console.log(result)
                     if (result !== null && result !== undefined && result.length > 0) {
                         let newPollID = result[0].data.result.pollID
                         this.progress = false;

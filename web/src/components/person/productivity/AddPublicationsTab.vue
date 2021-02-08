@@ -1,5 +1,5 @@
 <template>
-<v-row class="pa-4">
+<v-row>
     <v-col cols="12">
         <v-expansion-panels>
             <v-expansion-panel>

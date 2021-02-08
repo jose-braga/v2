@@ -21,6 +21,9 @@
     </v-card-text>
     <v-container v-if="indTotal">
         <v-row>
+            <v-col cols="12" v-if="timeUp">
+                <b class="red--text">Your reviewing time is up! You might ask josebraga@fct.unl.pt for an extension.</b>
+            </v-col>
             <v-col cols="12">
                 <span class="total-score ml-4">
                     Overall score: <span class="score">{{data.scores[indTotal].score_final}}</span>
@@ -443,6 +446,7 @@ export default {
             progress: false,
             formError: false,
             callName: '',
+            timeUp: false,
             data: {
                 application: {},
                 scores: {},
@@ -463,6 +467,12 @@ export default {
     created() {
         this.$store.commit('checkExistingSessionReviewer');
         this.getReviewerApplicationDetails();
+    },
+     mounted() {
+        this.checkTime = setInterval(this.getNow, 5000)
+    },
+    beforeDestroy() {
+        clearInterval(this.checkTime)
     },
     methods: {
         submitForm () {
@@ -663,6 +673,12 @@ export default {
                 return true;
             }
             return false;
+        },
+        getNow () {
+            const now = new Date();
+            if (now.toISOString() > '2021-02-11T16:59:59') {
+                this.timeUp = true;
+            }
         },
     },
 }

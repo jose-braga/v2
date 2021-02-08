@@ -756,6 +756,7 @@ import { PDFDocument, PageSizes,
     rgb
 //, PDFName, PDFBool, PDFString, PDFNumber
 } from 'pdf-lib'
+import fontkit from '@pdf-lib/fontkit'
 import download from 'downloadjs'
 
 const scoreSum = (obj, sum) => {
@@ -1129,8 +1130,12 @@ export default {
                     + '_applicants_' + dateFile + '.xlsx');
         },
         async exportDocumentation (application) {
+            let url = '/OpenSans-Regular.ttf'
+            const openSansBytes = await fetch(url).then((res) => res.arrayBuffer());
             let pdfDoc = await PDFDocument.create();
-            const textFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+            pdfDoc.registerFontkit(fontkit);
+            //const textFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+            const textFont = await pdfDoc.embedFont(openSansBytes);
             const textFontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
             const textFontOblique = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
             //const textFontBoldOblique = await pdfDoc.embedFont(StandardFonts.HelveticaBoldOblique);

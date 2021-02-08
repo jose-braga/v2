@@ -1,6 +1,6 @@
 <template>
     <!-- TODO: Separate finished and ongoing degrees -->
-    <v-row class="pa-4">
+    <v-row class="pa-1">
         <v-col cols="12" md="6" v-if="degrees && supervisorTypes">
             <v-card>
                 <v-card-title primary-title>

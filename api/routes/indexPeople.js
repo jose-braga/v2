@@ -43,6 +43,7 @@ const publicationsList = require('../controllers/people/publications_list');
 const researchIDs = require('../controllers/people/research_IDs');
 const researchInterests = require('../controllers/people/research_interests');
 const store = require('../controllers/store/store');
+const supervising = require('../controllers/people/supervising');
 const manageUsers = require('../controllers/store/manage_users');
 const manageOrders = require('../controllers/store/manage_orders');
 const manageStock = require('../controllers/store/manage_stock');
@@ -158,6 +159,10 @@ router.delete('/:personID/professional-situations/:jobID/fellowships/:fellowship
 router.post('/:personID/professional-situations/:jobID/contracts', cors(corsOptions), professionalSituations.createProfessionalSituationsContracts);
 router.put('/:personID/professional-situations/:jobID/contracts/:contractID', cors(corsOptions), professionalSituations.updateProfessionalSituationsContracts);
 router.delete('/:personID/professional-situations/:jobID/contracts/:contractID', cors(corsOptions), professionalSituations.deleteProfessionalSituationsContracts);
+//Supervisor
+router.get('/:personID/students', cors(corsOptions), supervising.getStudents);
+
+
 //Publications
 router.get('/all-publications', cors(corsOptions), publicationsList.getAllPublications);
 router.get('/:personID/publications', cors(corsOptions), publicationsList.getPublications);

@@ -1,8 +1,11 @@
 <template>
 <div class="px-4">
     <v-tabs v-model="currentTab">
+        <v-tab to="/person/productivity/supervisor">
+            Supervisor
+        </v-tab>
         <v-tab to="/person/productivity/publications">
-            Publications List
+            Publications
         </v-tab>
         <v-tab to="/person/productivity/add-publications">
             Add Publications

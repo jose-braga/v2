@@ -12,7 +12,7 @@
                         (EU) 2016/679, in force since 25 May, 2018, I have been
                         informed that:</b>
                     <ul class="small-text">
-                        <li>All data provided through the platform https://laqv-ucibio.info/
+                        <li>All data provided through the platform https://v2.laqv-ucibio.info/
                             can be used to:<br>
                             (1) the internal management of the research team
                             and<br>

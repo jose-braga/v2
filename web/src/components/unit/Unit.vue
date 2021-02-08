@@ -1,6 +1,6 @@
 <template>
     <p>
-        Group: Under Construction
+        Unit: Under Construction
     </p>
 
 </template>
@@ -9,8 +9,8 @@
 export default {
     mounted: function () {
         this.$store.commit('setActiveTile', {
-            newTile: 3,
-            newToolbarText: 'Edit your group details'
+            newTile: 4,
+            newToolbarText: 'Get Unit info'
         });
     },
     computed: {

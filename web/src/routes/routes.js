@@ -5,6 +5,7 @@ import passwordRecovery from './sections/recovery'
 import onBehalf from './sections/on-behalf'
 import team from './sections/team'
 import group from './sections/group'
+import unit from './sections/unit'
 import manager from './sections/manager'
 import admin from './sections/admin'
 import unitArea from './sections/unit-area' // area for documents: MyLAQV, MyUCIBIO
@@ -23,6 +24,7 @@ let routes1 = [
     onBehalf,
     team,
     group,
+    unit,
     manager,
     admin,
     unitArea,
