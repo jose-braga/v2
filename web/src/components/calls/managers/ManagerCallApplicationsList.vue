@@ -2,7 +2,10 @@
 <div>
     <v-app-bar prominent app>
         <v-row  align="center">
-            <v-col cols="1">
+            <v-col cols="1" v-if="isLAQV">
+                <img src="/images/logo/laqv-logo.png" width="70">
+            </v-col>
+            <v-col cols="1" v-else>
                 <img src="/images/logo/ucibio-logo.png" width="40">
             </v-col>
             <v-col cols="10" class="ml-auto call-title">
@@ -925,6 +928,7 @@ export default {
             formError: false,
             callName: '',
             applications: [],
+            isLAQV: false,
             data: {
                 scores: [],
                 isLAQV: false,
@@ -967,6 +971,7 @@ export default {
             .then((result) => {
                 this.callName = result.data.result.call.call_name
                 this.data.isLAQV = result.data.result.call.is_laqv;
+                this.isLAQV = result.data.result.call.is_laqv;
                 this.applications = result.data.result.applications;
                 if (result.data.result.call.call_url_segment.includes('-porto-')) {
                     this.data.isPorto = 1;

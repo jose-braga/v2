@@ -1,5 +1,11 @@
 <template>
 <v-card>
+    <v-card-title primary-title>
+        <div>
+            <h3 class="headline">People you supervise</h3>
+        </div>
+    </v-card-title>
+    <v-card-text>{{data.students}}</v-card-text>
 </v-card>
 
 </template>
