@@ -153,6 +153,7 @@
                                                                                     :loading="loadingPeople"
                                                                                     :items="people" item-value="id" item-text="colloquial_name"
                                                                                     :search-input.sync="vsup.supervisor_search"
+                                                                                    :filter="customSearch"
                                                                                     cache-items
                                                                                     flat
                                                                                     hide-no-data
@@ -512,6 +513,7 @@
                                                                                     :loading="loadingPeople"
                                                                                     :items="people" item-value="id" item-text="colloquial_name"
                                                                                     :search-input.sync="vsup.supervisor_search"
+                                                                                    :filter="customSearch"
                                                                                     cache-items
                                                                                     flat
                                                                                     hide-no-data
@@ -751,6 +753,25 @@ var processDegrees = function(vm, result) {
     }
     return {ongoing, finished};
 };
+function prepareStringComparison(str) {
+    if (str === null || str === undefined) {
+        return null;
+    } else {
+        return str.toLocaleLowerCase()
+            .replace(/[áàãâä]/g, 'a')
+            .replace(/[éèêë]/g, 'e')
+            .replace(/[íìîï]/g, 'i')
+            .replace(/[óòõôö]/g, 'o')
+            .replace(/[úùûü]/g, 'u')
+            .replace(/[ç]/g, 'c')
+            .replace(/[ñ]/g, 'n')
+            .replace(/(\.\s)/g, '')
+            .replace(/(\.)/g, '')
+            .replace(/[-:()]/g, ' ')
+            .trim()
+            ;
+    }
+}
 
 export default {
     props: {
@@ -1026,7 +1047,18 @@ export default {
                     this.$set(data, data_text, list[ind][list_text])
                 }
             }
-        }
+        },
+        customSearch (item, queryText, itemText) {
+            let queryPre = prepareStringComparison(queryText);
+            let query = queryPre.split(' ');
+            let text = prepareStringComparison(itemText);
+            for (let ind in query) {
+                if (text.indexOf(query[ind]) === -1) {
+                    return false;
+                }
+            }
+            return true;
+        },
     },
     validations: {
         data: {

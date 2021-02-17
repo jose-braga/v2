@@ -238,8 +238,6 @@ var actionGetLabGroups = function (positions, options, i) {
         );
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
-            console.log(positions[i])
-            console.log(resQuery)
             if (resQuery.length > 0) {
                 positions[i].groups = resQuery;
                 actionGetGroupsUnits(positions, options, i, 0);

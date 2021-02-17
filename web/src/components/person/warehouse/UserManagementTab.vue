@@ -70,6 +70,7 @@
             <v-col cols="12" md="3">
                 <v-autocomplete v-model="$v.newItem.user_id.$model"
                     :items="people" item-value="user_id" item-text="colloquial_name"
+                    :filter="customSearch"
                     label="Person Name"
                 >
                 </v-autocomplete>
@@ -123,6 +124,26 @@
 <script>
 import subUtil from '@/components/common/submit-utils'
 import { required } from 'vuelidate/lib/validators'
+
+function prepareStringComparison(str) {
+    if (str === null || str === undefined) {
+        return null;
+    } else {
+        return str.toLocaleLowerCase()
+            .replace(/[áàãâä]/g, 'a')
+            .replace(/[éèêë]/g, 'e')
+            .replace(/[íìîï]/g, 'i')
+            .replace(/[óòõôö]/g, 'o')
+            .replace(/[úùûü]/g, 'u')
+            .replace(/[ç]/g, 'c')
+            .replace(/[ñ]/g, 'n')
+            .replace(/(\.\s)/g, '')
+            .replace(/(\.)/g, '')
+            .replace(/[-:()]/g, ' ')
+            .trim()
+            ;
+    }
+}
 
 export default {
     data() {
@@ -310,6 +331,17 @@ export default {
                 this.toDelete.push(list[indRemove]);
             }
             list.splice(indRemove, 1);
+        },
+        customSearch (item, queryText, itemText) {
+            let queryPre = prepareStringComparison(queryText);
+            let query = queryPre.split(' ');
+            let text = prepareStringComparison(itemText);
+            for (let ind in query) {
+                if (text.indexOf(query[ind]) === -1) {
+                    return false;
+                }
+            }
+            return true;
         },
 
     },

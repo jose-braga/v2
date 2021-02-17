@@ -161,6 +161,22 @@ router.put('/:personID/professional-situations/:jobID/contracts/:contractID', co
 router.delete('/:personID/professional-situations/:jobID/contracts/:contractID', cors(corsOptions), professionalSituations.deleteProfessionalSituationsContracts);
 //Supervisor
 router.get('/:personID/students', cors(corsOptions), supervising.getStudents);
+router.post('/:personID/students', cors(corsOptions), supervising.addStudent);
+router.get('/:personID/students/:studentID', cors(corsOptions), supervising.getStudentDetails);
+router.put('/:personID/students/:studentID/supervisors/:supervisorID', cors(corsOptions), supervising.updateStudentSupervisors);
+router.delete('/:personID/students/:studentID/supervisors/:supervisorID', cors(corsOptions), supervising.deleteStudentSupervisors);
+router.post('/:personID/students/:studentID/lab-position', cors(corsOptions), supervising.addStudentLabPosition);
+router.post('/:personID/students/:studentID/facility-position', cors(corsOptions), supervising.addStudentFacilityPosition);
+router.post('/:personID/students/:studentID/science-management-position', cors(corsOptions), supervising.addStudentScienceManagementPosition);
+router.post('/:personID/students/:studentID/administrative-position', cors(corsOptions), supervising.addStudentAdministrativePosition);
+router.put('/:personID/students/:studentID/lab-position/:positionID', cors(corsOptions), supervising.updateStudentLabPosition);
+router.put('/:personID/students/:studentID/facility-position/:positionID', cors(corsOptions), supervising.updateStudentFacilityPosition);
+router.put('/:personID/students/:studentID/science-management-position/:positionID', cors(corsOptions), supervising.updateStudentScienceManagementPosition);
+router.put('/:personID/students/:studentID/administrative-position/:positionID', cors(corsOptions), supervising.updateStudentAdministrativePosition);
+router.delete('/:personID/students/:studentID/lab-position/:positionID', cors(corsOptions), supervising.deleteStudentLabPosition);
+router.delete('/:personID/students/:studentID/facility-position/:positionID', cors(corsOptions), supervising.deleteStudentFacilityPosition);
+router.delete('/:personID/students/:studentID/science-management-position/:positionID', cors(corsOptions), supervising.deleteStudentScienceManagementPosition);
+router.delete('/:personID/students/:studentID/administrative-position/:positionID', cors(corsOptions), supervising.deleteStudentAdministrativePosition);
 
 
 //Publications

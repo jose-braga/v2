@@ -63,6 +63,7 @@
                                 @change="processGenericId(i, 1, 'resourceID')"
                                 :items="people"
                                 item-value="id" item-text="colloquial_name"
+                                :filter="customSearch"
                                 label="Resource 1 person name"
                                 dense>
                             </v-autocomplete>
@@ -103,6 +104,7 @@
                                 @change="processGenericId(i, 1, 'resourceID')"
                                 :items="people"
                                 item-value="id" item-text="colloquial_name"
+                                :filter="customSearch"
                                 label="Resource 1 person name"
                                 dense>
                             </v-autocomplete>
@@ -111,6 +113,7 @@
                                 @change="processGenericId(i, 1, 'resourceID')"
                                 :items="people"
                                 item-value="id" item-text="colloquial_name"
+                                :filter="customSearch"
                                 label="Resource 1 person name"
                                 dense>
                             </v-autocomplete>
@@ -119,6 +122,7 @@
                                 @change="processGenericId(i, 1, 'resourceID')"
                                 :items="people"
                                 item-value="user_id" item-text="colloquial_name"
+                                :filter="customSearch"
                                 label="Resource 1 person name"
                                 dense>
                             </v-autocomplete>
@@ -164,6 +168,7 @@
                                 @change="processGenericId(i, 2, 'resourceID')"
                                 :items="people"
                                 item-value="id" item-text="colloquial_name"
+                                :filter="customSearch"
                                 label="Resource 2 person name"
                                 dense>
                             </v-autocomplete>
@@ -204,6 +209,7 @@
                                 @change="processGenericId(i, 2, 'resourceID')"
                                 :items="people"
                                 item-value="id" item-text="colloquial_name"
+                                :filter="customSearch"
                                 label="Resource 2 person name"
                                 dense>
                             </v-autocomplete>
@@ -212,6 +218,7 @@
                                 @change="processGenericId(i, 2, 'resourceID')"
                                 :items="people"
                                 item-value="id" item-text="colloquial_name"
+                                :filter="customSearch"
                                 label="Resource 2 person name"
                                 dense>
                             </v-autocomplete>
@@ -220,6 +227,7 @@
                                 @change="processGenericId(i, 2, 'resourceID')"
                                 :items="people"
                                 item-value="user_id" item-text="colloquial_name"
+                                :filter="customSearch"
                                 label="Resource 2 person name"
                                 dense>
                             </v-autocomplete>
@@ -270,6 +278,7 @@
                                 @change="processGenericId(i, 3, 'resourceID')"
                                 :items="people"
                                 item-value="id" item-text="colloquial_name"
+                                :filter="customSearch"
                                 label="Resource 3 person name"
                                 dense>
                             </v-autocomplete>
@@ -310,6 +319,7 @@
                                 @change="processGenericId(i, 3, 'resourceID')"
                                 :items="people"
                                 item-value="id" item-text="colloquial_name"
+                                :filter="customSearch"
                                 label="Resource 3 person name"
                                 dense>
                             </v-autocomplete>
@@ -318,6 +328,7 @@
                                 @change="processGenericId(i, 3, 'resourceID')"
                                 :items="people"
                                 item-value="id" item-text="colloquial_name"
+                                :filter="customSearch"
                                 label="Resource 3 person name"
                                 dense>
                             </v-autocomplete>
@@ -326,6 +337,7 @@
                                 @change="processGenericId(i, 3, 'resourceID')"
                                 :items="people"
                                 item-value="user_id" item-text="colloquial_name"
+                                :filter="customSearch"
                                 label="Resource 3 person name"
                                 dense>
                             </v-autocomplete>
@@ -376,6 +388,7 @@
                                 @change="processGenericId(i, 4, 'resourceID')"
                                 :items="people"
                                 item-value="id" item-text="colloquial_name"
+                                :filter="customSearch"
                                 label="Resource 4 person name"
                                 dense>
                             </v-autocomplete>
@@ -416,6 +429,7 @@
                                 @change="processGenericId(i, 4, 'resourceID')"
                                 :items="people"
                                 item-value="id" item-text="colloquial_name"
+                                :filter="customSearch"
                                 label="Resource 4 person name"
                                 dense>
                             </v-autocomplete>
@@ -424,6 +438,7 @@
                                 @change="processGenericId(i, 4, 'resourceID')"
                                 :items="people"
                                 item-value="id" item-text="colloquial_name"
+                                :filter="customSearch"
                                 label="Resource 4 person name"
                                 dense>
                             </v-autocomplete>
@@ -432,6 +447,7 @@
                                 @change="processGenericId(i, 4, 'resourceID')"
                                 :items="people"
                                 item-value="user_id" item-text="colloquial_name"
+                                :filter="customSearch"
                                 label="Resource 4 person name"
                                 dense>
                             </v-autocomplete>
@@ -566,6 +582,25 @@ function makeEndpointURL(data) {
         }
     }
     return data;
+}
+function prepareStringComparison(str) {
+    if (str === null || str === undefined) {
+        return null;
+    } else {
+        return str.toLocaleLowerCase()
+            .replace(/[áàãâä]/g, 'a')
+            .replace(/[éèêë]/g, 'e')
+            .replace(/[íìîï]/g, 'i')
+            .replace(/[óòõôö]/g, 'o')
+            .replace(/[úùûü]/g, 'u')
+            .replace(/[ç]/g, 'c')
+            .replace(/[ñ]/g, 'n')
+            .replace(/(\.\s)/g, '')
+            .replace(/(\.)/g, '')
+            .replace(/[-:()]/g, ' ')
+            .trim()
+            ;
+    }
 }
 
 export default {
@@ -959,6 +994,17 @@ export default {
                     }
                 }
             }
+        },
+        customSearch (item, queryText, itemText) {
+            let queryPre = prepareStringComparison(queryText);
+            let query = queryPre.split(' ');
+            let text = prepareStringComparison(itemText);
+            for (let ind in query) {
+                if (text.indexOf(query[ind]) === -1) {
+                    return false;
+                }
+            }
+            return true;
         },
     },
 

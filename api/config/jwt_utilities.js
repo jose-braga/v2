@@ -11,6 +11,7 @@ module.exports.generateJWT = function (user) {
         personName: user.person_name,
         currentUnits: user.current_units,
         currentCity: user.current_city,
+        currentDepartments: user.current_departments,
         permissionsLevel: user.permissions_level,
         permissionsEndpoints: user.permissions_endpoints,
         permissionsWebAreas: user.permissions_web_areas,

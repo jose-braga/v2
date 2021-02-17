@@ -16,6 +16,7 @@
                         :loading="loadingPeople"
                         :items="people" item-value="user_id" item-text="colloquial_name"
                         :search-input="editor.editor_search"
+                        :filter="customSearch"
                         :disabled="editor.id !== 'new'"
                         cache-items
                         flat
@@ -64,6 +65,26 @@
 
 <script>
 import subUtil from '@/components/common/submit-utils'
+
+function prepareStringComparison(str) {
+    if (str === null || str === undefined) {
+        return null;
+    } else {
+        return str.toLocaleLowerCase()
+            .replace(/[áàãâä]/g, 'a')
+            .replace(/[éèêë]/g, 'e')
+            .replace(/[íìîï]/g, 'i')
+            .replace(/[óòõôö]/g, 'o')
+            .replace(/[úùûü]/g, 'u')
+            .replace(/[ç]/g, 'c')
+            .replace(/[ñ]/g, 'n')
+            .replace(/(\.\s)/g, '')
+            .replace(/(\.)/g, '')
+            .replace(/[-:()]/g, ' ')
+            .trim()
+            ;
+    }
+}
 
 export default {
     data() {
@@ -176,6 +197,17 @@ export default {
                 this.toDelete.push(list[ind]);
             }
             list.splice(ind, 1);
+        },
+        customSearch (item, queryText, itemText) {
+            let queryPre = prepareStringComparison(queryText);
+            let query = queryPre.split(' ');
+            let text = prepareStringComparison(itemText);
+            for (let ind in query) {
+                if (text.indexOf(query[ind]) === -1) {
+                    return false;
+                }
+            }
+            return true;
         },
     },
 

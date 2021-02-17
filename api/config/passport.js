@@ -534,7 +534,38 @@ var getCurrentCity = function (req, done, user) {
             if (err) {
                 return done(err);
             }
-            user.current_city = rows[0];
+            if (rows.length > 0) {
+                user.current_city = rows[0];
+            } else {
+                user.current_city = [];
+            }
+            return getCurrentDepartment(req, done, user);
+        });
+    });
+}
+
+var getCurrentDepartment = function (req, done, user) {
+    let person_id = user.person_id;
+    var query =
+        'SELECT people_departments.*, departments.name_en, departments.name_pt'
+        + ' FROM people_departments'
+        + ' JOIN departments ON departments.id = people_departments.department_id'
+        + ' WHERE people_departments.person_id = ?'
+        + ' AND ('
+        + ' (people_departments.valid_from IS NULL OR people_departments.valid_from <= CURDATE())'
+        + ' AND (people_departments.valid_until IS NULL OR people_departments.valid_until >= CURDATE())'
+        + ');';
+    var places = [person_id];
+    pool.getConnection(function (err, connection) {
+        if (err) {
+            return done(err);
+        }
+        connection.query(query, places, function (err, rows) {
+            connection.release();
+            if (err) {
+                return done(err);
+            }
+            user.current_departments = rows;
             return getUserEndpointPermissions(req, done, user);
         });
     });

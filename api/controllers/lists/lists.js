@@ -22,8 +22,19 @@ var getDegrees = function (req, res, next) {
 var getPeopleSimple = function (req, res, next) {
     var querySQL = '';
     var places = [];
-    querySQL = querySQL + 'SELECT id, user_id, colloquial_name FROM people'
-                        + ' WHERE status = 1;';
+    querySQL = querySQL + 'SELECT id, user_id, name, colloquial_name FROM people'
+                        + ' WHERE status = 1'
+                        + ' ORDER BY colloquial_name ASC;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getSupervisors = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT id, user_id, name, colloquial_name FROM people'
+                        + ' WHERE status = 1 AND can_supervise = 1'
+                        + ' ORDER BY colloquial_name ASC;';
     //places.push()
     sql.makeSQLOperation(req, res, querySQL, places);
     return;
@@ -698,6 +709,9 @@ module.exports.listItems = function (req, res, next) {
     }
     if (category === 'people-simple') {
         getPeopleSimple(req, res, next);
+    }
+    if (category === 'supervisors') {
+        getSupervisors(req, res, next);
     }
     if (category === 'poles') {
         getPoles(req, res, next);

@@ -15,6 +15,7 @@ const session = {
         username: undefined,
         currentUnits: undefined,
         currentCity: undefined,
+        currentDepartments: undefined,
         permissionsLevel: undefined,
         permissionsEndpoints: [],
         permissionsWebAreas: [],
@@ -33,6 +34,7 @@ const session = {
                     state.username = token_json.username;
                     state.currentUnits = token_json.currentUnits;
                     state.currentCity = token_json.currentCity;
+                    state.currentDepartments = token_json.currentDepartments;
                     state.permissionsLevel = token_json.permissionsLevel;
                     state.permissionsEndpoints = token_json.permissionsEndpoints;
                     for (let ind in state.permissionsEndpoints) {
@@ -81,6 +83,7 @@ const session = {
             state.username = token_json.username;
             state.currentUnits = token_json.currentUnits;
             state.currentCity = token_json.currentCity;
+            state.currentDepartments = token_json.currentDepartments;
             state.permissionsLevel = token_json.permissionsLevel;
             state.permissionsEndpoints = token_json.permissionsEndpoints;
             for (let ind in state.permissionsEndpoints) {
@@ -103,6 +106,7 @@ const session = {
             state.username = undefined;
             state.currentUnits = undefined;
             state.currentCity = undefined;
+            state.currentDepartments = undefined;
             state.permissionsLevel = undefined;
             state.permissionsEndpoints = [];
             state.permissionsWebAreas = [];

@@ -25,6 +25,16 @@
                 </v-row>
             </v-col>
         </v-row>
+        <v-row class="mt-1">
+            <v-col cols="10" md="6" align="end">
+                <v-row justify="end" align="center">
+                    <span class="mr-4">Make candidates' classification file</span>
+                    <v-btn fab color="blue" @click="generateCandidateFiles(applications)">
+                        <v-icon color="white" x-large>mdi-file-excel</v-icon>
+                    </v-btn>
+                </v-row>
+            </v-col>
+        </v-row>
         <div
             v-for="(application, ind) in applications"
             :key="ind"
@@ -762,6 +772,8 @@ import { PDFDocument, PageSizes,
 import fontkit from '@pdf-lib/fontkit'
 import download from 'downloadjs'
 
+const round = (n, d) => Math.round(n * Math.pow(10, d)) / Math.pow(10, d)
+
 const scoreSum = (obj, sum) => {
     if (sum === undefined) sum = 0;
     const myKeys = Object.keys(obj)
@@ -1133,6 +1145,162 @@ export default {
             XLSX.writeFile(wb, username
                     + '_' + this.callName
                     + '_applicants_' + dateFile + '.xlsx');
+        },
+        generateCandidateFiles(items) {
+            console.log(items)
+            let today = time.moment();
+            let dateFile = time.momentToDate(today, 'Europe/Lisbon', 'YYYY-MM-DDTHHmmss')
+            for (let ind in items) {
+                let candidateName = items[ind].applicant_name;
+                console.log(candidateName)
+                let degrees = items[ind].academicDegrees;
+                let integratedMaster = false;
+                let bachelor;
+                let master;
+                for (let indDeg in degrees) {
+                    if (degrees[indDeg].degree_name === 'Integrated Master') {
+                        integratedMaster = true;
+                        master = degrees[indDeg];
+                    } else if (degrees[indDeg].degree_name === 'Master') {
+                        master = degrees[indDeg];
+                    } else if (degrees[indDeg].degree_name === 'Bachelor') {
+                        bachelor = degrees[indDeg];
+                    }
+                }
+                let academicGrade;
+                if (integratedMaster) {
+                    academicGrade = master.grade
+                } else {
+                    if (candidateName === 'Miguel Ângelo Lopes Tavares') { bachelor = {grade: 14}}
+                    if (candidateName === 'Pedro Miguel Gomes Guiomar') {
+                        bachelor = {grade: 13}
+                        integratedMaster = true;
+                    }
+                    academicGrade = 0.6 * parseFloat(bachelor.grade)
+                            + 0.4 * parseFloat(master.grade);
+                }
+                let admissibleAcademicGrade = 'Não'
+                if (academicGrade >= 14) {
+                    admissibleAcademicGrade = 'Sim'
+                }
+                let reviewers = items[ind].reviewers;
+                let academicCurriculum = 0;
+                let masterThesis = 0;
+                let scientificActivity = 0;
+                let papers = 0;
+                let communications = 0;
+                let motivation = 0;
+                let countReviewersUsed = 0;
+                for (let indRev in reviewers) {
+                    if (reviewers[indRev].use_score === 1) {
+                        countReviewersUsed++;
+                        for (let indScore in reviewers[indRev].automaticScores) {
+                            if (reviewers[indRev].automaticScores[indScore].criteria_name === 'Academic Curriculum') {
+                                academicCurriculum = academicCurriculum + parseFloat(reviewers[indRev].automaticScores[indScore].score_final);
+                            } else if (reviewers[indRev].automaticScores[indScore].criteria_name === 'Master thesis') {
+                                masterThesis = masterThesis + parseFloat(reviewers[indRev].automaticScores[indScore].score_final);
+                            } else if (reviewers[indRev].automaticScores[indScore].criteria_name === 'Scientific activity') {
+                                scientificActivity = scientificActivity + parseFloat(reviewers[indRev].automaticScores[indScore].score_final);
+                            } else if (reviewers[indRev].automaticScores[indScore].criteria_name === 'Papers') {
+                                papers = papers + parseFloat(reviewers[indRev].automaticScores[indScore].score_final);
+                            } else if (reviewers[indRev].automaticScores[indScore].criteria_name === 'Communications') {
+                                communications = communications + parseFloat(reviewers[indRev].automaticScores[indScore].score_final);
+                            } else if (reviewers[indRev].automaticScores[indScore].criteria_name === 'Motivation Letter e Recommendations') {
+                                motivation = motivation + parseFloat(reviewers[indRev].automaticScores[indScore].score_final);
+                            }
+                        }
+                    }
+                }
+                academicCurriculum = round(academicCurriculum / countReviewersUsed, 2);
+                masterThesis = round(masterThesis / countReviewersUsed, 2);
+                scientificActivity = round(scientificActivity / countReviewersUsed, 2);
+                papers = round(papers / countReviewersUsed, 2);
+                communications = round(communications / countReviewersUsed, 2);
+                motivation = round(motivation / countReviewersUsed, 2);
+                let gradeApplicant = Math.max(academicGrade-14,0);
+                let additionalGrade = academicCurriculum - gradeApplicant;
+                let ws_name = 'Avaliação'
+                let ws_data = [
+                    ['','PROGRAMA DOUTORAL EM QUÍMICA SUSTENTÁVEL 2021'],
+                    ['','FICHA DE AVALIAÇÃO DE CANDIDATO'],
+                    [],
+                    ['','Nome do candidato:','','',candidateName,'','','',''],
+                    [],
+                    ['','1) Admissibilidade a concurso:','','','','',admissibleAcademicGrade],
+                    ['','','Mestrado adequado','','','','Sim'],
+                    ['','','Nota de candidatura','','','',admissibleAcademicGrade],
+                    ['','2) Avaliação do Candidato:'],
+                    ['','2.1) Currículo académico:'],
+                    ['','', '1. Nota de candidatura:']
+                ];
+                if (integratedMaster) {
+                    ws_data.push(['','Mestrado Integrado:','','','','','',master.grade])
+                } else {
+                    ws_data.push(['','Licenciatura:',bachelor.grade,'Mestrado:',master.grade,
+                        '0.6L+0.4M=Nc=','',academicGrade])
+                }
+                ws_data.push(
+                    ['','','C1 = (Nc-14) =','','','','', gradeApplicant],
+                    ['','', '2. Classificação adicional:','','','','C2=', additionalGrade],
+                    ['','','','','','','',''],
+                    ['','Total (x0.3)', '','','','','', round(academicCurriculum * 0.3, 2)],
+                    ['','2.2) Currículo Científico:'],
+                    ['','a. Tese de mestrado de base científica', '','','','','',masterThesis],
+                    ['','b. Actividade científica geral', '','','','','',scientificActivity],
+                    ['','','','','','','',''],
+                    ['','c. Artigos', '','','','','',papers],
+                    ['','d. Comunicações','','','','','',communications],
+                    ['','Classificação 2.2 (0.2a+0.2b+0.5c+0.1d)', '','','','','',
+                        round(0.2*masterThesis + 0.2*scientificActivity + 0.5*papers + 0.1*communications,2)],
+                    ['','Total (x0.2)', '','','','','',round(0.2*(0.2*masterThesis + 0.2*scientificActivity + 0.5*papers + 0.1*communications),2)],
+                    ['','2.3) Carta de motivação e referências:','','','','','',round(motivation,2)],
+                    ['','','','','','','',''],
+                    ['','Total (x0.2)', '','','','','',round(0.2 * motivation,2)],
+                    ['','','','','','','',''],
+                    ['','Nota da 1º ronda de avaliação', '','','','','',
+                        round(academicCurriculum * 0.3
+                        + 0.2*(0.2*masterThesis + 0.2*scientificActivity + 0.5*papers + 0.1*communications)
+                        +0.2 * motivation,2)
+                    ],
+                );
+
+                let ws = XLSX.utils.aoa_to_sheet(ws_data);
+                ws['!merges'] = [
+                    XLSX.utils.decode_range("B4:D4"),
+                    XLSX.utils.decode_range("E4:I4"),
+                    XLSX.utils.decode_range("B6:D6"),
+                    XLSX.utils.decode_range("C7:E7"),
+                    XLSX.utils.decode_range("C8:E8"),
+                    XLSX.utils.decode_range("C13:D13"),
+                    XLSX.utils.decode_range("C14:E14"),
+                    XLSX.utils.decode_range("B15:H15"),
+                    XLSX.utils.decode_range("B18:G18"),
+                    XLSX.utils.decode_range("B19:G19"),
+                    XLSX.utils.decode_range("B20:G20"),
+                    XLSX.utils.decode_range("B22:G22"),
+                    XLSX.utils.decode_range("B23:G23"),
+                    XLSX.utils.decode_range("B25:E25"),
+                    XLSX.utils.decode_range("B26:H26"),
+                    XLSX.utils.decode_range("B29:G29"),
+                ];
+                if (integratedMaster) {
+                    ws['!merges'].push(XLSX.utils.decode_range("B12:D12"));
+                } else {
+                    ws['!merges'].push(XLSX.utils.decode_range("F12:G12"));
+                }
+                ws['!rows'] = [
+                    {},{},{},{},{},{},{},{},{},{},{},{},{},{},
+                    {hpt: 40},{},{},{},{},
+                    {hpt: 40},{},{},{},{},{},
+                    {hpt: 40}
+                ];
+                ws['!cols'] = [
+                    {wpx: 47},{wpx: 61},{wpx: 47},{wpx: 47},{wpx: 47},{wpx: 47},{wpx: 47},{wpx: 47},{wpx: 47}
+                ]
+                let wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, ws_name);
+                XLSX.writeFile(wb, candidateName + 'PDQS 2021_Candidate File' + dateFile + '.xlsx');
+            }
         },
         async exportDocumentation (application) {
             let url = '/OpenSans-Regular.ttf'
@@ -1896,7 +2064,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .applicant-name {
     font-size: 26px;
 }
