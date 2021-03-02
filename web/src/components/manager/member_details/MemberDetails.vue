@@ -11,7 +11,9 @@
             <v-tab>Academic</v-tab>
             <v-tab>Institutional</v-tab>
             <v-tab>Professional</v-tab>
+            <v-tab>Supervisor</v-tab>
             <v-tab>Publications</v-tab>
+            <v-tab>Spaces</v-tab>
             <v-tab>Other productivity</v-tab>
         </v-tabs>
         <v-tabs-items v-model="activeTab">
@@ -154,6 +156,13 @@
                 ></ProfessionalSituations>
             </v-tab-item>
             <v-tab-item>
+                <SupervisingList
+                    :person-id="personId"
+                    :manager-id="managerId"
+                    :endpoint="endpoint"
+                ></SupervisingList>
+            </v-tab-item>
+            <v-tab-item>
                 <v-expansion-panels multiple v-model="openPanel" class="mt-4">
                     <v-expansion-panel>
                         <v-expansion-panel-header>
@@ -206,6 +215,49 @@
                 </v-expansion-panels>
             </v-tab-item>
             <v-tab-item>
+                <v-expansion-panels multiple v-model="openPanel" class="mt-4">
+                    <v-expansion-panel>
+                        <v-expansion-panel-header>
+                            <h3>Spaces associated to user</h3>
+                        </v-expansion-panel-header>
+                        <v-expansion-panel-content>
+                            <SpacesManagement
+                                :other-person-id="personId"
+                                :manager-id="managerId"
+                                :endpoint="endpoint"
+                            ></SpacesManagement>
+                        </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel v-if="isLAQV && isSupervisor">
+                        <v-expansion-panel-header>
+                            <h3>Spaces associated to supervisor team</h3>
+                        </v-expansion-panel-header>
+                        <v-expansion-panel-content>
+                            <SupervisorSpaces
+                                :supervisor-id="personId"
+                                :endpoint="endpoint"
+                            >
+                            </SupervisorSpaces>
+                        </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel v-if="isUCIBIO && isLabLeader">
+                        <v-expansion-panel-header>
+                            <h3>Spaces associated to lab</h3>
+                        </v-expansion-panel-header>
+                        <v-expansion-panel-content>
+                            <LabSpaces v-for="(lab,i) in myLabs"
+                                :key="i"
+                                :other-person-id="personId"
+                                :lab="lab"
+                                :endpoint="endpoint"
+                            >
+                            </LabSpaces>
+                        </v-expansion-panel-content>
+                    </v-expansion-panel>
+                </v-expansion-panels>
+
+            </v-tab-item>
+            <v-tab-item>
             </v-tab-item>
         </v-tabs-items>
     </v-form>
@@ -214,6 +266,9 @@
 </template>
 
 <script>
+
+import subUtil from '@/components/common/submit-utils'
+import time from '@/components/common/date-utils'
 
 const AppAreaPermissions = () => import(/* webpackChunkName: "manager-details-app-area-permissions" */ './permissions/AppAreaPermissions')
 const Permissions = () => import(/* webpackChunkName: "manager-details-permissions" */ './permissions/Permissions')
@@ -231,6 +286,10 @@ const InstitutionalContacts = () => import(/* webpackChunkName: "manager-details
 const AcademicAffiliations = () => import(/* webpackChunkName: "manager-details-academic-affiliations" */ './institutional/AcademicAffiliations')
 const ProfessionalSituations = () => import(/* webpackChunkName: "manager-details-professional-situations" */ './professional/ProfessionalSituations')
 const PublicationsList = () => import(/* webpackChunkName: "manager-details-publications-list" */ './productivity/publications/PublicationsList')
+const SupervisingList = () => import(/* webpackChunkName: "manager-details-supervising-list" */ './supervisor/SupervisingList')
+const SpacesManagement = () => import(/* webpackChunkName: "manager-details-supervising-list" */ './spaces/SpacesManagement')
+const LabSpaces = () => import(/* webpackChunkName: "manager-details-lab-spaces" */ './spaces/LabSpaces')
+const SupervisorSpaces = () => import(/* webpackChunkName: "manager-details-lab-spaces" */ './spaces/SupervisorSpaces')
 const AddFromDatabase = () => import(/* webpackChunkName: "manager-details-add-from-database" */ './productivity/publications/add-publications/AddFromDatabase')
 const AddFromOrcid = () => import(/* webpackChunkName: "manager-details-add-from-orcid" */ './productivity/publications/add-publications/AddFromOrcid')
 const AddFromRepository = () => import(/* webpackChunkName: "manager-details-add-from-repo" */ './productivity/publications/add-publications/AddFromRepository')
@@ -253,6 +312,10 @@ export default {
         AcademicAffiliations,
         ProfessionalSituations,
         PublicationsList,
+        SupervisingList,
+        SpacesManagement,
+        LabSpaces,
+        SupervisorSpaces,
         AddFromDatabase,
         AddFromOrcid,
         AddFromRepository,
@@ -267,6 +330,11 @@ export default {
         return {
             activeTab: 2,
             openPanel: [],
+            isLAQV: false,
+            isSupervisor: false,
+            isUCIBIO: false,
+            isLabLeader: false, // or a person with team management permissions
+            myLabs: [],
         }
     },
     mounted () {
@@ -279,6 +347,64 @@ export default {
     },
     methods: {
         initialize () {
+            this.isLAQV = false;
+            this.isUCIBIO = false;
+            this.isSupervisor = false;
+            this.isLabLeader = false;
+            this.myLabs = [];
+            if (this.$store.state.session.loggedIn) {
+                //let this_session = this.$store.state.session;
+                let urlSubmit = 'api/v2/supervisors';
+                this.$http.get(urlSubmit)
+                .then((response) => {
+                    let supervisors = response.data.result;
+                    for (let ind in supervisors) {
+                        if(this.personId === supervisors[ind].id) {
+                            this.isSupervisor = true;
+                        }
+                    }
+                    if (this.isSupervisor) {
+                        urlSubmit = 'api' + this.endpoint
+                                + '/members'
+                                + '/' + this.personId
+                                + '/lab-affiliations';
+                        subUtil.getInfoPopulate(this, urlSubmit, true)
+                        .then( (result) => {
+                            let currentUnits = [];
+                            for (let ind in result) {
+                                let valid_from = time.momentToDate(result[ind].valid_from);
+                                let valid_until = time.momentToDate(result[ind].valid_until);
+                                let now = time.moment().format('YYYY-MM-DD');
+                                if ((valid_from === null || valid_from < now)
+                                    && (valid_until === null || valid_until > now)
+                                ) {
+                                    if (this.myLabs.indexOf(result[ind].lab_id) === -1) {
+                                        this.myLabs.push(parseInt(result[ind].lab_id, 10));
+                                    }
+                                    // current lab, get current unit
+                                    if (result[ind].lab_position_id === 11 || result[ind].lab_position_id === 2) {
+                                        this.isLabLeader = true;
+                                    }
+                                    for (let indGrp in result[ind].groups) {
+                                        for (let indUnit in result[ind].groups[indGrp].units) {
+                                            currentUnits.push( result[ind].groups[indGrp].units[indUnit].id);
+                                        }
+                                    }
+                                }
+                            }
+                            if (currentUnits.length === 1
+                                && currentUnits[0] === 2
+                            ) {
+                                this.isLAQV = true;
+                            } else if (currentUnits.length === 1
+                                && currentUnits[0] === 1
+                            ) {
+                                this.isUCIBIO = true;
+                            }
+                        });
+                    }
+                })
+            }
         },
     },
 

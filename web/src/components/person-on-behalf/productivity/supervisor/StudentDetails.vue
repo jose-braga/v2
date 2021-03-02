@@ -451,6 +451,7 @@ export default {
         itemId: Number,
         studentId: Number,
         studentData: Object,
+        otherPersonId: Number,
     },
     data() {
         return {
@@ -518,7 +519,7 @@ export default {
             for (let ind in this.studentData.administrative_data) {
                 this.studentDetails.administrative_data.push(this.studentData.administrative_data[ind])
             }
-            let personID = this.$store.state.session.personID;
+            let personID = this.otherPersonId;
             let urlSubmit = 'api/people/' + personID + '/students/' + this.studentId;
             subUtil.getInfoPopulate(this, urlSubmit, true)
             .then( (result) => {
@@ -568,7 +569,7 @@ export default {
                 let urlUpdateAdministrative = [];
                 let urlDeleteSupervisor = [];
                 let urlUpdateSupervisor = [];
-                let personID = this.$store.state.session.personID;
+                let personID = this.otherPersonId;
                 for (let ind in this.studentDetails.lab_data) {
                     let datum = this.studentDetails.lab_data[ind]
                     if (datum.id === 'new') {
@@ -809,7 +810,7 @@ export default {
                     this.toDeleteFacilityPositions = [];
                     this.toDeleteScienceManagementPositions = [];
                     this.toDeleteAdministrativePositions = [];
-                    this.$root.$emit('updateSupervisorTable')
+                    this.$root.$emit('otherPersonUpdateSupervisorTable')
                     //this.initialize();
                 })
                 .catch((error) => {

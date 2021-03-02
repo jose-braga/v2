@@ -6,9 +6,11 @@ const OtherPersonAcademicTab = () => import(/* webpackChunkName: "person-on-beha
 const OtherPersonInstitutionalTab = () => import(/* webpackChunkName: "person-on-behalf-institutional" */ '@/components/person-on-behalf/institutional/InstitutionalTab.vue')
 const OtherPersonProfessionalTab = () => import(/* webpackChunkName: "person-on-behalf-professional" */ '@/components/person-on-behalf/professional/ProfessionalTab.vue')
 const OtherPersonProductivityTab = () => import(/* webpackChunkName: "person-on-behalf-productivity" */ '@/components/person-on-behalf/productivity/ProductivityTab.vue')
+const OtherPersonSupervisorTab = () => import(/* webpackChunkName: "supervisor-tab" */ '@/components/person-on-behalf/productivity/SupervisorTab.vue')
 const OtherPersonProductivityPublicationsTab = () => import(/* webpackChunkName: "person-on-behalf-productivity-publications" */ '@/components/person-on-behalf/productivity/PublicationsTab.vue')
 const OtherPersonProductivityAddPublicationsTab = () => import(/* webpackChunkName: "person-on-behalf-productivity-add-publications" */ '@/components/person-on-behalf/productivity/AddPublicationsTab.vue')
 const OtherPersonProductivityOtherProductivityTab = () => import(/* webpackChunkName: "person-on-behalf-productivity-other-productivity" */ '@/components/person-on-behalf/productivity/OtherProductivityTab.vue')
+const OtherPersonSpacesTab = () => import(/* webpackChunkName: "person-on-behalf-spaces-tab" */ '@/components/person-on-behalf/spaces/SpacesTab.vue')
 
 const routes = {
     path: '/person-on-behalf',
@@ -42,6 +44,12 @@ const routes = {
                     component: OtherPersonProductivityTab,
                     children: [
                         {
+                            path: 'supervisor',
+                            components: {
+                                default: OtherPersonSupervisorTab,
+                            }
+                        },
+                        {
                             path: 'publications',
                             components: {
                                 default: OtherPersonProductivityPublicationsTab,
@@ -61,6 +69,10 @@ const routes = {
                         },
                         { path: '', redirect: 'publications' }
                     ]
+                },
+                {
+                    path: 'spaces',
+                    component: OtherPersonSpacesTab
                 },
                 //{ path: '', redirect: 'personal' }
             ],

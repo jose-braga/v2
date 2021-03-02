@@ -21,6 +21,9 @@
         <v-tab to="/person/productivity">
             Productivity
         </v-tab>
+        <v-tab v-if="accessSpaces" to="/person/spaces">
+            Spaces
+        </v-tab>
         <v-tab v-if="accessWarehouse" to="/person/warehouse">
             Warehouse
         </v-tab>
@@ -63,6 +66,15 @@ export default {
     computed: {
         loggedIn () {
             return this.$store.state.session.loggedIn;
+        },
+        accessSpaces () {
+            let departments = this.$store.state.session.currentDepartments;
+            for (let ind in departments) {
+                if (departments[ind].department_id === 1) {
+                    return true;
+                }
+            }
+            return false;
         },
         accessWarehouse () {
             return this.$store.state.session.storeAccess.accessStore

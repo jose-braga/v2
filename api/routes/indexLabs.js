@@ -22,6 +22,7 @@ router.options('*', cors())
  */
 const members = require('../controllers/team/members');
 const publications = require('../controllers/team/publications');
+const spaces = require('../controllers/team/spaces');
 
 router.get('/:labID', cors(corsOptions), members.getLabInfo);
 router.get('/:labID/people', cors(corsOptions), members.searchAllPeople);
@@ -32,13 +33,21 @@ router.post('/:labID/members-affiliation/:memberID/position', cors(corsOptions),
 router.put('/:labID/members-affiliation/:memberID/position/:positionID', cors(corsOptions), members.updateLabMemberPosition); // update this member team position
 router.delete('/:labID/members-affiliation/:memberID/position/:positionID', cors(corsOptions), members.deleteLabMemberPosition); // delete this members position
 
-
+//Publications
 router.get('/:labID/publications', cors(corsOptions), publications.getTeamPublications); // these are the team publications
 router.post('/:labID/publications', cors(corsOptions), publications.associateTeamPublication); // simply associates publication to lab
 router.put('/:labID/publications/:publicationID', cors(corsOptions), publications.updateTeamPublication); // update association state of publication
 router.delete('/:labID/publications/:publicationID', cors(corsOptions), publications.dissociateTeamPublication); // simply removes association to lab
-
 router.get('/:labID/members-publications', cors(corsOptions), publications.getMembersPublications); // these are the publications reported by team members
+
+//Spaces
+router.get('/:labID/spaces', cors(corsOptions), spaces.getLabSpaces);
+router.post('/:labID/spaces', cors(corsOptions), spaces.addLabSpaces);
+router.get('/:labID/spaces/:spaceID', cors(corsOptions), spaces.getSpaceInfo);
+router.put('/:labID/spaces/:spaceID', cors(corsOptions), spaces.updateLabSpace);
+router.delete('/:labID/spaces/:labSpaceID', cors(corsOptions), spaces.deleteLabSpace);
+
+
 
 router.use(function (req, res, next) {
   var err = new Error('Not Found');

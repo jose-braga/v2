@@ -273,6 +273,7 @@
                         :item-id="editedItem.id"
                         :student-id="editedItem.person_id"
                         :student-data="editedItem"
+                        :other-person-id="otherPersonId"
                     >
                     </StudentDetails>
                 </v-dialog>
@@ -310,6 +311,7 @@
                         :item-id="editedItem.id"
                         :student-id="editedItem.person_id"
                         :student-data="editedItem"
+                        :other-person-id="otherPersonId"
                     >
                     </StudentDetails>
                 </v-dialog>
@@ -330,7 +332,7 @@
 import subUtil from '@/components/common/submit-utils'
 import time from '@/components/common/date-utils'
 import { requiredIf, email, integer, between } from 'vuelidate/lib/validators'
-const StudentDetails = () => import(/* webpackChunkName: "supervisor-student-details" */ './StudentDetails')
+const StudentDetails = () => import(/* webpackChunkName: "person-on-behalf-supervisor-student-details" */ './StudentDetails')
 
 function prepareStringComparison(str) {
     if (str === null || str === undefined) {
@@ -353,11 +355,16 @@ function prepareStringComparison(str) {
 }
 
 export default {
+    props: {
+        currentTab: String,
+        otherPersonId: Number,
+    },
     components: {
         StudentDetails,
     },
     data() {
         return {
+            initialized: false,
             dialog: false,
             dialogPast: false,
             editedIndex: -1,
@@ -412,9 +419,14 @@ export default {
     },
     watch: {
         currentTab () {
-            if (this.currentTab === '/person/productivity/supervisor') {
-                this.initialize();
+            if (this.currentTab.includes('/supervisor')) {
+                if (!this.initialized) {
+                    this.initialize();
+                }
             }
+        },
+        otherPersonId () {
+            this.initialize();
         },
     },
     mounted() {
@@ -429,7 +441,7 @@ export default {
         this.getAdministrativePositions();
         this.getAdministrativeOffices();
         this.getPeople();
-        this.$root.$on('updateSupervisorTable',
+        this.$root.$on('otherPersonUpdateSupervisorTable',
             () => {
                 this.initialize();
             }
@@ -438,15 +450,17 @@ export default {
     methods: {
         initialize () {
             if (this.$store.state.session.loggedIn) {
+                /* Change this "if"
                 if (this.$store.state.session.currentUnits.length === 1
                     && this.$store.state.session.currentUnits[0] === 2
                 ) {
                     this.isLAQV = true;
                 }
+                */
                 this.data.students = [];
                 this.data.pastStudents = [];
                 let today = time.momentToDate(time.moment())
-                let personID = this.$store.state.session.personID;
+                let personID = this.otherPersonId;
                 let urlSubmit = 'api/people/' + personID + '/students';
                 subUtil.getInfoPopulate(this, urlSubmit, true)
                 .then( (result) => {
@@ -466,7 +480,6 @@ export default {
                             + ' - ' + sup_valid_until;
                         let affiliations = '<ul>';
                         for (let indPos in result[ind].lab_data) {
-
                             let valid_from = '...'
                             let valid_until = '...'
                             if (result[ind].lab_data[indPos].valid_from !== null) {
@@ -570,12 +583,13 @@ export default {
                     this.myLabs = result2;
                 })
             }
+            this.initialized = true;
         },
         submitForm () {
             if (this.$store.state.session.loggedIn) {
                 this.progress = true;
                 let urlCreate = [];
-                let personID = this.$store.state.session.personID;
+                let personID = this.otherPersonId;
                 urlCreate.push({
                     url: 'api/people/' + personID
                         + '/students',
@@ -616,7 +630,7 @@ export default {
                 let urlCreate = [];
                 this.data.newStudent.changedBy = this.$store.state.session.userID;
                 urlCreate.push({
-                    url: 'api/people/' + this.$store.state.session.personID
+                    url: 'api/people/' + this.otherPersonId
                             + '/pre-register-student/' + this.data.newStudent.lab_id,
                     body: this.data.newStudent,
                 });

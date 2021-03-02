@@ -451,6 +451,8 @@ export default {
         itemId: Number,
         studentId: Number,
         studentData: Object,
+        otherPersonId: Number,
+        endpoint: String,
     },
     data() {
         return {
@@ -518,8 +520,11 @@ export default {
             for (let ind in this.studentData.administrative_data) {
                 this.studentDetails.administrative_data.push(this.studentData.administrative_data[ind])
             }
-            let personID = this.$store.state.session.personID;
-            let urlSubmit = 'api/people/' + personID + '/students/' + this.studentId;
+            let personID = this.otherPersonId;
+            let urlSubmit = 'api' + this.endpoint
+                        + '/members'
+                        + '/' + personID
+                        + '/students/' + this.studentId;
             subUtil.getInfoPopulate(this, urlSubmit, true)
             .then( (result) => {
                 for (let ind in result) {
@@ -538,7 +543,9 @@ export default {
                     }
                 }
                 this.$set(this.studentDetails, 'supervisors', result);
-                subUtil.getInfoPopulate(this, 'api/people/' + personID + '/lab-affiliations', true)
+                subUtil.getInfoPopulate(this, 'api' + this.endpoint
+                                + '/members'
+                                + '/' + personID + '/lab-affiliations', true)
                 .then( (result2) => {
                     this.myLabs = result2;
                     for (let ind in result2) {
@@ -568,19 +575,23 @@ export default {
                 let urlUpdateAdministrative = [];
                 let urlDeleteSupervisor = [];
                 let urlUpdateSupervisor = [];
-                let personID = this.$store.state.session.personID;
+                let personID = this.otherPersonId;
                 for (let ind in this.studentDetails.lab_data) {
                     let datum = this.studentDetails.lab_data[ind]
                     if (datum.id === 'new') {
                         urlCreateLab.push({
-                            url: 'api/people/' + personID
+                            url: 'api' + this.endpoint
+                                + '/members'
+                                + '/' + personID
                                 + '/students/' + this.studentId
                                 + '/lab-position',
                             body: datum,
                         });
                     } else {
                         urlUpdateLab.push({
-                            url: 'api/people/' + personID
+                            url: 'api' + this.endpoint
+                                + '/members'
+                                + '/' + personID
                                 + '/students/' + this.studentId
                                 + '/lab-position/' + datum.id,
                             body: datum,
@@ -591,14 +602,18 @@ export default {
                     let datum = this.studentDetails.technician_data[ind]
                     if (datum.id === 'new') {
                         urlCreateFacility.push({
-                            url: 'api/people/' + personID
+                            url: 'api' + this.endpoint
+                                + '/members'
+                                + '/' + personID
                                 + '/students/' + this.studentId
                                 + '/facility-position',
                             body: datum,
                         });
                     } else {
                         urlUpdateFacility.push({
-                            url: 'api/people/' + personID
+                            url: 'api' + this.endpoint
+                                + '/members'
+                                + '/' + personID
                                 + '/students/' + this.studentId
                                 + '/facility-position/' + datum.id,
                             body: datum,
@@ -609,14 +624,18 @@ export default {
                     let datum = this.studentDetails.science_manager_data[ind]
                     if (datum.id === 'new') {
                         urlCreateScienceManagement.push({
-                            url: 'api/people/' + personID
+                            url: 'api' + this.endpoint
+                                + '/members'
+                                + '/' + personID
                                 + '/students/' + this.studentId
                                 + '/science-management-position',
                             body: datum,
                         });
                     } else {
                         urlUpdateScienceManagement.push({
-                            url: 'api/people/' + personID
+                            url: 'api' + this.endpoint
+                                + '/members'
+                                + '/' + personID
                                 + '/students/' + this.studentId
                                 + '/science-management-position/' + datum.id,
                             body: datum,
@@ -627,14 +646,18 @@ export default {
                     let datum = this.studentDetails.administrative_data[ind]
                     if (datum.id === 'new') {
                         urlCreateAdministrative.push({
-                            url: 'api/people/' + personID
+                            url: 'api' + this.endpoint
+                                + '/members'
+                                + '/' + personID
                                 + '/students/' + this.studentId
                                 + '/administrative-position',
                             body: datum,
                         });
                     } else {
                         urlUpdateAdministrative.push({
-                            url: 'api/people/' + personID
+                            url: 'api' + this.endpoint
+                                + '/members'
+                                + '/' + personID
                                 + '/students/' + this.studentId
                                 + '/administrative-position/' + datum.id,
                             body: datum,
@@ -643,32 +666,42 @@ export default {
                 }
                 for (let ind in this.toDeleteLabPositions) {
                     let datum = this.toDeleteLabPositions[ind]
-                    urlDeleteLab.push('api/people/' + personID
+                    urlDeleteLab.push('api' + this.endpoint
+                                + '/members'
+                                + '/' + personID
                                 + '/students/' + this.studentId
                                 + '/lab-position/' + datum.id)
                 }
                 for (let ind in this.toDeleteFacilityPositions) {
                     let datum = this.toDeleteFacilityPositions[ind]
-                    urlDeleteFacility.push('api/people/' + personID
+                    urlDeleteFacility.push('api' + this.endpoint
+                                + '/members'
+                                + '/' + personID
                                 + '/students/' + this.studentId
                                 + '/facility-position/' + datum.id)
                 }
                 for (let ind in this.toDeleteScienceManagementPositions) {
                     let datum = this.toDeleteScienceManagementPositions[ind]
-                    urlDeleteScienceManagement.push('api/people/' + personID
+                    urlDeleteScienceManagement.push('api' + this.endpoint
+                                + '/members'
+                                + '/' + personID
                                 + '/students/' + this.studentId
                                 + '/science-management-position/' + datum.id)
                 }
                 for (let ind in this.toDeleteAdministrativePositions) {
                     let datum = this.toDeleteAdministrativePositions[ind]
-                    urlDeleteAdministrative.push('api/people/' + personID
+                    urlDeleteAdministrative.push('api' + this.endpoint
+                                + '/members'
+                                + '/' + personID
                                 + '/students/' + this.studentId
                                 + '/administrative-position/' + datum.id)
                 }
                 for (let ind in this.studentDetails.supervisors) {
                     let datum = this.studentDetails.supervisors[ind];
                     urlUpdateSupervisor.push({
-                        url: 'api/people/' + personID
+                        url: 'api' + this.endpoint
+                            + '/members'
+                            + '/' + personID
                             + '/students/' + this.studentId
                             + '/supervisors/' + datum.id,
                         body: datum,
@@ -676,7 +709,9 @@ export default {
                 }
                 for (let ind in this.toDeleteSupervisors) {
                     let datum = this.toDeleteSupervisors[ind]
-                    urlDeleteSupervisor.push('api/people/' + personID
+                    urlDeleteSupervisor.push('api' + this.endpoint
+                                + '/members'
+                                + '/' + personID
                                 + '/students/' + this.studentId
                                 + '/supervisors/' + datum.id)
                 }
@@ -809,7 +844,7 @@ export default {
                     this.toDeleteFacilityPositions = [];
                     this.toDeleteScienceManagementPositions = [];
                     this.toDeleteAdministrativePositions = [];
-                    this.$root.$emit('updateSupervisorTable')
+                    this.$root.$emit('managerUpdateSupervisorTable')
                     //this.initialize();
                 })
                 .catch((error) => {

@@ -95,7 +95,7 @@ export default {
             ],
             countries: [],
             loadingCountries: false,
-            searchCountries: null,
+            searchCountries: '',
         }
     },
     created() {
@@ -107,10 +107,8 @@ export default {
         },
         getCountries() {
             var this_vm = this;
-            if (this.$store.state.session.loggedIn) {
-                const urlSubmit = 'api/v2/' + 'countries';
-                return subUtil.getPublicInfo(this_vm, urlSubmit, 'countries');
-            }
+            const urlSubmit = 'api/v2/' + 'countries';
+            return subUtil.getPublicInfo(this_vm, urlSubmit, 'countries');
         },
     },
     validations: {

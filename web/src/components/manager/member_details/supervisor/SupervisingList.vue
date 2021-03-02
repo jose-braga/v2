@@ -19,15 +19,6 @@
                     </v-btn>
 
                 </v-col>
-                <v-col cols="6" v-if="isLAQV">
-                    <v-btn
-                        @click="showPreRegister()"
-                        outlined color="red"
-                    >
-                        Pre-register new member
-                    </v-btn>
-
-                </v-col>
             </v-row>
             <v-row v-if="addingFromDB" align-content="center">
                 <v-col cols="12" sm="4">
@@ -97,165 +88,6 @@
                     <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
                 </v-col>
             </v-row>
-            <v-row v-if="addingPreregistration && isLAQV" align-content="center">
-                <v-col cols="12">
-                    <v-row align-content="center">
-                        <v-col cols="12" sm="2">
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-text-field
-                                        v-model="$v.data.newStudent.username.$model"
-                                        :error="$v.data.newStudent.username.$error"
-                                        v-bind="attrs"
-                                        v-on="on"
-                                        label="Username*"
-                                    >
-                                    </v-text-field>
-                                </template>
-                                To be used on credentials, e.g.: <i>johnsmith</i>
-                            </v-tooltip>
-                            <div v-if="$v.data.newStudent.username.$error">
-                                <div v-if="!$v.data.newStudent.username.required">
-                                    <p class="caption red--text">Username is required.</p>
-                                </div>
-                                <div v-if="!$v.data.newStudent.username.isUnique">
-                                    <p class="caption red--text">Username already taken.</p>
-                                </div>
-                            </div>
-                        </v-col>
-                        <v-col cols="12" sm="2">
-                            <v-text-field
-                                v-model="$v.data.newStudent.email.$model"
-                                :error="$v.data.newStudent.email.$error"
-                                label="Email*"
-                            >
-                            </v-text-field>
-                            <div v-if="$v.data.newStudent.email.$error">
-                                <div v-if="!$v.data.newStudent.email.required">
-                                    <p class="caption red--text">Email is required.</p>
-                                </div>
-                                <div v-if="!$v.data.newStudent.email.email">
-                                    <p class="caption red--text">Not a valid email.</p>
-                                </div>
-                            </div>
-                        </v-col>
-                        <v-col cols="12" sm="2">
-                            <v-select
-                                v-model="$v.data.newStudent.city_id.$model"
-                                :items="poles" item-value="id" item-text="city"
-                                label="Pole*">
-                            </v-select>
-                            <div v-if="$v.data.newStudent.city_id.$error">
-                                <div v-if="!$v.data.newStudent.city_id.required">
-                                    <p class="caption red--text">Pole is required.</p>
-                                </div>
-                            </div>
-                        </v-col>
-                        <v-col cols="12" sm="3">
-                            <v-select
-                                v-model="$v.data.newStudent.lab_id.$model"
-                                :items="myLabs" item-value="lab_id" item-text="lab_name"
-                                label="Lab/Group*">
-                            </v-select>
-                            <div v-if="$v.data.newStudent.lab_id.$error">
-                                <div v-if="!$v.data.newStudent.lab_id.required">
-                                    <p class="caption red--text">Lab is required.</p>
-                                </div>
-                            </div>
-                        </v-col>
-                        <v-col cols="12" sm="3">
-                            <v-select
-                                v-model="$v.data.newStudent.lab_position_id.$model"
-                                :items="labPositions" item-value="id" item-text="name_en"
-                                label="Position*">
-                            </v-select>
-                            <div v-if="$v.data.newStudent.lab_position_id.$error">
-                                <div v-if="!$v.data.newStudent.lab_position_id.required">
-                                    <p class="caption red--text">Position is required.</p>
-                                </div>
-                            </div>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12" sm="2">
-                            <v-text-field
-                                v-model="$v.data.newStudent.dedication.$model"
-                                :error="$v.data.newStudent.dedication.$error"
-                                label="Dedication (%)"
-                            >
-                            </v-text-field>
-                            <div v-if="$v.data.newStudent.dedication.$error">
-                                <div v-if="!$v.data.newStudent.dedication.integer">
-                                    <p class="caption red--text">Must be an integer.</p>
-                                </div>
-                                <div v-if="!$v.data.newStudent.dedication.between">
-                                    <p class="caption red--text">Must be between 0 and 100.</p>
-                                </div>
-                            </div>
-                        </v-col>
-                        <v-col cols="12" sm="2">
-                            <v-menu ref="date_menu"
-                                v-model="data.newStudent.show_valid_from"
-                                :close-on-content-click="false"
-                                :nudge-right="10"
-                                transition="scale-transition"
-                                offset-y min-width="290px">
-                                <template v-slot:activator="{ on }">
-                                    <v-text-field
-                                        v-model="$v.data.newStudent.valid_from.$model"
-                                        label="Start date*" v-on="on">
-                                    </v-text-field>
-                                </template>
-                                <v-date-picker
-                                    v-model="$v.data.newStudent.valid_from.$model"
-                                    @input="data.newStudent.show_valid_from = false"
-                                    no-title
-                                ></v-date-picker>
-                            </v-menu>
-                            <div v-if="$v.data.newStudent.valid_from.$error">
-                                <div v-if="!$v.data.newStudent.valid_from.required">
-                                    <p class="caption red--text">Date is required.</p>
-                                </div>
-                            </div>
-                        </v-col>
-                        <v-col cols="12" sm="2">
-                            <v-menu ref="menu_end_date"
-                                v-model="data.newStudent.show_valid_until"
-                                :close-on-content-click="false"
-                                :nudge-right="10"
-                                transition="scale-transition"
-                                offset-y min-width="290px">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-text-field v-model="data.newStudent.valid_until"
-                                        label="End date"
-                                        v-on="on"
-                                        v-bind="attrs"
-                                    >
-                                    </v-text-field>
-                                </template>
-                                <v-date-picker v-model="data.newStudent.valid_until"
-                                    @input="data.newStudent.show_valid_until = false"
-                                    no-title
-                                ></v-date-picker>
-                            </v-menu>
-                        </v-col>
-                        <v-col cols="2" align-self="center">
-                            <v-row justify="end">
-                                <v-btn @click="preRegister()"
-                                outlined color="red">Add</v-btn>
-                            </v-row>
-                        </v-col>
-                        <v-col cols="1" align-self="center">
-                            <v-progress-circular indeterminate
-                                    v-show="progress"
-                                    :size="20" :width="2"
-                                    color="primary"></v-progress-circular>
-                            <v-icon v-show="success" color="green">mdi-check</v-icon>
-                            <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
-                        </v-col>
-                    </v-row>
-                </v-col>
-            </v-row>
         </v-form>
         <v-data-table
             item-key="id"
@@ -273,6 +105,8 @@
                         :item-id="editedItem.id"
                         :student-id="editedItem.person_id"
                         :student-data="editedItem"
+                        :other-person-id="personId"
+                        :endpoint="endpoint"
                     >
                     </StudentDetails>
                 </v-dialog>
@@ -310,6 +144,8 @@
                         :item-id="editedItem.id"
                         :student-id="editedItem.person_id"
                         :student-data="editedItem"
+                        :other-person-id="personId"
+                        :endpoint="endpoint"
                     >
                     </StudentDetails>
                 </v-dialog>
@@ -329,8 +165,7 @@
 <script>
 import subUtil from '@/components/common/submit-utils'
 import time from '@/components/common/date-utils'
-import { requiredIf, email, integer, between } from 'vuelidate/lib/validators'
-const StudentDetails = () => import(/* webpackChunkName: "supervisor-student-details" */ './StudentDetails')
+const StudentDetails = () => import(/* webpackChunkName: "manager-supervisor-student-details" */ './StudentDetails')
 
 function prepareStringComparison(str) {
     if (str === null || str === undefined) {
@@ -353,11 +188,17 @@ function prepareStringComparison(str) {
 }
 
 export default {
+    props: {
+        personId: Number,
+        managerId: Number,
+        endpoint: String,
+    },
     components: {
         StudentDetails,
     },
     data() {
         return {
+            initialized: false,
             dialog: false,
             dialogPast: false,
             editedIndex: -1,
@@ -411,10 +252,8 @@ export default {
         }
     },
     watch: {
-        currentTab () {
-            if (this.currentTab === '/person/productivity/supervisor') {
-                this.initialize();
-            }
+        personId () {
+            this.initialize();
         },
     },
     mounted() {
@@ -429,7 +268,7 @@ export default {
         this.getAdministrativePositions();
         this.getAdministrativeOffices();
         this.getPeople();
-        this.$root.$on('updateSupervisorTable',
+        this.$root.$on('managerUpdateSupervisorTable',
             () => {
                 this.initialize();
             }
@@ -438,16 +277,20 @@ export default {
     methods: {
         initialize () {
             if (this.$store.state.session.loggedIn) {
+                /* Change this "if"
                 if (this.$store.state.session.currentUnits.length === 1
                     && this.$store.state.session.currentUnits[0] === 2
                 ) {
                     this.isLAQV = true;
                 }
+                */
                 this.data.students = [];
                 this.data.pastStudents = [];
                 let today = time.momentToDate(time.moment())
-                let personID = this.$store.state.session.personID;
-                let urlSubmit = 'api/people/' + personID + '/students';
+                let personID = this.personId;
+                let urlSubmit = 'api' + this.endpoint
+                                + '/members'
+                                + '/' + personID + '/students';
                 subUtil.getInfoPopulate(this, urlSubmit, true)
                 .then( (result) => {
                     for (let ind in result) {
@@ -466,7 +309,6 @@ export default {
                             + ' - ' + sup_valid_until;
                         let affiliations = '<ul>';
                         for (let indPos in result[ind].lab_data) {
-
                             let valid_from = '...'
                             let valid_until = '...'
                             if (result[ind].lab_data[indPos].valid_from !== null) {
@@ -565,19 +407,24 @@ export default {
                         }
                     }
                 })
-                subUtil.getInfoPopulate(this, 'api/people/' + personID + '/lab-affiliations', true)
+                subUtil.getInfoPopulate(this, 'api' + this.endpoint
+                                + '/members'
+                                + '/' + personID + '/lab-affiliations', true)
                 .then( (result2) => {
                     this.myLabs = result2;
                 })
             }
+            this.initialized = true;
         },
         submitForm () {
             if (this.$store.state.session.loggedIn) {
                 this.progress = true;
                 let urlCreate = [];
-                let personID = this.$store.state.session.personID;
+                let personID = this.personId;
                 urlCreate.push({
-                    url: 'api/people/' + personID
+                    url: 'api' + this.endpoint
+                        + '/members'
+                        + '/' + personID
                         + '/students',
                     body: this.data.newStudent,
                 });
@@ -606,53 +453,6 @@ export default {
                     // eslint-disable-next-line
                     console.log(error)
                 })
-            }
-        },
-        preRegister () {
-            if (this.$v.$invalid) {
-                this.$v.$touch()
-            } else {
-                this.progress = true;
-                let urlCreate = [];
-                this.data.newStudent.changedBy = this.$store.state.session.userID;
-                urlCreate.push({
-                    url: 'api/people/' + this.$store.state.session.personID
-                            + '/pre-register-student/' + this.data.newStudent.lab_id,
-                    body: this.data.newStudent,
-                });
-                this.$http.all(
-                        urlCreate.map(el =>
-                            this.$http.post(el.url,
-                                { data: el.body, },
-                                { headers:
-                                    {'Authorization': 'Bearer ' + localStorage['v2-token']
-                                },
-                            }))
-                    )
-                    .then(this.$http.spread( () => {
-                        this.progress = false;
-                        this.success = true;
-                        setTimeout(() => {
-                            this.success = false;
-                            //this.$refs.form.reset();
-                        }, 1500);
-                        this.data.newStudent = {
-                            username: '',
-                            email: '',
-                            lab_id: null,
-                            lab_position_id: null,
-                            dedication: null,
-                            city_id: null,
-                            valid_from: null,
-                        };
-                    }))
-                    .catch((error) => {
-                        this.progress = false;
-                        this.error = true;
-                        setTimeout(() => {this.error = false;}, 6000)
-                        // eslint-disable-next-line
-                        console.log(error)
-                    })
             }
         },
         getPeople () {
@@ -737,20 +537,6 @@ export default {
                     valid_until: null,
                 };
         },
-        showPreRegister () {
-            this.addingPreregistration = !this.addingPreregistration;
-            this.addingFromDB = false;
-            this.data.newStudent = {
-                    username: '',
-                    email: '',
-                    lab_id: null,
-                    lab_position_id: null,
-                    dedication: null,
-                    city_id: null,
-                    valid_from: null,
-                    valid_until: null,
-                };
-        },
         editItem (item) {
             this.dialog = true;
             this.editedIndex = this.data.students.indexOf(item);
@@ -767,45 +553,6 @@ export default {
             }
             return true;
         },
-    },
-    validations: {
-        data: {
-            newStudent: {
-                username: {
-                    required:
-                        requiredIf(function () { return this.addingPreregistration}),
-                        isUnique (value) {
-                            if (this.$store.state.session.loggedIn && value !== undefined) {
-                                if (value.length > 0) {
-                                    let urlSubmit = 'api/people/' + this.$store.state.session.personID
-                                        + '/users/' + value;
-                                    return subUtil.getInfoPopulate(this, urlSubmit, true, true)
-                                    .then( (result) => {
-                                        // only works if this.data and result have the same keys
-                                        return result.valid;
-                                    })
-                                    .catch((error) => {
-                                        console.log(error)
-                                        return false;
-                                    });
-                                } else {
-                                    return true;
-                                }
-                            } else {
-                                return false;
-                            }
-                        },
-                },
-                email: {
-                    required: requiredIf(function () { return this.addingPreregistration}),
-                    email },
-                lab_id: { required: requiredIf(function () { return this.addingPreregistration}), },
-                lab_position_id: { required: requiredIf(function () { return this.addingPreregistration}), },
-                dedication: { integer, between: between(0,100)},
-                city_id: { required: requiredIf(function () { return this.addingPreregistration}), },
-                valid_from: { required: requiredIf(function () { return this.addingPreregistration}), }
-            }
-        }
     },
 }
 </script>

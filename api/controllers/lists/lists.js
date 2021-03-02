@@ -687,6 +687,22 @@ var getPollsQuestionTypes = function (req, res, next) {
     sql.makeSQLOperation(req, res, querySQL, places);
     return;
 };
+var getSpaceRoles = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM space_roles;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getSpaceTypes = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM space_types;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
 module.exports.listItems = function (req, res, next) {
     let category = req.params.listCategory;
     if (category === 'countries') {
@@ -823,6 +839,12 @@ module.exports.listItems = function (req, res, next) {
     }
     if (category === 'polls-question-types') {
         getPollsQuestionTypes(req, res, next);
+    }
+    if (category === 'space-roles') {
+        getSpaceRoles(req, res, next);
+    }
+    if (category === 'space-types') {
+        getSpaceTypes(req, res, next);
     }
 
 };

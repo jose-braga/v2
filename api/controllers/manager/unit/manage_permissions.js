@@ -124,7 +124,8 @@ var actionGetPermissions = function (options) {
 };
 module.exports.getPermissions = function (req, res, next) {
     permissions.checkPermissions(
-        (options) => { getUserID(options, actionGetPermissions) },
+        (options) => {
+            getUserID(options, actionGetPermissions) },
         { req, res, next }
     );
 };

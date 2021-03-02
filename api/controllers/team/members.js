@@ -653,7 +653,6 @@ var getRecipientsGroupsPreReg = function (options, email_type_id) {
         },
         options);
 };
-
 async function actionSendUserMessage(options, recipientEmails) {
     let { req, res, next } = options;
     let person = req.body.data;

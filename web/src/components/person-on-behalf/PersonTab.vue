@@ -5,16 +5,21 @@
         Personal
     </v-tab>
     <v-tab :to="link + '/academic'">
-        Academic
+        Academic & Professional
     </v-tab>
     <v-tab :to="link + '/institutional'">
-        Institutional
+        Institutional & Scientific
     </v-tab>
+    <!--
     <v-tab :to="link + '/professional'">
         Professional
     </v-tab>
+    -->
     <v-tab :to="link + '/productivity'">
         Productivity
+    </v-tab>
+    <v-tab :to="link + '/spaces'">
+        Spaces
     </v-tab>
     <v-tabs-items>
         <keep-alive>

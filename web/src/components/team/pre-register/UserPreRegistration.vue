@@ -49,7 +49,8 @@
             </v-row>
             <v-row>
                 <v-col cols="12" md="6">
-                    <v-select v-model="$v.data.person.lab_id.$model"
+                    <v-select
+                        v-model="$v.data.person.lab_id.$model"
                         :items="myLabs"
                         item-value="id" item-text="name"
                         :error="$v.data.person.lab_id.$error"

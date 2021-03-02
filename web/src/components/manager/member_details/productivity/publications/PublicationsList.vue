@@ -197,7 +197,6 @@ export default {
     },
     mounted() {
         this.initialize();
-        //TODO: change event updateSinglePublication name to managerUpdateSinglePublication
         this.$root.$on('managerUpdateSinglePublication', (personPublicationID) => {
             this.initialize('updated-single-publication', personPublicationID);
         });

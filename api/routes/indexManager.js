@@ -38,6 +38,10 @@ const researchIDs = require('../controllers/people/research_IDs');
 const academicAffiliations = require('../controllers/people/academic_affiliations');
 const professionalSituations = require('../controllers/people/professional_situations');
 const publicationsList = require('../controllers/people/publications_list');
+const supervising = require('../controllers/people/supervising');
+const spaces = require('../controllers/people/spaces');
+const labSpaces = require('../controllers/team/spaces');
+const labMembers = require('../controllers/team/members');
 const addPublications = require('../controllers/people/add_publications');
 const addPubORCID = require('../controllers/people/add_pub_ORCID');
 const addPubRepository = require('../controllers/people/add_pub_repository');
@@ -515,6 +519,44 @@ router.get('/:userID/units/:unitID/members/:personID/permissions', cors(corsOpti
 router.post('/:userID/units/:unitID/members/:personID/permissions', cors(corsOptions), managePermissionsUnit.createPermissions);
 router.put('/:userID/units/:unitID/members/:personID/permissions/:permissionID', cors(corsOptions), managePermissionsUnit.updatePermissions);
 router.delete('/:userID/units/:unitID/members/:personID/permissions/:permissionID', cors(corsOptions), managePermissionsUnit.deletePermissions);
+//Supervisor
+router.get('/:userID/units/:unitID/members/:personID/students', cors(corsOptions), supervising.getStudents);
+router.post('/:userID/units/:unitID/members/:personID/students', cors(corsOptions), supervising.addStudent);
+router.get('/:userID/units/:unitID/members/:personID/students/:studentID', cors(corsOptions), supervising.getStudentDetails);
+router.put('/:userID/units/:unitID/members/:personID/students/:studentID/supervisors/:supervisorID', cors(corsOptions), supervising.updateStudentSupervisors);
+router.delete('/:userID/units/:unitID/members/:personID/students/:studentID/supervisors/:supervisorID', cors(corsOptions), supervising.deleteStudentSupervisors);
+router.post('/:userID/units/:unitID/members/:personID/students/:studentID/lab-position', cors(corsOptions), supervising.addStudentLabPosition);
+router.post('/:userID/units/:unitID/members/:personID/students/:studentID/facility-position', cors(corsOptions), supervising.addStudentFacilityPosition);
+router.post('/:userID/units/:unitID/members/:personID/students/:studentID/science-management-position', cors(corsOptions), supervising.addStudentScienceManagementPosition);
+router.post('/:userID/units/:unitID/members/:personID/students/:studentID/administrative-position', cors(corsOptions), supervising.addStudentAdministrativePosition);
+router.put('/:userID/units/:unitID/members/:personID/students/:studentID/lab-position/:positionID', cors(corsOptions), supervising.updateStudentLabPosition);
+router.put('/:userID/units/:unitID/members/:personID/students/:studentID/facility-position/:positionID', cors(corsOptions), supervising.updateStudentFacilityPosition);
+router.put('/:userID/units/:unitID/members/:personID/students/:studentID/science-management-position/:positionID', cors(corsOptions), supervising.updateStudentScienceManagementPosition);
+router.put('/:userID/units/:unitID/members/:personID/students/:studentID/administrative-position/:positionID', cors(corsOptions), supervising.updateStudentAdministrativePosition);
+router.delete('/:userID/units/:unitID/members/:personID/students/:studentID/lab-position/:positionID', cors(corsOptions), supervising.deleteStudentLabPosition);
+router.delete('/:userID/units/:unitID/members/:personID/students/:studentID/facility-position/:positionID', cors(corsOptions), supervising.deleteStudentFacilityPosition);
+router.delete('/:userID/units/:unitID/members/:personID/students/:studentID/science-management-position/:positionID', cors(corsOptions), supervising.deleteStudentScienceManagementPosition);
+router.delete('/:userID/units/:unitID/members/:personID/students/:studentID/administrative-position/:positionID', cors(corsOptions), supervising.deleteStudentAdministrativePosition);
+//Spaces
+router.get('/:userID/units/:unitID/members/:personID/all-spaces', cors(corsOptions), spaces.getAllSpaces);
+router.get('/:userID/units/:unitID/members/:personID/spaces', cors(corsOptions), spaces.getPersonSpaces);
+router.post('/:userID/units/:unitID/members/:personID/spaces', cors(corsOptions), spaces.addPersonSpaces);
+router.post('/:userID/units/:unitID/members/:personID/spaces/:spaceID/roles', cors(corsOptions), spaces.addPersonRoles);
+router.put('/:userID/units/:unitID/members/:personID/spaces/:spaceID/roles/:roleID', cors(corsOptions), spaces.updatePersonRoles);
+router.delete('/:userID/units/:unitID/members/:personID/spaces/:spaceID/roles/:roleID', cors(corsOptions), spaces.deletePersonRoles);
+router.get('/:userID/units/:unitID/members/:personID/supervisor-spaces', cors(corsOptions), spaces.getSupervisorSpaces);
+router.post('/:userID/units/:unitID/members/:personID/supervisor-spaces', cors(corsOptions), spaces.addSupervisorSpaces);
+router.get('/:userID/units/:unitID/members/:personID/supervisor-spaces/:spaceID', cors(corsOptions), spaces.getSpaceInfo);
+router.put('/:userID/units/:unitID/members/:personID/supervisor-spaces/:spaceID', cors(corsOptions), spaces.updateSupervisorSpace);
+router.delete('/:userID/units/:unitID/members/:personID/supervisor-spaces/:supervisorSpaceID', cors(corsOptions), spaces.deleteSupervisorSpace);
+router.get('/:userID/units/:unitID/labs/:labID', cors(corsOptions), labMembers.getLabInfo);
+router.get('/:userID/units/:unitID/labs/:labID/spaces', cors(corsOptions), labSpaces.getLabSpaces);
+router.post('/:userID/units/:unitID/labs/:labID/spaces', cors(corsOptions), labSpaces.addLabSpaces);
+router.get('/:userID/units/:unitID/labs/:labID/spaces/:spaceID', cors(corsOptions), labSpaces.getSpaceInfo);
+router.put('/:userID/units/:unitID/labs/:labID/spaces/:spaceID', cors(corsOptions), labSpaces.updateLabSpace);
+router.delete('/:userID/units/:unitID/labs/:labID/spaces/:labSpaceID', cors(corsOptions), labSpaces.deleteLabSpace);
+
+
 
 /* All units at the same time */
 router.get('/:userID/current-members', cors(corsOptions), membersAll.getMembersList);

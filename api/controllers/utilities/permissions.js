@@ -198,7 +198,6 @@ module.exports.checkPermissions = function (callback, callbackOptions) {
     } else {
         reqEndpointParts.splice(0,2); // the string starts by '/api' (always!!?)
     }
-
     if (permissionsLevel === 1) {
         // admin can do whatever he wants, no checking is necessary
         return callback(callbackOptions);

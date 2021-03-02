@@ -18,6 +18,10 @@ const AddPublicationsTab = () => import(/* webpackChunkName: "add-publications-t
 const AddPublicationsTabHelp = () => import(/* webpackChunkName: "add-publication-tab-help" */ '@/components/person/productivity/AddPublicationsTabHelp.vue')
 const OtherProductivityTab = () => import(/* webpackChunkName: "other-productivity-tab" */ '@/components/person/productivity/OtherProductivityTab.vue')
 const OtherProductivityTabHelp = () => import(/* webpackChunkName: "other-productivity-tab-help" */ '@/components/person/productivity/OtherProductivityTabHelp.vue')
+
+const SpacesTab = () => import(/* webpackChunkName: "spaces-tab" */ '@/components/person/spaces/SpacesTab.vue')
+const SpacesTabHelp = () => import(/* webpackChunkName: "spaces-tab-help" */ '@/components/person/spaces/SpacesTabHelp.vue')
+
 const WarehouseTab = () => import(/* webpackChunkName: "warehouse-tab" */ '@/components/person/warehouse/WarehouseTab.vue')
 const StoreTab = () => import(/* webpackChunkName: "warehouse-store-tab" */ '@/components/person/warehouse/StoreTab.vue')
 const StoreTabHelp = () => import(/* webpackChunkName: "warehouse-store-tab-help" */ '@/components/person/warehouse/StoreTabHelp.vue')
@@ -96,6 +100,13 @@ const routes = {
                 },
                 { path: '', redirect: 'publications' }
             ]
+        },
+        {
+            path: 'spaces',
+            components: {
+                default: SpacesTab,
+                help: SpacesTabHelp
+            },
         },
         {
             path: 'warehouse',

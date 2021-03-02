@@ -43,6 +43,9 @@ const publicationsList = require('../controllers/people/publications_list');
 const researchIDs = require('../controllers/people/research_IDs');
 const researchInterests = require('../controllers/people/research_interests');
 const store = require('../controllers/store/store');
+const spaces = require('../controllers/people/spaces');
+const labSpaces = require('../controllers/team/spaces');
+const labInfo = require('../controllers/team/members');
 const supervising = require('../controllers/people/supervising');
 const manageUsers = require('../controllers/store/manage_users');
 const manageOrders = require('../controllers/store/manage_orders');
@@ -50,6 +53,9 @@ const manageStock = require('../controllers/store/manage_stock');
 const manageFinances = require('../controllers/store/manage_finances');
 const websiteTexts = require('../controllers/people/website_texts');
 const users = require('../controllers/people/users');
+
+const permissions = require('../controllers/manager/unit/manage_permissions');
+const preRegister = require('../controllers/team/members');
 
 //remove lines below???
 //var routesAPIUserOnBehalf = require('./routes/indexUserOnBehalf');
@@ -160,6 +166,7 @@ router.post('/:personID/professional-situations/:jobID/contracts', cors(corsOpti
 router.put('/:personID/professional-situations/:jobID/contracts/:contractID', cors(corsOptions), professionalSituations.updateProfessionalSituationsContracts);
 router.delete('/:personID/professional-situations/:jobID/contracts/:contractID', cors(corsOptions), professionalSituations.deleteProfessionalSituationsContracts);
 //Supervisor
+router.post('/:personID/pre-register-student/:labID', cors(corsOptions), preRegister.preRegister);
 router.get('/:personID/students', cors(corsOptions), supervising.getStudents);
 router.post('/:personID/students', cors(corsOptions), supervising.addStudent);
 router.get('/:personID/students/:studentID', cors(corsOptions), supervising.getStudentDetails);
@@ -178,7 +185,6 @@ router.delete('/:personID/students/:studentID/facility-position/:positionID', co
 router.delete('/:personID/students/:studentID/science-management-position/:positionID', cors(corsOptions), supervising.deleteStudentScienceManagementPosition);
 router.delete('/:personID/students/:studentID/administrative-position/:positionID', cors(corsOptions), supervising.deleteStudentAdministrativePosition);
 
-
 //Publications
 router.get('/all-publications', cors(corsOptions), publicationsList.getAllPublications);
 router.get('/:personID/publications', cors(corsOptions), publicationsList.getPublications);
@@ -196,6 +202,31 @@ router.delete('/:personID/author-names/:authorID', cors(corsOptions), authorName
 
 router.post('/:personID/journals', cors(corsOptions), addPubORCID.createJournal);
 router.post('/:personID/journals/:journalID/publications', cors(corsOptions), addPubORCID.createPublication);
+
+//Spaces
+router.get('/:personID/all-spaces', cors(corsOptions), spaces.getAllSpaces);
+router.get('/:personID/spaces', cors(corsOptions), spaces.getPersonSpaces);
+router.post('/:personID/spaces', cors(corsOptions), spaces.addPersonSpaces);
+router.post('/:personID/spaces/:spaceID/roles', cors(corsOptions), spaces.addPersonRoles);
+router.put('/:personID/spaces/:spaceID/roles/:roleID', cors(corsOptions), spaces.updatePersonRoles);
+router.delete('/:personID/spaces/:spaceID/roles/:roleID', cors(corsOptions), spaces.deletePersonRoles);
+
+router.get('/:personID/supervisor-spaces', cors(corsOptions), spaces.getSupervisorSpaces);
+router.post('/:personID/supervisor-spaces', cors(corsOptions), spaces.addSupervisorSpaces);
+router.get('/:personID/supervisor-spaces/:spaceID', cors(corsOptions), spaces.getSpaceInfo);
+router.put('/:personID/supervisor-spaces/:spaceID', cors(corsOptions), spaces.updateSupervisorSpace);
+router.delete('/:personID/supervisor-spaces/:supervisorSpaceID', cors(corsOptions), spaces.deleteSupervisorSpace);
+
+// Endpoints for person on behalf
+//router.get('/:personID/permissions', cors(corsOptions), permissions.getPermissions);
+router.get('/:personID/labs/:labID', cors(corsOptions), labInfo.getLabInfo);
+router.get('/:personID/labs/:labID/spaces', cors(corsOptions), labSpaces.getLabSpaces);
+router.post('/:personID/labs/:labID/spaces', cors(corsOptions), labSpaces.addLabSpaces);
+router.get('/:personID/labs/:labID/spaces/:spaceID', cors(corsOptions), labSpaces.getSpaceInfo);
+router.put('/:personID/labs/:labID/spaces/:spaceID', cors(corsOptions), labSpaces.updateLabSpace);
+router.delete('/:personID/labs/:labID/spaces/:labSpaceID', cors(corsOptions), labSpaces.deleteLabSpace);
+
+
 
 // Warehouse
 router.get('/:personID/store', cors(corsOptions), store.getStoreProfile);

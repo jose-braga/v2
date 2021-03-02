@@ -1,6 +1,9 @@
 <template>
 <div>
     <v-tabs v-model="currentTab">
+        <v-tab :to="link + '/supervisor'">
+            Supervisor
+        </v-tab>
         <v-tab :to="link + '/publications'">
             Publications List
         </v-tab>
