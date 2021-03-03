@@ -216,9 +216,12 @@ module.exports.checkPermissions = function (callback, callbackOptions) {
     } else if (personID === resourcePersonID && resourcePersonID !== undefined
                 && reqEndpointParts[0] === 'people') {
         // any user can read its data
-        // any user can change its data except for affiliation
+        // any user can change its data except for af filiation
         // Assuming that reqEndpointParts.length > 2
-        if (reqEndpointParts.length > 2 && !reqEndpointParts[2].includes('affiliations')) {
+        if (reqEndpointParts.length > 2 &&
+            (!reqEndpointParts[2].includes('affiliations')
+                || reqEndpointParts[2] === 'academic-affiliations')
+            ) {
             return callback(callbackOptions);
         } else if (reqMethod === 'GET') {
             return callback(callbackOptions);

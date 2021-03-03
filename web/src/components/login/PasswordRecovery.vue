@@ -11,6 +11,9 @@
         >
             <v-container>
                 <v-row>
+                    Username: {{ $route.params.username }}
+                </v-row>
+                <v-row>
                     <v-col cols="12">
                         <v-text-field
                             v-model="$v.data.newPassword.$model"
