@@ -366,12 +366,18 @@ export default {
             if (this_session.loggedIn) {
                 for (let ind in this_session.permissionsEndpoints) {
                     let decomposedPath = this_session.permissionsEndpoints[ind].decomposedPath;
-                    if (decomposedPath[0] === 'labs'
+                    if ((decomposedPath[0] === 'labs'
                         && parseInt(decomposedPath[1], 10) === this.labId
                         && decomposedPath[2] === 'members-affiliation'
-                        && this_session.permissionsEndpoints[ind].method_name === 'GET') {
+                        && this_session.permissionsEndpoints[ind].method_name === 'GET')
+                        ||
+                        (decomposedPath[0] === 'labs'
+                        && parseInt(decomposedPath[1], 10) === this.labId
+                        && this_session.permissionsEndpoints[ind].allow_all_subpaths === 1
+                        && this_session.permissionsEndpoints[ind].method_name === 'GET')
+                    ) {
                         foundEndpoint = true;
-                        let urlSubmit = 'api' + this_session.permissionsEndpoints[ind].endpoint_url;
+                        let urlSubmit = 'api' + '/labs/' + this.labId + '/members-affiliation';
                         subUtil.getInfoPopulate(this, urlSubmit, true)
                         .then( (result) => {
                             let pastMembers = processResults(this, result);
@@ -413,7 +419,8 @@ export default {
                 for (let ind in this_session.permissionsEndpoints) {
                     if (subUtil.checkPermissions(reqCreate, 'POST',
                             this_session.permissionsEndpoints[ind].endpoint_url,
-                            this_session.permissionsEndpoints[ind].method_name)
+                            this_session.permissionsEndpoints[ind].method_name,
+                            this_session.permissionsEndpoints[ind].allow_all_subpaths)
                         && Object.keys(member.newer_data).length > 0) {
                         member.newer_data.changed_by = this_session.userID;
                         requests.push(this.$http.post(urlCreate,
@@ -443,7 +450,8 @@ export default {
                         // TODO: It makes sense to add newer data only if previous is closed
                         if (subUtil.checkPermissions(reqUpdate, 'PUT',
                                     this_session.permissionsEndpoints[ind].endpoint_url,
-                                    this_session.permissionsEndpoints[ind].method_name)
+                                    this_session.permissionsEndpoints[ind].method_name,
+                                    this_session.permissionsEndpoints[ind].allow_all_subpaths)
                             && !pos.to_delete ) {
                             requests.push(this.$http.put(urlUpdate,
                                 {
@@ -456,7 +464,8 @@ export default {
                         }
                         if (subUtil.checkPermissions(reqDelete, 'DELETE',
                                     this_session.permissionsEndpoints[ind].endpoint_url,
-                                    this_session.permissionsEndpoints[ind].method_name)
+                                    this_session.permissionsEndpoints[ind].method_name,
+                                    this_session.permissionsEndpoints[ind].allow_all_subpaths)
                             && pos.to_delete) {
                             requests.push(this.$http.delete(urlDelete,
                                 {

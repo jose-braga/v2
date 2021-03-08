@@ -16,6 +16,7 @@ var corsOptions = {
 
 router.options('*', cors())
 
+const externalAPI = require('../controllers/people/external_api'); //authorization of visibility to external partners
 const addMember = require('../controllers/manager/addMember');
 const membersAll = require('../controllers/manager/all/members');
 const membersUnit = require('../controllers/manager/unit/members');
@@ -169,9 +170,48 @@ router.get('/:userID/members/:personID/permissions', cors(corsOptions), managePe
 router.post('/:userID/members/:personID/permissions', cors(corsOptions), managePermissionsUnit.createPermissions);
 router.put('/:userID/members/:personID/permissions/:permissionID', cors(corsOptions), managePermissionsUnit.updatePermissions);
 router.delete('/:userID/members/:personID/permissions/:permissionID', cors(corsOptions), managePermissionsUnit.deletePermissions);
+//Supervisor
+router.get('/:userID/members/:personID/students', cors(corsOptions), supervising.getStudents);
+router.post('/:userID/members/:personID/students', cors(corsOptions), supervising.addStudent);
+router.get('/:userID/members/:personID/students/:studentID', cors(corsOptions), supervising.getStudentDetails);
+router.put('/:userID/members/:personID/students/:studentID/supervisors/:supervisorID', cors(corsOptions), supervising.updateStudentSupervisors);
+router.delete('/:userID/members/:personID/students/:studentID/supervisors/:supervisorID', cors(corsOptions), supervising.deleteStudentSupervisors);
+router.post('/:userID/members/:personID/students/:studentID/lab-position', cors(corsOptions), supervising.addStudentLabPosition);
+router.post('/:userID/members/:personID/students/:studentID/facility-position', cors(corsOptions), supervising.addStudentFacilityPosition);
+router.post('/:userID/members/:personID/students/:studentID/science-management-position', cors(corsOptions), supervising.addStudentScienceManagementPosition);
+router.post('/:userID/members/:personID/students/:studentID/administrative-position', cors(corsOptions), supervising.addStudentAdministrativePosition);
+router.put('/:userID/members/:personID/students/:studentID/lab-position/:positionID', cors(corsOptions), supervising.updateStudentLabPosition);
+router.put('/:userID/members/:personID/students/:studentID/facility-position/:positionID', cors(corsOptions), supervising.updateStudentFacilityPosition);
+router.put('/:userID/members/:personID/students/:studentID/science-management-position/:positionID', cors(corsOptions), supervising.updateStudentScienceManagementPosition);
+router.put('/:userID/members/:personID/students/:studentID/administrative-position/:positionID', cors(corsOptions), supervising.updateStudentAdministrativePosition);
+router.delete('/:userID/members/:personID/students/:studentID/lab-position/:positionID', cors(corsOptions), supervising.deleteStudentLabPosition);
+router.delete('/:userID/members/:personID/students/:studentID/facility-position/:positionID', cors(corsOptions), supervising.deleteStudentFacilityPosition);
+router.delete('/:userID/members/:personID/students/:studentID/science-management-position/:positionID', cors(corsOptions), supervising.deleteStudentScienceManagementPosition);
+router.delete('/:userID/members/:personID/students/:studentID/administrative-position/:positionID', cors(corsOptions), supervising.deleteStudentAdministrativePosition);
+//Spaces
+router.get('/:userID/members/:personID/all-spaces', cors(corsOptions), spaces.getAllSpaces);
+router.get('/:userID/members/:personID/spaces', cors(corsOptions), spaces.getPersonSpaces);
+router.post('/:userID/members/:personID/spaces', cors(corsOptions), spaces.addPersonSpaces);
+router.post('/:userID/members/:personID/spaces/:spaceID/roles', cors(corsOptions), spaces.addPersonRoles);
+router.put('/:userID/members/:personID/spaces/:spaceID/roles/:roleID', cors(corsOptions), spaces.updatePersonRoles);
+router.delete('/:userID/members/:personID/spaces/:spaceID/roles/:roleID', cors(corsOptions), spaces.deletePersonRoles);
+router.get('/:userID/members/:personID/supervisor-spaces', cors(corsOptions), spaces.getSupervisorSpaces);
+router.post('/:userID/members/:personID/supervisor-spaces', cors(corsOptions), spaces.addSupervisorSpaces);
+router.get('/:userID/members/:personID/supervisor-spaces/:spaceID', cors(corsOptions), spaces.getSpaceInfo);
+router.put('/:userID/members/:personID/supervisor-spaces/:spaceID', cors(corsOptions), spaces.updateSupervisorSpace);
+router.delete('/:userID/members/:personID/supervisor-spaces/:supervisorSpaceID', cors(corsOptions), spaces.deleteSupervisorSpace);
+router.get('/:userID/labs/:labID', cors(corsOptions), labMembers.getLabInfo);
+router.get('/:userID/labs/:labID/spaces', cors(corsOptions), labSpaces.getLabSpaces);
+router.post('/:userID/labs/:labID/spaces', cors(corsOptions), labSpaces.addLabSpaces);
+router.get('/:userID/labs/:labID/spaces/:spaceID', cors(corsOptions), labSpaces.getSpaceInfo);
+router.put('/:userID/labs/:labID/spaces/:spaceID', cors(corsOptions), labSpaces.updateLabSpace);
+router.delete('/:userID/labs/:labID/spaces/:labSpaceID', cors(corsOptions), labSpaces.deleteLabSpace);
+
 
 // --------------------------------------------------------------
 /* Units & Cities*/
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/external-api-authorization', cors(corsOptions), externalAPI.getAuthorization);
+router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/external-api-authorization', cors(corsOptions), externalAPI.updateAuthorization);
 router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/users/:username', cors(corsOptions), users.checkUserExistence);
 router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/users', cors(corsOptions), users.getUsername);
 router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/users/:userID', cors(corsOptions), users.updateUsername);
@@ -285,11 +325,47 @@ router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/permissions'
 router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/permissions', cors(corsOptions), managePermissionsUnit.createPermissions);
 router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/permissions/:permissionID', cors(corsOptions), managePermissionsUnit.updatePermissions);
 router.delete('/:userID/units/:unitID/cities/:cityID/members/:personID/permissions/:permissionID', cors(corsOptions), managePermissionsUnit.deletePermissions);
-
-
+//Supervisor
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/students', cors(corsOptions), supervising.getStudents);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/students', cors(corsOptions), supervising.addStudent);
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/students/:studentID', cors(corsOptions), supervising.getStudentDetails);
+router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/students/:studentID/supervisors/:supervisorID', cors(corsOptions), supervising.updateStudentSupervisors);
+router.delete('/:userID/units/:unitID/cities/:cityID/members/:personID/students/:studentID/supervisors/:supervisorID', cors(corsOptions), supervising.deleteStudentSupervisors);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/students/:studentID/lab-position', cors(corsOptions), supervising.addStudentLabPosition);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/students/:studentID/facility-position', cors(corsOptions), supervising.addStudentFacilityPosition);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/students/:studentID/science-management-position', cors(corsOptions), supervising.addStudentScienceManagementPosition);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/students/:studentID/administrative-position', cors(corsOptions), supervising.addStudentAdministrativePosition);
+router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/students/:studentID/lab-position/:positionID', cors(corsOptions), supervising.updateStudentLabPosition);
+router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/students/:studentID/facility-position/:positionID', cors(corsOptions), supervising.updateStudentFacilityPosition);
+router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/students/:studentID/science-management-position/:positionID', cors(corsOptions), supervising.updateStudentScienceManagementPosition);
+router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/students/:studentID/administrative-position/:positionID', cors(corsOptions), supervising.updateStudentAdministrativePosition);
+router.delete('/:userID/units/:unitID/cities/:cityID/members/:personID/students/:studentID/lab-position/:positionID', cors(corsOptions), supervising.deleteStudentLabPosition);
+router.delete('/:userID/units/:unitID/cities/:cityID/members/:personID/students/:studentID/facility-position/:positionID', cors(corsOptions), supervising.deleteStudentFacilityPosition);
+router.delete('/:userID/units/:unitID/cities/:cityID/members/:personID/students/:studentID/science-management-position/:positionID', cors(corsOptions), supervising.deleteStudentScienceManagementPosition);
+router.delete('/:userID/units/:unitID/cities/:cityID/members/:personID/students/:studentID/administrative-position/:positionID', cors(corsOptions), supervising.deleteStudentAdministrativePosition);
+//Spaces
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/all-spaces', cors(corsOptions), spaces.getAllSpaces);
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/spaces', cors(corsOptions), spaces.getPersonSpaces);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/spaces', cors(corsOptions), spaces.addPersonSpaces);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/spaces/:spaceID/roles', cors(corsOptions), spaces.addPersonRoles);
+router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/spaces/:spaceID/roles/:roleID', cors(corsOptions), spaces.updatePersonRoles);
+router.delete('/:userID/units/:unitID/cities/:cityID/members/:personID/spaces/:spaceID/roles/:roleID', cors(corsOptions), spaces.deletePersonRoles);
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/supervisor-spaces', cors(corsOptions), spaces.getSupervisorSpaces);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/supervisor-spaces', cors(corsOptions), spaces.addSupervisorSpaces);
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/supervisor-spaces/:spaceID', cors(corsOptions), spaces.getSpaceInfo);
+router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/supervisor-spaces/:spaceID', cors(corsOptions), spaces.updateSupervisorSpace);
+router.delete('/:userID/units/:unitID/cities/:cityID/members/:personID/supervisor-spaces/:supervisorSpaceID', cors(corsOptions), spaces.deleteSupervisorSpace);
+router.get('/:userID/units/:unitID/cities/:cityID/labs/:labID', cors(corsOptions), labMembers.getLabInfo);
+router.get('/:userID/units/:unitID/cities/:cityID/labs/:labID/spaces', cors(corsOptions), labSpaces.getLabSpaces);
+router.post('/:userID/units/:unitID/cities/:cityID/labs/:labID/spaces', cors(corsOptions), labSpaces.addLabSpaces);
+router.get('/:userID/units/:unitID/cities/:cityID/labs/:labID/spaces/:spaceID', cors(corsOptions), labSpaces.getSpaceInfo);
+router.put('/:userID/units/:unitID/cities/:cityID/labs/:labID/spaces/:spaceID', cors(corsOptions), labSpaces.updateLabSpace);
+router.delete('/:userID/units/:unitID/cities/:cityID/labs/:labID/spaces/:labSpaceID', cors(corsOptions), labSpaces.deleteLabSpace);
 
 
 /* Cities*/
+router.get('/:userID/cities/:cityID/members/:personID/external-api-authorization', cors(corsOptions), externalAPI.getAuthorization);
+router.put('/:userID/cities/:cityID/members/:personID/external-api-authorization', cors(corsOptions), externalAPI.updateAuthorization);
 router.get('/:userID/cities/:cityID/members/:personID/users/:username', cors(corsOptions), users.checkUserExistence);
 router.get('/:userID/cities/:cityID/members/:personID/users', cors(corsOptions), users.getUsername);
 router.put('/:userID/cities/:cityID/members/:personID/users/:userID', cors(corsOptions), users.updateUsername);
@@ -403,8 +479,45 @@ router.get('/:userID/cities/:cityID/members/:personID/permissions', cors(corsOpt
 router.post('/:userID/cities/:cityID/members/:personID/permissions', cors(corsOptions), managePermissionsUnit.createPermissions);
 router.put('/:userID/cities/:cityID/members/:personID/permissions/:permissionID', cors(corsOptions), managePermissionsUnit.updatePermissions);
 router.delete('/:userID/cities/:cityID/members/:personID/permissions/:permissionID', cors(corsOptions), managePermissionsUnit.deletePermissions);
+//Supervisor
+router.get('/:userID/cities/:cityID/members/:personID/students', cors(corsOptions), supervising.getStudents);
+router.post('/:userID/cities/:cityID/members/:personID/students', cors(corsOptions), supervising.addStudent);
+router.get('/:userID/cities/:cityID/members/:personID/students/:studentID', cors(corsOptions), supervising.getStudentDetails);
+router.put('/:userID/cities/:cityID/members/:personID/students/:studentID/supervisors/:supervisorID', cors(corsOptions), supervising.updateStudentSupervisors);
+router.delete('/:userID/cities/:cityID/members/:personID/students/:studentID/supervisors/:supervisorID', cors(corsOptions), supervising.deleteStudentSupervisors);
+router.post('/:userID/cities/:cityID/members/:personID/students/:studentID/lab-position', cors(corsOptions), supervising.addStudentLabPosition);
+router.post('/:userID/cities/:cityID/members/:personID/students/:studentID/facility-position', cors(corsOptions), supervising.addStudentFacilityPosition);
+router.post('/:userID/cities/:cityID/members/:personID/students/:studentID/science-management-position', cors(corsOptions), supervising.addStudentScienceManagementPosition);
+router.post('/:userID/cities/:cityID/members/:personID/students/:studentID/administrative-position', cors(corsOptions), supervising.addStudentAdministrativePosition);
+router.put('/:userID/cities/:cityID/members/:personID/students/:studentID/lab-position/:positionID', cors(corsOptions), supervising.updateStudentLabPosition);
+router.put('/:userID/cities/:cityID/members/:personID/students/:studentID/facility-position/:positionID', cors(corsOptions), supervising.updateStudentFacilityPosition);
+router.put('/:userID/cities/:cityID/members/:personID/students/:studentID/science-management-position/:positionID', cors(corsOptions), supervising.updateStudentScienceManagementPosition);
+router.put('/:userID/cities/:cityID/members/:personID/students/:studentID/administrative-position/:positionID', cors(corsOptions), supervising.updateStudentAdministrativePosition);
+router.delete('/:userID/cities/:cityID/members/:personID/students/:studentID/lab-position/:positionID', cors(corsOptions), supervising.deleteStudentLabPosition);
+router.delete('/:userID/cities/:cityID/members/:personID/students/:studentID/facility-position/:positionID', cors(corsOptions), supervising.deleteStudentFacilityPosition);
+router.delete('/:userID/cities/:cityID/members/:personID/students/:studentID/science-management-position/:positionID', cors(corsOptions), supervising.deleteStudentScienceManagementPosition);
+router.delete('/:userID/cities/:cityID/members/:personID/students/:studentID/administrative-position/:positionID', cors(corsOptions), supervising.deleteStudentAdministrativePosition);
+//Spaces
+router.get('/:userID/cities/:cityID/members/:personID/all-spaces', cors(corsOptions), spaces.getAllSpaces);
+router.get('/:userID/cities/:cityID/members/:personID/spaces', cors(corsOptions), spaces.getPersonSpaces);
+router.post('/:userID/cities/:cityID/members/:personID/spaces', cors(corsOptions), spaces.addPersonSpaces);
+router.post('/:userID/cities/:cityID/members/:personID/spaces/:spaceID/roles', cors(corsOptions), spaces.addPersonRoles);
+router.put('/:userID/cities/:cityID/members/:personID/spaces/:spaceID/roles/:roleID', cors(corsOptions), spaces.updatePersonRoles);
+router.delete('/:userID/cities/:cityID/members/:personID/spaces/:spaceID/roles/:roleID', cors(corsOptions), spaces.deletePersonRoles);
+router.get('/:userID/cities/:cityID/members/:personID/supervisor-spaces', cors(corsOptions), spaces.getSupervisorSpaces);
+router.post('/:userID/cities/:cityID/members/:personID/supervisor-spaces', cors(corsOptions), spaces.addSupervisorSpaces);
+router.get('/:userID/cities/:cityID/members/:personID/supervisor-spaces/:spaceID', cors(corsOptions), spaces.getSpaceInfo);
+router.put('/:userID/cities/:cityID/members/:personID/supervisor-spaces/:spaceID', cors(corsOptions), spaces.updateSupervisorSpace);
+router.delete('/:userID/cities/:cityID/members/:personID/supervisor-spaces/:supervisorSpaceID', cors(corsOptions), spaces.deleteSupervisorSpace);
+router.get('/:userID/cities/:cityID/labs/:labID', cors(corsOptions), labMembers.getLabInfo);
+router.get('/:userID/cities/:cityID/labs/:labID/spaces', cors(corsOptions), labSpaces.getLabSpaces);
+router.post('/:userID/cities/:cityID/labs/:labID/spaces', cors(corsOptions), labSpaces.addLabSpaces);
+router.get('/:userID/cities/:cityID/labs/:labID/spaces/:spaceID', cors(corsOptions), labSpaces.getSpaceInfo);
+router.put('/:userID/cities/:cityID/labs/:labID/spaces/:spaceID', cors(corsOptions), labSpaces.updateLabSpace);
+router.delete('/:userID/cities/:cityID/labs/:labID/spaces/:labSpaceID', cors(corsOptions), labSpaces.deleteLabSpace);
 
 /* Units*/
+router.get('/:userID/units/:unitID/members/:personID/external-api-authorization', cors(corsOptions), externalAPI.getAuthorization);
 router.get('/:userID/units/:unitID/members/:personID/users/:username', cors(corsOptions), users.checkUserExistence);
 router.get('/:userID/units/:unitID/members/:personID/users', cors(corsOptions), users.getUsername);
 router.put('/:userID/units/:unitID/members/:personID/users/:userID', cors(corsOptions), users.updateUsername);

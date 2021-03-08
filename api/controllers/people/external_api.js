@@ -2,6 +2,7 @@ const sql = require('../utilities/sql');
 const time = require('../utilities/time');
 const responses = require('../utilities/responses');
 const permissions = require('../utilities/permissions');
+const notifications = require('../utilities/notifications');
 
 var actionGetAuthorization = function (options) {
     let { req, res, next } = options;
@@ -63,7 +64,22 @@ var actionAddPeopleHistory = function (options) {
         req.payload.userID
     );
     return sql.makeSQLOperation(req, res, querySQL, places,
-        (options) => { responses.sendJSONResponseOptions(options) },
+        (options) => {
+            if (data.visible_public === 1 || data.visible_public === true) {
+                let notificationConfig = {
+                    operation: 'create',
+                    entityID: personID
+                };
+                notifications.notifyWebsiteAPI(notificationConfig);
+            } else {
+                let notificationConfig = {
+                    operation: 'delete',
+                    entityID: personID
+                };
+                notifications.notifyWebsiteAPI(notificationConfig);
+            }
+            responses.sendJSONResponseOptions(options)
+        },
         {
             response: res,
             status: 200,

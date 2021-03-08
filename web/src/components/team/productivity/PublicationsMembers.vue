@@ -135,7 +135,10 @@ export default {
                     urlCreateAssociation.push({
                         url: 'api/labs/' + this.labId
                                 + '/publications',
-                        body: publications[ind],
+                        body: {
+                            publication: publications[ind],
+                            labData: this.labData
+                        },
                     });
                 }
                 this.$http.all(

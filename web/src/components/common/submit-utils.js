@@ -79,14 +79,23 @@ var getPublicInfo = function (vm, url, data, sortKey) {
         });
 };
 
-var checkPermissions = function(reqURL, reqMethod, permURL, permMethod) {
+var checkPermissions = function(reqURL, reqMethod, permURL, permMethod, allow_all_subpaths) {
     let endpointPerm = permURL.replace(/\*/g, '\\d+');
-    let endpointRegex = new RegExp('^' + endpointPerm + '$');
-    if (endpointRegex.test(reqURL)
-        && reqMethod === permMethod) {
-        return true;
+    if (!allow_all_subpaths) {
+        let endpointRegex = new RegExp('^' + endpointPerm + '$');
+        if (endpointRegex.test(reqURL)
+            && reqMethod === permMethod) {
+            return true;
+        } else {
+            return false;
+        }
     } else {
-        return false;
+        let endpointRegex = new RegExp('^' + endpointPerm)
+        if (endpointRegex.test(reqURL)
+            && reqMethod === permMethod) {
+            return true;
+        }
+
     }
 }
 

@@ -350,16 +350,20 @@ var getCategorySituationID = function (options) {
 var updateJobCategorySituationID = function (options) {
     let { req, res, next, new_category_situation_id } = options;
     let data = req.body.data;
+    let personID = req.params.personID;
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'UPDATE jobs'
                         + ' SET category_situation_id = ?'
                         + ' WHERE id = ?;';
+    let notificationConfig
     if (options.action === 'create') {
         places.push(new_category_situation_id,
             options.jobID);
         return sql.makeSQLOperation(req, res, querySQL, places,
             (options) => {
+                notificationConfig = { entityID: personID };
+                notifications.notifyWebsiteAPI(notificationConfig);
                 responses.sendJSONResponseOptions({
                     response: res,
                     status: 200,
@@ -374,7 +378,20 @@ var updateJobCategorySituationID = function (options) {
     } else {
         places.push(new_category_situation_id,
             data.id);
-        return sql.makeSQLOperation(req, res, querySQL, places);
+        return sql.makeSQLOperation(req, res, querySQL, places,
+            (options) => {
+                notificationConfig = { entityID: personID };
+                notifications.notifyWebsiteAPI(notificationConfig)
+                return responses.sendJSONResponseOptions(options)
+            },
+            {
+                response: res,
+                status: 200,
+                message: {
+                    "status": "success", "statusCode": 200, "count": 0,
+                    "result": "Updated job data."
+                }
+            });
     }
 };
 

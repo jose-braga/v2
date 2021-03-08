@@ -3,7 +3,11 @@ const http = require('./axios-improved')
 var notifyWebsiteAPI = function (options) {
     let { entityType, entityID, operation, baseURL} = options;
     if (baseURL === undefined) {
-        baseURL = 'https://www.requimte.pt/ucibio/api'
+        if (process.env.NODE_ENV === 'production') {
+            baseURL = 'https://www.requimte.pt/ucibio/api'
+        } else {
+            baseURL = 'http://host.docker.internal/ucibio/api'
+        }
     }
     if (operation === undefined) {
         operation = 'update'
@@ -14,28 +18,34 @@ var notifyWebsiteAPI = function (options) {
     let url = baseURL + '/' + operation  + '/' + entityType + '/' + entityID;
     if (operation === 'update' || operation === 'delete') {
         return http.get(url)
-            .catch((err) => {
-                console.log('Failed:', url);
-                console.log(err);
-            });
+        .then((result) => {
+            let date = new Date()
+            console.log(date.toISOString(),'- Notification to', url,'was successful.')
+        })
+        .catch(function (error) {
+            console.log(error);
+        })
     } else {
         // create
         return http.get(url)
-            .then((result) => {
-                if (result.data.statusCode !== 200) {
-                    updateConfig = {
-                        entityID,
-                        entityType,
-                        baseURL,
-                        operation: 'update'
-                    }
-                    return notifyWebsiteAPI(updateConfig)
+        .then((result) => {
+            if (result.data.statusCode !== 200) {
+                let updateConfig = {
+                    entityID,
+                    entityType,
+                    baseURL,
+                    operation: 'update'
                 }
-            })
-            .catch((err) => {
-                console.log('Failed:', url);
-                console.log(err);
-            });
+                return notifyWebsiteAPI(updateConfig)
+            } else {
+                let date = new Date()
+                console.log(date.toISOString(),'- Notification to', url,'was successful.')
+            }
+        })
+        .catch((err) => {
+            console.log('Failed (create or update):', url);
+            console.log(err);
+        });
     }
 };
 

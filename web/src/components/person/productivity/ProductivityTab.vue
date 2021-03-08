@@ -10,6 +10,9 @@
         <v-tab to="/person/productivity/add-publications">
             Add Publications
         </v-tab>
+        <v-tab to="/person/productivity/projects">
+            Projects
+        </v-tab>
         <v-tab to="/person/productivity/other">
             Other
         </v-tab>

@@ -193,7 +193,9 @@ export default {
     },
     computed: {},
     watch: {
-
+        personId () {
+            this.initialize();
+        },
     },
     mounted() {
         this.initialize();

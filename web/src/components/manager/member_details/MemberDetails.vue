@@ -42,6 +42,11 @@
             <v-tab-item>
                 <v-row>
                     <v-col cols="12" md="6">
+                        <Authorization
+                            :person-id="personId"
+                            :manager-id="managerId"
+                            :endpoint="endpoint"
+                        ></Authorization>
                         <NuclearInformation
                             :person-id="personId"
                             :manager-id="managerId"
@@ -273,6 +278,7 @@ import time from '@/components/common/date-utils'
 const AppAreaPermissions = () => import(/* webpackChunkName: "manager-details-app-area-permissions" */ './permissions/AppAreaPermissions')
 const Permissions = () => import(/* webpackChunkName: "manager-details-permissions" */ './permissions/Permissions')
 const ManageUser = () => import(/* webpackChunkName: "manager-details-user" */ './user/ManageUser')
+const Authorization = () => import(/* webpackChunkName: "manager-details-authorization" */ './personal/Authorization')
 const NuclearInformation = () => import(/* webpackChunkName: "manager-details-nuclear-information" */ './personal/NuclearInformation')
 const Photo = () => import(/* webpackChunkName: "manager-details-photo" */ './personal/Photo')
 const PersonalContacts = () => import(/* webpackChunkName: "manager-details-personal-contacts" */ './personal/PersonalContacts')
@@ -299,6 +305,7 @@ export default {
         AppAreaPermissions,
         Permissions,
         ManageUser,
+        Authorization,
         NuclearInformation,
         Photo,
         PersonalContacts,

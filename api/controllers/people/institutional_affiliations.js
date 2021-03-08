@@ -3,6 +3,7 @@ const sql = require('../utilities/sql');
 const time = require('../utilities/time');
 const responses = require('../utilities/responses');
 const permissions = require('../utilities/permissions');
+const notifications = require('../utilities/notifications');
 const nodemailer = require('../../config/emailer');
 let transporter = nodemailer.transporter;
 
@@ -337,7 +338,20 @@ var actionCreateLabAffiliation = function (options) {
         ;
     places.push(personID, data.lab_id, data.lab_position_id, data.dedication,
         data.pluriannual, data.integrated, data.nuclearCV, data.valid_from, data.valid_until);
-    return sql.makeSQLOperation(req, res, querySQL, places);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            let notificationConfig = { entityID: personID };
+            notifications.notifyWebsiteAPI(notificationConfig)
+            return responses.sendJSONResponseOptions(options)
+        },
+        {
+            response: res,
+            status: 200,
+            message: {
+                "status": "success", "statusCode": 200, "count": 0,
+                "result": "Inserted new person affiliation."
+            }
+        });
 };
 module.exports.createLabAffiliation = function (req, res, next) {
     permissions.checkPermissions(
@@ -372,7 +386,20 @@ var actionUpdateLabAffiliation = function (options) {
     places.push(data.lab_id, data.lab_position_id, data.dedication,
         data.pluriannual, data.integrated, data.nuclearCV, data.valid_from, data.valid_until,
         affiliationID);
-    return sql.makeSQLOperation(req, res, querySQL, places);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            let notificationConfig = { entityID: personID };
+            notifications.notifyWebsiteAPI(notificationConfig)
+            return responses.sendJSONResponseOptions(options)
+        },
+        {
+            response: res,
+            status: 200,
+            message: {
+                "status": "success", "statusCode": 200, "count": 0,
+                "result": "Updated person affiliation."
+            }
+        });
 };
 module.exports.updateLabAffiliation = function (req, res, next) {
     permissions.checkPermissions(
@@ -382,12 +409,26 @@ module.exports.updateLabAffiliation = function (req, res, next) {
 };
 var actionDeleteLabAffiliation = function (options) {
     let { req, res, next } = options;
+    let personID = req.params.personID;
     let affiliationID = req.params.affiliationID;
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'DELETE FROM people_labs WHERE id = ?;';
     places.push(affiliationID);
-    return sql.makeSQLOperation(req, res, querySQL, places);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            let notificationConfig = { entityID: personID };
+            notifications.notifyWebsiteAPI(notificationConfig)
+            return responses.sendJSONResponseOptions(options)
+        },
+        {
+            response: res,
+            status: 200,
+            message: {
+                "status": "success", "statusCode": 200, "count": 0,
+                "result": "Deleted person affiliation."
+            }
+        });
 };
 module.exports.deleteLabAffiliation = function (req, res, next) {
     permissions.checkPermissions(
@@ -462,7 +503,20 @@ var actionAddTechnicianUnit = function (options) {
         + ' VALUES (?,?);'
         ;
     places.push(technicianId, data.unit_id);
-    return sql.makeSQLOperation(req, res, querySQL, places);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            let notificationConfig = { entityID: personID };
+            notifications.notifyWebsiteAPI(notificationConfig)
+            return responses.sendJSONResponseOptions(options)
+        },
+        {
+            response: res,
+            status: 200,
+            message: {
+                "status": "success", "statusCode": 200, "count": 0,
+                "result": "Inserted new person affiliation."
+            }
+        });
 };
 module.exports.createTechnicalAffiliation = function (req, res, next) {
     permissions.checkPermissions(
@@ -503,6 +557,7 @@ var actionUpdateTechnicalAffiliation = function (options) {
 };
 var actionUpdateTechnicianUnit = function (options) {
     let { req, res, next} = options;
+    let personID = req.params.personID;
     let affiliationID = req.params.affiliationID;
     let data = req.body.data;
     var querySQL = '';
@@ -512,7 +567,20 @@ var actionUpdateTechnicianUnit = function (options) {
         + ' WHERE technician_id = ?;'
         ;
     places.push(data.unit_id, affiliationID);
-    return sql.makeSQLOperation(req, res, querySQL, places);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            let notificationConfig = { entityID: personID };
+            notifications.notifyWebsiteAPI(notificationConfig)
+            return responses.sendJSONResponseOptions(options)
+        },
+        {
+            response: res,
+            status: 200,
+            message: {
+                "status": "success", "statusCode": 200, "count": 0,
+                "result": "Updated person affiliation."
+            }
+        });
 };
 module.exports.updateTechnicalAffiliation = function (req, res, next) {
     permissions.checkPermissions(
@@ -535,12 +603,26 @@ var actionDeleteTechnicianUnit = function (options) {
 };
 var actionDeleteTechnicalAffiliation = function (options) {
     let { req, res, next } = options;
+    let personID = req.params.personID;
     let affiliationID = req.params.affiliationID;
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'DELETE FROM technicians WHERE id = ?;';
     places.push(affiliationID);
-    return sql.makeSQLOperation(req, res, querySQL, places);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            let notificationConfig = { entityID: personID };
+            notifications.notifyWebsiteAPI(notificationConfig)
+            return responses.sendJSONResponseOptions(options)
+        },
+        {
+            response: res,
+            status: 200,
+            message: {
+                "status": "success", "statusCode": 200, "count": 0,
+                "result": "Deleted person affiliation."
+            }
+        });
 };
 module.exports.deleteTechnicalAffiliation = function (req, res, next) {
     permissions.checkPermissions(
@@ -615,7 +697,20 @@ var actionAddScienceManagementUnit = function (options) {
         + ' VALUES (?,?);'
         ;
     places.push(scienceManagerId, data.unit_id);
-    return sql.makeSQLOperation(req, res, querySQL, places);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            let notificationConfig = { entityID: personID };
+            notifications.notifyWebsiteAPI(notificationConfig)
+            return responses.sendJSONResponseOptions(options)
+        },
+        {
+            response: res,
+            status: 200,
+            message: {
+                "status": "success", "statusCode": 200, "count": 0,
+                "result": "Created new person affiliation."
+            }
+        });
 };
 module.exports.createScienceManagementAffiliation = function (req, res, next) {
     permissions.checkPermissions(
@@ -666,7 +761,20 @@ var actionUpdateScienceManagementUnit = function (options) {
         + ' WHERE science_manager_id = ?;'
         ;
     places.push(data.unit_id, affiliationID);
-    return sql.makeSQLOperation(req, res, querySQL, places);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            let notificationConfig = { entityID: personID };
+            notifications.notifyWebsiteAPI(notificationConfig)
+            return responses.sendJSONResponseOptions(options)
+        },
+        {
+            response: res,
+            status: 200,
+            message: {
+                "status": "success", "statusCode": 200, "count": 0,
+                "result": "Updated person affiliation."
+            }
+        });
 };
 module.exports.updateScienceManagementAffiliation = function (req, res, next) {
     permissions.checkPermissions(
@@ -690,12 +798,26 @@ var actionDeleteScienceManagementUnit = function (options) {
 };
 var actionDeleteScienceManagementAffiliation = function (options) {
     let { req, res, next } = options;
+    let personID = req.params.personID;
     let affiliationID = req.params.affiliationID;
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'DELETE FROM science_managers WHERE id = ?;';
     places.push(affiliationID);
-    return sql.makeSQLOperation(req, res, querySQL, places);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            let notificationConfig = { entityID: personID };
+            notifications.notifyWebsiteAPI(notificationConfig)
+            return responses.sendJSONResponseOptions(options)
+        },
+        {
+            response: res,
+            status: 200,
+            message: {
+                "status": "success", "statusCode": 200, "count": 0,
+                "result": "Deleted person affiliation."
+            }
+        });
 };
 module.exports.deleteScienceManagementAffiliation = function (req, res, next) {
     permissions.checkPermissions(
@@ -770,7 +892,20 @@ var actionAddAdministrativeUnit = function (options) {
         + ' VALUES (?,?);'
         ;
     places.push(administrativeId, data.unit_id);
-    return sql.makeSQLOperation(req, res, querySQL, places);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            let notificationConfig = { entityID: personID };
+            notifications.notifyWebsiteAPI(notificationConfig)
+            return responses.sendJSONResponseOptions(options)
+        },
+        {
+            response: res,
+            status: 200,
+            message: {
+                "status": "success", "statusCode": 200, "count": 0,
+                "result": "Created new person affiliation."
+            }
+        });
 };
 module.exports.createAdministrativeAffiliation = function (req, res, next) {
     permissions.checkPermissions(
@@ -812,6 +947,7 @@ var actionUpdateAdministrativeAffiliation = function (options) {
 };
 var actionUpdateAdministrativeUnit = function (options) {
     let { req, res, next} = options;
+    let personID = req.params.personID;
     let affiliationID = req.params.affiliationID;
     let data = req.body.data;
     var querySQL = '';
@@ -821,7 +957,20 @@ var actionUpdateAdministrativeUnit = function (options) {
         + ' WHERE administrative_id = ?;'
         ;
     places.push(data.unit_id, affiliationID);
-    return sql.makeSQLOperation(req, res, querySQL, places);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            let notificationConfig = { entityID: personID };
+            notifications.notifyWebsiteAPI(notificationConfig)
+            return responses.sendJSONResponseOptions(options)
+        },
+        {
+            response: res,
+            status: 200,
+            message: {
+                "status": "success", "statusCode": 200, "count": 0,
+                "result": "Updated person affiliation."
+            }
+        });
 };
 module.exports.updateAdministrativeAffiliation = function (req, res, next) {
     permissions.checkPermissions(
@@ -845,12 +994,26 @@ var actionDeleteAdministrativeUnit = function (options) {
 };
 var actionDeleteAdministrativeAffiliation = function (options) {
     let { req, res, next } = options;
+    let personID = req.params.personID;
     let affiliationID = req.params.affiliationID;
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'DELETE FROM people_administrative_offices WHERE id = ?;';
     places.push(affiliationID);
-    return sql.makeSQLOperation(req, res, querySQL, places);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            let notificationConfig = { entityID: personID };
+            notifications.notifyWebsiteAPI(notificationConfig)
+            return responses.sendJSONResponseOptions(options)
+        },
+        {
+            response: res,
+            status: 200,
+            message: {
+                "status": "success", "statusCode": 200, "count": 0,
+                "result": "Deleted person affiliation."
+            }
+        });
 };
 module.exports.deleteAdministrativeAffiliation = function (req, res, next) {
     permissions.checkPermissions(

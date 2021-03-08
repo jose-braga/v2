@@ -1,4 +1,5 @@
 const sql = require('../utilities/sql');
+const time = require('../utilities/time');
 const responses = require('../utilities/responses');
 const permissions = require('../utilities/permissions');
 const notifications = require('../utilities/notifications');
@@ -32,19 +33,59 @@ var actionAssociateTeamPublication = function (options) {
     let { req, res, next } = options;
     let labID = req.params.labID;
     let data = req.body.data;
+    let publication = data.publication;
+    let labData = data.labData;
+    let currentUnit;
+    let currentGroup;
     var querySQL = '';
     var places = [];
+    for (let ind in labData.groups_history) {
+        let grp_valid_from = time.momentToDate(labData.groups_history[ind].valid_from)
+        let grp_valid_until = time.momentToDate(labData.groups_history[ind].valid_until)
+        let today = time.momentToDate(time.moment(), undefined, 'YYYY-MM-DD');
+        if ((grp_valid_from === null || grp_valid_from <= today)
+            && (grp_valid_until === null || grp_valid_until >= today)
+        ) {
+            currentGroup = labData.groups_history[ind].id
+            // a unit history has always just a single entry
+            currentUnit = labData.groups_history[ind].units_history[0].id
+            break
+        }
+    }
+    options.currentUnit = currentUnit;
     querySQL = querySQL + 'INSERT INTO labs_publications'
-                        + ' (lab_id, publication_id)'
-                        + ' VALUES (?,?);';
-    places.push(labID, data.id);
+                        + ' (lab_id, group_id, publication_id)'
+                        + ' VALUES (?,?,?);';
+    places.push(labID, currentGroup, publication.id);
     return sql.makeSQLOperation(req, res, querySQL, places,
         (options) => {
-            let notificationConfig = {
-                entityType: 'publications',
-                entityID: data.id
-            };
-            notifications.notifyWebsiteAPI(notificationConfig)
+            return actionAssociateUnitPublication(options)
+        },
+        options);
+};
+var actionAssociateUnitPublication = function (options) {
+    let { req, res, next, currentUnit } = options;
+    let data = req.body.data;
+    let publication = data.publication;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'INSERT INTO units_publications'
+                        + ' (unit_id, publication_id, public)'
+                        + ' SELECT ?, ?, ? FROM DUAL'
+                        + ' WHERE NOT EXISTS (SELECT *'
+                        +       ' FROM units_publications'
+                        +       ' WHERE unit_id = ? AND publication_id = ?'
+                        +    ');';
+    places.push(currentUnit, publication.id, 1, currentUnit, publication.id);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            if (currentUnit === 1) {
+                let notificationConfig = {
+                    entityType: 'publications',
+                    entityID: data.id
+                };
+                notifications.notifyWebsiteAPI(notificationConfig)
+            }
             return responses.sendJSONResponseOptions(options)
         },
         {
@@ -56,7 +97,6 @@ var actionAssociateTeamPublication = function (options) {
             }
         });
 };
-
 module.exports.associateTeamPublication = function (req, res, next) {
     permissions.checkPermissions(
         (options) => {
@@ -95,7 +135,6 @@ var actionUpdateTeamPublication = function (options) {
             }
         });
 };
-
 module.exports.updateTeamPublication = function (req, res, next) {
     permissions.checkPermissions(
         (options) => { actionUpdateTeamPublication(options) },
@@ -129,8 +168,6 @@ var actionDissociateTeamPublication = function (options) {
             }
         });
 };
-
-
 module.exports.dissociateTeamPublication = function (req, res, next) {
     permissions.checkPermissions(
         (options) => { actionDissociateTeamPublication(options) },
@@ -152,7 +189,6 @@ var getMembersPublications = function (options) {
     places.push(labID);
     return sql.makeSQLOperation(req, res, querySQL, places);
 };
-
 module.exports.getMembersPublications = function (req, res, next) {
     permissions.checkPermissions(
         (options) => { getMembersPublications(options) },
