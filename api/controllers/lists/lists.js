@@ -703,6 +703,30 @@ var getSpaceTypes = function (req, res, next) {
     sql.makeSQLOperation(req, res, querySQL, places);
     return;
 };
+var getProjectTypes = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM project_types;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getProjectCallTypes = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM call_types;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getProjectPersonPositions = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM person_project_positions;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
 module.exports.listItems = function (req, res, next) {
     let category = req.params.listCategory;
     if (category === 'countries') {
@@ -845,6 +869,15 @@ module.exports.listItems = function (req, res, next) {
     }
     if (category === 'space-types') {
         getSpaceTypes(req, res, next);
+    }
+    if (category === 'project-types') {
+        getProjectTypes(req, res, next);
+    }
+    if (category === 'project-call-types') {
+        getProjectCallTypes(req, res, next);
+    }
+    if (category === 'project-person-positions') {
+        getProjectPersonPositions(req, res, next);
     }
 
 };

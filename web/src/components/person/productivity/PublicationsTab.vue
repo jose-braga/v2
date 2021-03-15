@@ -1,5 +1,5 @@
 <template>
-<v-row>
+<v-row class="px-4">
     <v-col cols="12">
         <AuthorNames
                 :current-tab="currentTab"

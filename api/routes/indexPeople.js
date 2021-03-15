@@ -40,6 +40,7 @@ const personalURLs = require('../controllers/people/personal_urls');
 const photo = require('../controllers/people/photo');
 const professionalSituations = require('../controllers/people/professional_situations');
 const publicationsList = require('../controllers/people/publications_list');
+const projects = require('../controllers/people/projects');
 const researchIDs = require('../controllers/people/research_IDs');
 const researchInterests = require('../controllers/people/research_interests');
 const store = require('../controllers/store/store');
@@ -199,9 +200,14 @@ router.post('/:personID/author-names', cors(corsOptions), authorNames.createAuth
 router.put('/:personID/author-names/:authorID', cors(corsOptions), authorNames.updateAuthorName);
 router.delete('/:personID/author-names/:authorID', cors(corsOptions), authorNames.deleteAuthorName);
 
-
-router.post('/:personID/journals', cors(corsOptions), addPubORCID.createJournal);
-router.post('/:personID/journals/:journalID/publications', cors(corsOptions), addPubORCID.createPublication);
+//Projects
+router.get('/:personID/all-projects', cors(corsOptions), projects.getAllProjects);
+router.get('/:personID/projects', cors(corsOptions), projects.getPersonProjects);
+router.post('/:personID/projects', cors(corsOptions), projects.createPersonProject);
+router.get('/:personID/projects/:projectID', cors(corsOptions), projects.getProjectInfo);
+router.put('/:personID/projects/:projectID', cors(corsOptions), projects.updatePersonProject);
+router.post('/:personID/projects/:projectID', cors(corsOptions), projects.createPersonProjectAssociation);
+//router.delete('/:personID/projects/:projectID', cors(corsOptions), projects.deletePersonProjectAssociation);
 
 //Spaces
 router.get('/:personID/all-spaces', cors(corsOptions), spaces.getAllSpaces);

@@ -16,6 +16,10 @@ const PublicationsTabHelp = () => import(/* webpackChunkName: "publications-tab-
 
 const AddPublicationsTab = () => import(/* webpackChunkName: "add-publications-tab" */ '@/components/person/productivity/AddPublicationsTab.vue')
 const AddPublicationsTabHelp = () => import(/* webpackChunkName: "add-publication-tab-help" */ '@/components/person/productivity/AddPublicationsTabHelp.vue')
+
+const ProjectsTab = () => import(/* webpackChunkName: "projects-tab" */ '@/components/person/productivity/ProjectsTab.vue')
+const ProjectsTabHelp = () => import(/* webpackChunkName: "projects-tab-help" */ '@/components/person/productivity/ProjectsTabHelp.vue')
+
 const OtherProductivityTab = () => import(/* webpackChunkName: "other-productivity-tab" */ '@/components/person/productivity/OtherProductivityTab.vue')
 const OtherProductivityTabHelp = () => import(/* webpackChunkName: "other-productivity-tab-help" */ '@/components/person/productivity/OtherProductivityTabHelp.vue')
 
@@ -89,6 +93,13 @@ const routes = {
                     components: {
                         default: AddPublicationsTab,
                         help: AddPublicationsTabHelp
+                    }
+                },
+                {
+                    path: 'projects',
+                    components: {
+                        default: ProjectsTab,
+                        help: ProjectsTabHelp
                     }
                 },
                 {

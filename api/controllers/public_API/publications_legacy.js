@@ -259,17 +259,30 @@ module.exports.getLatestUnitPublications = function (req, res, next) {
     let unitID = req.params.unitID;
     let numberPublications = 20; // the default number of publications to retrieve
     let currentYear = time.moment().year();
+    let now = time.moment();
+    let querySQL;
+    let places;
 
     if (req.query.hasOwnProperty('size')) {
         numberPublications = parseInt(req.query.size, 10);
     }
-
-    var querySQL = 'SELECT publications.*, journals.name AS journal_name'
+    if (now.isAfter(moment(currentYear + '-04-30'))) {
+        querySQL = 'SELECT publications.*, journals.name AS journal_name'
+                + ' FROM publications'
+                + ' LEFT JOIN journals ON journals.id = publications.journal_id'
+                + ' LEFT JOIN units_publications ON units_publications.publication_id = publications.id'
+                + ' WHERE publications.year = ? AND units_publications.unit_id = ?;';
+        places = [currentYear, unitID];
+    } else {
+        querySQL = 'SELECT publications.*, journals.name AS journal_name'
                 + ' FROM publications'
                 + ' LEFT JOIN journals ON journals.id = publications.journal_id'
                 + ' LEFT JOIN units_publications ON units_publications.publication_id = publications.id'
                 + ' WHERE (publications.year = ? OR publications.year = ?) AND units_publications.unit_id = ?;';
-    var places = [currentYear, currentYear - 1, unitID];
+        places = [currentYear, currentYear - 1, unitID];
+    }
+
+
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             if (resQuery.length === 0 || resQuery === undefined) {
@@ -335,7 +348,7 @@ module.exports.getLatestUnitPublications = function (req, res, next) {
                             }
                             if (addToList) {
                                 resQuery[ind].curated_date = time.moment({
-                                    year: currentYear,
+                                    year: resQuery[ind].year,
                                     month: month,
                                     day: day
                                 });

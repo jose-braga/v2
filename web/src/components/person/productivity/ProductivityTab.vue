@@ -1,5 +1,5 @@
 <template>
-<div class="px-4">
+<div>
     <v-tabs v-model="currentTab">
         <v-tab v-if="isSupervisor" to="/person/productivity/supervisor">
             Supervisor
