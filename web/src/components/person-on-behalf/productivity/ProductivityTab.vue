@@ -10,6 +10,9 @@
         <v-tab :to="link + '/add-publications'">
             Add Publications
         </v-tab>
+        <v-tab :to="link + '/projects'">
+            Projects
+        </v-tab>
         <v-tab :to="link + '/other'">
             Other
         </v-tab>

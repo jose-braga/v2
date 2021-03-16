@@ -9,6 +9,7 @@ const OtherPersonProductivityTab = () => import(/* webpackChunkName: "person-on-
 const OtherPersonSupervisorTab = () => import(/* webpackChunkName: "supervisor-tab" */ '@/components/person-on-behalf/productivity/SupervisorTab.vue')
 const OtherPersonProductivityPublicationsTab = () => import(/* webpackChunkName: "person-on-behalf-productivity-publications" */ '@/components/person-on-behalf/productivity/PublicationsTab.vue')
 const OtherPersonProductivityAddPublicationsTab = () => import(/* webpackChunkName: "person-on-behalf-productivity-add-publications" */ '@/components/person-on-behalf/productivity/AddPublicationsTab.vue')
+const OtherPersonProductivityProjectsTab = () => import(/* webpackChunkName: "person-on-behalf-productivity-publications" */ '@/components/person-on-behalf/productivity/ProjectsTab.vue')
 const OtherPersonProductivityOtherProductivityTab = () => import(/* webpackChunkName: "person-on-behalf-productivity-other-productivity" */ '@/components/person-on-behalf/productivity/OtherProductivityTab.vue')
 const OtherPersonSpacesTab = () => import(/* webpackChunkName: "person-on-behalf-spaces-tab" */ '@/components/person-on-behalf/spaces/SpacesTab.vue')
 
@@ -59,6 +60,12 @@ const routes = {
                             path: 'add-publications',
                             components: {
                                 default: OtherPersonProductivityAddPublicationsTab,
+                            }
+                        },
+                        {
+                            path: 'projects',
+                            components: {
+                                default: OtherPersonProductivityProjectsTab,
                             }
                         },
                         {

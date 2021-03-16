@@ -9,7 +9,8 @@
                     </div>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
-                    <PersonProjects id="person-projects"
+                    <PersonProjects
+                            :other-person-id="otherPersonId"
                             :current-tab="currentTab"
                     ></PersonProjects>
                 </v-expansion-panel-content>
@@ -21,7 +22,8 @@
                     </div>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
-                    <AddFromDatabase id="projects-database"
+                    <AddFromDatabase
+                            :other-person-id="otherPersonId"
                             :current-tab="currentTab"
                     ></AddFromDatabase>
                 </v-expansion-panel-content>
@@ -33,7 +35,8 @@
                     </div>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
-                    <AddFromOrcid id="projects-orcid"
+                    <AddFromOrcid
+                            :other-person-id="otherPersonId"
                             :current-tab="currentTab"
                     ></AddFromOrcid>
                 </v-expansion-panel-content>
@@ -57,6 +60,7 @@ export default {
     },
     props: {
          currentTab: String,
+         otherPersonId: Number,
     },
     methods: {
 

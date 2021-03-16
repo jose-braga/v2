@@ -7,7 +7,6 @@
             :footer-props="footerProps"
             :items="data.projects"
             :items-per-page="10"
-
             :sort-by="['project_details.end_show', 'project_details.start_show', 'project_details.title']"
             :sort-desc="[true, true, false]"
             multi-sort
@@ -17,6 +16,7 @@
             <template v-slot:top>
                 <v-dialog v-model="dialog" max-width="1600px">
                     <ProjectDetails
+                        :other-person-id="otherPersonId"
                         :project-data="editedItem"
                         :project-id="itemID"
                     >
@@ -50,7 +50,8 @@ import ProjectDetails from './ProjectDetails'
 
 export default {
     props: {
-         currentTab: String,
+        currentTab: String,
+        otherPersonId: Number,
     },
     components: {
         ProjectDetails,
@@ -92,14 +93,17 @@ export default {
     },
     watch: {
         currentTab () {
-            if (this.currentTab === '/person/productivity/projects') {
+            if (this.currentTab.includes('/projects')) {
                 this.initialize();
             }
+        },
+        otherPersonId () {
+            this.initialize();
         },
     },
     methods: {
         initialize () {
-            let personID = this.$store.state.session.personID;
+            let personID = this.otherPersonId;
             let urlSubmit = 'api/people/' + personID  + '/projects';
             subUtil.getInfoPopulate(this, urlSubmit, true)
             .then( (result) => {

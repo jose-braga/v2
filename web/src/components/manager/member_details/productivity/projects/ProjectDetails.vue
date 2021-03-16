@@ -404,6 +404,8 @@ export default {
     props: {
         projectData: Object,
         projectId: Number,
+        otherPersonId: Number,
+        endpoint: String,
     },
     data() {
         return {
@@ -433,7 +435,7 @@ export default {
         }
     },
     watch: {
-        projectData () {
+        projectId () {
             this.initialize();
         },
     },
@@ -453,8 +455,10 @@ export default {
     },
     methods: {
         initialize () {
-            let personID = this.$store.state.session.personID;
-            let urlSubmit = 'api/people/' + personID  + '/projects/' + this.projectId;
+            let personID = this.otherPersonId;
+            let urlSubmit = 'api' + this.endpoint
+                            + '/members'
+                            + '/' + personID  + '/projects/' + this.projectId;
             subUtil.getInfoPopulate(this, urlSubmit, true)
             .then((result) => {
                 if (result.length === 1) {
@@ -482,7 +486,7 @@ export default {
                         && this.projectDetails.project_details.other_funding_agencies.name !== ''
                     ) {
                         this.$set(this.projectDetails.project_details, 'funding_agencies',
-                       [{id: 'other', official_name: 'Other'}])
+                            [{id: 'other', official_name: 'Other'}])
                         this.otherFundingAgency = true;
                     }
                 }
@@ -491,7 +495,7 @@ export default {
         submitForm () {
             if (this.$store.state.session.loggedIn) {
                 this.progress = true;
-                let personID = this.$store.state.session.personID;
+                let personID = this.otherPersonId;
                 if (this.projectDetails.project_details.funding_agencies.length === 1) {
                     if (this.projectDetails.project_details.funding_agencies[0].id === 'other') {
                         this.projectDetails.project_details.funding_agencies = [];
@@ -516,7 +520,9 @@ export default {
                 this.projectDetails.toDeleteLab = this.toDeleteLab;
                 let urlUpdate = [
                     {
-                        url: 'api/people/' + personID
+                        url: 'api' + this.endpoint
+                            + '/members'
+                            + '/' + personID
                             + '/projects/' + this.projectDetails.project_id,
                         body: this.projectDetails,
                     }

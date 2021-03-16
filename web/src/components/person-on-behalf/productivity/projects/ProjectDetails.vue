@@ -404,6 +404,7 @@ export default {
     props: {
         projectData: Object,
         projectId: Number,
+        otherPersonId: Number,
     },
     data() {
         return {
@@ -453,7 +454,7 @@ export default {
     },
     methods: {
         initialize () {
-            let personID = this.$store.state.session.personID;
+            let personID = this.otherPersonId;
             let urlSubmit = 'api/people/' + personID  + '/projects/' + this.projectId;
             subUtil.getInfoPopulate(this, urlSubmit, true)
             .then((result) => {
@@ -491,7 +492,7 @@ export default {
         submitForm () {
             if (this.$store.state.session.loggedIn) {
                 this.progress = true;
-                let personID = this.$store.state.session.personID;
+                let personID = this.otherPersonId;
                 if (this.projectDetails.project_details.funding_agencies.length === 1) {
                     if (this.projectDetails.project_details.funding_agencies[0].id === 'other') {
                         this.projectDetails.project_details.funding_agencies = [];

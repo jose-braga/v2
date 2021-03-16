@@ -7,7 +7,6 @@
             :footer-props="footerProps"
             :items="data.projects"
             :items-per-page="10"
-
             :sort-by="['project_details.end_show', 'project_details.start_show', 'project_details.title']"
             :sort-desc="[true, true, false]"
             multi-sort
@@ -17,8 +16,10 @@
             <template v-slot:top>
                 <v-dialog v-model="dialog" max-width="1600px">
                     <ProjectDetails
+                        :other-person-id="personId"
                         :project-data="editedItem"
                         :project-id="itemID"
+                        :endpoint="endpoint"
                     >
                     </ProjectDetails>
                 </v-dialog>
@@ -50,7 +51,9 @@ import ProjectDetails from './ProjectDetails'
 
 export default {
     props: {
-         currentTab: String,
+        personId: Number,
+        managerId: Number,
+        endpoint: String,
     },
     components: {
         ProjectDetails,
@@ -91,16 +94,16 @@ export default {
         );
     },
     watch: {
-        currentTab () {
-            if (this.currentTab === '/person/productivity/projects') {
-                this.initialize();
-            }
+        personId () {
+            this.initialize();
         },
     },
     methods: {
         initialize () {
-            let personID = this.$store.state.session.personID;
-            let urlSubmit = 'api/people/' + personID  + '/projects';
+            let personID = this.personId;
+            let urlSubmit = 'api' + this.endpoint
+                            + '/members'
+                            + '/' + personID  + '/projects';
             subUtil.getInfoPopulate(this, urlSubmit, true)
             .then( (result) => {
                 for (let ind in result) {

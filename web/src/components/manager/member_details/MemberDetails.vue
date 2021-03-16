@@ -13,6 +13,7 @@
             <v-tab>Professional</v-tab>
             <v-tab>Supervisor</v-tab>
             <v-tab>Publications</v-tab>
+            <v-tab>Projects</v-tab>
             <v-tab>Spaces</v-tab>
             <v-tab>Other productivity</v-tab>
         </v-tabs>
@@ -220,6 +221,53 @@
                 </v-expansion-panels>
             </v-tab-item>
             <v-tab-item>
+                <v-expansion-panels multiple>
+                    <v-expansion-panel>
+                        <v-expansion-panel-header>
+                            <div>
+                                <h3 class="headline">Projects with your participation</h3>
+                            </div>
+                        </v-expansion-panel-header>
+                        <v-expansion-panel-content>
+                            <PersonProjects
+                                    :person-id="personId"
+                                    :manager-id="managerId"
+                                    :endpoint="endpoint"
+                            ></PersonProjects>
+                        </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel>
+                        <v-expansion-panel-header>
+                            <div>
+                                <h3 class="headline">Search within LAQV/UCIBIO database</h3>
+                            </div>
+                        </v-expansion-panel-header>
+                        <v-expansion-panel-content>
+                            <ProjectsAddFromDatabase
+                                    :person-id="personId"
+                                    :manager-id="managerId"
+                                    :endpoint="endpoint"
+                            ></ProjectsAddFromDatabase>
+                        </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel>
+                        <v-expansion-panel-header>
+                            <div>
+                                <h3 class="headline">Add projects from ORCID data</h3>
+                            </div>
+                        </v-expansion-panel-header>
+                        <v-expansion-panel-content>
+                            <ProjectsAddFromOrcid
+                                    :person-id="personId"
+                                    :manager-id="managerId"
+                                    :endpoint="endpoint"
+                            ></ProjectsAddFromOrcid>
+                        </v-expansion-panel-content>
+                    </v-expansion-panel>
+                </v-expansion-panels>
+
+            </v-tab-item>
+            <v-tab-item>
                 <v-expansion-panels multiple v-model="openPanel" class="mt-4">
                     <v-expansion-panel>
                         <v-expansion-panel-header>
@@ -299,6 +347,9 @@ const SupervisorSpaces = () => import(/* webpackChunkName: "manager-details-lab-
 const AddFromDatabase = () => import(/* webpackChunkName: "manager-details-add-from-database" */ './productivity/publications/add-publications/AddFromDatabase')
 const AddFromOrcid = () => import(/* webpackChunkName: "manager-details-add-from-orcid" */ './productivity/publications/add-publications/AddFromOrcid')
 const AddFromRepository = () => import(/* webpackChunkName: "manager-details-add-from-repo" */ './productivity/publications/add-publications/AddFromRepository')
+const PersonProjects = () => import(/* webpackChunkName: "manager-details-person-projects" */ './productivity/projects/PersonProjects')
+const ProjectsAddFromOrcid = () => import(/* webpackChunkName: "manager-details-projects-orcid" */ './productivity/projects/AddFromOrcid')
+const ProjectsAddFromDatabase = () => import(/* webpackChunkName: "manager-details-projects-database" */ './productivity/projects/AddFromDatabase')
 
 export default {
     components: {
@@ -326,6 +377,9 @@ export default {
         AddFromDatabase,
         AddFromOrcid,
         AddFromRepository,
+        PersonProjects,
+        ProjectsAddFromOrcid,
+        ProjectsAddFromDatabase,
     },
     props: {
         personId: Number,

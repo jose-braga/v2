@@ -46,6 +46,7 @@ const labMembers = require('../controllers/team/members');
 const addPublications = require('../controllers/people/add_publications');
 const addPubORCID = require('../controllers/people/add_pub_ORCID');
 const addPubRepository = require('../controllers/people/add_pub_repository');
+const projects = require('../controllers/people/projects');
 
 const managePermissionsUnit = require('../controllers/manager/unit/manage_permissions');
 const manageAppAreaPermissionsUnit = require('../controllers/manager/unit/manage_app_area_permissions');
@@ -316,6 +317,13 @@ router.delete('/:userID/units/:unitID/cities/:cityID/members/:personID/people-pu
 router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/publications/:publicationID', cors(corsOptions), publicationsList.updatePublication);
 router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/journals', cors(corsOptions), addPubORCID.createJournal);
 router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/journals/:journalID/publications', cors(corsOptions), addPubORCID.createPublication);
+//Projects
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/all-projects', cors(corsOptions), projects.getAllProjects);
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/projects', cors(corsOptions), projects.getPersonProjects);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/projects', cors(corsOptions), projects.createPersonProject);
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/projects/:projectID', cors(corsOptions), projects.getProjectInfo);
+router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/projects/:projectID', cors(corsOptions), projects.updatePersonProject);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/projects/:projectID', cors(corsOptions), projects.createPersonProjectAssociation);
 //Permissions
 router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/app-area-permissions', cors(corsOptions), manageAppAreaPermissionsUnit.getPermissions);
 router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/app-area-permissions', cors(corsOptions), manageAppAreaPermissionsUnit.createPermissions);
@@ -470,6 +478,13 @@ router.delete('/:userID/cities/:cityID/members/:personID/people-publications/:pu
 router.put('/:userID/cities/:cityID/members/:personID/publications/:publicationID', cors(corsOptions), publicationsList.updatePublication);
 router.post('/:userID/cities/:cityID/members/:personID/journals', cors(corsOptions), addPubORCID.createJournal);
 router.post('/:userID/cities/:cityID/members/:personID/journals/:journalID/publications', cors(corsOptions), addPubORCID.createPublication);
+//Projects
+router.get('/:userID/cities/:cityID/members/:personID/all-projects', cors(corsOptions), projects.getAllProjects);
+router.get('/:userID/cities/:cityID/members/:personID/projects', cors(corsOptions), projects.getPersonProjects);
+router.post('/:userID/cities/:cityID/members/:personID/projects', cors(corsOptions), projects.createPersonProject);
+router.get('/:userID/cities/:cityID/members/:personID/projects/:projectID', cors(corsOptions), projects.getProjectInfo);
+router.put('/:userID/cities/:cityID/members/:personID/projects/:projectID', cors(corsOptions), projects.updatePersonProject);
+router.post('/:userID/cities/:cityID/members/:personID/projects/:projectID', cors(corsOptions), projects.createPersonProjectAssociation);
 //Permissions
 router.get('/:userID/cities/:cityID/members/:personID/app-area-permissions', cors(corsOptions), manageAppAreaPermissionsUnit.getPermissions);
 router.post('/:userID/cities/:cityID/members/:personID/app-area-permissions', cors(corsOptions), manageAppAreaPermissionsUnit.createPermissions);
@@ -623,6 +638,13 @@ router.delete('/:userID/units/:unitID/members/:personID/people-publications/:pub
 router.put('/:userID/units/:unitID/members/:personID/publications/:publicationID', cors(corsOptions), publicationsList.updatePublication);
 router.post('/:userID/units/:unitID/members/:personID/journals', cors(corsOptions), addPubORCID.createJournal);
 router.post('/:userID/units/:unitID/members/:personID/journals/:journalID/publications', cors(corsOptions), addPubORCID.createPublication);
+//Projects
+router.get('/:userID/units/:unitID/members/:personID/all-projects', cors(corsOptions), projects.getAllProjects);
+router.get('/:userID/units/:unitID/members/:personID/projects', cors(corsOptions), projects.getPersonProjects);
+router.post('/:userID/units/:unitID/members/:personID/projects', cors(corsOptions), projects.createPersonProject);
+router.get('/:userID/units/:unitID/members/:personID/projects/:projectID', cors(corsOptions), projects.getProjectInfo);
+router.put('/:userID/units/:unitID/members/:personID/projects/:projectID', cors(corsOptions), projects.updatePersonProject);
+router.post('/:userID/units/:unitID/members/:personID/projects/:projectID', cors(corsOptions), projects.createPersonProjectAssociation);
     //Permissions
 router.get('/:userID/units/:unitID/members/:personID/app-area-permissions', cors(corsOptions), manageAppAreaPermissionsUnit.getPermissions);
 router.post('/:userID/units/:unitID/members/:personID/app-area-permissions', cors(corsOptions), manageAppAreaPermissionsUnit.createPermissions);
