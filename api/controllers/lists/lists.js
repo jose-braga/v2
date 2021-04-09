@@ -727,6 +727,55 @@ var getProjectPersonPositions = function (req, res, next) {
     sql.makeSQLOperation(req, res, querySQL, places);
     return;
 };
+var getCommunicationTypes = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM communication_types;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getConferenceTypes = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM conference_types;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getPatentTypes = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM patent_types;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getPatentStatusTypes = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM patent_status;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getBoardTypes = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM board_types;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getDatasetTypes = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM data_set_types;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+
 module.exports.listItems = function (req, res, next) {
     let category = req.params.listCategory;
     if (category === 'countries') {
@@ -878,6 +927,24 @@ module.exports.listItems = function (req, res, next) {
     }
     if (category === 'project-person-positions') {
         getProjectPersonPositions(req, res, next);
+    }
+    if (category === 'communication-types') {
+        getCommunicationTypes(req, res, next);
+    }
+    if (category === 'conference-types') {
+        getConferenceTypes(req, res, next);
+    }
+    if (category === 'patent-types') {
+        getPatentTypes(req, res, next);
+    }
+    if (category === 'patent-status-types') {
+        getPatentStatusTypes(req, res, next);
+    }
+    if (category === 'board-types') {
+        getBoardTypes(req, res, next);
+    }
+    if (category === 'dataset-types') {
+        getDatasetTypes(req, res, next);
     }
 
 };

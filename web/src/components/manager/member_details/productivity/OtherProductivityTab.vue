@@ -11,7 +11,8 @@
                 <v-expansion-panel-content>
                     <IndustryProjects id="other-person-industry-projects"
                             :other-person-id="otherPersonId"
-                            :current-tab="currentTab"
+                            :manager-id="managerId"
+                            :endpoint="endpoint"
                     ></IndustryProjects>
                 </v-expansion-panel-content>
             </v-expansion-panel>
@@ -23,7 +24,8 @@
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
                     <TrainingNetworks id="other-person-training-networks"
-                            :current-tab="currentTab"
+                            :manager-id="managerId"
+                    :endpoint="endpoint"
                             :other-person-id="otherPersonId"
                     ></TrainingNetworks>
                 </v-expansion-panel-content>
@@ -36,7 +38,8 @@
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
                     <StartupCompanies id="other-person-startups"
-                            :current-tab="currentTab"
+                            :manager-id="managerId"
+                            :endpoint="endpoint"
                             :other-person-id="otherPersonId"
                     ></StartupCompanies>
 
@@ -50,7 +53,8 @@
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
                     <OralCommunications id="other-person-communications"
-                            :current-tab="currentTab"
+                            :manager-id="managerId"
+                            :endpoint="endpoint"
                             :other-person-id="otherPersonId"
                     ></OralCommunications>
                 </v-expansion-panel-content>
@@ -63,7 +67,8 @@
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
                     <ScientificPrizes id="other-person-prizes"
-                            :current-tab="currentTab"
+                            :manager-id="managerId"
+                            :endpoint="endpoint"
                             :other-person-id="otherPersonId"
                     ></ScientificPrizes>
 
@@ -77,7 +82,8 @@
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
                     <MemberBoards id="other-person-boards"
-                            :current-tab="currentTab"
+                            :manager-id="managerId"
+                            :endpoint="endpoint"
                             :other-person-id="otherPersonId"
                     ></MemberBoards>
                 </v-expansion-panel-content>
@@ -90,7 +96,8 @@
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
                     <SubmittedPatents id="other-person-patents"
-                            :current-tab="currentTab"
+                            :manager-id="managerId"
+                            :endpoint="endpoint"
                             :other-person-id="otherPersonId"
                     ></SubmittedPatents>
                 </v-expansion-panel-content>
@@ -103,7 +110,8 @@
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
                     <DepositDatasets id="other-person-datasets"
-                            :current-tab="currentTab"
+                            :manager-id="managerId"
+                            :endpoint="endpoint"
                             :other-person-id="otherPersonId"
                     ></DepositDatasets>
                 </v-expansion-panel-content>
@@ -116,7 +124,8 @@
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
                     <ParticipationOutreach id="other-person-outreach"
-                            :current-tab="currentTab"
+                            :manager-id="managerId"
+                            :endpoint="endpoint"
                             :other-person-id="otherPersonId"
                     ></ParticipationOutreach>
                 </v-expansion-panel-content>
@@ -127,16 +136,15 @@
 </template>
 
 <script>
-const IndustryProjects = () => import(/* webpackChunkName: "other-person-industry-projects" */ './other/IndustryProjects')
-const TrainingNetworks = () => import(/* webpackChunkName: "other-person-training-networks" */ './other/TrainingNetworks')
-const OralCommunications = () => import(/* webpackChunkName: "other-person-communications" */ './other/OralCommunications')
-const StartupCompanies = () => import(/* webpackChunkName: "other-person-startups" */ './other/StartupCompanies')
-const ScientificPrizes = () => import(/* webpackChunkName: "other-person-prizes" */ './other/ScientificPrizes')
-const MemberBoards = () => import(/* webpackChunkName: "other-person-boards" */ './other/MemberBoards')
-const ParticipationOutreach = () => import(/* webpackChunkName: "other-person-outreach" */ './other/ParticipationOutreach')
-const SubmittedPatents = () => import(/* webpackChunkName: "other-person-patents" */ './other/SubmittedPatents')
-const DepositDatasets = () => import(/* webpackChunkName: "other-person-datasets" */ './other/DepositDatasets')
-
+const IndustryProjects = () => import(/* webpackChunkName: "manager-industry-projects" */ './other/IndustryProjects')
+const TrainingNetworks = () => import(/* webpackChunkName: "manager-training-networks" */ './other/TrainingNetworks')
+const OralCommunications = () => import(/* webpackChunkName: "manager-communications" */ './other/OralCommunications')
+const StartupCompanies = () => import(/* webpackChunkName: "manager-startups" */ './other/StartupCompanies')
+const ScientificPrizes = () => import(/* webpackChunkName: "manager-prizes" */ './other/ScientificPrizes')
+const MemberBoards = () => import(/* webpackChunkName: "manager-boards" */ './other/MemberBoards')
+const ParticipationOutreach = () => import(/* webpackChunkName: "manager-outreach" */ './other/ParticipationOutreach')
+const SubmittedPatents = () => import(/* webpackChunkName: "manager-patents" */ './other/SubmittedPatents')
+const DepositDatasets = () => import(/* webpackChunkName: "manager-datasets" */ './other/DepositDatasets')
 
 export default {
     components: {
@@ -151,8 +159,9 @@ export default {
         DepositDatasets,
     },
     props: {
-        currentTab: String,
         otherPersonId: Number,
+        managerId: Number,
+        endpoint: String,
     },
     methods: {
 

@@ -127,9 +127,7 @@ export default {
             this.editedItem = item;
             this.itemID = item.project_id;
         },
-
     }
-
 }
 </script>
 

@@ -47,6 +47,16 @@ const addPublications = require('../controllers/people/add_publications');
 const addPubORCID = require('../controllers/people/add_pub_ORCID');
 const addPubRepository = require('../controllers/people/add_pub_repository');
 const projects = require('../controllers/people/projects');
+const industryProjects = require('../controllers/people/private_agreements');
+const trainingNetworks = require('../controllers/people/training_networks');
+const communications = require('../controllers/people/communications');
+const patents = require('../controllers/people/patents');
+const startups = require('../controllers/people/startups');
+const prizes = require('../controllers/people/prizes');
+const boards = require('../controllers/people/boards');
+const datasets = require('../controllers/people/datasets');
+const outreaches = require('../controllers/people/outreaches');
+
 
 const managePermissionsUnit = require('../controllers/manager/unit/manage_permissions');
 const manageAppAreaPermissionsUnit = require('../controllers/manager/unit/manage_app_area_permissions');
@@ -207,6 +217,62 @@ router.post('/:userID/labs/:labID/spaces', cors(corsOptions), labSpaces.addLabSp
 router.get('/:userID/labs/:labID/spaces/:spaceID', cors(corsOptions), labSpaces.getSpaceInfo);
 router.put('/:userID/labs/:labID/spaces/:spaceID', cors(corsOptions), labSpaces.updateLabSpace);
 router.delete('/:userID/labs/:labID/spaces/:labSpaceID', cors(corsOptions), labSpaces.deleteLabSpace);
+//Private agreements (or industry collaborations)
+router.get('/:userID/members/:personID/all-industry-projects', cors(corsOptions), industryProjects.getAllProjects);
+router.get('/:userID/members/:personID/industry-projects', cors(corsOptions), industryProjects.getPersonProjects);
+router.post('/:userID/members/:personID/industry-projects', cors(corsOptions), industryProjects.createPersonProject);
+//router.get('/:userID/members/:personID/industry-projects/:projectID', cors(corsOptions), industryProjects.getProjectInfo);
+router.put('/:userID/members/:personID/industry-projects/:projectID', cors(corsOptions), industryProjects.updatePersonProject);
+router.post('/:userID/members/:personID/industry-projects/:projectID', cors(corsOptions), industryProjects.createPersonProjectAssociation);
+//Training networks
+router.get('/:userID/members/:personID/all-training-networks', cors(corsOptions), trainingNetworks.getAllProjects);
+router.get('/:userID/members/:personID/training-networks', cors(corsOptions), trainingNetworks.getPersonProjects);
+router.post('/:userID/members/:personID/training-networks', cors(corsOptions), trainingNetworks.createPersonProject);
+router.put('/:userID/members/:personID/training-networks/:projectID', cors(corsOptions), trainingNetworks.updatePersonProject);
+router.post('/:userID/members/:personID/training-networks/:projectID', cors(corsOptions), trainingNetworks.createPersonProjectAssociation);
+//Communications
+//router.get('/:userID/members/:personID/all-communications', cors(corsOptions), communications.getAllItems);
+router.get('/:userID/members/:personID/communications', cors(corsOptions), communications.getPersonItems);
+router.post('/:userID/members/:personID/communications', cors(corsOptions), communications.createPersonItem);
+router.put('/:userID/members/:personID/communications/:itemID', cors(corsOptions), communications.updatePersonItem);
+router.delete('/:userID/members/:personID/communications/:itemID', cors(corsOptions), communications.deletePersonItem);
+//Patents
+router.get('/:userID/members/:personID/all-patents', cors(corsOptions), patents.getAllItems);
+router.get('/:userID/members/:personID/patents', cors(corsOptions), patents.getPersonItems);
+router.post('/:userID/members/:personID/patents', cors(corsOptions), patents.createPersonItem);
+router.put('/:userID/members/:personID/patents/:itemID', cors(corsOptions), patents.updatePersonItem);
+router.post('/:userID/members/:personID/patents/:itemID', cors(corsOptions), patents.createPersonItemAssociation);
+//Startups
+router.get('/:userID/members/:personID/all-startups', cors(corsOptions), startups.getAllItems);
+router.get('/:userID/members/:personID/startups', cors(corsOptions), startups.getPersonItems);
+router.post('/:userID/members/:personID/startups', cors(corsOptions), startups.createPersonItem);
+router.put('/:userID/members/:personID/startups/:itemID', cors(corsOptions), startups.updatePersonItem);
+router.post('/:userID/members/:personID/startups/:itemID', cors(corsOptions), startups.createPersonItemAssociation);
+//Prizes
+router.get('/:userID/members/:personID/all-prizes', cors(corsOptions), prizes.getAllItems);
+router.get('/:userID/members/:personID/prizes', cors(corsOptions), prizes.getPersonItems);
+router.post('/:userID/members/:personID/prizes', cors(corsOptions), prizes.createPersonItem);
+router.put('/:userID/members/:personID/prizes/:itemID', cors(corsOptions), prizes.updatePersonItem);
+router.post('/:userID/members/:personID/prizes/:itemID', cors(corsOptions), prizes.createPersonItemAssociation);
+//Boards
+router.get('/:userID/members/:personID/all-boards', cors(corsOptions), boards.getAllItems);
+router.get('/:userID/members/:personID/boards', cors(corsOptions), boards.getPersonItems);
+router.post('/:userID/members/:personID/boards', cors(corsOptions), boards.createPersonItem);
+router.put('/:userID/members/:personID/boards/:itemID', cors(corsOptions), boards.updatePersonItem);
+router.post('/:userID/members/:personID/boards/:itemID', cors(corsOptions), boards.createPersonItemAssociation);
+//Datasets
+router.get('/:userID/members/:personID/all-datasets', cors(corsOptions), datasets.getAllItems);
+router.get('/:userID/members/:personID/datasets', cors(corsOptions), datasets.getPersonItems);
+router.post('/:userID/members/:personID/datasets', cors(corsOptions), datasets.createPersonItem);
+router.put('/:userID/members/:personID/datasets/:itemID', cors(corsOptions), datasets.updatePersonItem);
+router.post('/:userID/members/:personID/datasets/:itemID', cors(corsOptions), datasets.createPersonItemAssociation);
+//Outreaches
+router.get('/:userID/members/:personID/all-outreaches', cors(corsOptions), outreaches.getAllItems);
+router.get('/:userID/members/:personID/outreaches', cors(corsOptions), outreaches.getPersonItems);
+router.post('/:userID/members/:personID/outreaches', cors(corsOptions), outreaches.createPersonItem);
+router.put('/:userID/members/:personID/outreaches/:itemID', cors(corsOptions), outreaches.updatePersonItem);
+router.post('/:userID/members/:personID/outreaches/:itemID', cors(corsOptions), outreaches.createPersonItemAssociation);
+
 
 
 // --------------------------------------------------------------
@@ -369,7 +435,61 @@ router.post('/:userID/units/:unitID/cities/:cityID/labs/:labID/spaces', cors(cor
 router.get('/:userID/units/:unitID/cities/:cityID/labs/:labID/spaces/:spaceID', cors(corsOptions), labSpaces.getSpaceInfo);
 router.put('/:userID/units/:unitID/cities/:cityID/labs/:labID/spaces/:spaceID', cors(corsOptions), labSpaces.updateLabSpace);
 router.delete('/:userID/units/:unitID/cities/:cityID/labs/:labID/spaces/:labSpaceID', cors(corsOptions), labSpaces.deleteLabSpace);
-
+//Private agreements (or industry collaborations)
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/all-industry-projects', cors(corsOptions), industryProjects.getAllProjects);
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/industry-projects', cors(corsOptions), industryProjects.getPersonProjects);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/industry-projects', cors(corsOptions), industryProjects.createPersonProject);
+//router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/industry-projects/:projectID', cors(corsOptions), industryProjects.getProjectInfo);
+router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/industry-projects/:projectID', cors(corsOptions), industryProjects.updatePersonProject);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/industry-projects/:projectID', cors(corsOptions), industryProjects.createPersonProjectAssociation);
+//Training networks
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/all-training-networks', cors(corsOptions), trainingNetworks.getAllProjects);
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/training-networks', cors(corsOptions), trainingNetworks.getPersonProjects);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/training-networks', cors(corsOptions), trainingNetworks.createPersonProject);
+router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/training-networks/:projectID', cors(corsOptions), trainingNetworks.updatePersonProject);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/training-networks/:projectID', cors(corsOptions), trainingNetworks.createPersonProjectAssociation);
+//Communications
+//router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/all-communications', cors(corsOptions), communications.getAllItems);
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/communications', cors(corsOptions), communications.getPersonItems);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/communications', cors(corsOptions), communications.createPersonItem);
+router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/communications/:itemID', cors(corsOptions), communications.updatePersonItem);
+router.delete('/:userID/units/:unitID/cities/:cityID/members/:personID/communications/:itemID', cors(corsOptions), communications.deletePersonItem);
+//Patents
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/all-patents', cors(corsOptions), patents.getAllItems);
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/patents', cors(corsOptions), patents.getPersonItems);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/patents', cors(corsOptions), patents.createPersonItem);
+router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/patents/:itemID', cors(corsOptions), patents.updatePersonItem);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/patents/:itemID', cors(corsOptions), patents.createPersonItemAssociation);
+//Startups
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/all-startups', cors(corsOptions), startups.getAllItems);
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/startups', cors(corsOptions), startups.getPersonItems);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/startups', cors(corsOptions), startups.createPersonItem);
+router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/startups/:itemID', cors(corsOptions), startups.updatePersonItem);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/startups/:itemID', cors(corsOptions), startups.createPersonItemAssociation);
+//Prizes
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/all-prizes', cors(corsOptions), prizes.getAllItems);
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/prizes', cors(corsOptions), prizes.getPersonItems);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/prizes', cors(corsOptions), prizes.createPersonItem);
+router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/prizes/:itemID', cors(corsOptions), prizes.updatePersonItem);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/prizes/:itemID', cors(corsOptions), prizes.createPersonItemAssociation);
+//Boards
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/all-boards', cors(corsOptions), boards.getAllItems);
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/boards', cors(corsOptions), boards.getPersonItems);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/boards', cors(corsOptions), boards.createPersonItem);
+router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/boards/:itemID', cors(corsOptions), boards.updatePersonItem);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/boards/:itemID', cors(corsOptions), boards.createPersonItemAssociation);
+//Datasets
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/all-datasets', cors(corsOptions), datasets.getAllItems);
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/datasets', cors(corsOptions), datasets.getPersonItems);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/datasets', cors(corsOptions), datasets.createPersonItem);
+router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/datasets/:itemID', cors(corsOptions), datasets.updatePersonItem);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/datasets/:itemID', cors(corsOptions), datasets.createPersonItemAssociation);
+//Outreaches
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/all-outreaches', cors(corsOptions), outreaches.getAllItems);
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/outreaches', cors(corsOptions), outreaches.getPersonItems);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/outreaches', cors(corsOptions), outreaches.createPersonItem);
+router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/outreaches/:itemID', cors(corsOptions), outreaches.updatePersonItem);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/outreaches/:itemID', cors(corsOptions), outreaches.createPersonItemAssociation);
 
 /* Cities*/
 router.get('/:userID/cities/:cityID/members/:personID/external-api-authorization', cors(corsOptions), externalAPI.getAuthorization);
@@ -530,6 +650,63 @@ router.post('/:userID/cities/:cityID/labs/:labID/spaces', cors(corsOptions), lab
 router.get('/:userID/cities/:cityID/labs/:labID/spaces/:spaceID', cors(corsOptions), labSpaces.getSpaceInfo);
 router.put('/:userID/cities/:cityID/labs/:labID/spaces/:spaceID', cors(corsOptions), labSpaces.updateLabSpace);
 router.delete('/:userID/cities/:cityID/labs/:labID/spaces/:labSpaceID', cors(corsOptions), labSpaces.deleteLabSpace);
+//Private agreements (or industry collaborations)
+router.get('/:userID/cities/:cityID/members/:personID/all-industry-projects', cors(corsOptions), industryProjects.getAllProjects);
+router.get('/:userID/cities/:cityID/members/:personID/industry-projects', cors(corsOptions), industryProjects.getPersonProjects);
+router.post('/:userID/cities/:cityID/members/:personID/industry-projects', cors(corsOptions), industryProjects.createPersonProject);
+//router.get('/:userID/cities/:cityID/members/:personID/industry-projects/:projectID', cors(corsOptions), industryProjects.getProjectInfo);
+router.put('/:userID/cities/:cityID/members/:personID/industry-projects/:projectID', cors(corsOptions), industryProjects.updatePersonProject);
+router.post('/:userID/cities/:cityID/members/:personID/industry-projects/:projectID', cors(corsOptions), industryProjects.createPersonProjectAssociation);
+//Training networks
+router.get('/:userID/cities/:cityID/members/:personID/all-training-networks', cors(corsOptions), trainingNetworks.getAllProjects);
+router.get('/:userID/cities/:cityID/members/:personID/training-networks', cors(corsOptions), trainingNetworks.getPersonProjects);
+router.post('/:userID/cities/:cityID/members/:personID/training-networks', cors(corsOptions), trainingNetworks.createPersonProject);
+router.put('/:userID/cities/:cityID/members/:personID/training-networks/:projectID', cors(corsOptions), trainingNetworks.updatePersonProject);
+router.post('/:userID/cities/:cityID/members/:personID/training-networks/:projectID', cors(corsOptions), trainingNetworks.createPersonProjectAssociation);
+//Communications
+//router.get('/:userID/cities/:cityID/members/:personID/all-communications', cors(corsOptions), communications.getAllItems);
+router.get('/:userID/cities/:cityID/members/:personID/communications', cors(corsOptions), communications.getPersonItems);
+router.post('/:userID/cities/:cityID/members/:personID/communications', cors(corsOptions), communications.createPersonItem);
+router.put('/:userID/cities/:cityID/members/:personID/communications/:itemID', cors(corsOptions), communications.updatePersonItem);
+router.delete('/:userID/cities/:cityID/members/:personID/communications/:itemID', cors(corsOptions), communications.deletePersonItem);
+//Patents
+router.get('/:userID/cities/:cityID/members/:personID/all-patents', cors(corsOptions), patents.getAllItems);
+router.get('/:userID/cities/:cityID/members/:personID/patents', cors(corsOptions), patents.getPersonItems);
+router.post('/:userID/cities/:cityID/members/:personID/patents', cors(corsOptions), patents.createPersonItem);
+router.put('/:userID/cities/:cityID/members/:personID/patents/:itemID', cors(corsOptions), patents.updatePersonItem);
+router.post('/:userID/cities/:cityID/members/:personID/patents/:itemID', cors(corsOptions), patents.createPersonItemAssociation);
+//Startups
+router.get('/:userID/cities/:cityID/members/:personID/all-startups', cors(corsOptions), startups.getAllItems);
+router.get('/:userID/cities/:cityID/members/:personID/startups', cors(corsOptions), startups.getPersonItems);
+router.post('/:userID/cities/:cityID/members/:personID/startups', cors(corsOptions), startups.createPersonItem);
+router.put('/:userID/cities/:cityID/members/:personID/startups/:itemID', cors(corsOptions), startups.updatePersonItem);
+router.post('/:userID/cities/:cityID/members/:personID/startups/:itemID', cors(corsOptions), startups.createPersonItemAssociation);
+//Prizes
+router.get('/:userID/cities/:cityID/members/:personID/all-prizes', cors(corsOptions), prizes.getAllItems);
+router.get('/:userID/cities/:cityID/members/:personID/prizes', cors(corsOptions), prizes.getPersonItems);
+router.post('/:userID/cities/:cityID/members/:personID/prizes', cors(corsOptions), prizes.createPersonItem);
+router.put('/:userID/cities/:cityID/members/:personID/prizes/:itemID', cors(corsOptions), prizes.updatePersonItem);
+router.post('/:userID/cities/:cityID/members/:personID/prizes/:itemID', cors(corsOptions), prizes.createPersonItemAssociation);
+//Boards
+router.get('/:userID/cities/:cityID/members/:personID/all-boards', cors(corsOptions), boards.getAllItems);
+router.get('/:userID/cities/:cityID/members/:personID/boards', cors(corsOptions), boards.getPersonItems);
+router.post('/:userID/cities/:cityID/members/:personID/boards', cors(corsOptions), boards.createPersonItem);
+router.put('/:userID/cities/:cityID/members/:personID/boards/:itemID', cors(corsOptions), boards.updatePersonItem);
+router.post('/:userID/cities/:cityID/members/:personID/boards/:itemID', cors(corsOptions), boards.createPersonItemAssociation);
+//Datasets
+router.get('/:userID/cities/:cityID/members/:personID/all-datasets', cors(corsOptions), datasets.getAllItems);
+router.get('/:userID/cities/:cityID/members/:personID/datasets', cors(corsOptions), datasets.getPersonItems);
+router.post('/:userID/cities/:cityID/members/:personID/datasets', cors(corsOptions), datasets.createPersonItem);
+router.put('/:userID/cities/:cityID/members/:personID/datasets/:itemID', cors(corsOptions), datasets.updatePersonItem);
+router.post('/:userID/cities/:cityID/members/:personID/datasets/:itemID', cors(corsOptions), datasets.createPersonItemAssociation);
+//Outreaches
+router.get('/:userID/cities/:cityID/members/:personID/all-outreaches', cors(corsOptions), outreaches.getAllItems);
+router.get('/:userID/cities/:cityID/members/:personID/outreaches', cors(corsOptions), outreaches.getPersonItems);
+router.post('/:userID/cities/:cityID/members/:personID/outreaches', cors(corsOptions), outreaches.createPersonItem);
+router.put('/:userID/cities/:cityID/members/:personID/outreaches/:itemID', cors(corsOptions), outreaches.updatePersonItem);
+router.post('/:userID/cities/:cityID/members/:personID/outreaches/:itemID', cors(corsOptions), outreaches.createPersonItemAssociation);
+
+
 
 /* Units*/
 router.get('/:userID/units/:unitID/members/:personID/external-api-authorization', cors(corsOptions), externalAPI.getAuthorization);
@@ -645,7 +822,7 @@ router.post('/:userID/units/:unitID/members/:personID/projects', cors(corsOption
 router.get('/:userID/units/:unitID/members/:personID/projects/:projectID', cors(corsOptions), projects.getProjectInfo);
 router.put('/:userID/units/:unitID/members/:personID/projects/:projectID', cors(corsOptions), projects.updatePersonProject);
 router.post('/:userID/units/:unitID/members/:personID/projects/:projectID', cors(corsOptions), projects.createPersonProjectAssociation);
-    //Permissions
+//Permissions
 router.get('/:userID/units/:unitID/members/:personID/app-area-permissions', cors(corsOptions), manageAppAreaPermissionsUnit.getPermissions);
 router.post('/:userID/units/:unitID/members/:personID/app-area-permissions', cors(corsOptions), manageAppAreaPermissionsUnit.createPermissions);
 router.put('/:userID/units/:unitID/members/:personID/app-area-permissions/:permissionID', cors(corsOptions), manageAppAreaPermissionsUnit.updatePermissions);
@@ -690,6 +867,61 @@ router.post('/:userID/units/:unitID/labs/:labID/spaces', cors(corsOptions), labS
 router.get('/:userID/units/:unitID/labs/:labID/spaces/:spaceID', cors(corsOptions), labSpaces.getSpaceInfo);
 router.put('/:userID/units/:unitID/labs/:labID/spaces/:spaceID', cors(corsOptions), labSpaces.updateLabSpace);
 router.delete('/:userID/units/:unitID/labs/:labID/spaces/:labSpaceID', cors(corsOptions), labSpaces.deleteLabSpace);
+//Private agreements (or industry collaborations)
+router.get('/:userID/units/:unitID/members/:personID/all-industry-projects', cors(corsOptions), industryProjects.getAllProjects);
+router.get('/:userID/units/:unitID/members/:personID/industry-projects', cors(corsOptions), industryProjects.getPersonProjects);
+router.post('/:userID/units/:unitID/members/:personID/industry-projects', cors(corsOptions), industryProjects.createPersonProject);
+//router.get('/:userID/units/:unitID/members/:personID/industry-projects/:projectID', cors(corsOptions), industryProjects.getProjectInfo);
+router.put('/:userID/units/:unitID/members/:personID/industry-projects/:projectID', cors(corsOptions), industryProjects.updatePersonProject);
+router.post('/:userID/units/:unitID/members/:personID/industry-projects/:projectID', cors(corsOptions), industryProjects.createPersonProjectAssociation);
+//Training networks
+router.get('/:userID/units/:unitID/members/:personID/all-training-networks', cors(corsOptions), trainingNetworks.getAllProjects);
+router.get('/:userID/units/:unitID/members/:personID/training-networks', cors(corsOptions), trainingNetworks.getPersonProjects);
+router.post('/:userID/units/:unitID/members/:personID/training-networks', cors(corsOptions), trainingNetworks.createPersonProject);
+router.put('/:userID/units/:unitID/members/:personID/training-networks/:projectID', cors(corsOptions), trainingNetworks.updatePersonProject);
+router.post('/:userID/units/:unitID/members/:personID/training-networks/:projectID', cors(corsOptions), trainingNetworks.createPersonProjectAssociation);
+//Communications
+//router.get('/:userID/units/:unitID/members/:personID/all-communications', cors(corsOptions), communications.getAllItems);
+router.get('/:userID/units/:unitID/members/:personID/communications', cors(corsOptions), communications.getPersonItems);
+router.post('/:userID/units/:unitID/members/:personID/communications', cors(corsOptions), communications.createPersonItem);
+router.put('/:userID/units/:unitID/members/:personID/communications/:itemID', cors(corsOptions), communications.updatePersonItem);
+router.delete('/:userID/units/:unitID/members/:personID/communications/:itemID', cors(corsOptions), communications.deletePersonItem);
+//Patents
+router.get('/:userID/units/:unitID/members/:personID/all-patents', cors(corsOptions), patents.getAllItems);
+router.get('/:userID/units/:unitID/members/:personID/patents', cors(corsOptions), patents.getPersonItems);
+router.post('/:userID/units/:unitID/members/:personID/patents', cors(corsOptions), patents.createPersonItem);
+router.put('/:userID/units/:unitID/members/:personID/patents/:itemID', cors(corsOptions), patents.updatePersonItem);
+router.post('/:userID/units/:unitID/members/:personID/patents/:itemID', cors(corsOptions), patents.createPersonItemAssociation);
+//Startups
+router.get('/:userID/units/:unitID/members/:personID/all-startups', cors(corsOptions), startups.getAllItems);
+router.get('/:userID/units/:unitID/members/:personID/startups', cors(corsOptions), startups.getPersonItems);
+router.post('/:userID/units/:unitID/members/:personID/startups', cors(corsOptions), startups.createPersonItem);
+router.put('/:userID/units/:unitID/members/:personID/startups/:itemID', cors(corsOptions), startups.updatePersonItem);
+router.post('/:userID/units/:unitID/members/:personID/startups/:itemID', cors(corsOptions), startups.createPersonItemAssociation);
+//Prizes
+router.get('/:userID/units/:unitID/members/:personID/all-prizes', cors(corsOptions), prizes.getAllItems);
+router.get('/:userID/units/:unitID/members/:personID/prizes', cors(corsOptions), prizes.getPersonItems);
+router.post('/:userID/units/:unitID/members/:personID/prizes', cors(corsOptions), prizes.createPersonItem);
+router.put('/:userID/units/:unitID/members/:personID/prizes/:itemID', cors(corsOptions), prizes.updatePersonItem);
+router.post('/:userID/units/:unitID/members/:personID/prizes/:itemID', cors(corsOptions), prizes.createPersonItemAssociation);
+//Boards
+router.get('/:userID/units/:unitID/members/:personID/all-boards', cors(corsOptions), boards.getAllItems);
+router.get('/:userID/units/:unitID/members/:personID/boards', cors(corsOptions), boards.getPersonItems);
+router.post('/:userID/units/:unitID/members/:personID/boards', cors(corsOptions), boards.createPersonItem);
+router.put('/:userID/units/:unitID/members/:personID/boards/:itemID', cors(corsOptions), boards.updatePersonItem);
+router.post('/:userID/units/:unitID/members/:personID/boards/:itemID', cors(corsOptions), boards.createPersonItemAssociation);
+//Datasets
+router.get('/:userID/units/:unitID/members/:personID/all-datasets', cors(corsOptions), datasets.getAllItems);
+router.get('/:userID/units/:unitID/members/:personID/datasets', cors(corsOptions), datasets.getPersonItems);
+router.post('/:userID/units/:unitID/members/:personID/datasets', cors(corsOptions), datasets.createPersonItem);
+router.put('/:userID/units/:unitID/members/:personID/datasets/:itemID', cors(corsOptions), datasets.updatePersonItem);
+router.post('/:userID/units/:unitID/members/:personID/datasets/:itemID', cors(corsOptions), datasets.createPersonItemAssociation);
+//Outreaches
+router.get('/:userID/units/:unitID/members/:personID/all-outreaches', cors(corsOptions), outreaches.getAllItems);
+router.get('/:userID/units/:unitID/members/:personID/outreaches', cors(corsOptions), outreaches.getPersonItems);
+router.post('/:userID/units/:unitID/members/:personID/outreaches', cors(corsOptions), outreaches.createPersonItem);
+router.put('/:userID/units/:unitID/members/:personID/outreaches/:itemID', cors(corsOptions), outreaches.updatePersonItem);
+router.post('/:userID/units/:unitID/members/:personID/outreaches/:itemID', cors(corsOptions), outreaches.createPersonItemAssociation);
 
 
 

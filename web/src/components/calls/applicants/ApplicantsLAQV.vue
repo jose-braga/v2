@@ -445,7 +445,7 @@ export default {
                             this.buttonDisabled = false;
                         }
                     , 1500)
-                    console.log(result.data.result)
+                    //console.log(result.data.result)
                     this.$store.dispatch('setApplicationSubmitted',
                         {
                             submitted: true,

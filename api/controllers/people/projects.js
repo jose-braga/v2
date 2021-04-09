@@ -47,7 +47,6 @@ var actionGetAllProjects = function (options) {
     var querySQL = '';
     var places = [];
     if (req.query.q !== undefined & req.query.q !== null) {
-        console.log('here!!')
         let q = '%'
         let qraw = req.query.q;
         q = '%' + qraw.replace(/\s/gi,'%') + '%';
@@ -285,13 +284,13 @@ var getPersonProjectDetails = function (options) {
         },
         options);
 };
-
 module.exports.getPersonProjects = function (req, res, next) {
     permissions.checkPermissions(
         (options) => { actionGetPersonProjects(options) },
         { req, res, next }
     );
 };
+
 var actionGetProjectInfo = function (options) {
     let { req, res, next } = options;
     let personID = req.params.personID;

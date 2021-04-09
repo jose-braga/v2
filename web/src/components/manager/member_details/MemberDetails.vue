@@ -308,9 +308,14 @@
                         </v-expansion-panel-content>
                     </v-expansion-panel>
                 </v-expansion-panels>
-
             </v-tab-item>
             <v-tab-item>
+                <OtherProductivityTab
+                    :other-person-id="personId"
+                    :manager-id="managerId"
+                    :endpoint="endpoint"
+                    class="mt-6"
+                ></OtherProductivityTab>
             </v-tab-item>
         </v-tabs-items>
     </v-form>
@@ -348,6 +353,7 @@ const AddFromDatabase = () => import(/* webpackChunkName: "manager-details-add-f
 const AddFromOrcid = () => import(/* webpackChunkName: "manager-details-add-from-orcid" */ './productivity/publications/add-publications/AddFromOrcid')
 const AddFromRepository = () => import(/* webpackChunkName: "manager-details-add-from-repo" */ './productivity/publications/add-publications/AddFromRepository')
 const PersonProjects = () => import(/* webpackChunkName: "manager-details-person-projects" */ './productivity/projects/PersonProjects')
+const OtherProductivityTab = () => import(/* webpackChunkName: "manager-details-person-projects" */ './productivity/OtherProductivityTab')
 const ProjectsAddFromOrcid = () => import(/* webpackChunkName: "manager-details-projects-orcid" */ './productivity/projects/AddFromOrcid')
 const ProjectsAddFromDatabase = () => import(/* webpackChunkName: "manager-details-projects-database" */ './productivity/projects/AddFromDatabase')
 
@@ -380,6 +386,7 @@ export default {
         PersonProjects,
         ProjectsAddFromOrcid,
         ProjectsAddFromDatabase,
+        OtherProductivityTab,
     },
     props: {
         personId: Number,
