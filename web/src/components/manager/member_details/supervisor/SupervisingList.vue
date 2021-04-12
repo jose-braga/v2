@@ -21,7 +21,7 @@
                 </v-col>
             </v-row>
             <v-row v-if="addingFromDB" align-content="center">
-                <v-col cols="12" sm="4">
+                <v-col cols="12" sm="3">
                     <v-autocomplete
                         v-model="data.newStudent.person_id"
                         :items="people" item-value="id" item-text="colloquial_name"
@@ -33,6 +33,12 @@
                         hide-details
                         label="People">
                     </v-autocomplete>
+                </v-col>
+                <v-col cols="12" sm="2">
+                    <v-select v-model="data.newStudent.responsible_type_id"
+                        :items="responsibleTypes" item-value="id" item-text="name_en"
+                        label="Type">
+                    </v-select>
                 </v-col>
                 <v-col cols="12" sm="2">
                     <v-menu ref="date_menu"
@@ -247,6 +253,7 @@ export default {
             scienceManagerPositions: [],
             administrativeOffices: [],
             administrativePositions: [],
+            responsibleTypes: [],
             toCreate: [],
             toDelete: [],
         }
@@ -259,6 +266,7 @@ export default {
     mounted() {
         this.initialize();
         this.getPoles();
+        this.getResponsibleTypes();
         this.getLabs();
         this.getLabPositions();
         this.getFacilities();
@@ -465,6 +473,13 @@ export default {
             if (this.$store.state.session.loggedIn) {
                 const urlSubmit = 'api/v2/' + 'poles';
                 return subUtil.getPublicInfo(vm, urlSubmit, 'poles');
+            }
+        },
+        getResponsibleTypes() {
+            var vm = this;
+            if (this.$store.state.session.loggedIn) {
+                const urlSubmit = 'api/v2/' + 'responsible-types';
+                return subUtil.getPublicInfo(vm, urlSubmit, 'responsibleTypes');
             }
         },
         getLabs() {

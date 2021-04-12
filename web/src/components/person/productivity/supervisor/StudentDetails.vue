@@ -371,6 +371,12 @@
                                     <v-col cols="12" sm="3">
                                         {{supervisor.colloquial_name}}:
                                     </v-col>
+                                    <v-col cols="12" sm="3">
+                                        <v-select v-model="supervisor.responsible_type_id"
+                                            :items="responsibleTypes" item-value="id" item-text="name_en"
+                                            label="Type">
+                                        </v-select>
+                                    </v-col>
                                     <v-col cols="5" sm="2">
                                         <v-menu ref="date_menu"
                                             v-model="supervisor.show_valid_from"
@@ -415,7 +421,7 @@
                                 </v-row>
                             </li>
                             <li v-else>
-                                {{supervisor.colloquial_name}}: {{supervisor.valid_from_show}} - {{supervisor.valid_until_show}}
+                                {{supervisor.colloquial_name}} ({{supervisor.responsible_type_name_en}}): {{supervisor.valid_from_show}} - {{supervisor.valid_until_show}}
                             </li>
                         </ul>
                     </v-expansion-panel-content>
@@ -480,6 +486,7 @@ export default {
             scienceManagerPositions: [],
             administrativeOffices: [],
             administrativePositions: [],
+            responsibleTypes: [],
         }
     },
     watch: {
@@ -498,6 +505,7 @@ export default {
         this.getScienceManagerOffices();
         this.getAdministrativePositions();
         this.getAdministrativeOffices();
+        this.getResponsibleTypes();
     },
     methods: {
         initialize () {
@@ -829,6 +837,13 @@ export default {
 
             }
 
+        },
+        getResponsibleTypes() {
+            var vm = this;
+            if (this.$store.state.session.loggedIn) {
+                const urlSubmit = 'api/v2/' + 'responsible-types';
+                return subUtil.getPublicInfo(vm, urlSubmit, 'responsibleTypes');
+            }
         },
         getLabs() {
             var vm = this;

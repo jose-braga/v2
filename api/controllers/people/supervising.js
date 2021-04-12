@@ -8,9 +8,11 @@ var actionGetStudents = function (options) {
     var querySQL = '';
     var places = [];
     querySQL = querySQL
-        + 'SELECT people_responsibles.*, people.name, people.colloquial_name'
+        + 'SELECT people_responsibles.*, people.name, people.colloquial_name,'
+        + ' responsible_types.name_en AS responsible_type_name_en, responsible_types.name_pt AS responsible_type_name_pt'
         + ' FROM people_responsibles'
         + ' JOIN people ON people.id = people_responsibles.person_id'
+        + ' LEFT JOIN responsible_types ON responsible_types.id = people_responsibles.responsible_type_id'
         + ' WHERE people_responsibles.responsible_id = ?;';
     places.push(personID)
     return sql.getSQLOperationResult(req, res, querySQL, places,
@@ -265,19 +267,21 @@ var actionAddStudents = function (options) {
     var places = [];
     querySQL = querySQL
         + 'INSERT INTO people_responsibles'
-        + ' (person_id, responsible_id, valid_from, valid_until)'
-        + ' SELECT * FROM (SELECT ? AS person_id, ? AS responsible_id, ? AS valid_from, ? AS valid_until) AS tmp'
-        + ' WHERE NOT EXISTS ('
-            + ' SELECT * FROM people_responsibles'
-            + ' WHERE person_id <=> ? AND responsible_id <=> ?'
-        + ');';
+        + ' (person_id, responsible_id, responsible_type_id, valid_from, valid_until)'
+        + ' VALUES (?, ?, ?, ?, ?);'
+        //+ ' SELECT * FROM (SELECT ? AS person_id, ? AS responsible_id, ? AS valid_from, ? AS valid_until) AS tmp'
+        //+ ' WHERE NOT EXISTS ('
+        //    + ' SELECT * FROM people_responsibles'
+        //    + ' WHERE person_id <=> ? AND responsible_id <=> ?'
+        //+ ');';
     places.push(
         data.person_id,
         personID,
+        data.responsible_type_id,
         data.valid_from,
         data.valid_until,
-        data.person_id,
-        personID
+        //data.person_id,
+        //personID
     )
     return sql.makeSQLOperation(req, res, querySQL, places)
 };
@@ -294,9 +298,11 @@ var actionGetStudentSupervisors = function (options) {
     var querySQL = '';
     var places = [];
     querySQL = querySQL
-        + 'SELECT people_responsibles.*, people.name, people.colloquial_name'
+        + 'SELECT people_responsibles.*, people.name, people.colloquial_name,'
+        + ' responsible_types.name_en AS responsible_type_name_en, responsible_types.name_pt AS responsible_type_name_pt'
         + ' FROM people_responsibles'
         + ' JOIN people ON people.id = people_responsibles.responsible_id'
+        + ' LEFT JOIN responsible_types ON responsible_types.id = people_responsibles.responsible_type_id'
         + ' WHERE people_responsibles.person_id = ?;';
     places.push(studentID)
     return sql.getSQLOperationResult(req, res, querySQL, places,
@@ -336,12 +342,14 @@ var actionUpdateStudentSupervisors = function (options) {
     querySQL = querySQL
         + 'UPDATE people_responsibles'
         + ' SET valid_from = ?,'
-        + ' valid_until = ?'
+        + ' valid_until = ?,'
+        + ' responsible_type_id = ?'
         + ' WHERE id = ?;'
         ;
     places.push(
         data.valid_from,
         data.valid_until,
+        data.responsible_type_id,
         supervisorID
     )
     return sql.makeSQLOperation(req, res, querySQL, places)

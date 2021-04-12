@@ -42,6 +42,7 @@ export default {
     },
     data() {
         return {
+            isLisboa: false,
             isLAQV: false,
             isSupervisor: false,
             isUCIBIO: false,
@@ -65,6 +66,7 @@ export default {
     },
     methods: {
         initialize () {
+            this.isLisboa = false;
             this.isLAQV = false;
             this.isUCIBIO = false;
             this.isSupervisor = false;

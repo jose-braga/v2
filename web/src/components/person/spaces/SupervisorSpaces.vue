@@ -212,7 +212,7 @@ export default {
             let urlSubmit = 'api/people/' + this.supervisorId + '/supervisor-spaces';
             subUtil.getInfoPopulate(this, urlSubmit, true)
             .then((result) => {
-                console.log(result)
+                //console.log(result)
                 for (let ind in result) {
                     let spaces_valid_from = '...'
                     let spaces_valid_until = '...'

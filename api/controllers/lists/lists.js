@@ -94,6 +94,14 @@ var getSupervisorTypes = function (req, res, next) {
     sql.makeSQLOperation(req, res, querySQL, places);
     return;
 };
+var getResponsibleTypes = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * from responsible_types;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
 var getSituations = function (req, res, next) {
     var querySQL = '';
     var places = [];
@@ -807,6 +815,9 @@ module.exports.listItems = function (req, res, next) {
     }
     if (category === 'supervisor-types') {
         getSupervisorTypes(req, res, next);
+    }
+    if (category === 'responsible-types') {
+        getResponsibleTypes(req, res, next);
     }
     if (category === 'roles') {
         getRoles(req, res, next);
