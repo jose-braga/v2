@@ -139,7 +139,7 @@
 import subUtil from '@/components/common/submit-utils'
 import time from '@/components/common/date-utils'
 
-const SpaceDetails = () => import(/* webpackChunkName: "space-supervisor-details" */ './SpaceSupervisorDetails')
+const SpaceDetails = () => import(/* webpackChunkName: "space-manager-details" */ './ManagerSpacesDetails')
 
 function prepareStringComparison(str) {
     if (str === null || str === undefined) {

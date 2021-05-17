@@ -143,6 +143,14 @@
                     </v-menu>
                 </v-col>
             </v-row>
+            <v-row class="px-2">
+                <v-col cols="12">
+                    <v-checkbox
+                        v-model="data.person.must_be_added"
+                        label="Add to the team reported to FCT/MCTES"
+                    ></v-checkbox>
+                </v-col>
+            </v-row>
             <v-row align-content="center" justify="end">
                 <v-col cols="4" v-if="formError" class="caption red--text">
                     <div>Unable to submit form.</div>

@@ -10,7 +10,7 @@
             <v-dialog
                 v-model="dialogNewMember"
                 scrollable
-                max-width="600px"
+                max-width="800px"
             >
             <template v-slot:activator="{ on, attrs }">
                 <v-btn

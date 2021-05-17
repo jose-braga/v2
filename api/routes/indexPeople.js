@@ -194,6 +194,7 @@ router.delete('/:personID/students/:studentID/lab-position/:positionID', cors(co
 router.delete('/:personID/students/:studentID/facility-position/:positionID', cors(corsOptions), supervising.deleteStudentFacilityPosition);
 router.delete('/:personID/students/:studentID/science-management-position/:positionID', cors(corsOptions), supervising.deleteStudentScienceManagementPosition);
 router.delete('/:personID/students/:studentID/administrative-position/:positionID', cors(corsOptions), supervising.deleteStudentAdministrativePosition);
+//
 
 //Publications
 router.get('/all-publications', cors(corsOptions), publicationsList.getAllPublications);
@@ -274,6 +275,7 @@ router.put('/:personID/outreaches/:itemID', cors(corsOptions), outreaches.update
 router.post('/:personID/outreaches/:itemID', cors(corsOptions), outreaches.createPersonItemAssociation);
 
 //Spaces
+router.get('/:personID/space-data-managers', cors(corsOptions), spaces.getSpaceDataManagers);
 router.get('/:personID/all-spaces', cors(corsOptions), spaces.getAllSpaces);
 router.get('/:personID/spaces', cors(corsOptions), spaces.getPersonSpaces);
 router.post('/:personID/spaces', cors(corsOptions), spaces.addPersonSpaces);
@@ -281,11 +283,11 @@ router.post('/:personID/spaces/:spaceID/roles', cors(corsOptions), spaces.addPer
 router.put('/:personID/spaces/:spaceID/roles/:roleID', cors(corsOptions), spaces.updatePersonRoles);
 router.delete('/:personID/spaces/:spaceID/roles/:roleID', cors(corsOptions), spaces.deletePersonRoles);
 
-router.get('/:personID/supervisor-spaces', cors(corsOptions), spaces.getSupervisorSpaces);
-router.post('/:personID/supervisor-spaces', cors(corsOptions), spaces.addSupervisorSpaces);
-router.get('/:personID/supervisor-spaces/:spaceID', cors(corsOptions), spaces.getSpaceInfo);
-router.put('/:personID/supervisor-spaces/:spaceID', cors(corsOptions), spaces.updateSupervisorSpace);
-router.delete('/:personID/supervisor-spaces/:supervisorSpaceID', cors(corsOptions), spaces.deleteSupervisorSpace);
+router.get('/:personID/manager-spaces', cors(corsOptions), spaces.getManagerSpaces);
+router.post('/:personID/manager-spaces', cors(corsOptions), spaces.addManagerSpaces);
+router.get('/:personID/manager-spaces/:spaceID', cors(corsOptions), spaces.getSpaceInfo);
+router.put('/:personID/manager-spaces/:spaceID', cors(corsOptions), spaces.updateManagerSpace);
+router.delete('/:personID/manager-spaces/:managerSpaceID', cors(corsOptions), spaces.deleteManagerSpace);
 
 // Endpoints for person on behalf
 //router.get('/:personID/permissions', cors(corsOptions), permissions.getPermissions);

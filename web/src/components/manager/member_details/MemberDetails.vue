@@ -127,6 +127,12 @@
             <v-tab-item>
                 <v-row class="pa-4">
                     <v-col cols="12" md="6">
+                        <StatusFct
+                            :person-id="personId"
+                            :person-name="personName"
+                            :manager-id="managerId"
+                            :endpoint="endpoint"
+                        ></StatusFct>
                         <Roles
                             :person-id="personId"
                             :person-name="personName"
@@ -150,6 +156,11 @@
                             :manager-id="managerId"
                             :endpoint="endpoint"
                         ></AcademicAffiliations>
+                        <CostCenters
+                            :person-id="personId"
+                            :manager-id="managerId"
+                            :endpoint="endpoint"
+                        ></CostCenters>
                     </v-col>
                 </v-row>
             </v-tab-item>
@@ -339,10 +350,12 @@ const EmergencyContacts = () => import(/* webpackChunkName: "manager-details-eme
 const Identifications = () => import(/* webpackChunkName: "manager-details-identifications" */ './personal/Identifications')
 const Cars = () => import(/* webpackChunkName: "manager-details-cars" */ './personal/Cars')
 const Degrees = () => import(/* webpackChunkName: "manager-details-degrees" */ './academic/Degrees')
+const StatusFct = () => import(/* webpackChunkName: "manager-details-status-fct" */ './institutional/StatusFct')
 const Roles = () => import(/* webpackChunkName: "manager-details-roles" */ './institutional/roles/Roles')
 const ScientificIdentifications = () => import(/* webpackChunkName: "manager-details-sc-identifications" */ './institutional/Identifications')
 const InstitutionalContacts = () => import(/* webpackChunkName: "manager-details-institutional-contacts" */ './institutional/InstitutionalContacts')
 const AcademicAffiliations = () => import(/* webpackChunkName: "manager-details-academic-affiliations" */ './institutional/AcademicAffiliations')
+const CostCenters = () => import(/* webpackChunkName: "manager-details-cost-centers" */ './institutional/CostCenters')
 const ProfessionalSituations = () => import(/* webpackChunkName: "manager-details-professional-situations" */ './professional/ProfessionalSituations')
 const PublicationsList = () => import(/* webpackChunkName: "manager-details-publications-list" */ './productivity/publications/PublicationsList')
 const SupervisingList = () => import(/* webpackChunkName: "manager-details-supervising-list" */ './supervisor/SupervisingList')
@@ -370,10 +383,12 @@ export default {
         Identifications,
         Cars,
         Degrees,
+        StatusFct,
         Roles,
         ScientificIdentifications,
         InstitutionalContacts,
         AcademicAffiliations,
+        CostCenters,
         ProfessionalSituations,
         PublicationsList,
         SupervisingList,

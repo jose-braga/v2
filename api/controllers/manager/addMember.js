@@ -3,6 +3,8 @@ const sql = require('../utilities/sql');
 const time = require('../utilities/time');
 const responses = require('../utilities/responses');
 const permissions = require('../utilities/permissions');
+const nodemailer = require('../../config/emailer');
+let transporter = nodemailer.transporter;
 // there are no notifications to external APIs because the user must agree first with this
 
 var addUser = function (options) {
@@ -183,7 +185,112 @@ var addWorkPhone = function (options) {
         );
         sql.makeSQLOperation(req, res, querySQL, places,
             (options) => {
-                return addPole(options);
+                return addScientificIdentifiers(options);
+            },
+            options);
+    } else {
+        return addScientificIdentifiers(options);
+    }
+};
+var addScientificIdentifiers = function (options) {
+    let { req, res, next, personID } = options;
+    let data = req.body.data;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'INSERT INTO researchers_info'
+        + ' (person_id, ciencia_id, ORCID)'
+        + ' VALUES (?,?,?);';
+    places.push(
+        personID,
+        data.ciencia_id,
+        data.ORCID
+    );
+    sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            return addHighestDegree(options);
+        },
+        options);
+};
+var addHighestDegree = function (options) {
+    let { req, res, next, personID } = options;
+    let data = req.body.data;
+    var querySQL = '';
+    var places = [];
+    if (data.degree !== undefined && data.degree !== null) {
+        querySQL = querySQL
+            + 'INSERT INTO degrees_people'
+            + ' (person_id, degree_id)'
+            + ' VALUES (?,?);';
+        places.push(
+            personID,
+            data.degree.id
+        );
+        sql.makeSQLOperation(req, res, querySQL, places,
+            (options) => {
+                options.i = 0;
+                return addInstitutionalAffiliations(options);
+            },
+            options);
+    } else {
+        options.i = 0;
+        return addInstitutionalAffiliations(options);
+    }
+};
+var addInstitutionalAffiliations = function (options) {
+    let { req, res, next, personID, i } = options;
+    let data = req.body.data;
+    if (data.current_institutional_affiliations.length > 0) {
+        let position = data.current_institutional_affiliations[i];
+        let places = [];
+        querySQL = 'INSERT INTO people_departments'
+            + ' (person_id, department_id, valid_from, valid_until)'
+            + ' VALUES (?, ?, ?, ?);';
+        places.push(
+            personID,
+            position.department_id,
+            position.valid_from,
+            position.valid_until,
+        );
+        return sql.getSQLOperationResult(req, res, querySQL, places,
+            (resQuery, options) => {
+                if (i + 1 < data.current_institutional_affiliations.length) {
+                    options.i = i + 1;
+                    return addInstitutionalAffiliations(options);
+                } else {
+                    options.i = 0;
+                    return addCostCenters(options);
+                }
+            },
+            options);
+    } else {
+        options.i = 0;
+        return addCostCenters(options);
+    }
+};
+var addCostCenters = function (options) {
+    let { req, res, next, personID, i } = options;
+    let data = req.body.data;
+    if (data.costCenters.length > 0) {
+        let center = data.costCenters[i];
+        let places = [];
+        querySQL = 'INSERT INTO people_cost_centers'
+            + ' (person_id, cost_center_id, valid_from, valid_until)'
+            + ' VALUES (?, ?, ?, ?);';
+        places.push(
+            personID,
+            center.cost_center_id,
+            center.valid_from,
+            center.valid_until,
+        );
+        return sql.getSQLOperationResult(req, res, querySQL, places,
+            (resQuery, options) => {
+                if (i + 1 < data.costCenters.length) {
+                    options.i = i + 1;
+                    return addCostCenters(options);
+                } else {
+                    return addPole(options);
+                }
             },
             options);
     } else {
@@ -206,6 +313,11 @@ var addPole = function (options) {
             if (data.roles.length > 0) {
                 options.i = 0;
                 return addRole(options);
+            } else if (data.add_fct_mctes) {
+                // send email to managers with the data necessary
+                // for addition to FCT/MCTES team
+                return addFCTMCTESstatus(options)
+
             } else {
                 //finish
                 responses.sendJSONResponseOptions({
@@ -251,6 +363,11 @@ var addRole = function (options) {
                 } else if (data.adm_current_positions.length > 0) {
                     options.i = 0;
                     return addAdministrative(options);
+                } else if (data.add_fct_mctes) {
+                    // send email to managers with the data necessary
+                    // for addition to FCT/MCTES team
+                    return addFCTMCTESstatus(options)
+
                 } else {
                     //finish
                     responses.sendJSONResponseOptions({
@@ -273,8 +390,8 @@ var addLab = function (options) {
     let position = data.current_positions[i];
     let places = [];
     querySQL = 'INSERT INTO people_labs'
-        + ' (person_id, lab_id, lab_position_id, dedication, valid_from, valid_until)'
-        + ' VALUES (?, ?, ?, ?, ?, ?);';
+        + ' (person_id, lab_id, lab_position_id, dedication, valid_from, valid_until, pluriannual, integrated, nuclearCV)'
+        + ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);';
     places.push(
         personID,
         position.lab_id,
@@ -282,6 +399,9 @@ var addLab = function (options) {
         position.dedication,
         position.valid_from,
         position.valid_until,
+        position.plurianual,
+        position.integrated,
+        position.nuclearCV,
     );
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
@@ -298,6 +418,11 @@ var addLab = function (options) {
                 } else if (data.adm_current_positions.length > 0) {
                     options.i = 0;
                     return addAdministrative(options);
+                } else if (data.add_fct_mctes) {
+                    // send email to managers with the data necessary
+                    // for addition to FCT/MCTES team
+                    return addFCTMCTESstatus(options)
+
                 } else {
                     //finish
                     responses.sendJSONResponseOptions({
@@ -361,6 +486,10 @@ var addFacilityUnit = function (options) {
                 } else if (data.adm_current_positions.length > 0) {
                     options.i = 0;
                     return addAdministrative(options);
+                } else if (data.add_fct_mctes) {
+                    // send email to managers with the data necessary
+                    // for addition to FCT/MCTES team
+                    return addFCTMCTESstatus(options)
                 } else {
                     //finish
                     responses.sendJSONResponseOptions({
@@ -376,7 +505,7 @@ var addFacilityUnit = function (options) {
             }
         },
         options);
-}
+};
 var addScienceManagement = function (options) {
     let { req, res, next, personID, i } = options;
     let data = req.body.data;
@@ -421,6 +550,10 @@ var addScienceManagementUnit = function (options) {
                 if (data.adm_current_positions.length > 0) {
                     options.i = 0;
                     return addAdministrative(options);
+                } else if (data.add_fct_mctes) {
+                    // send email to managers with the data necessary
+                    // for addition to FCT/MCTES team
+                    return addFCTMCTESstatus(options);
                 } else {
                     //finish
                     responses.sendJSONResponseOptions({
@@ -436,7 +569,7 @@ var addScienceManagementUnit = function (options) {
             }
         },
         options);
-}
+};
 var addAdministrative = function (options) {
     let { req, res, next, personID, i } = options;
     let data = req.body.data;
@@ -477,6 +610,11 @@ var addAdministrativeUnit = function (options) {
             if (i + 1 < data.adm_current_positions.length) {
                 options.i = i + 1;
                 return addAdministrative(options);
+            } else if (data.add_fct_mctes) {
+                // send email to managers with the data necessary
+                // for addition to FCT/MCTES team
+                return addFCTMCTESstatus(options);
+
             } else {
                 //finish
                 responses.sendJSONResponseOptions({
@@ -491,7 +629,208 @@ var addAdministrativeUnit = function (options) {
             }
         },
         options);
-}
+};
+var addFCTMCTESstatus = function(options) {
+    let { req, res, next, personID } = options;
+    let data = req.body.data;
+    let unitID;
+    if (data.current_positions.length > 0) {
+        if (data.current_positions[0].groups.length > 0) {
+            if (data.current_positions[0].groups[0].units.length > 0) {
+                unitID = data.current_positions[0].groups[0].units[0].id;
+            }
+        }
+    }
+    if (data.tech_current_positions.length > 0) {
+        unitID = data.tech_current_positions[0].unit_id;
+    }
+    if (data.scm_current_positions.length > 0) {
+        unitID = data.scm_current_positions[0].unit_id;
+    }
+    if (data.adm_current_positions.length > 0) {
+        unitID = data.adm_current_positions[0].unit_id;
+    }
+    var querySQL = '';
+    var places = [];
+    querySQL = 'INSERT INTO status_fct'
+        + ' (person_id, unit_id, must_be_added)'
+        + ' VALUES (?, ?, ?);';
+    places.push(
+        personID,
+        unitID,
+        1
+    );
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            return getRecipientsGroups(options, 10, false)
+        },
+        options)
+
+
+
+};
+var getRecipientsGroups = function (options, email_type_id, is_local) {
+    let { req, res, next } = options;
+    let { currentCity } = req.payload;
+    var querySQL = '';
+    var places = [];
+    if (is_local) {
+        querySQL = querySQL + 'SELECT recipient_groups.*, emails.person_id, emails.email'
+            + ' FROM recipient_groups'
+            + ' JOIN people_recipient_groups ON people_recipient_groups.recipient_group_id = recipient_groups.id'
+            + ' LEFT JOIN emails ON emails.person_id = people_recipient_groups.person_id'
+            + ' WHERE recipient_groups.city_id = ?'
+            + ' AND recipient_groups.any_cities = 0'
+            + ' AND recipient_groups.email_type_id = ?;';
+        places.push(currentCity.city_id, email_type_id);
+    } else {
+        querySQL = querySQL + 'SELECT recipient_groups.*, emails.person_id, emails.email'
+            + ' FROM recipient_groups'
+            + ' JOIN people_recipient_groups ON people_recipient_groups.recipient_group_id = recipient_groups.id'
+            + ' LEFT JOIN emails ON emails.person_id = people_recipient_groups.person_id'
+            + ' WHERE recipient_groups.city_id IS NULL'
+            + ' AND recipient_groups.any_cities = 1'
+            + ' AND recipient_groups.email_type_id = ?;';
+        places.push(email_type_id);
+    }
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            actionSendChangeMessage(options, resQuery)
+                .catch((e) => {
+                    console.log(e);
+                    return writeMessageDB(options, e);
+                });
+        },
+        options);
+};
+async function actionSendChangeMessage(options, recipientEmails) {
+    let { req, res, next } = options;
+    options.recipientGroup = recipientEmails[0].id;
+    let recipients = '';
+    for (let el in recipientEmails) {
+        recipients = recipients + recipientEmails[el].email + ', ';
+    }
+
+    let data = req.body.data;
+    let unitName = ''
+    let dedication, startDate;
+    if (data.current_positions.length > 0) {
+        if (data.current_positions[0].groups.length > 0) {
+            if (data.current_positions[0].groups[0].units.length > 0) {
+                unitName = data.current_positions[0].groups[0].units[0].short_name;
+            }
+        }
+        dedication = data.current_positions[0].dedication;
+        startDate = data.current_positions[0].valid_from;
+    }
+    if (data.tech_current_positions.length > 0) {
+        if (data.tech_current_positions[0].unit_id === 1) {
+            unitName = 'UCIBIO';
+        } else if (data.tech_current_positions[0].unit_id === 2) {
+            unitName = 'LAQV';
+        }
+        dedication = data.tech_current_positions[0].dedication;
+        startDate = data.tech_current_positions[0].valid_from;
+    }
+    if (data.scm_current_positions.length > 0) {
+        if (data.scm_current_positions[0].unit_id === 1) {
+            unitName = 'UCIBIO';
+        } else if (data.scm_current_positions[0].unit_id === 2) {
+            unitName = 'LAQV';
+        }
+        dedication = data.scm_current_positions[0].dedication;
+        startDate = data.scm_current_positions[0].valid_from;
+    }
+    if (data.adm_current_positions.length > 0) {
+        if (data.adm_current_positions[0].unit_id === 1) {
+            unitName = 'UCIBIO';
+        } else if (data.adm_current_positions[0].unit_id === 2) {
+            unitName = 'LAQV';
+        }
+        dedication = data.adm_current_positions[0].dedication;
+        startDate = data.adm_current_positions[0].valid_from;
+    }
+    let mailOptions;
+    let subjectText = unitName + ' - Addition to FCT/MCTES team data: ' + data.name;
+    /*
+    *tipo: inv, bolseiro, contrato ou outro,
+    *tipo de bolsa, se aplicável,
+    */
+    let emailBody = 'Hi,\n\n'
+        + 'A new person must be added to the ' + unitName + ' team reported to FCT/MCTES:\n\n'
+        + 'CIÊNCIA ID: ' + data.ciencia_id + '\n'
+        + 'Name: ' + data.name + '\n'
+        + 'Email: ' + data.emails.email + '\n'
+        //+ 'Contract:' + data.name + '\n'
+        //+ 'Fellowship type:' + data.name + '\n'
+        + 'Research Unit: ' + unitName + '\n'
+        + 'Degree: ' + (data.degree ? data.degree.name_en : '') + '\n'
+        + 'Dedication: ' + dedication + '\n'
+        + 'Start Date: ' + startDate + '\n'
+        + '\n\nBest regards,\nAdmin';
+    options.subjectText = subjectText;
+    options.emailBody = emailBody;
+    if (process.env.NODE_ENV === 'production') {
+        mailOptions = {
+            from: '"Admin" <admin@laqv-ucibio.info>', // sender address
+            to: recipients, // list of receivers (comma-separated)
+            subject: subjectText, // Subject line
+            text: emailBody,
+        };
+        // send mail with defined transport object
+        let info = await transporter.sendMail(mailOptions);
+        console.log('Message %s sent: %s', info.messageId, info.response);
+        return writeMessageDB(options);
+
+    } else {
+        // just for testing purposes
+        mailOptions = {
+            from: '"Admin" <admin@laqv-ucibio.info>', // sender address
+            to: recipients, // list of receivers (comma-separated)
+            subject: 'TESTING: ' + subjectText, // Subject line
+            text: emailBody,
+        };
+        // send mail with defined transport object
+        let info = await transporter.sendMail(mailOptions);
+        console.log('Message %s sent: %s', info.messageId, info.response);
+        return writeMessageDB(options);
+    }
+};
+var writeMessageDB = function (options, error) {
+    let today = time.moment();
+    let now = time.momentToDate(today, 'Europe/Lisbon', 'YYYY-MM-DD HH:mm:ss')
+    let { req, res, next, recipientGroup, subjectText, emailBody } = options;
+    let personID = req.params.personID;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'INSERT INTO email_messages'
+        + ' (sender_id, recipient_group_id, subject, message_text, date, solved)'
+        + ' VALUES (?,?,?,?,?,?);';
+    places.push(personID, recipientGroup, subjectText, emailBody, now, 0);
+    sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            if (error) {
+                responses.sendJSONResponseOptions({
+                    response: res,
+                    status: 500,
+                    message: { "message": "Error sending email, but database OK!", "error": error.message }
+                });
+            } else {
+                responses.sendJSONResponseOptions({
+                    response: res,
+                    status: 200,
+                    message: {
+                        "status": "success",
+                        "statusCode": 200,
+                        "message": "Done!",
+                    }
+                });
+            }
+            return;
+        },
+        options);
+    return;
+};
 
 module.exports.addMember = function (req, res, next) {
     permissions.checkPermissions(

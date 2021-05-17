@@ -245,6 +245,12 @@
                                 ></v-date-picker>
                             </v-menu>
                         </v-col>
+                        <v-col cols="3">
+                            <v-checkbox
+                                v-model="data.newStudent.must_be_added"
+                                label="Add to the team reported to FCT/MCTES"
+                            ></v-checkbox>
+                        </v-col>
                         <v-col cols="2" align-self="center">
                             <v-row justify="end">
                                 <v-btn @click="preRegister()"

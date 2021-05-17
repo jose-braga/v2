@@ -7,38 +7,32 @@
 </v-row>
 <v-row class="px-4">
     <v-col cols="12">
-        <SupervisorSpaces v-if="isLAQV && isSupervisor"
+        <ManagerSpaces v-if="isSpaceDataManager"
             :supervisor-id="personID"
-        ></SupervisorSpaces>
-        <div v-if="isUCIBIO && isLabLeader">
-            <LabSpaces v-for="(lab,i) in myLabs"
-                :key="i"
-                :lab="lab"
-            >
-            </LabSpaces>
-        </div>
+        ></ManagerSpaces>
     </v-col>
 </v-row>
 </div>
 </template>
 
 <script>
-const LabSpaces = () => import(/* webpackChunkName: "lab-spaces" */ './LabSpaces')
-const SupervisorSpaces = () => import(/* webpackChunkName: "supervisor-spaces" */ './SupervisorSpaces')
+//const LabSpaces = () => import(/* webpackChunkName: "lab-spaces" */ './LabSpaces')
+const ManagerSpaces = () => import(/* webpackChunkName: "manager-spaces" */ './ManagerSpaces')
 const SpacesManagement = () => import(/* webpackChunkName: "spaces-management" */ './SpacesManagement')
 
 export default {
     components: {
-        LabSpaces,
-        SupervisorSpaces,
+        //LabSpaces,
+        ManagerSpaces,
         SpacesManagement,
     },
     data() {
         return {
-            isLAQV: false,
-            isSupervisor: false,
-            isUCIBIO: false,
-            isLabLeader: false, // or a person with team management permissions
+            isSpaceDataManager: false,
+            //isLAQV: false,
+            //isSupervisor: false,
+            //isUCIBIO: false,
+            //isLabLeader: false, // or a person with team management permissions
             myLabs: [],
         }
     },
@@ -59,7 +53,21 @@ export default {
     methods: {
         initialize () {
             if (this.$store.state.session.loggedIn) {
-                let this_session = this.$store.state.session;
+                let personID = this.$store.state.session.personID
+                let urlSubmit = 'api/people/' + personID + '/space-data-managers';
+                this.$http.get(urlSubmit)
+                .then((response) => {
+                    let dataManagers = response.data.result;
+                    for (let ind in dataManagers) {
+                        if(personID === dataManagers[ind].person_id) {
+                            this.isSpaceDataManager = true;
+                        }
+                    }
+                });
+
+
+
+                /*
                 let urlSubmit = 'api/v2/supervisors';
                 this.$http.get(urlSubmit)
                 .then((response) => {
@@ -80,15 +88,15 @@ export default {
                     this.isUCIBIO = true;
                 }
                 if (this.isUCIBIO) {
-                    /*
-                    let permissionsWebAreas = this_session.permissionsWebAreas;
-                    let permisionToTeamArea = false;
-                    for (let ind in permissionsWebAreas) {
-                        if (permissionsWebAreas[ind].app_area_en === 'Team') {
-                            permisionToTeamArea === true;
-                        }
-                    }
-                    */
+
+                    //let permissionsWebAreas = this_session.permissionsWebAreas;
+                    //let permisionToTeamArea = false;
+                    //for (let ind in permissionsWebAreas) {
+                    //    if (permissionsWebAreas[ind].app_area_en === 'Team') {
+                    //        permisionToTeamArea === true;
+                    //    }
+                    //}
+
                     // to know which labs a user manages
                     for (let ind in this_session.permissionsEndpoints) {
                         let decomposedPath = this_session.permissionsEndpoints[ind].decomposedPath;
@@ -102,6 +110,7 @@ export default {
                         }
                     }
                 }
+                */
             }
         }
     },

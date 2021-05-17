@@ -156,7 +156,7 @@ export default {
                 isActive: false,
             },
             {
-                text: 'My LAQV',
+                text: 'Docs LAQV',
                 icon: false,
                 image: '/images/logo/laqv-logo.png',
                 link: '/unit-area/LAQV',

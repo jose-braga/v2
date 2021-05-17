@@ -24,6 +24,7 @@ const membersUnitValidate = require('../controllers/manager/unit/members_validat
 const membersUnitCity = require('../controllers/manager/unit_city/members');
 const membersCity = require('../controllers/manager/city/members');
 const membersUnknown = require('../controllers/manager/unknown_associations/members');
+const manageFCTMCTESmembers = require('../controllers/manager/unit/fct_mctes_management');
 const users = require('../controllers/people/users');
 const nuclearInformation = require('../controllers/people/nuclear_information');
 const photo = require('../controllers/people/photo');
@@ -34,6 +35,7 @@ const cars = require('../controllers/people/cars');
 const degrees = require('../controllers/people/degrees');
 const institutionalContacts = require('../controllers/people/institutional_contacts');
 const institutionalAffiliations = require('../controllers/people/institutional_affiliations');
+const costCenters = require('../controllers/people/cost_centers');
 const institutionalResponsibles = require('../controllers/people/institutional_responsibles');
 const researchIDs = require('../controllers/people/research_IDs');
 const academicAffiliations = require('../controllers/people/academic_affiliations');
@@ -111,6 +113,11 @@ router.put('/:userID/members/:personID/degrees/:degreeID', cors(corsOptions), de
 router.delete('/:userID/members/:personID/degrees/:degreeID', cors(corsOptions), degrees.deleteDegrees);
 router.post('/:userID/members/:personID/degrees', cors(corsOptions), degrees.createDegrees);
 // Affiliations: user can't change his/hers affiliations, only managers can do that (poleID is the people_institution_city table ID)
+router.get('/:userID/members/:personID/cost-centers', cors(corsOptions), costCenters.getCostCenters);
+router.post('/:userID/members/:personID/cost-centers', cors(corsOptions), costCenters.createCostCenters);
+router.put('/:userID/members/:personID/cost-centers/:costCenterID', cors(corsOptions), costCenters.updateCostCenters);
+router.delete('/:userID/members/:personID/cost-centers/:costCenterID', cors(corsOptions), costCenters.deleteCostCenters);
+
 router.get('/:userID/members/:personID/poles', cors(corsOptions), institutionalAffiliations.getPoles);
 router.post('/:userID/members/:personID/poles', cors(corsOptions), institutionalAffiliations.createPole);
 router.put('/:userID/members/:personID/poles/:poleID', cors(corsOptions), institutionalAffiliations.updatePole);
@@ -206,11 +213,11 @@ router.post('/:userID/members/:personID/spaces', cors(corsOptions), spaces.addPe
 router.post('/:userID/members/:personID/spaces/:spaceID/roles', cors(corsOptions), spaces.addPersonRoles);
 router.put('/:userID/members/:personID/spaces/:spaceID/roles/:roleID', cors(corsOptions), spaces.updatePersonRoles);
 router.delete('/:userID/members/:personID/spaces/:spaceID/roles/:roleID', cors(corsOptions), spaces.deletePersonRoles);
-router.get('/:userID/members/:personID/supervisor-spaces', cors(corsOptions), spaces.getSupervisorSpaces);
-router.post('/:userID/members/:personID/supervisor-spaces', cors(corsOptions), spaces.addSupervisorSpaces);
+router.get('/:userID/members/:personID/supervisor-spaces', cors(corsOptions), spaces.getManagerSpaces);
+router.post('/:userID/members/:personID/supervisor-spaces', cors(corsOptions), spaces.addManagerSpaces);
 router.get('/:userID/members/:personID/supervisor-spaces/:spaceID', cors(corsOptions), spaces.getSpaceInfo);
-router.put('/:userID/members/:personID/supervisor-spaces/:spaceID', cors(corsOptions), spaces.updateSupervisorSpace);
-router.delete('/:userID/members/:personID/supervisor-spaces/:supervisorSpaceID', cors(corsOptions), spaces.deleteSupervisorSpace);
+router.put('/:userID/members/:personID/supervisor-spaces/:spaceID', cors(corsOptions), spaces.updateManagerSpace);
+router.delete('/:userID/members/:personID/supervisor-spaces/:supervisorSpaceID', cors(corsOptions), spaces.deleteManagerSpace);
 router.get('/:userID/labs/:labID', cors(corsOptions), labMembers.getLabInfo);
 router.get('/:userID/labs/:labID/spaces', cors(corsOptions), labSpaces.getLabSpaces);
 router.post('/:userID/labs/:labID/spaces', cors(corsOptions), labSpaces.addLabSpaces);
@@ -278,12 +285,24 @@ router.post('/:userID/members/:personID/outreaches/:itemID', cors(corsOptions), 
 // --------------------------------------------------------------
 /* Units & Cities*/
 router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/external-api-authorization', cors(corsOptions), externalAPI.getAuthorization);
-router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/external-api-authorization', cors(corsOptions), externalAPI.updateAuthorization);
+//router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/external-api-authorization', cors(corsOptions), externalAPI.updateAuthorization);
 router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/users/:username', cors(corsOptions), users.checkUserExistence);
 router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/users', cors(corsOptions), users.getUsername);
 router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/users/:userID', cors(corsOptions), users.updateUsername);
 router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/password/:userID', cors(corsOptions), users.updatePassword);
 // routes for manager with access to
+router.get('/:userID/units/:unitID/cities/:cityID/fct-status/:personID', cors(corsOptions), manageFCTMCTESmembers.getPersonStatus);
+router.post('/:userID/units/:unitID/cities/:cityID/fct-status/:personID', cors(corsOptions), manageFCTMCTESmembers.createPersonStatus);
+router.put('/:userID/units/:unitID/cities/:cityID/fct-status/:personID/status/:statusID', cors(corsOptions), manageFCTMCTESmembers.updatePersonStatus);
+
+router.get('/:userID/units/:unitID/cities/:cityID/to-add-fct-mctes-members', cors(corsOptions), manageFCTMCTESmembers.getMembersList);
+router.put('/:userID/units/:unitID/cities/:cityID/to-add-fct-mctes-members/:memberID', cors(corsOptions), manageFCTMCTESmembers.updateMember);
+router.get('/:userID/units/:unitID/cities/:cityID/requested-fct-mctes-members', cors(corsOptions), manageFCTMCTESmembers.getRequestedMembersList);
+router.put('/:userID/units/:unitID/cities/:cityID/requested-fct-mctes-members/:memberID', cors(corsOptions), manageFCTMCTESmembers.updateRequestedMember);
+router.get('/:userID/units/:unitID/cities/:cityID/removed-fct-mctes-members', cors(corsOptions), manageFCTMCTESmembers.getRemovedMembersList);
+router.put('/:userID/units/:unitID/cities/:cityID/removed-fct-mctes-members/:memberID', cors(corsOptions), manageFCTMCTESmembers.updateRemovedMember);
+
+
 router.get('/:userID/units/:unitID/cities/:cityID/validate-members', cors(corsOptions), membersUnitValidate.getMembersList);
 router.put('/:userID/units/:unitID/cities/:cityID/validate-members/:personID', cors(corsOptions), membersUnitValidate.validateRegistration);
 router.get('/:userID/units/:unitID/cities/:cityID/current-members', cors(corsOptions), membersUnitCity.getMembersList);
@@ -322,6 +341,11 @@ router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/degrees/:deg
 router.delete('/:userID/units/:unitID/cities/:cityID/members/:personID/degrees/:degreeID', cors(corsOptions), degrees.deleteDegrees);
 router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/degrees', cors(corsOptions), degrees.createDegrees);
 // Affiliations: user can't change his/hers affiliations, only managers can do that (poleID is the people_institution_city table ID)
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/cost-centers', cors(corsOptions), costCenters.getCostCenters);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/cost-centers', cors(corsOptions), costCenters.createCostCenters);
+router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/cost-centers/:costCenterID', cors(corsOptions), costCenters.updateCostCenters);
+router.delete('/:userID/units/:unitID/cities/:cityID/members/:personID/cost-centers/:costCenterID', cors(corsOptions), costCenters.deleteCostCenters);
+
 router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/poles', cors(corsOptions), institutionalAffiliations.getPoles);
 router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/poles', cors(corsOptions), institutionalAffiliations.createPole);
 router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/poles/:poleID', cors(corsOptions), institutionalAffiliations.updatePole);
@@ -424,11 +448,11 @@ router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/spaces', co
 router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/spaces/:spaceID/roles', cors(corsOptions), spaces.addPersonRoles);
 router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/spaces/:spaceID/roles/:roleID', cors(corsOptions), spaces.updatePersonRoles);
 router.delete('/:userID/units/:unitID/cities/:cityID/members/:personID/spaces/:spaceID/roles/:roleID', cors(corsOptions), spaces.deletePersonRoles);
-router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/supervisor-spaces', cors(corsOptions), spaces.getSupervisorSpaces);
-router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/supervisor-spaces', cors(corsOptions), spaces.addSupervisorSpaces);
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/supervisor-spaces', cors(corsOptions), spaces.getManagerSpaces);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/supervisor-spaces', cors(corsOptions), spaces.addManagerSpaces);
 router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/supervisor-spaces/:spaceID', cors(corsOptions), spaces.getSpaceInfo);
-router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/supervisor-spaces/:spaceID', cors(corsOptions), spaces.updateSupervisorSpace);
-router.delete('/:userID/units/:unitID/cities/:cityID/members/:personID/supervisor-spaces/:supervisorSpaceID', cors(corsOptions), spaces.deleteSupervisorSpace);
+router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/supervisor-spaces/:spaceID', cors(corsOptions), spaces.updateManagerSpace);
+router.delete('/:userID/units/:unitID/cities/:cityID/members/:personID/supervisor-spaces/:supervisorSpaceID', cors(corsOptions), spaces.deleteManagerSpace);
 router.get('/:userID/units/:unitID/cities/:cityID/labs/:labID', cors(corsOptions), labMembers.getLabInfo);
 router.get('/:userID/units/:unitID/cities/:cityID/labs/:labID/spaces', cors(corsOptions), labSpaces.getLabSpaces);
 router.post('/:userID/units/:unitID/cities/:cityID/labs/:labID/spaces', cors(corsOptions), labSpaces.addLabSpaces);
@@ -493,12 +517,19 @@ router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/outreaches/
 
 /* Cities*/
 router.get('/:userID/cities/:cityID/members/:personID/external-api-authorization', cors(corsOptions), externalAPI.getAuthorization);
-router.put('/:userID/cities/:cityID/members/:personID/external-api-authorization', cors(corsOptions), externalAPI.updateAuthorization);
+//router.put('/:userID/cities/:cityID/members/:personID/external-api-authorization', cors(corsOptions), externalAPI.updateAuthorization);
 router.get('/:userID/cities/:cityID/members/:personID/users/:username', cors(corsOptions), users.checkUserExistence);
 router.get('/:userID/cities/:cityID/members/:personID/users', cors(corsOptions), users.getUsername);
 router.put('/:userID/cities/:cityID/members/:personID/users/:userID', cors(corsOptions), users.updateUsername);
 router.put('/:userID/cities/:cityID/members/:personID/password/:userID', cors(corsOptions), users.updatePassword);
 // routes for manager with access to
+router.get('/:userID/cities/:cityID/to-add-fct-mctes-members', cors(corsOptions), manageFCTMCTESmembers.getMembersList);
+router.put('/:userID/cities/:cityID/to-add-fct-mctes-members/:memberID', cors(corsOptions), manageFCTMCTESmembers.updateMember);
+router.get('/:userID/cities/:cityID/requested-fct-mctes-members', cors(corsOptions), manageFCTMCTESmembers.getRequestedMembersList);
+router.put('/:userID/cities/:cityID/requested-fct-mctes-members/:memberID', cors(corsOptions), manageFCTMCTESmembers.updateRequestedMember);
+router.get('/:userID/cities/:cityID/removed-fct-mctes-members', cors(corsOptions), manageFCTMCTESmembers.getRemovedMembersList);
+router.put('/:userID/cities/:cityID/removed-fct-mctes-members/:memberID', cors(corsOptions), manageFCTMCTESmembers.updateRemovedMember);
+
 router.get('/:userID/cities/:cityID/validate-members', cors(corsOptions), membersUnitValidate.getMembersList);
 router.put('/:userID/cities/:cityID/validate-members/:personID', cors(corsOptions), membersUnitValidate.validateRegistration);
 router.get('/:userID/cities/:cityID/current-members', cors(corsOptions), membersCity.getMembersList);
@@ -537,6 +568,11 @@ router.put('/:userID/cities/:cityID/members/:personID/degrees/:degreeID', cors(c
 router.delete('/:userID/cities/:cityID/members/:personID/degrees/:degreeID', cors(corsOptions), degrees.deleteDegrees);
 router.post('/:userID/cities/:cityID/members/:personID/degrees', cors(corsOptions), degrees.createDegrees);
 // Affiliations: user can't change his/hers affiliations, only managers can do that (poleID is the people_institution_city table ID)
+router.get('/:userID/cities/:cityID/members/:personID/cost-centers', cors(corsOptions), costCenters.getCostCenters);
+router.post('/:userID/cities/:cityID/members/:personID/cost-centers', cors(corsOptions), costCenters.createCostCenters);
+router.put('/:userID/cities/:cityID/members/:personID/cost-centers/:costCenterID', cors(corsOptions), costCenters.updateCostCenters);
+router.delete('/:userID/cities/:cityID/members/:personID/cost-centers/:costCenterID', cors(corsOptions), costCenters.deleteCostCenters);
+
 router.get('/:userID/cities/:cityID/members/:personID/poles', cors(corsOptions), institutionalAffiliations.getPoles);
 router.post('/:userID/cities/:cityID/members/:personID/poles', cors(corsOptions), institutionalAffiliations.createPole);
 router.put('/:userID/cities/:cityID/members/:personID/poles/:poleID', cors(corsOptions), institutionalAffiliations.updatePole);
@@ -639,11 +675,11 @@ router.post('/:userID/cities/:cityID/members/:personID/spaces', cors(corsOptions
 router.post('/:userID/cities/:cityID/members/:personID/spaces/:spaceID/roles', cors(corsOptions), spaces.addPersonRoles);
 router.put('/:userID/cities/:cityID/members/:personID/spaces/:spaceID/roles/:roleID', cors(corsOptions), spaces.updatePersonRoles);
 router.delete('/:userID/cities/:cityID/members/:personID/spaces/:spaceID/roles/:roleID', cors(corsOptions), spaces.deletePersonRoles);
-router.get('/:userID/cities/:cityID/members/:personID/supervisor-spaces', cors(corsOptions), spaces.getSupervisorSpaces);
-router.post('/:userID/cities/:cityID/members/:personID/supervisor-spaces', cors(corsOptions), spaces.addSupervisorSpaces);
+router.get('/:userID/cities/:cityID/members/:personID/supervisor-spaces', cors(corsOptions), spaces.getManagerSpaces);
+router.post('/:userID/cities/:cityID/members/:personID/supervisor-spaces', cors(corsOptions), spaces.addManagerSpaces);
 router.get('/:userID/cities/:cityID/members/:personID/supervisor-spaces/:spaceID', cors(corsOptions), spaces.getSpaceInfo);
-router.put('/:userID/cities/:cityID/members/:personID/supervisor-spaces/:spaceID', cors(corsOptions), spaces.updateSupervisorSpace);
-router.delete('/:userID/cities/:cityID/members/:personID/supervisor-spaces/:supervisorSpaceID', cors(corsOptions), spaces.deleteSupervisorSpace);
+router.put('/:userID/cities/:cityID/members/:personID/supervisor-spaces/:spaceID', cors(corsOptions), spaces.updateManagerSpace);
+router.delete('/:userID/cities/:cityID/members/:personID/supervisor-spaces/:supervisorSpaceID', cors(corsOptions), spaces.deleteManagerSpace);
 router.get('/:userID/cities/:cityID/labs/:labID', cors(corsOptions), labMembers.getLabInfo);
 router.get('/:userID/cities/:cityID/labs/:labID/spaces', cors(corsOptions), labSpaces.getLabSpaces);
 router.post('/:userID/cities/:cityID/labs/:labID/spaces', cors(corsOptions), labSpaces.addLabSpaces);
@@ -714,7 +750,18 @@ router.get('/:userID/units/:unitID/members/:personID/users/:username', cors(cors
 router.get('/:userID/units/:unitID/members/:personID/users', cors(corsOptions), users.getUsername);
 router.put('/:userID/units/:unitID/members/:personID/users/:userID', cors(corsOptions), users.updateUsername);
 router.put('/:userID/units/:unitID/members/:personID/password/:userID', cors(corsOptions), users.updatePassword);
-    // routes for manager with access to a single whole unit
+// routes for manager with access to a single whole unit
+router.get('/:userID/units/:unitID/fct-status/:personID', cors(corsOptions), manageFCTMCTESmembers.getPersonStatus);
+router.post('/:userID/units/:unitID/fct-status/:personID', cors(corsOptions), manageFCTMCTESmembers.createPersonStatus);
+router.put('/:userID/units/:unitID/fct-status/:personID/status/:statusID', cors(corsOptions), manageFCTMCTESmembers.updatePersonStatus);
+
+router.get('/:userID/units/:unitID/to-add-fct-mctes-members', cors(corsOptions), manageFCTMCTESmembers.getMembersList);
+router.put('/:userID/units/:unitID/to-add-fct-mctes-members/:memberID', cors(corsOptions), manageFCTMCTESmembers.updateMember);
+router.get('/:userID/units/:unitID/requested-fct-mctes-members', cors(corsOptions), manageFCTMCTESmembers.getRequestedMembersList);
+router.put('/:userID/units/:unitID/requested-fct-mctes-members/:memberID', cors(corsOptions), manageFCTMCTESmembers.updateRequestedMember);
+router.get('/:userID/units/:unitID/removed-fct-mctes-members', cors(corsOptions), manageFCTMCTESmembers.getRemovedMembersList);
+router.put('/:userID/units/:unitID/removed-fct-mctes-members/:memberID', cors(corsOptions), manageFCTMCTESmembers.updateRemovedMember);
+
 router.get('/:userID/units/:unitID/validate-members', cors(corsOptions), membersUnitValidate.getMembersList);
 router.put('/:userID/units/:unitID/validate-members/:personID', cors(corsOptions), membersUnitValidate.validateRegistration);
 router.get('/:userID/units/:unitID/current-members', cors(corsOptions), membersUnit.getMembersList);
@@ -754,6 +801,11 @@ router.put('/:userID/units/:unitID/members/:personID/degrees/:degreeID', cors(co
 router.delete('/:userID/units/:unitID/members/:personID/degrees/:degreeID', cors(corsOptions), degrees.deleteDegrees);
 router.post('/:userID/units/:unitID/members/:personID/degrees', cors(corsOptions), degrees.createDegrees);
     // Affiliations: user can't change his/hers affiliations, only managers can do that (poleID is the people_institution_city table ID)
+router.get('/:userID/units/:unitID/members/:personID/cost-centers', cors(corsOptions), costCenters.getCostCenters);
+router.post('/:userID/units/:unitID/members/:personID/cost-centers', cors(corsOptions), costCenters.createCostCenters);
+router.put('/:userID/units/:unitID/members/:personID/cost-centers/:costCenterID', cors(corsOptions), costCenters.updateCostCenters);
+router.delete('/:userID/units/:unitID/members/:personID/cost-centers/:costCenterID', cors(corsOptions), costCenters.deleteCostCenters);
+
 router.get('/:userID/units/:unitID/members/:personID/poles', cors(corsOptions), institutionalAffiliations.getPoles);
 router.post('/:userID/units/:unitID/members/:personID/poles', cors(corsOptions), institutionalAffiliations.createPole);
 router.put('/:userID/units/:unitID/members/:personID/poles/:poleID', cors(corsOptions), institutionalAffiliations.updatePole);
@@ -856,11 +908,11 @@ router.post('/:userID/units/:unitID/members/:personID/spaces', cors(corsOptions)
 router.post('/:userID/units/:unitID/members/:personID/spaces/:spaceID/roles', cors(corsOptions), spaces.addPersonRoles);
 router.put('/:userID/units/:unitID/members/:personID/spaces/:spaceID/roles/:roleID', cors(corsOptions), spaces.updatePersonRoles);
 router.delete('/:userID/units/:unitID/members/:personID/spaces/:spaceID/roles/:roleID', cors(corsOptions), spaces.deletePersonRoles);
-router.get('/:userID/units/:unitID/members/:personID/supervisor-spaces', cors(corsOptions), spaces.getSupervisorSpaces);
-router.post('/:userID/units/:unitID/members/:personID/supervisor-spaces', cors(corsOptions), spaces.addSupervisorSpaces);
+router.get('/:userID/units/:unitID/members/:personID/supervisor-spaces', cors(corsOptions), spaces.getManagerSpaces);
+router.post('/:userID/units/:unitID/members/:personID/supervisor-spaces', cors(corsOptions), spaces.addManagerSpaces);
 router.get('/:userID/units/:unitID/members/:personID/supervisor-spaces/:spaceID', cors(corsOptions), spaces.getSpaceInfo);
-router.put('/:userID/units/:unitID/members/:personID/supervisor-spaces/:spaceID', cors(corsOptions), spaces.updateSupervisorSpace);
-router.delete('/:userID/units/:unitID/members/:personID/supervisor-spaces/:supervisorSpaceID', cors(corsOptions), spaces.deleteSupervisorSpace);
+router.put('/:userID/units/:unitID/members/:personID/supervisor-spaces/:spaceID', cors(corsOptions), spaces.updateManagerSpace);
+router.delete('/:userID/units/:unitID/members/:personID/supervisor-spaces/:supervisorSpaceID', cors(corsOptions), spaces.deleteManagerSpace);
 router.get('/:userID/units/:unitID/labs/:labID', cors(corsOptions), labMembers.getLabInfo);
 router.get('/:userID/units/:unitID/labs/:labID/spaces', cors(corsOptions), labSpaces.getLabSpaces);
 router.post('/:userID/units/:unitID/labs/:labID/spaces', cors(corsOptions), labSpaces.addLabSpaces);

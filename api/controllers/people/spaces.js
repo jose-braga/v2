@@ -111,6 +111,15 @@ var combo = function(a, min, max) {
     return all;
 };
 
+/* TODO: Implement actionGetSpaceDataManagers*/
+module.exports.getSpaceDataManagers = function (req, res, next) {
+    permissions.checkPermissions(
+        (options) => { actionGetSpaceDataManagers(options) },
+        { req, res, next }
+    );
+};
+
+
 var actionGetAllSpaces = function (options) {
     let { req, res, next } = options;
     var querySQL = '';
@@ -328,7 +337,7 @@ module.exports.deletePersonRoles = function (req, res, next) {
 };
 
 
-var actionGetSupervisorSpaces = function (options) {
+var actionGetManagerSpaces = function (options) {
     let { req, res, next } = options;
     let personID = req.params.personID;
     var querySQL = '';
@@ -348,9 +357,9 @@ var actionGetSupervisorSpaces = function (options) {
     places.push(personID)
     return sql.makeSQLOperation(req, res, querySQL, places)
 };
-module.exports.getSupervisorSpaces = function (req, res, next) {
+module.exports.getManagerSpaces = function (req, res, next) {
     permissions.checkPermissions(
-        (options) => { actionGetSupervisorSpaces(options) },
+        (options) => { actionGetManagerSpaces(options) },
         { req, res, next }
     );
 };
@@ -382,7 +391,7 @@ var getSpacePercentages = function (options, callback) {
         },
         options);
 };
-var actionAddSupervisorSpaces = function (options) {
+var actionAddManagerSpaces = function (options) {
     let { req, res, next, space } = options;
     let personID = req.params.personID;
     let data = req.body.data;
@@ -467,14 +476,14 @@ var actionAddSupervisorSpaces = function (options) {
     }
 
 };
-module.exports.addSupervisorSpaces = function (req, res, next) {
+module.exports.addManagerSpaces = function (req, res, next) {
     permissions.checkPermissions(
-        (options) => { getSpacePercentages(options, actionAddSupervisorSpaces) },
+        (options) => { getSpacePercentages(options, actionAddManagerSpaces) },
         { req, res, next }
     );
 };
 
-var actionUpdateSupervisorSpace = function (options) {
+var actionUpdateManagerSpace = function (options) {
     let { req, res, next, space } = options;
     let labID = req.params.labID;
     let data = req.body.data;
@@ -567,14 +576,14 @@ var actionUpdateSupervisorSpace = function (options) {
         });
     }
 };
-module.exports.updateSupervisorSpace = function (req, res, next) {
+module.exports.updateManagerSpace = function (req, res, next) {
     permissions.checkPermissions(
-        (options) => { getSpacePercentages(options, actionUpdateSupervisorSpace) },
+        (options) => { getSpacePercentages(options, actionUpdateManagerSpace) },
         { req, res, next }
     );
 };
 
-var actionDeleteSupervisorSpace = function (options) {
+var actionDeleteManagerSpace = function (options) {
     let { req, res, next } = options;
     let supervisorSpaceID = req.params.supervisorSpaceID;
     var querySQL = '';
@@ -585,9 +594,9 @@ var actionDeleteSupervisorSpace = function (options) {
     places.push(supervisorSpaceID);
     return sql.makeSQLOperation(req, res, querySQL, places);
 };
-module.exports.deleteSupervisorSpace = function (req, res, next) {
+module.exports.deleteManagerSpace = function (req, res, next) {
     permissions.checkPermissions(
-        (options) => { actionDeleteSupervisorSpace(options) },
+        (options) => { actionDeleteManagerSpace(options) },
         { req, res, next }
     );
 };
@@ -645,7 +654,7 @@ var getLabsAssociatedToSpace = function (options) {
                 options.i = 0;
                 return getLabLeaderFromLabsAssociatedToSpace(options);
             } else {
-                return getSupervisorsAssociatedToSpace(options);
+                return getManagersAssociatedToSpace(options);
             }
 
         },
@@ -671,12 +680,12 @@ var getLabLeaderFromLabsAssociatedToSpace = function (options) {
                 options.i = i + 1;
                 return getLabLeaderFromLabsAssociatedToSpace(options);
             } else {
-                return getSupervisorsAssociatedToSpace(options);
+                return getManagersAssociatedToSpace(options);
             }
         },
         options);
 };
-var getSupervisorsAssociatedToSpace = function (options) {
+var getManagersAssociatedToSpace = function (options) {
     let { req, res, next, space } = options;
     let spaceID = req.params.spaceID;
     var querySQL = '';
@@ -693,7 +702,7 @@ var getSupervisorsAssociatedToSpace = function (options) {
             options.space.supervisors = resQuery;
             if (resQuery.length > 0) {
                 options.i = 0;
-                return getLabsFromSupervisorsAssociatedToSpace(options);
+                return getLabsFromManagersAssociatedToSpace(options);
             } else {
                 return responses.sendJSONResponseOptions({
                     response: res,
@@ -709,7 +718,7 @@ var getSupervisorsAssociatedToSpace = function (options) {
         },
         options);
 }
-var getLabsFromSupervisorsAssociatedToSpace = function (options) {
+var getLabsFromManagersAssociatedToSpace = function (options) {
     let { req, res, next, space, i } = options;
     let supervisor = space.supervisors[i];
     var querySQL = '';
@@ -726,7 +735,7 @@ var getLabsFromSupervisorsAssociatedToSpace = function (options) {
             options.space.supervisors[i].labs = resQuery;
             if (i + 1 < options.space.supervisors.length) {
                 options.i = i + 1;
-                return getLabsFromSupervisorsAssociatedToSpace(options);
+                return getLabsFromManagersAssociatedToSpace(options);
             } else {
                 return responses.sendJSONResponseOptions({
                     response: res,

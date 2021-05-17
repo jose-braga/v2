@@ -606,6 +606,59 @@ var actionAddPersonLabHistory = function (options) {
     );
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
+            if (person.must_be_added) {
+                actionGetPersonUnit(options);
+            } else {
+                actionAddPersonEmailAddress(options);
+            }
+        },
+        options);
+};
+var actionGetPersonUnit = function (options) {
+    let { req, res, next } = options;
+    let labID = req.params.labID;
+    let person = req.body.data;
+    if (person.valid_from === '') {
+        person.valid_from = null;
+    }
+    if (person.valid_until === '') {
+        person.valid_until = null;
+    }
+    let places = [];
+    querySQL = 'SELECT groups_units.unit_id'
+        + ' FROM labs_groups'
+        + ' JOIN `groups` ON labs_groups.group_id = `groups`.id'
+        + ' JOIN groups_units ON groups_units.group_id = `groups`.id'
+        + ' WHERE labs_groups.lab_id = ?;'
+        ;
+    places.push(
+        labID
+    );
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            if (resQuery.length > 0) {
+                options.unitID = resQuery[0].unit_id;
+                actionAddPersonStatusFCT(options);
+            } else {
+                actionAddPersonEmailAddress(options);
+            }
+        },
+        options);
+}
+var actionAddPersonStatusFCT = function (options) {
+    let { req, res, next, personID, unitID } = options;
+    let person = req.body.data;
+    let places = [];
+    querySQL = 'INSERT INTO status_fct'
+        + ' (unit_id, person_id, must_be_added)'
+        + ' VALUES (?, ?, ?);';
+    places.push(
+        unitID,
+        personID,
+        person.must_be_added
+    );
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
             actionAddPersonEmailAddress(options);
         },
         options);

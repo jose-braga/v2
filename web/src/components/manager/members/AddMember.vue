@@ -137,6 +137,36 @@
             </v-col>
         </v-row>
         <v-row>
+            <h2 class="black--text">Highest Academic Degree</h2>
+        </v-row>
+        <v-row>
+            <v-col cols="12" sm="5">
+                <v-select
+                    v-model="data.degree"
+                    :items="degrees" item-value="id" item-text="name_en"
+                    return-object
+                    label="Degrees">
+                </v-select>
+            </v-col>
+        </v-row>
+        <v-row>
+            <h2 class="black--text">Scientific Identifiers</h2>
+        </v-row>
+        <v-row>
+            <v-col cols="12" sm="6">
+                <v-text-field
+                    v-model="data.ciencia_id"
+                    label="Ciência ID (wwww-wwww-wwww)">
+                </v-text-field>
+            </v-col>
+            <v-col cols="12" sm="6">
+                <v-text-field
+                    v-model="data.ORCID"
+                    label="ORCID (dddd-dddd-dddd-dddd)">
+                </v-text-field>
+            </v-col>
+        </v-row>
+        <v-row>
             <h2 class="black--text">Institutional Contacts</h2>
         </v-row>
         <v-row>
@@ -164,6 +194,65 @@
                     </div>
                 </div>
             </v-col>
+        </v-row>
+        <v-row>
+            <h2 class="black--text">Institutional Affiliations</h2>
+        </v-row>
+        <v-row v-for="(aff, i) in data.current_institutional_affiliations"
+            :key="'aff-' + i"
+            align="center"
+        >
+            <v-col cols="12" sm="5">
+                <v-select
+                    v-model="aff.department_id"
+                    :items="departments" item-value="id" item-text="short_str_department_en"
+                    label="Academic Institution">
+                </v-select>
+            </v-col>
+            <v-col cols="12" sm="3">
+                <v-menu ref="aff.show_valid_from"
+                    v-model="aff.show_valid_from"
+                    :close-on-content-click="false"
+                    :nudge-right="10"
+                    transition="scale-transition"
+                    offset-y min-width="290px">
+                    <template v-slot:activator="{ on }">
+                        <v-text-field v-model="aff.valid_from"
+                            label="From" v-on="on">
+                        </v-text-field>
+                    </template>
+                    <v-date-picker v-model="aff.valid_from"
+                            @input="aff.show_valid_from = false"
+                            no-title></v-date-picker>
+                </v-menu>
+            </v-col>
+            <v-col cols="12" sm="3">
+                <v-menu ref="aff.show_valid_until"
+                    v-model="aff.show_valid_until"
+                    :close-on-content-click="false"
+                    :nudge-right="10"
+                    transition="scale-transition"
+                    offset-y min-width="290px">
+                    <template v-slot:activator="{ on }">
+                        <v-text-field v-model="aff.valid_until"
+                            label="Until" v-on="on">
+                        </v-text-field>
+                    </template>
+                    <v-date-picker v-model="aff.valid_until"
+                            @input="aff.show_valid_until = false"
+                            no-title></v-date-picker>
+                </v-menu>
+            </v-col>
+            <v-col cols="1">
+                <v-btn icon @click.stop="removeItem(data.current_institutional_affiliations, i)">
+                    <v-icon color="red darken">mdi-delete</v-icon>
+                </v-btn>
+            </v-col>
+        </v-row>
+        <v-row class="mt-2 mb-8">
+            <v-btn class="ml-2" outlined @click="addItem('institutional-affiliation')">
+                Add an affiliation
+            </v-btn>
         </v-row>
         <v-row>
             <h2 class="black--text">Research Units Affiliations</h2>
@@ -221,6 +310,7 @@
                                     <v-switch v-model="pos.nuclearCV" class="mx-2" label="Nuclear CV"></v-switch>
                                     <v-switch v-model="pos.pluriannual" class="mx-2" label="Pluriannual"></v-switch>
                                 </v-row>
+
                                 <v-row align="center">
                                     <v-col cols="12" sm="4">
                                         <v-select v-if="unitId === undefined || unitId === null"
@@ -322,7 +412,7 @@
                         </v-expansion-panel-header>
                         <v-expansion-panel-content>
                             <div v-for="(pos, i) in data.tech_current_positions"
-                                :key="i"
+                                :key="'tech'+i"
                             >
                                 <v-row align="center">
                                     <v-col cols="12" sm="6">
@@ -355,6 +445,7 @@
                                     </v-col>
                                     <v-col cols="12" sm="4">
                                         <v-text-field v-model="pos.dedication"
+
                                             label="Dedication (%)"
                                         ></v-text-field>
                                     </v-col>
@@ -417,7 +508,7 @@
                         </v-expansion-panel-header>
                         <v-expansion-panel-content>
                             <div v-for="(pos, i) in data.scm_current_positions"
-                                :key="i"
+                                :key="'scm'+i"
                             >
                                 <v-row align="center">
                                     <v-col cols="12" sm="6">
@@ -512,7 +603,7 @@
                         </v-expansion-panel-header>
                         <v-expansion-panel-content>
                             <div v-for="(pos, i) in data.adm_current_positions"
-                                :key="i"
+                                :key="'adm'+i"
                             >
                                 <v-row align="center">
                                     <v-col cols="12" sm="6">
@@ -623,14 +714,98 @@
 
             </v-col>
         </v-row>
-
         <v-row>
+            <h2 class="black--text">Cost Centers</h2>
+        </v-row>
+        <v-row v-for="(cost, i) in data.costCenters"
+            :key="'cCenters-' + i"
+            align="center"
+        >
+            <v-col cols="12" sm="5">
+                <v-select
+                    v-model="cost.cost_center_id"
+                    :items="costCenters" item-value="id" item-text="short_name"
+                    label="Cost Center">
+                </v-select>
+            </v-col>
+            <v-col cols="12" sm="3">
+                <v-menu ref="cost.show_valid_from"
+                    v-model="cost.show_valid_from"
+                    :close-on-content-click="false"
+                    :nudge-right="10"
+                    transition="scale-transition"
+                    offset-y min-width="290px">
+                    <template v-slot:activator="{ on }">
+                        <v-text-field v-model="cost.valid_from"
+                            label="From" v-on="on">
+                        </v-text-field>
+                    </template>
+                    <v-date-picker v-model="cost.valid_from"
+                            @input="cost.show_valid_from = false"
+                            no-title></v-date-picker>
+                </v-menu>
+            </v-col>
+            <v-col cols="12" sm="3">
+                <v-menu ref="cost.show_valid_until"
+                    v-model="cost.show_valid_until"
+                    :close-on-content-click="false"
+                    :nudge-right="10"
+                    transition="scale-transition"
+                    offset-y min-width="290px">
+                    <template v-slot:activator="{ on }">
+                        <v-text-field v-model="cost.valid_until"
+                            label="Until" v-on="on">
+                        </v-text-field>
+                    </template>
+                    <v-date-picker v-model="cost.valid_until"
+                            @input="cost.show_valid_until = false"
+                            no-title></v-date-picker>
+                </v-menu>
+            </v-col>
+            <v-col cols="1">
+                <v-btn icon @click.stop="removeItem(data.costCenters, i)">
+                    <v-icon color="red darken">mdi-delete</v-icon>
+                </v-btn>
+            </v-col>
+        </v-row>
+        <v-row class="mt-2 mb-8">
+            <v-btn class="ml-2" outlined @click="addItem('cost-centers')">
+                Add a Cost Center
+            </v-btn>
+        </v-row>
+        <v-row>
+            <h2 class="black--text">Current Professional Situation</h2>
+        </v-row>
+        <v-row>
+            <v-col cols="12" sm="5">
+                <v-select
+                    v-model="data.situation_id"
+                    :items="situationsCategories.situations"
+                    item-value="id" item-text="name_en"
+                    label="Situations">
+                </v-select>
+            </v-col>
+            <!--
+            <v-col cols="12" sm="5">
+                <v-text-field
+                    v-model="data.username"
+                    label="Username">
+                </v-text-field>
+            </v-col>
+            -->
+        </v-row>
+        <v-row>
+            <v-checkbox
+                v-model="data.add_fct_mctes"
+                label="To be added as member of team (for FCT/MCTES)"
+            ></v-checkbox>
         </v-row>
     </v-card-text>
     <v-card-actions>
         <v-row>
             <v-col cols="6" sm="4">
                 <v-btn type="submit"
+                    outlined
                     color="blue darken-1"
                     text
                 >
@@ -653,8 +828,9 @@
 <script>
 import subUtil from '@/components/common/submit-utils'
 import {
-    required, requiredIf, sameAs, maxLength, email,
-    //minValue, maxValue, integer
+    required, sameAs, maxLength, email,
+    // requiredIf,
+    // minValue, maxValue, integer
 } from 'vuelidate/lib/validators'
 
 export default {
@@ -695,6 +871,11 @@ export default {
                     phone: undefined,
                     extension: undefined,
                 },
+                degrees: [],
+                ciencia_id: null,
+                ORCID: null,
+
+                current_institutional_affiliations: [],
                 poles: null,
                 roles: [],
                 currentUnit: null,
@@ -706,6 +887,9 @@ export default {
                 tech_current_positions: [],
                 scm_current_positions: [],
                 adm_current_positions: [],
+                costCenters: [],
+                situation_id: null,
+                add_fct_mctes: false,
             },
             genders: [
                 {id: 'M', value: 'Male'},
@@ -714,6 +898,7 @@ export default {
             countries: [],
             loadingCountries: false,
             searchCountries: null,
+            departments: [],
             roles: [],
             poles: null,
             units: [],
@@ -724,11 +909,15 @@ export default {
             scienceManagerOffices: [],
             administrativePositions: [],
             administrativeOffices: [],
+            costCenters: [],
+            degrees: [],
+            situationsCategories: {},
         }
     },
     mounted () {
         this.initialize();
         this.getCountries();
+        this.getDepartments();
         this.getRoles();
         this.getPoles();
         this.getUnits();
@@ -739,6 +928,9 @@ export default {
         this.getScienceManagerOffices();
         this.getAdministrativePositions();
         this.getAdministrativeOffices();
+        this.getCostCenters();
+        this.getDegrees();
+        this.getSituationsCategories();
     },
     watch: {
         unitId () {
@@ -750,10 +942,13 @@ export default {
     },
     methods: {
         initialize () {
+            this.data.username = '';
+            this.data.password = '';
             this.data.isScientific = false;
             this.data.isTechnical = false;
             this.data.isScienceManagement = false;
             this.data.isAdministrative = false;
+            this.data.current_institutional_affiliations = [];
             this.data.roles = [];
             this.data.currentUnit = this.unitId;
             this.data.current_positions = [];
@@ -765,6 +960,7 @@ export default {
             } else {
                 this.data.poles = null;
             }
+            this.data.costCenters = [];
 
         },
         submitForm() {
@@ -788,6 +984,8 @@ export default {
                         url: url,
                         body: this.data,
                     });
+                    console.log(urlCreate)
+
                     this.$http.all(
                         urlCreate.map(el =>
                             this.$http.post(el.url,
@@ -826,6 +1024,8 @@ export default {
                                 phone: undefined,
                                 extension: undefined,
                             },
+                            degrees: [],
+                            current_institutional_affiliations: [],
                             poles: null,
                             roles: [],
                             currentUnit: null,
@@ -837,6 +1037,9 @@ export default {
                             tech_current_positions: [],
                             scm_current_positions: [],
                             adm_current_positions: [],
+                            costCenters: [],
+                            situation_id: null,
+                            add_fct_mctes: false,
                         };
                     }))
                     .catch((error) => {
@@ -846,7 +1049,15 @@ export default {
                         // eslint-disable-next-line
                         console.log(error)
                     })
+                    
                 }
+            }
+        },
+        getDegrees() {
+            var vm = this;
+            if (this.$store.state.session.loggedIn) {
+                const urlSubmit = 'api/v2/' + 'degrees';
+                return subUtil.getPublicInfo(vm, urlSubmit, 'degrees');
             }
         },
         getCountries() {
@@ -854,6 +1065,13 @@ export default {
             if (this.$store.state.session.loggedIn) {
                 const urlSubmit = 'api/v2/' + 'countries';
                 return subUtil.getPublicInfo(this_vm, urlSubmit, 'countries');
+            }
+        },
+        getDepartments () {
+            let vm = this;
+            if (this.$store.state.session.loggedIn) {
+                const urlSubmit = 'api/v2/' + 'departments';
+                return subUtil.getPublicInfo(vm, urlSubmit, 'departments');
             }
         },
         getPoles() {
@@ -923,6 +1141,20 @@ export default {
             if (this.$store.state.session.loggedIn) {
                 const urlSubmit = 'api/v2/' + 'administrative-offices';
                 return subUtil.getPublicInfo(vm, urlSubmit, 'administrativeOffices');
+            }
+        },
+        getCostCenters () {
+            let vm = this;
+            if (this.$store.state.session.loggedIn) {
+                const urlSubmit = 'api/v2/' + 'cost-centers';
+                return subUtil.getPublicInfo(vm, urlSubmit, 'costCenters');
+            }
+        },
+        getSituationsCategories() {
+            var vm = this;
+            if (this.$store.state.session.loggedIn) {
+                const urlSubmit = 'api/v2/' + 'situations-categories';
+                return subUtil.getPublicInfo(vm, urlSubmit, 'situationsCategories');
             }
         },
         addItem(role) {
@@ -1019,6 +1251,18 @@ export default {
                         valid_until: null,
                     });
                 }
+            } else if (role === 'institutional-affiliation') {
+                this.data.current_institutional_affiliations.push({
+                    id: 'new',
+                });
+            } else if (role === 'cost-centers') {
+                this.data.costCenters.push({
+                    id: 'new',
+                });
+            } else if (role === 'degrees') {
+                this.data.degrees.push({
+                    id: 'new',
+                });
             }
         },
         removeItem(list, ind) {
@@ -1117,34 +1361,41 @@ export default {
             poles: { required },
             roles: { required },
             current_positions: {
-                required: requiredIf(function () {
-                    return this.data.isScientific;
-                }),
+                /*$each: {
+                    dedication: {
+                        integer,
+                        maxValue: maxValue(100),
+                        minValue: minValue(0),
+                    },
+                    /*
+                    required: requiredIf(function () {
+                        return this.data.isScientific;
+                    }),
+                }
+                */
             },
             tech_current_positions: {
-                required: requiredIf(function () {
-                    return this.data.isTechnical;
-                }),
+                /*$each: {
+                    required: requiredIf(function () {
+                        return this.data.isTechnical;
+                    }),
+                }*/
             },
             scm_current_positions: {
-                required: requiredIf(function () {
-                    return this.data.isScienceManagement;
-                }),
+                /*$each: {
+                    required: requiredIf(function () {
+                        return this.data.isScienceManagement;
+                    }),
+                }*/
             },
             adm_current_positions: {
-                required: requiredIf(function () {
-                    return this.data.isAdministrative;
-                }),
+                /*$each: {
+                    required: requiredIf(function () {
+                        return this.data.isAdministrative;
+                    }),
+                }*/
             },
-            //situations: {
-            //    $each: {
-            //        dedication: {
-            //            minValue: minValue(0),
-            //            maxValue: maxValue(100),
-            //            integer
-            //        }
-            //    }
-            //},
+
         }
     }
 }
