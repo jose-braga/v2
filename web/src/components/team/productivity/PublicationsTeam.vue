@@ -6,7 +6,6 @@
         </div>
     </v-card-title>
     <v-card-text>
-        {{labData}}
     </v-card-text>
     <v-container>
         <v-form ref="form" class="pa-4"

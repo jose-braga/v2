@@ -126,6 +126,14 @@
                                 label="Resource 1 person name"
                                 dense>
                             </v-autocomplete>
+                            <v-select v-else-if="permission.resource1_type_id === 20"
+                                v-model="permission.resource1_id"
+                                @change="processGenericId(i, 1, 'resourceID')"
+                                :items="departmentTeams"
+                                item-value="id" item-text="name"
+                                label="Resource 1 department team"
+                                dense>
+                            </v-select>
                             <v-text-field v-else
                                 v-model="permission.resource1_id"
                                 @change="processGenericId(i, 1, 'resourceID')"
@@ -625,6 +633,7 @@ export default {
             labs: [],
             groups: [],
             units: [],
+            departmentTeams: [],
             institutionCities : [],
         }
     },
@@ -636,6 +645,7 @@ export default {
         this.getLabs();
         this.getGroups();
         this.getUnits();
+        this.getDepartmentTeams();
         this.getInstitutionCities();
     },
     watch: {
@@ -939,6 +949,13 @@ export default {
             if (this.$store.state.session.loggedIn) {
                 const urlSubmit = 'api/v2/' + 'units';
                 return subUtil.getPublicInfo(vm, urlSubmit, 'units');
+            }
+        },
+        getDepartmentTeams() {
+            var vm = this;
+            if (this.$store.state.session.loggedIn) {
+                const urlSubmit = 'api/v2/' + 'department-teams';
+                return subUtil.getPublicInfo(vm, urlSubmit, 'departmentTeams');
             }
         },
         getInstitutionCities() {

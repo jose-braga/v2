@@ -5,6 +5,7 @@
         <SpacesManagement></SpacesManagement>
     </v-col>
 </v-row>
+<!--
 <v-row class="px-4">
     <v-col cols="12">
         <ManagerSpaces v-if="isSpaceDataManager"
@@ -12,18 +13,19 @@
         ></ManagerSpaces>
     </v-col>
 </v-row>
+-->
 </div>
 </template>
 
 <script>
 //const LabSpaces = () => import(/* webpackChunkName: "lab-spaces" */ './LabSpaces')
-const ManagerSpaces = () => import(/* webpackChunkName: "manager-spaces" */ './ManagerSpaces')
+//const ManagerSpaces = () => import(/* webpackChunkName: "manager-spaces" */ './ManagerSpaces')
 const SpacesManagement = () => import(/* webpackChunkName: "spaces-management" */ './SpacesManagement')
 
 export default {
     components: {
         //LabSpaces,
-        ManagerSpaces,
+        //ManagerSpaces,
         SpacesManagement,
     },
     data() {
@@ -53,7 +55,8 @@ export default {
     methods: {
         initialize () {
             if (this.$store.state.session.loggedIn) {
-                let personID = this.$store.state.session.personID
+                //let personID = this.$store.state.session.personID
+                /*
                 let urlSubmit = 'api/people/' + personID + '/space-data-managers';
                 this.$http.get(urlSubmit)
                 .then((response) => {

@@ -5,18 +5,17 @@
             <PublicationsTeam
                 :lab-id="labId"
                 :lab-data="labData"
-                :lab-positions="labPositions"
                 :my-labs="myLabs"
+                :lab-positions="labPositions"
                 :publications="data.publicationsTeam"
             ></PublicationsTeam>
         </v-col>
         <v-col cols="12">
             <PublicationsMembers
-                 v-if="data.publicationsMembers.length > 0"
                 :lab-id="labId"
                 :lab-data="labData"
-                :lab-positions="labPositions"
                 :my-labs="myLabs"
+                :lab-positions="labPositions"
                 :publications="data.publicationsMembers"
             ></PublicationsMembers>
         </v-col>
@@ -39,8 +38,11 @@ export default {
     props: {
         labId: Number,
         labData: Object,
-        labPositions: Array,
         myLabs: Array,
+        //depTeamId: Number,
+        //depTeamData: Object,
+        //myDepTeams: Array,
+        labPositions: Array,
     },
     data() {
         return {
@@ -65,7 +67,12 @@ export default {
     methods: {
         initialize () {
             if (this.$store.state.session.loggedIn) {
-                subUtil.getInfoPopulate(this, 'api/labs/' + this.labId + '/publications', true)
+                let url;
+                url = 'api/labs/' + this.labId + '/publications';
+                //if (this.depTeamId !== undefined) {
+                //    url = 'api/department-teams/' + this.depTeamId + '/publications';
+                //}
+                subUtil.getInfoPopulate(this, url, true)
                 .then( (result) => {
                     for (let ind in result) {
                         result[ind].title_show = result[ind].title;
@@ -73,8 +80,12 @@ export default {
                     }
                     this.data.publicationsTeam = result;
                 })
-                .then(
-                    subUtil.getInfoPopulate(this, 'api/labs/' + this.labId + '/members-publications', true)
+                .then( () => {
+                    url = 'api/labs/' + this.labId + '/members-publications';
+                    //if (this.depTeamId !== undefined) {
+                    //    url = 'api/department-teams/' + this.depTeamId + '/publications';
+                    //}
+                    subUtil.getInfoPopulate(this, url, true)
                     .then( (result) => {
                         let publicationsMembers = [];
                         for (let ind in result) {
@@ -93,7 +104,7 @@ export default {
                         }
                         this.data.publicationsMembers = publicationsMembers;
                     })
-                )
+                })
             }
         },
     },

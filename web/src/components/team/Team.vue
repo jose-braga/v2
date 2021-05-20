@@ -10,15 +10,25 @@
         >
             {{lab.name}}
         </v-tab>
+        <v-tab v-for="(lab, i) in departmentTeamData"
+            :key="'dep-' + i"
+            :to="lab.link"
+        >
+            {{lab.name}}
+        </v-tab>
         <v-tab to="/team/pre-register" :key="labData.length">
             Pre-Register
         </v-tab>
        <v-tabs-items>
-            <router-view v-if="data.labPositions && currentLab && data.myLabsManagement"
+            <router-view v-if="data.labPositions && ((currentLab && data.myLabsManagement) || (currentDepartmentTeam && data.myDepartmentTeamsManagement))"
                 :lab-id="labID"
                 :lab-data="currentLab"
+                :my-labs="data.myLabsManagement"
+                :dep-team-id="depTeamID"
+                :dep-team-data="currentDepartmentTeam"
+                :my-dep-teams="data.myDepartmentTeamsManagement"
                 :lab-positions="data.labPositions"
-                :my-labs="data.myLabsManagement">
+            >
             </router-view>
             <v-dialog v-model="showHelp" content-class="help">
                 <router-view name="help2"></router-view>
@@ -50,11 +60,15 @@ export default {
             activeTab: 0,
             labID: undefined,
             currentLab: undefined,
+            depTeamID: undefined,
+            currentDepartmentTeam: undefined,
             data: {
                 myLabs: [],
                 myLabsManagement: [],
                 //myLabsMembers: [],
                 labPositions: undefined,
+                myDepartmentTeams: [],
+                myDepartmentTeamsManagement: [],
             },
         }
     },
@@ -85,6 +99,14 @@ export default {
             }
             return labData;
         },
+        departmentTeamData () {
+            let labData = this.data.myDepartmentTeams;
+            for (let ind in labData) {
+                this.$set(labData[ind], 'link', '/team/'
+                + labData[ind].name.toLowerCase().replace(/\s/g,'-'));
+            }
+            return labData;
+        },
         showHelp: {
             get() {
                 return this.$store.state.navigation.showHelp;
@@ -105,7 +127,6 @@ export default {
         }
 
     },
-
     methods: {
         initialize() {
             let this_session = this.$store.state.session;
@@ -139,11 +160,46 @@ export default {
                         && decomposedPath.length === 5
                         && decomposedPath[2] === 'members-affiliation'
                         && decomposedPath[4] === 'position'
-                        && this_session.permissionsEndpoints[ind].method_name === 'POST') {
+                        && this_session.permissionsEndpoints[ind].method_name === 'POST'
+                    ) {
                         let urlSubmit = 'api' + '/labs/' + decomposedPath[1];
                         subUtil.getInfoPopulate(this, urlSubmit, true)
                         .then( (result) => {
                             this.data.myLabsManagement.push(result);
+                        });
+                    }
+                    if (decomposedPath[0] === 'department-teams'
+                        && decomposedPath.length === 2
+                        && this_session.permissionsEndpoints[ind].method_name === 'GET') {
+                        let urlSubmit = 'api' + this_session.permissionsEndpoints[ind].endpoint_url;
+                        subUtil.getInfoPopulate(this, urlSubmit, true)
+                        .then( (result) => {
+                            this.$set(result, 'link', '/team/'
+                                + result.name.toLowerCase().replace(/\s/g,'-'));
+                            this.data.myDepartmentTeams.push(result);
+                            if (firstLab) {
+                                firstLab = false;
+                                //this.activeTab = result.link;
+                                this.$router.replace(result.link).catch((err)=>console.log(err));
+                            }
+                        });
+                        urlSubmit = 'api/v2/lab-positions';
+                        subUtil.getInfoPopulate(this, urlSubmit, true)
+                        .then( (result) => {
+                            this.data.labPositions = result;
+                        });
+                    }
+                    // if user manages a department team
+                    if (decomposedPath[0] === 'department-teams'
+                        && decomposedPath.length === 5
+                        && decomposedPath[2] === 'members-affiliation'
+                        && decomposedPath[4] === 'position'
+                        && this_session.permissionsEndpoints[ind].method_name === 'POST'
+                    ) {
+                        let urlSubmit = 'api' + '/department-teams/' + decomposedPath[1];
+                        subUtil.getInfoPopulate(this, urlSubmit, true)
+                        .then( (result) => {
+                            this.data.myDepartmentTeamsManagement.push(result);
                         });
                     }
                 }
@@ -154,6 +210,18 @@ export default {
                 if (this.data.myLabs[ind].link === tab) {
                     this.labID = this.data.myLabs[ind].id;
                     this.currentLab = this.data.myLabs[ind];
+                    this.depTeamID = undefined;
+                    this.currentDepartmentTeam = undefined;
+                    return;
+                }
+            }
+            for (let ind in this.data.myDepartmentTeams) {
+                if (this.data.myDepartmentTeams[ind].link === tab) {
+                    this.labID = undefined;
+                    this.currentLab = undefined;
+                    this.depTeamID = this.data.myDepartmentTeams[ind].id;
+                    this.currentDepartmentTeam = this.data.myDepartmentTeams[ind];
+                    return;
                 }
             }
         },

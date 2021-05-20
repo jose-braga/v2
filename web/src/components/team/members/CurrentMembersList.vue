@@ -67,6 +67,15 @@
                                                     Undelete this
                                                 </v-btn>
                                             </v-col>
+                                            <v-col cols="12" sm="3"
+                                                v-if="depTeamId !== undefined"
+                                            >
+                                                <v-select v-model="editedItem.most_recent_data.lab_id"
+                                                    :items="labs" item-value="id" item-text="name"
+                                                    disabled
+                                                    label="Lab/Group"
+                                                ></v-select>
+                                            </v-col>
                                             <v-col cols="12" sm="3">
                                                 <v-select v-model="editedItem.most_recent_data.lab_position_id"
                                                     :items="labPositions" item-value="id" item-text="name_en"
@@ -198,6 +207,17 @@
                                                     class="mr-2">Save</v-btn>
                                             </v-row>
                                         </v-col>
+                                        <v-col cols="11" sm="2"
+                                            v-if="depTeamId !== undefined"
+                                        >
+                                            <v-row justify="end">
+                                                <v-btn
+                                                    @click="submitDeleteDepartmentTeam(editedItem)"
+                                                    outlined
+                                                    color="red"
+                                                    class="mr-2">Remove from team</v-btn>
+                                            </v-row>
+                                        </v-col>
                                         <v-col cols="1" sm="2">
                                             <v-progress-circular indeterminate
                                                     v-show="editedItem.progress"
@@ -289,8 +309,11 @@ export default {
     props: {
         labId: Number,
         labData: Object,
-        labPositions: Array,
         myLabs: Array,
+        depTeamId: Number,
+        depTeamData: Object,
+        myDepTeams: Array,
+        labPositions: Array,
     },
     data() {
         return {
@@ -316,6 +339,7 @@ export default {
             data: {
                 members: [],
             },
+            labs: [],
         }
     },
     mounted () {
@@ -324,21 +348,24 @@ export default {
             // your code goes here
             this.initialize();
         });
+        this.getLabs();
     },
     computed: {
         currentGroup () {
             let today = time.moment();
-            for (let ind in  this.labData.groups_history) {
-                if ((this.labData.groups_history[ind].valid_from === null ||
-                    time.moment(this.labData.groups_history[ind].valid_from).isBefore(today))
-                    &&
-                    (this.labData.groups_history[ind].valid_until === null ||
-                    time.moment(this.labData.groups_history[ind].valid_until).isAfter(today))) {
-                    let currentGroup = {
-                        name: this.labData.groups_history[ind].name,
-                        unit: this.labData.groups_history[ind].units_history[0],
-                    };
-                    return currentGroup;
+            if (this.labData !== undefined) {
+                for (let ind in  this.labData.groups_history) {
+                    if ((this.labData.groups_history[ind].valid_from === null ||
+                        time.moment(this.labData.groups_history[ind].valid_from).isBefore(today))
+                        &&
+                        (this.labData.groups_history[ind].valid_until === null ||
+                        time.moment(this.labData.groups_history[ind].valid_until).isAfter(today))) {
+                        let currentGroup = {
+                            name: this.labData.groups_history[ind].name,
+                            unit: this.labData.groups_history[ind].units_history[0],
+                        };
+                        return currentGroup;
+                    }
                 }
             }
             return false;
@@ -346,12 +373,14 @@ export default {
         pastGroups () {
             let today = time.moment();
             let pastGroups = [];
-            for (let ind in  this.labData.groups_history) {
-                if ((this.labData.groups_history[ind].valid_from === null ||
-                    time.moment(this.labData.groups_history[ind].valid_from).isBefore(today))
-                    && time.moment(this.labData.groups_history[ind].valid_until).isBefore(today)) {
-                    pastGroups.push(this.labData.groups_history[ind]);
-                    return pastGroups;
+            if (this.labData !== undefined) {
+                for (let ind in  this.labData.groups_history) {
+                    if ((this.labData.groups_history[ind].valid_from === null ||
+                        time.moment(this.labData.groups_history[ind].valid_from).isBefore(today))
+                        && time.moment(this.labData.groups_history[ind].valid_until).isBefore(today)) {
+                        pastGroups.push(this.labData.groups_history[ind]);
+                        return pastGroups;
+                    }
                 }
             }
             return false;
@@ -359,6 +388,9 @@ export default {
     },
     watch: {
         labId () {
+            this.initialize();
+        },
+        depTeamId () {
             this.initialize();
         }
     },
@@ -369,7 +401,6 @@ export default {
             if (this_session.loggedIn) {
                 for (let ind in this_session.permissionsEndpoints) {
                     let decomposedPath = this_session.permissionsEndpoints[ind].decomposedPath;
-
                     if ((decomposedPath[0] === 'labs'
                         && parseInt(decomposedPath[1], 10) === this.labId
                         && decomposedPath[2] === 'members-affiliation'
@@ -382,6 +413,24 @@ export default {
                     ) {
                         foundEndpoint = true;
                         let urlSubmit = 'api' + '/labs/' + this.labId + '/members-affiliation';
+                        subUtil.getInfoPopulate(this, urlSubmit, true)
+                        .then( (result) => {
+                            let currentMembers = processResults(this, result);
+                            this.data.members = currentMembers;
+                        });
+                    }
+                    if ((decomposedPath[0] === 'department-teams'
+                        && parseInt(decomposedPath[1], 10) === this.depTeamId
+                        && decomposedPath[2] === 'members-affiliation'
+                        && this_session.permissionsEndpoints[ind].method_name === 'GET')
+                        ||
+                        (decomposedPath[0] === 'department-teams'
+                        && parseInt(decomposedPath[1], 10) === this.depTeamId
+                        && this_session.permissionsEndpoints[ind].allow_all_subpaths === 1
+                        && this_session.permissionsEndpoints[ind].method_name === 'GET')
+                    ) {
+                        foundEndpoint = true;
+                        let urlSubmit = 'api' + '/department-teams/' + this.depTeamId + '/members-affiliation';
                         subUtil.getInfoPopulate(this, urlSubmit, true)
                         .then( (result) => {
                             let currentMembers = processResults(this, result);
@@ -420,21 +469,41 @@ export default {
                     member.most_recent_data.changed_by = this_session.userID;
                     member.progress = true;
                     let memberID = member.person_id;
-                    let reqUpdate = '/labs/' + this.labId
+                    let reqUpdate, urlUpdate,
+                        reqCreate, urlCreate,
+                        reqDelete, urlDelete;
+                    if (this.labId !== undefined) {
+                        reqUpdate = '/labs/' + this.labId
                                 + '/members-affiliation/' + memberID
                                 + '/position/' + member.most_recent_data.id;
-                    let urlUpdate = 'api' + reqUpdate;
+                        urlUpdate = 'api' + reqUpdate;
 
-                    let reqCreate = '/labs/' + this.labId
-                                + '/members-affiliation/' + memberID
-                                + '/position';
-                    let urlCreate = 'api' + reqCreate;
-                    let reqDelete = '/labs/' + this.labId
+                        reqCreate = '/labs/' + this.labId
+                                    + '/members-affiliation/' + memberID
+                                    + '/position';
+                        urlCreate = 'api' + reqCreate;
+                        reqDelete = '/labs/' + this.labId
+                                    + '/members-affiliation/' + memberID
+                                    + '/position/' + member.most_recent_data.id;
+                        urlDelete = 'api' + reqDelete;
+                    }
+                    if (this.depTeamId !== undefined) {
+                        reqUpdate = '/department-teams/' + this.depTeamId
                                 + '/members-affiliation/' + memberID
                                 + '/position/' + member.most_recent_data.id;
-                    let urlDelete = 'api' + reqDelete;
+                        urlUpdate = 'api' + reqUpdate;
 
+                        reqCreate = '/department-teams/' + this.depTeamId
+                                    + '/members-affiliation/' + memberID
+                                    + '/position';
+                        urlCreate = 'api' + reqCreate;
+                        reqDelete = '/department-teams/' + this.depTeamId
+                                    + '/members-affiliation/' + memberID
+                                    + '/position/' + member.most_recent_data.id;
+                        urlDelete = 'api' + reqDelete;
+                    }
                     let requests = [];
+                    let alreadyCreate = false;
                     for (let ind in this_session.permissionsEndpoints) {
                         if (subUtil.checkPermissions(reqUpdate, 'PUT',
                                     this_session.permissionsEndpoints[ind].endpoint_url,
@@ -455,8 +524,11 @@ export default {
                                     this_session.permissionsEndpoints[ind].endpoint_url,
                                     this_session.permissionsEndpoints[ind].method_name,
                                     this_session.permissionsEndpoints[ind].allow_all_subpaths)
-                            && Object.keys(member.newer_data).length > 0) {
+                            && Object.keys(member.newer_data).length > 0
+                            && !alreadyCreate) {
+                            alreadyCreate = true;
                             member.newer_data.changed_by = this_session.userID;
+                            member.newer_data.lab_id = this.depTeamData.lab_id;
                             requests.push(this.$http.post(urlCreate,
                                 {
                                     data: member.newer_data
@@ -496,6 +568,49 @@ export default {
                             console.log(error)
                         })
                 }
+            }
+        },
+        submitDeleteDepartmentTeam (member) {
+            let this_session = this.$store.state.session;
+            if (this_session.loggedIn) {
+                member.most_recent_data.changed_by = this_session.userID;
+                member.progress = true;
+                let memberID = member.person_id;
+                let reqDelete, urlDelete;
+                reqDelete = '/department-teams/' + this.depTeamId
+                            + '/members-affiliation/' + memberID;
+                urlDelete = 'api' + reqDelete;
+                let requests = [];
+                for (let ind in this_session.permissionsEndpoints) {
+                    if (subUtil.checkPermissions(reqDelete, 'DELETE',
+                                this_session.permissionsEndpoints[ind].endpoint_url,
+                                this_session.permissionsEndpoints[ind].method_name,
+                                this_session.permissionsEndpoints[ind].allow_all_subpaths)
+                    ) {
+                        requests.push(this.$http.delete(urlDelete,
+                            {
+                            headers: {'Authorization': 'Bearer ' + localStorage['v2-token']},
+                            data: { data: member.most_recent_data },
+                            }
+                        ));
+                    }
+                }
+                this.$http.all(requests)
+                    .then(this.$http.spread( () => {
+                        member.progress = false;
+                        member.success = true;
+                        setTimeout(() => {member.success = false;}, 1500)
+                        this.$root.$emit('updatePastTeamMembers')
+                        this.initialize();
+                    }))
+                    .catch((error) => {
+                        member.progress = false;
+                        member.error = true;
+                        this.initialize();
+                        setTimeout(() => {member.error = false;}, 6000)
+                        // eslint-disable-next-line
+                        console.log(error)
+                    })
             }
 
         },
@@ -545,6 +660,13 @@ export default {
             items = orderBy(items, funcOrderArray, directionArray);
 
             return items
+        },
+        getLabs() {
+            var vm = this;
+            if (this.$store.state.session.loggedIn) {
+                const urlSubmit = 'api/v2/' + 'labs';
+                return subUtil.getPublicInfo(vm, urlSubmit, 'labs');
+            }
         },
     },
     //editedItem.most_recent_data.valid_until

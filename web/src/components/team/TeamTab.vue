@@ -4,18 +4,25 @@
     <v-tab :to="link + '/members'">
         Members
     </v-tab>
-    <v-tab :to="link + '/publications'">
+    <v-tab v-if="labId !== undefined"
+        :to="link + '/publications'">
         Publications
     </v-tab>
+    <v-tab
+        :to="link + '/spaces'">
+        Spaces
+    </v-tab>
     <v-tabs-items>
-
             <router-view
                 :lab-id="labId"
                 :lab-data="labData"
-                :lab-positions="labPositions"
                 :my-labs="myLabs"
+                :dep-team-id="depTeamId"
+                :dep-team-data="depTeamData"
+                :my-dep-teams="myDepTeams"
+                :lab-positions="labPositions"
             ></router-view>
-        
+
         <v-dialog v-model="showHelp" content-class="help">
             <router-view name="help2"></router-view>
         </v-dialog>
@@ -29,12 +36,15 @@ export default {
     props: {
         labId: Number,
         labData: Object,
-        labPositions: Array,
         myLabs: Array,
+        depTeamId: Number,
+        depTeamData: Object,
+        myDepTeams: Array,
+        labPositions: Array,
     },
     data () {
         return {
-            coisa: true
+            //coisa: true
         }
     },
     mounted () {
@@ -42,7 +52,14 @@ export default {
     },
     computed: {
         link() {
-            return this.labData.link;
+            let link;
+            if (this.labData !== undefined) {
+                link = this.labData.link;
+            }
+            if (this.depTeamData !== undefined) {
+                link = this.depTeamData.link;
+            }
+            return link;
         },
         showHelp: {
             get() {

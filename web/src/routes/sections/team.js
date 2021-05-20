@@ -4,6 +4,8 @@ const TeamMembersTab = () => import(/* webpackChunkName: "team-members-tab" */ '
 const TeamMembersTabHelp = () => import(/* webpackChunkName: "team-members-tab-help" */ '@/components/team/members/MembersTabHelp.vue')
 const TeamPublicationsTab = () => import(/* webpackChunkName: "team-members-tab" */ '@/components/team/productivity/PublicationsTab.vue')
 const TeamPublicationsTabHelp = () => import(/* webpackChunkName: "team-members-tab" */ '@/components/team/productivity/PublicationsTabHelp.vue')
+const TeamSpacesTab = () => import(/* webpackChunkName: "team-spaces-tab" */ '@/components/team/spaces/SpacesTab.vue')
+const TeamSpacesTabHelp = () => import(/* webpackChunkName: "team-spaces-tab-help" */ '@/components/team/spaces/SpacesTabHelp.vue')
 const PreRegisterTab = () => import(/* webpackChunkName: "pre-register" */ '@/components/team/pre-register/PreRegisterTab.vue')
 const PreRegisterTabHelp = () => import(/* webpackChunkName: "pre-register-tab-help" */ '@/components/team/pre-register/PreRegisterTabHelp.vue')
 
@@ -34,6 +36,13 @@ const routes = {
                     components: {
                         default: TeamPublicationsTab,
                         help2: TeamPublicationsTabHelp,
+                    }
+                },
+                {
+                    path: 'spaces',
+                    components: {
+                        default: TeamSpacesTab,
+                        help2: TeamSpacesTabHelp,
                     }
                 },
             ]

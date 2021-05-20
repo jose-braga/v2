@@ -275,7 +275,7 @@ router.put('/:personID/outreaches/:itemID', cors(corsOptions), outreaches.update
 router.post('/:personID/outreaches/:itemID', cors(corsOptions), outreaches.createPersonItemAssociation);
 
 //Spaces
-router.get('/:personID/space-data-managers', cors(corsOptions), spaces.getSpaceDataManagers);
+//router.get('/:personID/space-data-managers', cors(corsOptions), spaces.getSpaceDataManagers);
 router.get('/:personID/all-spaces', cors(corsOptions), spaces.getAllSpaces);
 router.get('/:personID/spaces', cors(corsOptions), spaces.getPersonSpaces);
 router.post('/:personID/spaces', cors(corsOptions), spaces.addPersonSpaces);

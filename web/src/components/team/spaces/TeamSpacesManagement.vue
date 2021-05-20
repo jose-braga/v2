@@ -1,11 +1,11 @@
 <template>
 <v-card>
-    <!-- For managing space associations at the lab level -->
     <v-card-title primary-title>
         <div>
-            <h3 class="headline">Spaces associated to {{labName}}</h3>
+            <h3 class="headline">Spaces used by team</h3>
         </div>
     </v-card-title>
+    <v-card-text></v-card-text>
     <v-container>
         <v-form ref="form" class="my-2 ml-2"
             @submit.prevent="submitForm"
@@ -118,12 +118,14 @@
                     <SpaceDetails
                         :item-id="editedItem.id"
                         :space-id="editedItem.space_id"
-                        :lab-id="lab"
+                        :lab-id="labId"
+                        :dep-team-id="depTeamId"
                         :space-data="editedItem"
                     >
                     </SpaceDetails>
                 </v-dialog>
             </template>
+
             <template v-slot:item.action="{ item }">
                 <v-icon @click.stop="editItem(item)">mdi-pencil</v-icon>
                 <v-icon @click.stop="deleteItem(item)"
@@ -131,9 +133,10 @@
                     color="red">mdi-delete</v-icon>
             </template>
         </v-data-table>
-
     </v-container>
+
 </v-card>
+
 </template>
 
 <script>
@@ -164,7 +167,13 @@ function prepareStringComparison(str) {
 
 export default {
     props: {
-        lab: Number,
+        labId: Number,
+        labData: Object,
+        myLabs: Array,
+        depTeamId: Number,
+        depTeamData: Object,
+        myDepTeams: Array,
+        labPositions: Array,
     },
     components: {
         SpaceDetails,
@@ -190,7 +199,7 @@ export default {
                 { text: 'Name', value:'space_name_pt' },
                 { text: '%', value:'percentage' },
                 { text: 'Dates', value:'spaces_dates_show' },
-                { text: 'Type', value:'space_type_name_pt' },
+                { text: 'Type', value:'space_type_name_en' },
                 { text: 'Actions', value: 'action', sortable: false},
             ],
             footerProps: {
@@ -209,10 +218,16 @@ export default {
             }
         );
     },
-
     methods: {
         initialize () {
-            let urlSubmit = 'api/labs/' + this.lab + '/spaces';
+            let urlSubmit
+            if (this.labId !== undefined) {
+                urlSubmit = 'api/labs/' + this.labId + '/spaces';
+            }
+            if (this.depTeamId !== undefined) {
+                urlSubmit = 'api/department-teams/' + this.depTeamId + '/spaces';
+            }
+
             subUtil.getInfoPopulate(this, urlSubmit, true)
             .then((result) => {
                 for (let ind in result) {
@@ -229,56 +244,12 @@ export default {
                     }
                     result[ind].spaces_dates_show = spaces_valid_from
                         + ' - ' + spaces_valid_until;
-
                 }
                 this.data.spaces = result;
             })
+        },
 
-            urlSubmit = 'api/labs/' + this.lab;
-            subUtil.getInfoPopulate(this, urlSubmit, true)
-            .then((result) => {
-                this.labName = result.name;
-            })
-        },
-        submitForm () {
-            if (this.$store.state.session.loggedIn) {
-                this.progress = true;
-                let urlCreate = [];
-                urlCreate.push({
-                    url: 'api/labs/' + this.lab
-                        + '/spaces',
-                    body: this.data.newSpaces,
-                });
-                this.$http.all(
-                    urlCreate.map(el =>
-                        this.$http.post(el.url,
-                            { data: el.body, },
-                            { headers:
-                                {'Authorization': 'Bearer ' + localStorage['v2-token']
-                            },
-                        }))
-                )
-                .then(this.$http.spread( () => {
-                    this.progress = false;
-                    this.success = true;
-                    setTimeout(() => {this.success = false;}, 1500)
-                    //this.toDeleteLabPositions = []; // add the others
-                    this.data.newSpaces = {}
-                    this.addingNewSpace = false;
-                    this.initialize();
-                }))
-                .catch((error) => {
-                    if (error.response) {
-                        this.errorMessage = error.response.data.message;
-                    }
-                    this.progress = false;
-                    this.error = true;
-                    setTimeout(() => {this.error = false;}, 6000)
-                    // eslint-disable-next-line
-                    console.log(error)
-                })
-            }
-        },
+
         getSpaces () {
             let personID = this.$store.state.session.personID;
             const urlSubmit = 'api/people/' + personID + '/all-spaces';
@@ -351,6 +322,7 @@ export default {
             }
             return true;
         },
+
     },
 
 }

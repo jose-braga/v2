@@ -148,7 +148,7 @@ var actionGetMemberDetails = function (members, options) {
 };
 var getMembersLabPositions = function (members, options, i) {
     let { req, res, next } = options;
-    let labID = req.params.labID;
+    //let depTeamID = req.params.depTeamID;
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'SELECT people_labs.*,'
@@ -160,7 +160,7 @@ var getMembersLabPositions = function (members, options, i) {
                         + ' JOIN labs ON labs.id = people_labs.lab_id'
                         + ' LEFT JOIN lab_positions ON lab_positions.id = people_labs.lab_position_id'
                         + ' WHERE people_labs.lab_id = ? AND people_labs.person_id = ?;';
-    places.push(labID, members[i].person_id);
+    places.push(members[i].lab_id, members[i].person_id);
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             members[i].history = resQuery;
@@ -198,14 +198,15 @@ var getMemberDetails = function (members, options, i) {
 };
 var actionGetLabMembers = function (options) {
     let { req, res, next } = options;
-    let labID = req.params.labID;
+    let depTeamID = req.params.depTeamID;
     var querySQL = '';
     var places = [];
-    querySQL = querySQL + 'SELECT DISTINCT people.id AS person_id, people.name, people.colloquial_name '
+    querySQL = querySQL + 'SELECT DISTINCT people.id AS person_id, people.name, people.colloquial_name, teams_department.lab_id '
                         + ' FROM people'
-                        + ' JOIN people_labs ON people_labs.person_id = people.id'
-                        + ' WHERE people_labs.lab_id = ? AND people.status = ?;';
-    places.push(labID, 1)
+                        + ' JOIN people_team_department ON people_team_department.person_id = people.id'
+                        + ' JOIN teams_department ON teams_department.id = people_team_department.team_id'
+                        + ' WHERE people_team_department.team_id = ? AND people.status = ?;';
+    places.push(depTeamID, 1)
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             actionGetMemberDetails(resQuery, options)
@@ -218,10 +219,20 @@ module.exports.getLabMembersAffiliations = function (req, res, next) {
         { req, res, next }
     );
 };
-// below: unused?
+
+var actionRemoveTeamMember = function (options) {
+    let { req, res, next } = options;
+    let depTeamID = req.params.depTeamID;
+    let personID = req.params.memberID;
+    var places = [];
+    querySQL = 'DELETE FROM people_team_department'
+        + ' WHERE team_id = ? AND person_id = ?;';
+    places.push(depTeamID, personID)
+    return sql.makeSQLOperation(req, res, querySQL, places);
+};
 module.exports.deleteLabMember = function (req, res, next) {
     permissions.checkPermissions(
-        (options) => { actionGetLabMembers(options) },
+        (options) => { actionRemoveTeamMember(options) },
         { req, res, next }
     );
 };
@@ -257,7 +268,7 @@ var actionUpdateLabMemberPosition = function (options) {
 };
 var actionAddLabMemberPositionHistory = function (resQuery, options) {
     let { req, res, next } = options;
-    let labID = req.params.labID;
+    //let depTeamID = req.params.depTeamID;
     let personID = req.params.memberID;
     let positionID = req.params.positionID;
     let positionData = req.body.data;
@@ -285,7 +296,7 @@ var actionAddLabMemberPositionHistory = function (resQuery, options) {
         + ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
     places.push(positionID,
                 personID,
-                labID,
+                positionData.lab_id,
                 positionData.lab_position_id,
                 positionData.dedication,
                 positionData.valid_from,
@@ -321,7 +332,7 @@ module.exports.updateLabMemberPosition = function (req, res, next) {
 var actionCreateLabMemberPosition = function (options) {
     let { req, res, next } = options;
     options.operation = 'C';
-    let labID = req.params.labID;
+    let depTeamID = req.params.depTeamID;
     let personID = req.params.memberID;
     let positionData = req.body.data;
     if (positionData.valid_from === '') {
@@ -335,7 +346,7 @@ var actionCreateLabMemberPosition = function (options) {
         + ' (person_id, lab_id, lab_position_id, dedication, valid_from, valid_until)'
         + ' VALUES (?, ?, ?, ?, ?, ?);';
     places.push(personID,
-                labID,
+                positionData.lab_id,
                 positionData.lab_position_id,
                 positionData.dedication,
                 positionData.valid_from,
@@ -375,73 +386,47 @@ module.exports.deleteLabMemberPosition = function (req, res, next) {
     );
 };
 
-var actionGetLabInfo = function (options) {
+var actionGetDepartmentTeamInfo = function (options) {
     let { req, res, next } = options;
-    let labID = req.params.labID;
+    let depTeamID = req.params.depTeamID;
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'SELECT * '
-                        + ' FROM labs'
+                        + ' FROM teams_department'
                         + ' WHERE id = ?;';
-    places.push(labID)
+    places.push(depTeamID)
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
-            let labs = resQuery[0]; // there is only one lab
-            actionGetLabGroups(labs, options)
-        },
-        options);
-};
-var actionGetLabGroups = function (labs, options) {
-    let { req, res, next } = options;
-    let labID = req.params.labID;
-    var querySQL = '';
-    var places = [];
-    querySQL = querySQL + 'SELECT `groups`.*, labs_groups.valid_from, labs_groups.valid_until'
-                        + ' FROM labs_groups'
-                        + ' JOIN `groups` ON `groups`.id = labs_groups.group_id'
-                        + ' WHERE labs_groups.lab_id = ?;';
-    places.push(labID)
-    return sql.getSQLOperationResult(req, res, querySQL, places,
-        (resQuery, options) => {
-            labs.groups_history = resQuery;
-            actionGetGroupsUnits(labs, options, 0)
-        },
-        options);
-};
-var actionGetGroupsUnits = function (labs, options, i) {
-    let { req, res, next } = options;
-    let groupID = labs.groups_history[i].id;
-    var querySQL = '';
-    var places = [];
-    querySQL = querySQL + 'SELECT units.*, groups_units.valid_from, groups_units.valid_until'
-                        + ' FROM groups_units'
-                        + ' JOIN units ON units.id = groups_units.unit_id'
-                        + ' WHERE groups_units.group_id = ?;';
-    places.push(groupID)
-    return sql.getSQLOperationResult(req, res, querySQL, places,
-        (resQuery, options) => {
-            labs.groups_history[i].units_history = resQuery;
-            if (i + 1 < labs.groups_history.length) {
-                actionGetGroupsUnits(labs, options, i + 1);
+            if (resQuery.length > 0) {
+                responses.sendJSONResponseOptions({
+                    response: res,
+                    status: 200,
+                    message: {
+                        "status": "success",
+                        "statusCode": 200,
+                        "count": 1,
+                        "result": resQuery[0],
+                    }
+                });
             } else {
                 responses.sendJSONResponseOptions({
                     response: res,
                     status: 200,
                     message: {
-                        "status": "success", "statusCode": 200,
+                        "status": "success",
+                        "statusCode": 200,
                         "count": 1,
-                        "result": labs
+                        "result": {},
                     }
                 });
-                return;
             }
+            return;
         },
         options);
 };
-
-module.exports.getLabInfo = function (req, res, next) {
+module.exports.getDepartmentTeamInfo = function (req, res, next) {
     permissions.checkPermissions(
-        (options) => { actionGetLabInfo(options) },
+        (options) => { actionGetDepartmentTeamInfo(options) },
         { req, res, next }
     );
 };
@@ -551,7 +536,7 @@ var actionAddPersonRole = function (options) {
 };
 var actionAddPersonLab = function (options) {
     let { req, res, next } = options;
-    let labID = req.params.labID;
+    let depTeamID = req.params.depTeamID;
     let person = req.body.data;
     if (person.valid_from === '') {
         person.valid_from = null;
@@ -561,11 +546,11 @@ var actionAddPersonLab = function (options) {
     }
     let places = [];
     querySQL = 'INSERT INTO people_labs'
-        + ' (person_id, lab_id, lab_position_id, dedication, valid_from, valid_until)'
+        + ' (person_id, team_id, lab_position_id, dedication, valid_from, valid_until)'
         + ' VALUES (?, ?, ?, ?, ?, ?);';
     places.push(
         options.personID,
-        labID,
+        depTeamID,
         person.lab_position_id,
         person.dedication,
         person.valid_from,
@@ -580,7 +565,7 @@ var actionAddPersonLab = function (options) {
 };
 var actionAddPersonLabHistory = function (options) {
     let { req, res, next } = options;
-    let labID = req.params.labID;
+    let depTeamID = req.params.depTeamID;
     let person = req.body.data;
     if (person.valid_from === '') {
         person.valid_from = null;
@@ -590,12 +575,12 @@ var actionAddPersonLabHistory = function (options) {
     }
     let places = [];
     querySQL = 'INSERT INTO people_labs_history'
-        + ' (people_labs_id, person_id, lab_id, lab_position_id, dedication, valid_from, valid_until, created, operation, changed_by)'
+        + ' (people_labs_id, person_id, team_id, lab_position_id, dedication, valid_from, valid_until, created, operation, changed_by)'
         + ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
     places.push(
         options.peopleLabsID,
         options.personID,
-        labID,
+        depTeamID,
         person.lab_position_id,
         person.dedication,
         person.valid_from,
@@ -616,7 +601,7 @@ var actionAddPersonLabHistory = function (options) {
 };
 var actionGetPersonUnit = function (options) {
     let { req, res, next } = options;
-    let labID = req.params.labID;
+    let depTeamID = req.params.depTeamID;
     let person = req.body.data;
     if (person.valid_from === '') {
         person.valid_from = null;
@@ -629,10 +614,10 @@ var actionGetPersonUnit = function (options) {
         + ' FROM labs_groups'
         + ' JOIN `groups` ON labs_groups.group_id = `groups`.id'
         + ' JOIN groups_units ON groups_units.group_id = `groups`.id'
-        + ' WHERE labs_groups.lab_id = ?;'
+        + ' WHERE labs_groups.team_id = ?;'
         ;
     places.push(
-        labID
+        depTeamID
     );
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {

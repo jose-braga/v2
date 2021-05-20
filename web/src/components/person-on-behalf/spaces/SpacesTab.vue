@@ -7,6 +7,7 @@
         ></SpacesManagement>
     </v-col>
 </v-row>
+<!--
 <v-row class="px-4">
     <v-col cols="12">
         <SupervisorSpaces v-if="isLAQV && isSupervisor"
@@ -22,22 +23,23 @@
         </div>
     </v-col>
 </v-row>
+-->
 </div>
 </template>
 
 <script>
 
-import subUtil from '@/components/common/submit-utils'
-import time from '@/components/common/date-utils'
+//import subUtil from '@/components/common/submit-utils'
+//import time from '@/components/common/date-utils'
 
-const LabSpaces = () => import(/* webpackChunkName: "person-on-behalf-lab-spaces" */ './LabSpaces')
-const SupervisorSpaces = () => import(/* webpackChunkName: "person-on-behalf-supervisor-spaces" */ './SupervisorSpaces')
+//const LabSpaces = () => import(/* webpackChunkName: "person-on-behalf-lab-spaces" */ './LabSpaces')
+//const SupervisorSpaces = () => import(/* webpackChunkName: "person-on-behalf-supervisor-spaces" */ './SupervisorSpaces')
 const SpacesManagement = () => import(/* webpackChunkName: "person-on-behalf-spaces-management" */ './SpacesManagement')
 
 export default {
     components: {
-        LabSpaces,
-        SupervisorSpaces,
+        //LabSpaces,
+        //SupervisorSpaces,
         SpacesManagement,
     },
     data() {
@@ -65,6 +67,7 @@ export default {
     },
     methods: {
         initialize () {
+            /*
             this.isLAQV = false;
             this.isUCIBIO = false;
             this.isSupervisor = false;
@@ -121,6 +124,7 @@ export default {
                     }
                 })
             }
+            */
         }
     },
 }

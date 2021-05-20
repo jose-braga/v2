@@ -10,6 +10,7 @@ var routesPublicLegacyAPI_LAQV = require('./routes/indexPublicLegacy_LAQV');
 var routesPublicAPI = require('./routes/indexPublic'); //includes Applicant submission
 var routesAPIPeople = require('./routes/indexPeople');
 var routesAPILabs = require('./routes/indexLabs');
+var routesAPIDepartmentTeams = require('./routes/indexDepartmentTeams');
 var routesAPIManagers = require('./routes/indexManager');
 var routesAPIAdmins = require('./routes/indexAdmins');
 var routesAPIAreas = require('./routes/indexUnitAreas');
@@ -34,6 +35,7 @@ app.use('/api/v2', routesPublicAPI);
 // Internal API routes below
 app.use('/api/people', routesAPIPeople);
 app.use('/api/labs', routesAPILabs);
+app.use('/api/department-teams', routesAPIDepartmentTeams);
 // TODO: create API routes for facilities, science mngmt offices and administrative
 app.use('/api/managers', routesAPIManagers);
 app.use('/api/admins', routesAPIAdmins);

@@ -419,6 +419,14 @@ var getAppAreas = function (req, res, next) {
     sql.makeSQLOperation(req, res, querySQL, places);
     return;
 };
+var getDepartmentTeams = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM teams_department;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
 var getLabs = function (req, res, next) {
     var querySQL = '';
     var places = [];
@@ -866,6 +874,9 @@ module.exports.listItems = function (req, res, next) {
     }
     if (category === 'app-areas') {
         getAppAreas(req, res, next);
+    }
+    if (category === 'department-teams') {
+        getDepartmentTeams(req, res, next);
     }
     if (category === 'labs') {
         getLabs(req, res, next);

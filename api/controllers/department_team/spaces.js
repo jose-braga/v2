@@ -111,263 +111,36 @@ var combo = function(a, min, max) {
     return all;
 };
 
-/* TODO: Implement actionGetSpaceDataManagers*/
-/*
-module.exports.getSpaceDataManagers = function (req, res, next) {
-    permissions.checkPermissions(
-        (options) => { actionGetSpaceDataManagers(options) },
-        { req, res, next }
-    );
-};
-*/
-
-var actionGetAllSpaces = function (options) {
+var actionGetLabSpaces = function (options) {
     let { req, res, next } = options;
+    let depTeamID = req.params.depTeamID;
     var querySQL = '';
     var places = [];
     querySQL = querySQL
-        + 'SELECT spaces.*,'
-        + ' space_types.name_en AS space_type_name_en, space_types.name_pt AS space_type_name_pt'
-        + ' FROM spaces'
-        + ' LEFT JOIN space_types ON space_types.id = spaces.space_type_id'
-        + ' ORDER BY reference ASC'
-        ;
-    //places.push()
-    return sql.makeSQLOperation(req, res, querySQL, places)
-};
-module.exports.getAllSpaces = function (req, res, next) {
-    permissions.checkPermissions(
-        (options) => { actionGetAllSpaces(options) },
-        { req, res, next }
-    );
-};
-
-var actionGetPersonSpaces = function (options) {
-    let { req, res, next } = options;
-    let personID = req.params.personID;
-    var querySQL = '';
-    var places = [];
-    querySQL = querySQL
-        + 'SELECT DISTINCT users_spaces.person_id, users_spaces.space_id,'
-        + ' spaces.reference, spaces.short_reference,'
-        + ' spaces.name_en AS space_name_en, spaces.name_pt AS space_name_pt,'
-        + ' spaces.space_type_id,'
-        + ' space_types.name_en AS space_type_name_en, space_types.name_pt AS space_type_name_pt'
-        + ' FROM users_spaces'
-        + ' LEFT JOIN spaces ON spaces.id = users_spaces.space_id'
-        + ' LEFT JOIN space_types ON space_types.id = spaces.space_type_id'
-        + ' WHERE users_spaces.person_id = ?'
-        + ' ORDER BY reference ASC'
-        ;
-    places.push(personID)
-    return sql.getSQLOperationResult(req, res, querySQL, places,
-        (resQuery, options) => {
-            if (resQuery.length > 0) {
-                options.i = 0;
-                options.spaces = resQuery;
-                return getPersonSpaceRoles(options);
-            } else {
-                responses.sendJSONResponseOptions({
-                    response: res,
-                    status: 200,
-                    message: {
-                        "status": "success", "statusCode": 200,
-                        "count": 0,
-                        "result": []
-                    }
-                });
-                return;
-            }
-        },
-        options
-    )
-};
-var getPersonSpaceRoles = function (options) {
-    let { req, res, next, spaces, i } = options;
-    let personID = req.params.personID;
-    let space = spaces[i];
-    var querySQL = '';
-    var places = [];
-    querySQL = querySQL
-        + 'SELECT users_spaces.*,'
-        + ' space_roles.name_en AS space_role_name_en, space_roles.name_pt AS space_role_name_pt'
-        + ' FROM users_spaces'
-        + ' LEFT JOIN space_roles ON space_roles.id = users_spaces.role_id'
-        + ' WHERE users_spaces.person_id = ? AND users_spaces.space_id = ?'
-        ;
-    places.push(personID, space.space_id)
-    return sql.getSQLOperationResult(req, res, querySQL, places,
-        (resQuery, options) => {
-            options.spaces[i].roles = resQuery
-            if (i + 1 < options.spaces.length) {
-                options.i = i + 1;
-                return getPersonSpaceRoles(options);
-            } else {
-                responses.sendJSONResponseOptions({
-                    response: res,
-                    status: 200,
-                    message: {
-                        "status": "success", "statusCode": 200,
-                        "count": spaces.length,
-                        "result": options.spaces
-                    }
-                });
-                return;
-            }
-        },
-        options
-    )
-};
-module.exports.getPersonSpaces = function (req, res, next) {
-    permissions.checkPermissions(
-        (options) => { actionGetPersonSpaces(options) },
-        { req, res, next }
-    );
-};
-
-var actionAddPersonSpaces = function (options) {
-    let { req, res, next } = options;
-    let personID = req.params.personID;
-    let data = req.body.data;
-    if (data.valid_from === '') {
-        data.valid_from = null;
-    }
-    if (data.valid_until === '') {
-        data.valid_until = null;
-    }
-    var querySQL = '';
-    var places = [];
-    querySQL = querySQL
-        + 'INSERT INTO users_spaces (person_id, space_id, role_id, valid_from, valid_until)'
-        + ' VALUES (?,?,?,?,?);'
-        ;
-    places.push(personID,
-        data.space_id,
-        data.role_id,
-        data.valid_from,
-        data.valid_until
-    )
-    return sql.makeSQLOperation(req, res, querySQL, places)
-};
-module.exports.addPersonSpaces = function (req, res, next) {
-    permissions.checkPermissions(
-        (options) => { actionAddPersonSpaces(options) },
-        { req, res, next }
-    );
-};
-var actionAddPersonRoles = function (options) {
-    let { req, res, next } = options;
-    let personID = req.params.personID;
-    let spaceID = req.params.spaceID;
-    let data = req.body.data;
-    if (data.valid_from === '') {
-        data.valid_from = null;
-    }
-    if (data.valid_until === '') {
-        data.valid_until = null;
-    }
-    var querySQL = '';
-    var places = [];
-    querySQL = querySQL
-        + 'INSERT INTO users_spaces (person_id, space_id, role_id, valid_from, valid_until)'
-        + ' VALUES (?,?,?,?,?);'
-        ;
-    places.push(personID,
-        spaceID,
-        data.role_id,
-        data.valid_from,
-        data.valid_until
-    )
-    return sql.makeSQLOperation(req, res, querySQL, places)
-};
-module.exports.addPersonRoles = function (req, res, next) {
-    permissions.checkPermissions(
-        (options) => { actionAddPersonRoles(options) },
-        { req, res, next }
-    );
-};
-var actionUpdatePersonRoles = function (options) {
-    let { req, res, next } = options;
-    let userRoleID = req.params.roleID;
-    let data = req.body.data;
-    if (data.valid_from === '') {
-        data.valid_from = null;
-    }
-    if (data.valid_until === '') {
-        data.valid_until = null;
-    }
-    var querySQL = '';
-    var places = [];
-    querySQL = querySQL
-        + 'UPDATE users_spaces'
-        + ' SET role_id = ?,'
-        + ' valid_from = ?,'
-        + ' valid_until = ?'
-        + ' WHERE id = ?;'
-        ;
-    places.push(
-        data.role_id,
-        data.valid_from,
-        data.valid_until,
-        userRoleID
-    );
-    return sql.makeSQLOperation(req, res, querySQL, places)
-};
-module.exports.updatePersonRoles = function (req, res, next) {
-    permissions.checkPermissions(
-        (options) => { actionUpdatePersonRoles(options) },
-        { req, res, next }
-    );
-};
-var actionDeletePersonRoles = function (options) {
-    let { req, res, next } = options;
-    let userRoleID = req.params.roleID;
-    var querySQL = '';
-    var places = [];
-    querySQL = querySQL
-        + 'DELETE FROM users_spaces WHERE id = ?;'
-        ;
-    places.push(userRoleID)
-    return sql.makeSQLOperation(req, res, querySQL, places)
-};
-module.exports.deletePersonRoles = function (req, res, next) {
-    permissions.checkPermissions(
-        (options) => { actionDeletePersonRoles(options) },
-        { req, res, next }
-    );
-};
-
-
-var actionGetManagerSpaces = function (options) {
-    let { req, res, next } = options;
-    let personID = req.params.personID;
-    var querySQL = '';
-    var places = [];
-    querySQL = querySQL
-        + 'SELECT DISTINCT supervisors_spaces.*,'
+        + 'SELECT DISTINCT teams_spaces.*,'
         + ' spaces.area, spaces.reference, spaces.short_reference,'
         + ' spaces.name_en AS space_name_en, spaces.name_pt AS space_name_pt,'
         + ' spaces.space_type_id,'
         + ' space_types.name_en AS space_type_name_en, space_types.name_pt AS space_type_name_pt'
-        + ' FROM supervisors_spaces'
-        + ' LEFT JOIN spaces ON spaces.id = supervisors_spaces.space_id'
+        + ' FROM teams_spaces'
+        + ' LEFT JOIN spaces ON spaces.id = teams_spaces.space_id'
         + ' LEFT JOIN space_types ON space_types.id = spaces.space_type_id'
-        + ' WHERE supervisors_spaces.person_id = ?'
+        + ' WHERE teams_spaces.team_id = ?'
         + ' ORDER BY reference ASC'
         ;
-    places.push(personID)
+    places.push(depTeamID)
     return sql.makeSQLOperation(req, res, querySQL, places)
 };
-module.exports.getManagerSpaces = function (req, res, next) {
+module.exports.getLabSpaces = function (req, res, next) {
     permissions.checkPermissions(
-        (options) => { actionGetManagerSpaces(options) },
+        (options) => { actionGetLabSpaces(options) },
         { req, res, next }
     );
 };
 
 var getSpacePercentages = function (options, callback) {
     let { req, res, next } = options;
-    let spaceID = req.params.spaceID; // maybe no route will use this
+    let spaceID = req.params.spaceID;
     let data;
     if (spaceID === undefined) {
         data = req.body.data
@@ -392,9 +165,9 @@ var getSpacePercentages = function (options, callback) {
         },
         options);
 };
-var actionAddManagerSpaces = function (options) {
+var actionAddLabSpaces = function (options) {
     let { req, res, next, space } = options;
-    let personID = req.params.personID;
+    let labID = req.params.labID;
     let data = req.body.data;
     if (data.valid_from === '') {
         data.valid_from = null;
@@ -454,11 +227,11 @@ var actionAddManagerSpaces = function (options) {
         var querySQL = '';
         var places = [];
         querySQL = querySQL
-            + 'INSERT INTO supervisors_spaces'
-            + ' (person_id, space_id, percentage, valid_from, valid_until)'
+            + 'INSERT INTO labs_spaces'
+            + ' (lab_id, space_id, percentage, valid_from, valid_until)'
             + ' VALUES (?, ?, ?, ?, ?);'
             ;
-        places.push(personID,
+        places.push(labID,
             data.space_id,
             data.percentage,
             data.valid_from,
@@ -477,14 +250,14 @@ var actionAddManagerSpaces = function (options) {
     }
 
 };
-module.exports.addManagerSpaces = function (req, res, next) {
+module.exports.addLabSpaces = function (req, res, next) {
     permissions.checkPermissions(
-        (options) => { getSpacePercentages(options, actionAddManagerSpaces) },
+        (options) => { getSpacePercentages(options, actionAddLabSpaces) },
         { req, res, next }
     );
 };
 
-var actionUpdateManagerSpace = function (options) {
+var actionUpdateLabSpace = function (options) {
     let { req, res, next, space } = options;
     let labID = req.params.labID;
     let data = req.body.data;
@@ -553,7 +326,7 @@ var actionUpdateManagerSpace = function (options) {
         var querySQL = '';
         var places = [];
         querySQL = querySQL
-            + 'UPDATE supervisors_spaces'
+            + 'UPDATE labs_spaces'
             + ' SET percentage = ?,'
             + ' valid_from = ?,'
             + ' valid_until = ?'
@@ -577,31 +350,30 @@ var actionUpdateManagerSpace = function (options) {
         });
     }
 };
-module.exports.updateManagerSpace = function (req, res, next) {
+module.exports.updateLabSpace = function (req, res, next) {
     permissions.checkPermissions(
-        (options) => { getSpacePercentages(options, actionUpdateManagerSpace) },
+        (options) => { getSpacePercentages(options, actionUpdateLabSpace) },
         { req, res, next }
     );
 };
 
-var actionDeleteManagerSpace = function (options) {
+var actionDeleteLabSpace = function (options) {
     let { req, res, next } = options;
-    let supervisorSpaceID = req.params.supervisorSpaceID;
+    let labSpaceID = req.params.labSpaceID;
     var querySQL = '';
     var places = [];
     querySQL = querySQL
-        + 'DELETE FROM supervisors_spaces WHERE id = ?'
+        + 'DELETE FROM labs_spaces WHERE id = ?'
         ;
-    places.push(supervisorSpaceID);
+    places.push(labSpaceID);
     return sql.makeSQLOperation(req, res, querySQL, places);
 };
-module.exports.deleteManagerSpace = function (req, res, next) {
+module.exports.deleteLabSpace = function (req, res, next) {
     permissions.checkPermissions(
-        (options) => { actionDeleteManagerSpace(options) },
+        (options) => { actionDeleteLabSpace(options) },
         { req, res, next }
     );
 };
-
 var actionGetSpaceInfo = function (options) {
     let { req, res, next } = options;
     let spaceID = req.params.spaceID;
@@ -642,10 +414,10 @@ var getLabsAssociatedToSpace = function (options) {
     var querySQL = '';
     var places = [];
     querySQL = querySQL
-        + 'SELECT labs_spaces.*, labs.name'
-        + ' FROM labs_spaces'
-        + ' JOIN labs ON labs.id = labs_spaces.lab_id'
-        + ' WHERE labs_spaces.space_id = ?'
+        + 'SELECT teams_spaces.*, labs.name'
+        + ' FROM teams_spaces'
+        + ' JOIN labs ON labs.id = teams_spaces.lab_id'
+        + ' WHERE teams_spaces.space_id = ?'
         ;
     places.push(spaceID)
     return sql.getSQLOperationResult(req, res, querySQL, places,
@@ -655,7 +427,7 @@ var getLabsAssociatedToSpace = function (options) {
                 options.i = 0;
                 return getLabLeaderFromLabsAssociatedToSpace(options);
             } else {
-                return getManagersAssociatedToSpace(options);
+                return getSupervisorsAssociatedToSpace(options);
             }
 
         },
@@ -681,12 +453,12 @@ var getLabLeaderFromLabsAssociatedToSpace = function (options) {
                 options.i = i + 1;
                 return getLabLeaderFromLabsAssociatedToSpace(options);
             } else {
-                return getManagersAssociatedToSpace(options);
+                return getSupervisorsAssociatedToSpace(options);
             }
         },
         options);
 };
-var getManagersAssociatedToSpace = function (options) {
+var getSupervisorsAssociatedToSpace = function (options) {
     let { req, res, next, space } = options;
     let spaceID = req.params.spaceID;
     var querySQL = '';
@@ -703,7 +475,7 @@ var getManagersAssociatedToSpace = function (options) {
             options.space.supervisors = resQuery;
             if (resQuery.length > 0) {
                 options.i = 0;
-                return getLabsFromManagersAssociatedToSpace(options);
+                return getLabsFromSupervisorsAssociatedToSpace(options);
             } else {
                 return responses.sendJSONResponseOptions({
                     response: res,
@@ -719,7 +491,7 @@ var getManagersAssociatedToSpace = function (options) {
         },
         options);
 }
-var getLabsFromManagersAssociatedToSpace = function (options) {
+var getLabsFromSupervisorsAssociatedToSpace = function (options) {
     let { req, res, next, space, i } = options;
     let supervisor = space.supervisors[i];
     var querySQL = '';
@@ -736,7 +508,7 @@ var getLabsFromManagersAssociatedToSpace = function (options) {
             options.space.supervisors[i].labs = resQuery;
             if (i + 1 < options.space.supervisors.length) {
                 options.i = i + 1;
-                return getLabsFromManagersAssociatedToSpace(options);
+                return getLabsFromSupervisorsAssociatedToSpace(options);
             } else {
                 return responses.sendJSONResponseOptions({
                     response: res,
