@@ -114,7 +114,7 @@ export default {
                         })
                     }
                 }
-                this.$http.all(
+                Promise.all(
                     getFromUnits.map(el =>
                         this.$http.get(el.url,
                             {
@@ -123,7 +123,7 @@ export default {
                         )
                     )
                 )
-                .then( this.$http.spread( (...members) => {
+                .then( (members) => {
                     let list = []
                     for (let ind in members) {
                         for (let indMember in members[ind].data.result) {
@@ -135,7 +135,7 @@ export default {
                     }
                     this.data.members = list;
                     this.loading = false;
-                }))
+                })
             }
         },
         editItem (item) {

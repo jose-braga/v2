@@ -598,7 +598,7 @@ export default {
                         + '/managers/' + personID,
                     body: this.data.poll,
                 });
-                this.$http.all(
+                Promise.all(
                     urlCreateQuestionOption.map(el =>
                         this.$http.post(el.url,
                             { data: el.body, },
@@ -685,7 +685,7 @@ export default {
                                 }))
                         )
                 )
-                .then(this.$http.spread( () => {
+                .then( () => {
                         this.progress = false;
                         this.success = true;
                         setTimeout(() => {this.success = false;}, 1500)
@@ -693,7 +693,7 @@ export default {
                         this.toDeleteQuestions = [];
                         this.toDeleteQuestionOptions = [];
                         this.initialize();
-                }))
+                })
                 .catch((error) => {
                     this.progress = false;
                     this.error = true;
@@ -724,7 +724,7 @@ export default {
                         });
                     }
                 }
-                this.$http.all(
+                Promise.all(
                     urlAddPeople.map(el =>
                         this.$http.post(el.url,
                             { data: el.body, },
@@ -733,12 +733,12 @@ export default {
                             },
                         }))
                 )
-                .then(this.$http.spread( () => {
+                .then( () => {
                         this.progressPeople = false;
                         this.successPeople = true;
                         setTimeout(() => {this.successPeople = false;}, 1500)
                         this.initialize();
-                }))
+                })
                 .catch((error) => {
                     this.progressPeople = false;
                     this.errorPeople = true;
@@ -764,7 +764,7 @@ export default {
                         });
                     }
                 }
-                this.$http.all(
+                Promise.all(
                     urlDeletePeople.map(el =>
                         this.$http.delete(el.url,
                             { headers:
@@ -772,12 +772,12 @@ export default {
                             },
                         }))
                 )
-                .then(this.$http.spread( () => {
+                .then( () => {
                     this.progressDelete = false;
                     this.successDelete = true;
                     setTimeout(() => {this.successDelete = false;}, 1500)
                     this.initialize();
-                }))
+                })
                 .catch((error) => {
                     this.progressDelete = false;
                     this.errorDelete = true;
@@ -803,7 +803,7 @@ export default {
                         url: 'api/polls/' + pollID
                             + '/managers/'+ managerID,
                     });
-                    this.$http.all(
+                    Promise.all(
                         urlDeletePoll.map(el =>
                             this.$http.delete(el.url,
                                 { headers:
@@ -811,12 +811,12 @@ export default {
                                 },
                             }))
                     )
-                    .then(this.$http.spread( () => {
+                    .then( () => {
                         this.progressPollDelete = false;
                         this.successPollDelete = true;
                         setTimeout(() => {this.successPollDelete = false;}, 1500)
                         this.$router.push('/polls/managers')
-                    }))
+                    })
                     .catch((error) => {
                         this.progressPollDelete = false;
                         this.errorPollDelete = true;

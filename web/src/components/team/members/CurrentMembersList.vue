@@ -551,14 +551,14 @@ export default {
                             ));
                         }
                     }
-                    this.$http.all(requests)
-                        .then(this.$http.spread( () => {
+                    Promise.all(requests)
+                        .then( () => {
                             member.progress = false;
                             member.success = true;
                             setTimeout(() => {member.success = false;}, 1500)
                             this.$root.$emit('updatePastTeamMembers')
                             this.initialize();
-                        }))
+                        })
                         .catch((error) => {
                             member.progress = false;
                             member.error = true;
@@ -595,14 +595,14 @@ export default {
                         ));
                     }
                 }
-                this.$http.all(requests)
-                    .then(this.$http.spread( () => {
+                Promise.all(requests)
+                    .then( () => {
                         member.progress = false;
                         member.success = true;
                         setTimeout(() => {member.success = false;}, 1500)
                         this.$root.$emit('updatePastTeamMembers')
                         this.initialize();
-                    }))
+                    })
                     .catch((error) => {
                         member.progress = false;
                         member.error = true;

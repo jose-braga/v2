@@ -124,7 +124,7 @@ export default {
                     url: 'api/polls'
                         + '/managers/'+ managerID,
                 });
-                this.$http.all(
+                Promise.all(
                     urlCreatePoll.map(el =>
                         this.$http.post(el.url,
                             { data: {} },
@@ -133,7 +133,7 @@ export default {
                             },
                         }))
                 )
-                .then(this.$http.spread( (...result) => {
+                .then( (result) => {
                     if (result !== null && result !== undefined && result.length > 0) {
                         let newPollID = result[0].data.result.pollID
                         this.progress = false;
@@ -141,7 +141,7 @@ export default {
                         setTimeout(() => {this.success = false;}, 1500)
                         this.$router.push('/polls/managers/' + newPollID)
                     }
-                }))
+                })
                 .catch((error) => {
                     this.progress = false;
                     this.error = true;

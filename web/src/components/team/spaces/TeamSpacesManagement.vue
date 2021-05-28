@@ -227,7 +227,6 @@ export default {
             if (this.depTeamId !== undefined) {
                 urlSubmit = 'api/department-teams/' + this.depTeamId + '/spaces';
             }
-
             subUtil.getInfoPopulate(this, urlSubmit, true)
             .then((result) => {
                 for (let ind in result) {
@@ -247,6 +246,51 @@ export default {
                 }
                 this.data.spaces = result;
             })
+        },
+        submitForm () {
+            if (this.$store.state.session.loggedIn) {
+                this.progress = true;
+                let urlCreate = [];
+                let url
+                if (this.labId !== undefined) {
+                    url = 'api/labs/' + this.labId + '/spaces';
+                }
+                if (this.depTeamId !== undefined) {
+                    url = 'api/department-teams/' + this.depTeamId + '/spaces';
+                }
+                urlCreate.push({
+                    url: url,
+                    body: this.data.newSpaces,
+                });
+                Promise.all(
+                    urlCreate.map(el =>
+                        this.$http.post(el.url,
+                            { data: el.body, },
+                            { headers:
+                                {'Authorization': 'Bearer ' + localStorage['v2-token']
+                            },
+                        }))
+                )
+                .then( () => {
+                    this.progress = false;
+                    this.success = true;
+                    setTimeout(() => {this.success = false;}, 1500)
+                    //this.toDeleteLabPositions = []; // add the others
+                    this.data.newSpaces = {}
+                    this.addingNewSpace = false;
+                    this.initialize();
+                })
+                .catch((error) => {
+                    if (error.response) {
+                        this.errorMessage = error.response.data.message;
+                    }
+                    this.progress = false;
+                    this.error = true;
+                    setTimeout(() => {this.error = false;}, 6000)
+                    // eslint-disable-next-line
+                    console.log(error)
+                })
+            }
         },
 
 
@@ -283,9 +327,15 @@ export default {
             let confirmation = confirm('Do you want to delete this association?')
             if (confirmation) {
                 let urlDeleteLab = [];
+                let url
+                if (this.labId !== undefined) {
+                    url = 'api/labs/' + this.labId + '/spaces/' + item.id;
+                }
+                if (this.depTeamId !== undefined) {
+                    url = 'api/department-teams/' + this.depTeamId + '/spaces/' + item.id;
+                }
                 urlDeleteLab.push({
-                    url: 'api/labs/' + this.lab
-                        + '/spaces/' + item.id
+                    url: url
                 });
                 Promise.all(
                     urlDeleteLab.map(el =>

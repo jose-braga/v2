@@ -32,7 +32,7 @@
                         <v-card-title>
                             <span> Edit document data</span>
                         </v-card-title>
-                        <v-card-text>{{data.item}}</v-card-text>
+                        <v-card-text></v-card-text>
                         <v-container>
                             <v-form ref="form"
                                 @submit.prevent="submitForm"
@@ -50,6 +50,12 @@
                                             @change="changedContentOption()"
                                             label="Contents type">
                                         </v-select>
+                                    </v-col>
+                                    <v-col cols="2">
+                                        <v-text-field
+                                            v-model="data.item.sort_order"
+                                            label="Order #">
+                                        </v-text-field>
                                     </v-col>
                                 </v-row>
                                 <v-row align="center">
@@ -237,6 +243,11 @@ export default {
     mounted () {
         this.initialize();
         this.getDocumentTypes();
+        this.$root.$on('updateUnitUserDocumentsList',
+            () => {
+                this.initialize();
+            }
+        );
     },
     watch: {
         cityId () {
@@ -291,6 +302,7 @@ export default {
                 formData.append('title',this.data.item.title);
                 formData.append('content',this.data.item.content);
                 formData.append('doc_type_id',this.data.item.doc_type_id);
+                formData.append('sort_order',this.data.item.sort_order);
                 if (this.data.item.valid_from !== null
                         && this.data.item.valid_from !== undefined) {
                     formData.append('valid_from', this.data.item.valid_from);
@@ -348,7 +360,7 @@ export default {
                                     + '/documents/' + this.toDelete[ind].id);
                     }
                 }
-                this.$http.all(
+                Promise.all(
                     urlDelete.map(el =>
                         this.$http.delete(el,
                             { headers:
@@ -356,14 +368,14 @@ export default {
                             }
                     ))
                 )
-                .then(this.$http.spread( () => {
+                .then( () => {
                     this.progress = false;
                     this.success = true;
                     setTimeout(() => {this.success = false;}, 1500)
                     this.toDelete = [];
                     this.$root.$emit('updateUnitUserDocumentsList')
                     this.initialize();
-                }))
+                })
                 .catch((error) => {
                     this.progress = false;
                     this.error = true;

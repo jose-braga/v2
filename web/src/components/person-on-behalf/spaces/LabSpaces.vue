@@ -251,7 +251,7 @@ export default {
                         + '/spaces',
                     body: this.data.newSpaces,
                 });
-                this.$http.all(
+                Promise.all(
                     urlCreate.map(el =>
                         this.$http.post(el.url,
                             { data: el.body, },
@@ -260,7 +260,7 @@ export default {
                             },
                         }))
                 )
-                .then(this.$http.spread( () => {
+                .then( () => {
                     this.progress = false;
                     this.success = true;
                     setTimeout(() => {this.success = false;}, 1500)
@@ -268,7 +268,7 @@ export default {
                     this.data.newSpaces = {}
                     this.addingNewSpace = false;
                     this.initialize();
-                }))
+                })
                 .catch((error) => {
                     if (error.response) {
                         this.errorMessage = error.response.data.message;

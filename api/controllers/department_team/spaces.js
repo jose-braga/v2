@@ -149,15 +149,18 @@ var getSpacePercentages = function (options, callback) {
     var querySQL = '';
     var places = [];
     querySQL = querySQL
-        + 'SELECT id AS lab_space_id, NULL AS supervisor_space_id, lab_id, NULL AS person_id, space_id, percentage, valid_from, valid_until'
-        + ' FROM labs_spaces'
+        + 'SELECT id AS team_space_id, team_id, space_id, percentage, valid_from, valid_until'
+        + ' FROM teams_spaces'
         + ' WHERE space_id = ?'
-        + ' UNION'
-        + ' SELECT NULL AS lab_space_id, id AS supervisor_space_id, NULL AS lab_id, person_id, space_id, percentage, valid_from, valid_until'
-        + ' FROM supervisors_spaces'
-        + ' WHERE space_id = ?'
+        //+ ' UNION'
+        //+ ' SELECT NULL AS lab_space_id, id AS supervisor_space_id, NULL AS lab_id, person_id, space_id, percentage, valid_from, valid_until'
+        //+ ' FROM supervisors_spaces'
+        //+ ' WHERE space_id = ?'
         ;
-    places.push(spaceID, spaceID)
+    places.push(
+        spaceID,
+        //spaceID
+    )
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             options.space = resQuery;
@@ -167,7 +170,7 @@ var getSpacePercentages = function (options, callback) {
 };
 var actionAddLabSpaces = function (options) {
     let { req, res, next, space } = options;
-    let labID = req.params.labID;
+    let depTeamID = req.params.depTeamID;
     let data = req.body.data;
     if (data.valid_from === '') {
         data.valid_from = null;
@@ -227,11 +230,11 @@ var actionAddLabSpaces = function (options) {
         var querySQL = '';
         var places = [];
         querySQL = querySQL
-            + 'INSERT INTO labs_spaces'
-            + ' (lab_id, space_id, percentage, valid_from, valid_until)'
+            + 'INSERT INTO teams_spaces'
+            + ' (team_id, space_id, percentage, valid_from, valid_until)'
             + ' VALUES (?, ?, ?, ?, ?);'
             ;
-        places.push(labID,
+        places.push(depTeamID,
             data.space_id,
             data.percentage,
             data.valid_from,
@@ -259,7 +262,7 @@ module.exports.addLabSpaces = function (req, res, next) {
 
 var actionUpdateLabSpace = function (options) {
     let { req, res, next, space } = options;
-    let labID = req.params.labID;
+    let depTeamID = req.params.depTeamID;
     let data = req.body.data;
     if (data.valid_from === '') {
         data.valid_from = null;
@@ -272,7 +275,7 @@ var actionUpdateLabSpace = function (options) {
     let max_sum_percentage = 0;
     for (let ind in space) {
         // remove the lab-space row you are going to update
-        if (space[ind].lab_space_id === data.id) {
+        if (space[ind].team_space_id === data.id) {
             space.splice(ind, 1);
             break
         }
@@ -326,7 +329,7 @@ var actionUpdateLabSpace = function (options) {
         var querySQL = '';
         var places = [];
         querySQL = querySQL
-            + 'UPDATE labs_spaces'
+            + 'UPDATE teams_spaces'
             + ' SET percentage = ?,'
             + ' valid_from = ?,'
             + ' valid_until = ?'
@@ -359,13 +362,13 @@ module.exports.updateLabSpace = function (req, res, next) {
 
 var actionDeleteLabSpace = function (options) {
     let { req, res, next } = options;
-    let labSpaceID = req.params.labSpaceID;
+    let teamSpaceID = req.params.teamSpaceID;
     var querySQL = '';
     var places = [];
     querySQL = querySQL
-        + 'DELETE FROM labs_spaces WHERE id = ?'
+        + 'DELETE FROM teams_spaces WHERE id = ?'
         ;
-    places.push(labSpaceID);
+    places.push(teamSpaceID);
     return sql.makeSQLOperation(req, res, querySQL, places);
 };
 module.exports.deleteLabSpace = function (req, res, next) {
@@ -414,25 +417,32 @@ var getLabsAssociatedToSpace = function (options) {
     var querySQL = '';
     var places = [];
     querySQL = querySQL
-        + 'SELECT teams_spaces.*, labs.name'
+        + 'SELECT teams_spaces.*, teams_department.name AS team_name,'
+        + ' labs.name AS lab_name, labs.id AS lab_id'
         + ' FROM teams_spaces'
-        + ' JOIN labs ON labs.id = teams_spaces.lab_id'
+        + ' JOIN teams_department ON teams_department.id = teams_spaces.team_id'
+        + ' JOIN labs ON labs.id = teams_department.lab_id'
         + ' WHERE teams_spaces.space_id = ?'
         ;
     places.push(spaceID)
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             options.space.labs = resQuery;
-            if ( resQuery.length > 0) {
-                options.i = 0;
-                return getLabLeaderFromLabsAssociatedToSpace(options);
-            } else {
-                return getSupervisorsAssociatedToSpace(options);
-            }
-
+            return responses.sendJSONResponseOptions({
+                response: res,
+                status: 200,
+                message: {
+                    "status": "success",
+                    "statusCode": 200,
+                    "count": 1,
+                    "result": options.space,
+                }
+            });
         },
         options);
 };
+
+// Remove the following 3 functions ??
 var getLabLeaderFromLabsAssociatedToSpace = function (options) {
     let { req, res, next, space, i } = options;
     let lab = space.labs[i];

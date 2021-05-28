@@ -25,6 +25,12 @@
                         label="Contents type">
                     </v-select>
                 </v-col>
+                <v-col cols="2">
+                    <v-text-field
+                        v-model="data.document.sort_order"
+                        label="Order #">
+                    </v-text-field>
+                </v-col>
             </v-row>
             <v-row align="center">
                 <v-col cols="12" sm="4">
@@ -172,6 +178,7 @@ export default {
                 formData.append('title',this.data.document.title);
                 formData.append('content',this.data.document.content);
                 formData.append('doc_type_id',this.data.document.doc_type_id);
+                formData.append('sort_order',this.data.document.sort_order);
                 if (this.data.document.valid_from !== null
                         && this.data.document.valid_from !== undefined) {
                     formData.append('valid_from', this.data.document.valid_from);
@@ -211,30 +218,6 @@ export default {
                     // eslint-disable-next-line
                     console.log(error)
                 });
-
-
-
-                /*
-                this.$http.all(
-                    urlCreate.map(el =>
-
-                    )
-                )
-                .then(this.$http.spread( () => {
-                    this.progress = false;
-                    this.success = true;
-                    setTimeout(() => {this.success = false;}, 1500)
-                    this.initialize();
-                }))
-                .catch((error) => {
-                    this.progress = false;
-                    this.error = true;
-                    this.initialize();
-                    setTimeout(() => {this.error = false;}, 6000)
-                    // eslint-disable-next-line
-                    console.log(error)
-                })
-                */
             }
         },
         changedContentOption () {

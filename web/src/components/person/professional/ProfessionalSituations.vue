@@ -461,7 +461,7 @@ export default {
                             + '/professional-situations/' + this.toDeleteContracts[ind].situation.id
                             + '/contracts/' + this.toDeleteContracts[ind].contract.contract_id);
                     }
-                    this.$http.all(
+                    Promise.all(
                         urlCreate.map(el =>
                             this.$http.post(el.url,
                                 { data: el.body, },
@@ -470,7 +470,7 @@ export default {
                                 },
                             }))
                     )
-                    .then(this.$http.spread( (...createdJobs) => {
+                    .then( (createdJobs) => {
                         for (let ind in createdJobs) {
                             let jobID = createdJobs[ind].data.result.jobID;
                             for (let indFellow in urlCreate[ind].body.fellowships) {
@@ -486,7 +486,7 @@ export default {
                                 });
                             }
                         }
-                        return this.$http.all(
+                        return Promise.all(
                             urlCreateFellowships.map(el =>
                                 this.$http.post(el.url,
                                     { data: el.body, },
@@ -523,9 +523,9 @@ export default {
                                     },
                                 })))
                         )
-                    }))
-                    .then(this.$http.spread( () => {
-                        return this.$http.all(
+                    })
+                    .then( () => {
+                        return Promise.all(
                             urlDeleteFellowships.map(el =>
                                 this.$http.delete(el,
                                     { headers:
@@ -540,9 +540,9 @@ export default {
                                 }))
                             )
                         );
-                    }))
-                    .then(this.$http.spread( () => {
-                        return this.$http.all(
+                    })
+                    .then( () => {
+                        return Promise.all(
                             urlDelete.map(el =>
                                 this.$http.delete(el,
                                     { headers:
@@ -550,8 +550,8 @@ export default {
                                     },
                                 }))
                             )
-                    }))
-                    .then(this.$http.spread( () => {
+                    })
+                    .then( () => {
                         this.progress = false;
                         this.success = true;
                         setTimeout(() => {this.success = false;}, 1500)
@@ -559,7 +559,7 @@ export default {
                         this.toDeleteFellowships = [];
                         this.toDeleteContracts = [];
                         this.initialize();
-                    }))
+                    })
                     .catch((error) => {
                         this.progress = false;
                         this.error = true;

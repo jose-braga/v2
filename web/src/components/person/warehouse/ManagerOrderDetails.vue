@@ -209,7 +209,7 @@ export default {
                     + '/order-management/orders/' + this.data.thisOrder.id,
                 body: this.data.thisOrder,
             });
-            this.$http.all(
+            Promise.all(
                 urlUpdate.map(el =>
                     this.$http.put(el.url,
                         { data: el.body, },
@@ -218,7 +218,7 @@ export default {
                         },
                     }))
             )
-            .then(this.$http.spread( () => {
+            .then( () => {
                 this.progress = false;
                 this.success = true;
                 this.$root.$emit('orderManagerOrderUpdate');
@@ -226,7 +226,7 @@ export default {
                     this.success = false;
                 }
                 , 1000)
-            }))
+            })
             .catch((err) => {
                 this.progress = false;
                 this.error = true;

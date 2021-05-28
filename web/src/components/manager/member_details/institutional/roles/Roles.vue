@@ -181,6 +181,26 @@
                 </v-expansion-panels>
             </v-col>
         </v-row>
+        <v-row>
+            <v-col>
+                <v-expansion-panels class="px-4" v-if="isLaqv">
+                    <v-expansion-panel>
+                        <v-expansion-panel-header>
+                            <div>
+                                <span class="role-name">Internal Department Teams (NOVA ST only)</span>
+                            </div>
+                        </v-expansion-panel-header>
+                        <v-expansion-panel-content>
+                            <DepartmentTeams
+                                :person-id="personId"
+                                :manager-id="managerId"
+                                :endpoint="endpoint"
+                            ></DepartmentTeams>
+                        </v-expansion-panel-content>
+                    </v-expansion-panel>
+                </v-expansion-panels>
+            </v-col>
+        </v-row>
 </v-card>
 
 </template>
@@ -193,6 +213,7 @@ const ScientificAffiliations = () => import(/* webpackChunkName: "manager-detail
 const TechnicalAffiliations = () => import(/* webpackChunkName: "manager-details-roles-technical-affiliations" */ './TechnicalAffiliations')
 const ScienceManagerAffiliations = () => import(/* webpackChunkName: "manager-details-roles-science-manager-affiliations" */ './ScienceManagerAffiliations')
 const AdministrativeAffiliations = () => import(/* webpackChunkName: "manager-details-roles-administrative-affiliations" */ './AdministrativeAffiliations')
+const DepartmentTeams = () => import(/* webpackChunkName: "manager-details-roles-department-teams" */ './DepartmentTeams')
 
 export default {
     components: {
@@ -201,12 +222,14 @@ export default {
         TechnicalAffiliations,
         ScienceManagerAffiliations,
         AdministrativeAffiliations,
+        DepartmentTeams,
     },
     props: {
         personId: Number,
         personName: String,
         managerId: Number,
         endpoint: String,
+        isLaqv: Boolean,
     },
     data() {
         return {
@@ -395,7 +418,7 @@ export default {
                     }
                 }
 
-                this.$http.all(
+                Promise.all(
                     urlDeleteRoles.map(el =>
                         this.$http.delete(el,
                             { headers:
@@ -404,8 +427,8 @@ export default {
                         }))
                 )
 
-                .then(this.$http.spread( () => {
-                    return this.$http.all(
+                .then( () => {
+                    return Promise.all(
                         urlCreateRoles.map(el =>
                             this.$http.post(el.url,
                                 { data: el.body, },
@@ -414,9 +437,9 @@ export default {
                                 },
                             }))
                     );
-                }))
-                .then(this.$http.spread( () => {
-                    return this.$http.all(
+                })
+                .then( () => {
+                    return Promise.all(
                         urlUpdate.map(el =>
                             this.$http.put(el.url,
                                 { data: el.body, },
@@ -440,8 +463,8 @@ export default {
                                     },
                                 })))
                     )
-                }))
-                .then(this.$http.spread( () => {
+                })
+                .then( () => {
                     this.progress = false;
                     this.success = true;
                     setTimeout(() => {this.success = false;}, 1500)
@@ -449,7 +472,7 @@ export default {
                     this.initialize();
                     //this.changedRoles();
                     this.$root.$emit('updateManagerRolesFromRoles')
-                }))
+                })
                 .catch((error) => {
                     this.progress = false;
                     this.error = true;

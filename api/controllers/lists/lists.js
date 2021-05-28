@@ -422,7 +422,10 @@ var getAppAreas = function (req, res, next) {
 var getDepartmentTeams = function (req, res, next) {
     var querySQL = '';
     var places = [];
-    querySQL = querySQL + 'SELECT * FROM teams_department;';
+    querySQL = querySQL
+        + 'SELECT * FROM teams_department'
+        + ' ORDER BY name ASC;'
+        ;
     //places.push()
     sql.makeSQLOperation(req, res, querySQL, places);
     return;

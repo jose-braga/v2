@@ -45,13 +45,16 @@ var actionGetDocs = function (options) {
                 +' JOIN document_types ON unit_documents.doc_type_id = document_types.id'
                 +' WHERE unit_documents.unit_id = ?'
                 +' AND ((unit_documents.valid_from <= CURRENT_DATE() OR unit_documents.valid_from IS NULL) '
-                + ' AND (unit_documents.valid_until >= CURRENT_DATE() OR unit_documents.valid_until IS NULL));';
+                + ' AND (unit_documents.valid_until >= CURRENT_DATE() OR unit_documents.valid_until IS NULL))'
+                + ' ORDER BY sort_order DESC';
         places.push(unitID)
     } else {
         querySQL = querySQL
                 + 'SELECT unit_documents.*, document_types.name AS doc_type_name FROM unit_documents'
                 +' JOIN document_types ON unit_documents.doc_type_id = document_types.id'
-                +' WHERE unit_documents.unit_id = ?;';
+                +' WHERE unit_documents.unit_id = ?'
+                + ' ORDER BY sort_order DESC'
+                ;
         places.push(unitID)
     }
     return sql.makeSQLOperation(req, res, querySQL, places)
@@ -102,6 +105,7 @@ var createDocAddRemainingDataDB = function (req, res, next) {
     var docData = req.body;
     let valid_from = null;
     let valid_until = null;
+    console.log(docData)
     if (docData.valid_from !== null && docData.valid_from !== undefined && docData.valid_from !== '') {
         valid_from = time.momentToDate(docData.valid_from);
     }
@@ -118,20 +122,22 @@ var createDocAddRemainingDataDB = function (req, res, next) {
     }
     let querySQL = '';
     let places = [];
-    querySQL = 'UPDATE unit_documents' +
-                    ' SET doc_type_id = ?,' +
-                    ' title = ?,' +
-                    ' content = ?,' +
-                    ' attachment_url = ?,' +
-                    ' valid_from = ?,' +
-                    ' valid_until = ?' +
-                    ' WHERE id = ?';
+    querySQL = 'UPDATE unit_documents'
+                + ' SET doc_type_id = ?,'
+                + ' title = ?,'
+                + ' content = ?,'
+                + ' attachment_url = ?,'
+                + ' valid_from = ?,'
+                + ' valid_until = ?,'
+                + ' sort_order = ?'
+                + ' WHERE id = ?'
     places.push(docData.doc_type_id,
                 docData.title,
                 docData.content,
                 url,
                 valid_from,
                 valid_until,
+                docData.sort_order,
                 req.docID);
     return sql.makeSQLOperation(req, res, querySQL, places);
 };
@@ -169,6 +175,7 @@ var updateDocwriteFile = function (options) {
 };
 var updateDocDataDB = function (req, res, next) {
     var docData = req.body;
+    console.log(docData)
     let valid_from = null;
     let valid_until = null;
     if (docData.valid_from !== null && docData.valid_from !== undefined && docData.valid_from !== '') {
@@ -187,20 +194,22 @@ var updateDocDataDB = function (req, res, next) {
     }
     let querySQL = '';
     let places = [];
-    querySQL = 'UPDATE unit_documents' +
-                    ' SET doc_type_id = ?,' +
-                    ' title = ?,' +
-                    ' content = ?,' +
-                    ' attachment_url = ?,' +
-                    ' valid_from = ?,' +
-                    ' valid_until = ?' +
-                    ' WHERE id = ?';
+    querySQL = 'UPDATE unit_documents'
+                + ' SET doc_type_id = ?,'
+                + ' title = ?,'
+                + ' content = ?,'
+                + ' attachment_url = ?,'
+                + ' valid_from = ?,'
+                + ' valid_until = ?,'
+                + ' sort_order = ?'
+                + ' WHERE id = ?';
     places.push(docData.doc_type_id,
                 docData.title,
                 docData.content,
                 url,
                 valid_from,
                 valid_until,
+                docData.sort_order,
                 req.docID);
     return sql.makeSQLOperation(req, res, querySQL, places);
 };

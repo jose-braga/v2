@@ -210,7 +210,7 @@ export default {
             } else {
                 if (this.$store.state.session.loggedIn) {
                     this.progress = true;
-                    this.$http.all([
+                    Promise.all([
                         submitNuclearInformation(this,
                                 'api' + this.endpoint
                                 + '/members'
@@ -222,12 +222,12 @@ export default {
                                 + '/' + this.personId
                                 + '/nationalities'),
                     ])
-                    .then(this.$http.spread( () => {
+                    .then( () => {
                         this.progress = false;
                         this.success = true;
                         setTimeout(() => {this.success = false;}, 1500)
                         this.initialize(true);
-                    }))
+                    })
                     .catch((error) => {
                         this.progress = false;
                         this.error = true;

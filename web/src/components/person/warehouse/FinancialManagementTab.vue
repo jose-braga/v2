@@ -320,7 +320,7 @@ export default {
                             + '/financial-management/cost-centers/' + item.id,
                         body: item,
                     });
-                    action = this.$http.all(
+                    action = this.Promise.all(
                         url.map(el =>
                             this.$http.put(el.url,
                                 { data: el.body, },
@@ -335,7 +335,7 @@ export default {
                             + '/financial-management/cost-centers',
                         body: item,
                     });
-                    action = this.$http.all(
+                    action = this.Promise.all(
                         url.map(el =>
                             this.$http.post(el.url,
                                 { data: el.body, },
@@ -353,7 +353,7 @@ export default {
                             + '/accounts/' + item.id,
                         body: item,
                     });
-                    action = this.$http.all(
+                    action = this.Promise.all(
                         url.map(el =>
                             this.$http.put(el.url,
                                 { data: el.body, },
@@ -369,7 +369,7 @@ export default {
                             + '/accounts',
                         body: item,
                     });
-                    action = this.$http.all(
+                    action = this.Promise.all(
                         url.map(el =>
                             this.$http.post(el.url,
                                 { data: el.body, },
@@ -381,7 +381,7 @@ export default {
                 }
             }
             action
-            .then(this.$http.spread( () => {
+            .then( () => {
                 this.$set(item, 'progress', false);
                 this.$set(item, 'success', true);
                 setTimeout(() => {
@@ -390,7 +390,7 @@ export default {
                     this.initialize();
                 }, 1500);
 
-            }))
+            })
             .catch((error) => {
                 this.$set(item, 'progress', false);
                 this.$set(item, 'error', true);
@@ -423,7 +423,7 @@ export default {
                         body: item.accounts[ind],
                     });
                 }
-                action = this.$http.all(
+                action = this.Promise.all(
                     url.map(el =>
                         this.$http.put(el.url,
                             { data: el.body, },
@@ -440,7 +440,7 @@ export default {
                         + '/accounts/' + item.id,
                     body: item,
                 });
-                action = this.$http.all(
+                action = this.Promise.all(
                     url.map(el =>
                         this.$http.put(el.url,
                             { data: el.body, },
@@ -451,7 +451,7 @@ export default {
                 )
             }
             action
-            .then(this.$http.spread( () => {
+            .then( () => {
                 this.$set(item, 'progress', false);
                 this.$set(item, 'success', true);
                 setTimeout(() => {
@@ -460,7 +460,7 @@ export default {
                     this.initialize();
                 }, 1500);
 
-            }))
+            })
             .catch((error) => {
                 this.$set(item, 'progress', false);
                 this.$set(item, 'error', true);
@@ -503,7 +503,7 @@ export default {
                     }
                 }
             }
-            this.$http.all(
+            this.Promise.all(
                 urlUpdate.map(el =>
                     this.$http.put(el.url,
                         { data: el.body, },
@@ -520,7 +520,7 @@ export default {
                             },
                         })))
             )
-            .then(this.$http.spread( () => {
+            .then( () => {
                 this.$set(item, 'progress', false);
                 this.$set(item, 'success', true);
                 setTimeout(() => {
@@ -528,7 +528,7 @@ export default {
                     this.initialize();
                 }, 1500);
 
-            }))
+            })
             .catch((error) => {
                 this.$set(item, 'progress', false);
                 this.$set(item, 'error', true);

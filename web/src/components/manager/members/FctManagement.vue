@@ -380,7 +380,7 @@ export default {
                         });
                     }
                 }
-                this.$http.all(
+                Promise.all(
                     urlUpdate.map(el =>
                         this.$http.put(el.url,
                             { data: el.body, },
@@ -389,12 +389,12 @@ export default {
                             },
                         }))
                 )
-                .then(this.$http.spread( () => {
+                .then( () => {
                     this.progress = false;
                     this.success = true;
                     setTimeout(() => {this.success = false;}, 1500)
                     this.initialize();
-                }))
+                })
                 .catch((error) => {
                     this.progress = false;
                     this.error = true;
@@ -435,7 +435,7 @@ export default {
                         });
                     }
                 }
-                this.$http.all(
+                Promise.all(
                     urlUpdate.map(el =>
                         this.$http.put(el.url,
                             { data: el.body, },
@@ -444,12 +444,12 @@ export default {
                             },
                         }))
                 )
-                .then(this.$http.spread( () => {
+                .then( () => {
                     this.progressRequested = false;
                     this.successRequested = true;
                     setTimeout(() => {this.successRequested = false;}, 1500)
                     this.initialize();
-                }))
+                })
                 .catch((error) => {
                     this.progressRequested = false;
                     this.errorRequested = true;
@@ -480,7 +480,7 @@ export default {
                         });
                     }
                 }
-                this.$http.all(
+                Promise.all(
                     urlUpdate.map(el =>
                         this.$http.put(el.url,
                             { data: el.body, },
@@ -489,12 +489,12 @@ export default {
                             },
                         }))
                 )
-                .then(this.$http.spread( () => {
+                .then( () => {
                     this.progressRemoved = false;
                     this.successRemoved = true;
                     setTimeout(() => {this.successRemoved = false;}, 1500)
                     this.initialize();
-                }))
+                })
                 .catch((error) => {
                     this.progressRemoved = false;
                     this.errorRemoved = true;

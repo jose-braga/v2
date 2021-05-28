@@ -247,7 +247,7 @@ export default {
                         reference: this.reference,
                     },
                 });
-                this.$http.all(
+                Promise.all(
                     urlCreate.map(el =>
                         this.$http.post(el.url,
                             { data: el.body, },
@@ -257,12 +257,12 @@ export default {
                         )
                     )
                 )
-                .then(this.$http.spread( () => {
+                .then( () => {
                     this.progress = false;
                     this.success = true;
                     this.submitted = true;
                     setTimeout(() => {this.success = false;}, 10000)
-                }))
+                })
                 .catch((error) => {
                     this.progress = false;
                     this.error = true;

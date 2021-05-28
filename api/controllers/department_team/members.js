@@ -391,9 +391,10 @@ var actionGetDepartmentTeamInfo = function (options) {
     let depTeamID = req.params.depTeamID;
     var querySQL = '';
     var places = [];
-    querySQL = querySQL + 'SELECT * '
+    querySQL = querySQL + 'SELECT teams_department.*, labs.name AS lab_name'
                         + ' FROM teams_department'
-                        + ' WHERE id = ?;';
+                        + ' JOIN labs ON labs.id = teams_department.lab_id'
+                        + ' WHERE teams_department.id = ?;';
     places.push(depTeamID)
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
@@ -514,6 +515,33 @@ var actionAddPersonPole = function (options) {
     );
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
+            actionAddPersonDepTeam(options);
+        },
+        options);
+};
+var actionAddPersonDepTeam = function (options) {
+    let { req, res, next } = options;
+    let depTeamID = req.params.depTeamID;
+    let person = req.body.data;
+    if (person.valid_from === '') {
+        person.valid_from = null;
+    }
+    if (person.valid_until === '') {
+        person.valid_until = null;
+    }
+    let places = [];
+    querySQL = 'INSERT INTO people_team_department'
+        + ' (person_id, team_id, valid_from, valid_until)'
+        + ' VALUES (?, ?, ?, ?);';
+    places.push(
+        options.personID,
+        depTeamID,
+        person.valid_from,
+        person.valid_until
+    );
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            options.peopleLabsID = resQuery.insertId;
             actionAddPersonRole(options);
         },
         options);
@@ -536,7 +564,7 @@ var actionAddPersonRole = function (options) {
 };
 var actionAddPersonLab = function (options) {
     let { req, res, next } = options;
-    let depTeamID = req.params.depTeamID;
+    //let depTeamID = req.params.depTeamID;
     let person = req.body.data;
     if (person.valid_from === '') {
         person.valid_from = null;
@@ -546,11 +574,11 @@ var actionAddPersonLab = function (options) {
     }
     let places = [];
     querySQL = 'INSERT INTO people_labs'
-        + ' (person_id, team_id, lab_position_id, dedication, valid_from, valid_until)'
+        + ' (person_id, lab_id, lab_position_id, dedication, valid_from, valid_until)'
         + ' VALUES (?, ?, ?, ?, ?, ?);';
     places.push(
         options.personID,
-        depTeamID,
+        person.lab_id,
         person.lab_position_id,
         person.dedication,
         person.valid_from,
@@ -575,12 +603,12 @@ var actionAddPersonLabHistory = function (options) {
     }
     let places = [];
     querySQL = 'INSERT INTO people_labs_history'
-        + ' (people_labs_id, person_id, team_id, lab_position_id, dedication, valid_from, valid_until, created, operation, changed_by)'
+        + ' (people_labs_id, person_id, lab_id, lab_position_id, dedication, valid_from, valid_until, created, operation, changed_by)'
         + ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
     places.push(
         options.peopleLabsID,
         options.personID,
-        depTeamID,
+        person.lab_id,
         person.lab_position_id,
         person.dedication,
         person.valid_from,
@@ -601,7 +629,7 @@ var actionAddPersonLabHistory = function (options) {
 };
 var actionGetPersonUnit = function (options) {
     let { req, res, next } = options;
-    let depTeamID = req.params.depTeamID;
+    //let depTeamID = req.params.depTeamID;
     let person = req.body.data;
     if (person.valid_from === '') {
         person.valid_from = null;
@@ -614,10 +642,10 @@ var actionGetPersonUnit = function (options) {
         + ' FROM labs_groups'
         + ' JOIN `groups` ON labs_groups.group_id = `groups`.id'
         + ' JOIN groups_units ON groups_units.group_id = `groups`.id'
-        + ' WHERE labs_groups.team_id = ?;'
+        + ' WHERE labs_groups.lab_id = ?;'
         ;
     places.push(
-        depTeamID
+        person.lab_id
     );
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {

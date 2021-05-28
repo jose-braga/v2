@@ -278,7 +278,7 @@ export default {
                             + '/publications/' + this.publicationDetails.publication_id,
                     body: this.publicationDetails,
                 });
-                this.$http.all(
+                Promise.all(
                         urlUpdate.map(el =>
                             this.$http.put(el.url,
                                 { data: el.body, },
@@ -287,13 +287,13 @@ export default {
                                 },
                             }))
                     )
-                    .then(this.$http.spread( () => {
+                    .then( () => {
                         this.progress = false;
                         this.success = true;
                         this.$root.$emit('updateSinglePublication', this.personPublicationId);
                         setTimeout(() => {this.success = false;}, 1500)
                         this.initialize();
-                    }))
+                    })
                     .catch((error) => {
                         this.progress = false;
                         this.error = true;

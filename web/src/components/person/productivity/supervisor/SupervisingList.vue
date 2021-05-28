@@ -596,7 +596,7 @@ export default {
                         + '/students',
                     body: this.data.newStudent,
                 });
-                this.$http.all(
+                Promise.all(
                     urlCreate.map(el =>
                         this.$http.post(el.url,
                             { data: el.body, },
@@ -605,7 +605,7 @@ export default {
                             },
                         }))
                 )
-                .then(this.$http.spread( () => {
+                .then( () => {
                     this.progress = false;
                     this.success = true;
                     setTimeout(() => {this.success = false;}, 1500)
@@ -613,7 +613,7 @@ export default {
                     this.data.newStudent = {}
                     this.addingFromDB = false;
                     this.initialize();
-                }))
+                })
                 .catch((error) => {
                     this.progress = false;
                     this.error = true;
@@ -635,7 +635,7 @@ export default {
                             + '/pre-register-student/' + this.data.newStudent.lab_id,
                     body: this.data.newStudent,
                 });
-                this.$http.all(
+                Promise.all(
                         urlCreate.map(el =>
                             this.$http.post(el.url,
                                 { data: el.body, },
@@ -644,7 +644,7 @@ export default {
                                 },
                             }))
                     )
-                    .then(this.$http.spread( () => {
+                    .then( () => {
                         this.progress = false;
                         this.success = true;
                         setTimeout(() => {
@@ -660,7 +660,7 @@ export default {
                             city_id: null,
                             valid_from: null,
                         };
-                    }))
+                    })
                     .catch((error) => {
                         this.progress = false;
                         this.error = true;

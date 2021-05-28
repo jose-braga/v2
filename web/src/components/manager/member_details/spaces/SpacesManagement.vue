@@ -234,7 +234,7 @@ export default {
                                 + '/' + personID + '/spaces',
                     body: this.data.newSpaces,
                 });
-                this.$http.all(
+                Promise.all(
                     urlCreate.map(el =>
                         this.$http.post(el.url,
                             { data: el.body, },
@@ -243,14 +243,14 @@ export default {
                             },
                         }))
                 )
-                .then(this.$http.spread( () => {
+                .then( () => {
                     this.progress = false;
                     this.success = true;
                     setTimeout(() => {this.success = false;}, 1500)
                     this.data.newSpaces = {}
                     this.addingNewStudent = false;
                     this.initialize();
-                }))
+                })
                 .catch((error) => {
                     this.progress = false;
                     this.error = true;

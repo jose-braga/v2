@@ -379,7 +379,7 @@ export default {
                             })
                         }
                         //this.$store.dispatch('addApplicationData', data);
-                        return this.$http.all(
+                        return Promise.all(
                             uploadDocuments.map(el =>
                                 this.$http.post(el.url,
                                     el.body,
@@ -391,7 +391,7 @@ export default {
                         );
                     }
                 )
-                .then(this.$http.spread( () => {
+                .then( () => {
                     //this.$store.dispatch('addApplicationData', data);
                     return this.$http.post('api/v2/calls/' + callSegment
                                     + '/applications/' + data.applicationID
@@ -400,7 +400,7 @@ export default {
                             { }
                         )
                     }
-                ))
+                )
                 .then( (result) => {
                     this.progress = false;
                     this.success = true;
@@ -463,7 +463,7 @@ export default {
                                 body: formDataDegree,
                             })
                         }
-                        return this.$http.all(
+                        return Promise.all(
                             uploadDocuments.map(el =>
                                 this.$http.post(el.url,
                                     el.body,
@@ -475,7 +475,7 @@ export default {
                         );
                     }
                 )
-                .then(this.$http.spread( () => {
+                .then( () => {
                     return this.$http.put('api/v2/calls/' + callSegment
                                     + '/applications/' + this.applicationData.application.applicationID
                                     + '/scores',
@@ -483,7 +483,7 @@ export default {
                             { }
                         )
                     }
-                ))
+                )
                 .then( () => {
                     this.progress = false;
                     this.success = true;

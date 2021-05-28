@@ -111,35 +111,67 @@ var combo = function(a, min, max) {
     return all;
 };
 
-var actionGetLabSpaces = function (options) {
+var actionGetTeamFromLab = function (options, callback) {
+    // this route is used for teams that are univocally determined by a lab
+    // (i.e. UCIBIO Research Labs)
+    // NOTE: create an entry for each UCIBIO lab in the teams_department table
     let { req, res, next } = options;
     let labID = req.params.labID;
     var querySQL = '';
     var places = [];
     querySQL = querySQL
-        + 'SELECT DISTINCT labs_spaces.*,'
+        + 'SELECT DISTINCT *'
+        + ' FROM teams_department'
+        + ' WHERE lab_id = ?'
+        ;
+    places.push(labID)
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            if (resQuery.length > 0) {
+                options.depTeamID = resQuery[0].id;
+                return callback(options);
+            } else {
+                return responses.sendJSONResponseOptions({
+                    response: res,
+                    status: 403,
+                    message: {
+                        "status": "error", "statusCode": 403,
+                        "message": "There was a problema with your request. No team was found."
+                    }
+                });
+            }
+        },
+        options
+    )
+};
+var actionGetLabSpaces = function (options) {
+    let { req, res, next, depTeamID } = options;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'SELECT DISTINCT teams_spaces.*,'
         + ' spaces.area, spaces.reference, spaces.short_reference,'
         + ' spaces.name_en AS space_name_en, spaces.name_pt AS space_name_pt,'
         + ' spaces.space_type_id,'
         + ' space_types.name_en AS space_type_name_en, space_types.name_pt AS space_type_name_pt'
-        + ' FROM labs_spaces'
-        + ' LEFT JOIN spaces ON spaces.id = labs_spaces.space_id'
+        + ' FROM teams_spaces'
+        + ' LEFT JOIN spaces ON spaces.id = teams_spaces.space_id'
         + ' LEFT JOIN space_types ON space_types.id = spaces.space_type_id'
-        + ' WHERE labs_spaces.lab_id = ?'
+        + ' WHERE teams_spaces.team_id = ?'
         + ' ORDER BY reference ASC'
         ;
-    places.push(labID)
+    places.push(depTeamID)
     return sql.makeSQLOperation(req, res, querySQL, places)
 };
 module.exports.getLabSpaces = function (req, res, next) {
     permissions.checkPermissions(
-        (options) => { actionGetLabSpaces(options) },
+        (options) => { actionGetTeamFromLab(options, actionGetLabSpaces) },
         { req, res, next }
     );
 };
 
 var getSpacePercentages = function (options, callback) {
-    let { req, res, next } = options;
+    let { req, res, next, type } = options;
     let spaceID = req.params.spaceID; // maybe no route will use this
     let data;
     if (spaceID === undefined) {
@@ -149,25 +181,31 @@ var getSpacePercentages = function (options, callback) {
     var querySQL = '';
     var places = [];
     querySQL = querySQL
-        + 'SELECT id AS lab_space_id, NULL AS supervisor_space_id, lab_id, NULL AS person_id, space_id, percentage, valid_from, valid_until'
-        + ' FROM labs_spaces'
+        + 'SELECT id AS team_space_id, team_id, space_id, percentage, valid_from, valid_until'
+        + ' FROM teams_spaces'
         + ' WHERE space_id = ?'
-        + ' UNION'
-        + ' SELECT NULL AS lab_space_id, id AS supervisor_space_id, NULL AS lab_id, person_id, space_id, percentage, valid_from, valid_until'
-        + ' FROM supervisors_spaces'
-        + ' WHERE space_id = ?'
+        //+ ' UNION'
+        //+ ' SELECT NULL AS lab_space_id, id AS supervisor_space_id, NULL AS lab_id, person_id, space_id, percentage, valid_from, valid_until'
+        //+ ' FROM supervisors_spaces'
+        //+ ' WHERE space_id = ?'
         ;
     places.push(spaceID, spaceID)
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             options.space = resQuery;
-            return callback(options);
+            if (type === 'add') {
+                return actionAddLabSpaces(options);
+            } else if (type === 'update') {
+                return actionUpdateLabSpace(options);
+            } else {
+                return callback(options);
+            }
         },
         options);
 };
 var actionAddLabSpaces = function (options) {
-    let { req, res, next, space } = options;
-    let labID = req.params.labID;
+    let { req, res, next, space, depTeamID } = options;
+    //let labID = req.params.labID;
     let data = req.body.data;
     if (data.valid_from === '') {
         data.valid_from = null;
@@ -227,11 +265,11 @@ var actionAddLabSpaces = function (options) {
         var querySQL = '';
         var places = [];
         querySQL = querySQL
-            + 'INSERT INTO labs_spaces'
-            + ' (lab_id, space_id, percentage, valid_from, valid_until)'
+            + 'INSERT INTO teams_spaces'
+            + ' (team_id, space_id, percentage, valid_from, valid_until)'
             + ' VALUES (?, ?, ?, ?, ?);'
             ;
-        places.push(labID,
+        places.push(depTeamID,
             data.space_id,
             data.percentage,
             data.valid_from,
@@ -252,14 +290,17 @@ var actionAddLabSpaces = function (options) {
 };
 module.exports.addLabSpaces = function (req, res, next) {
     permissions.checkPermissions(
-        (options) => { getSpacePercentages(options, actionAddLabSpaces) },
+        (options) => {
+            options.type = 'add';
+            actionGetTeamFromLab(options, getSpacePercentages);
+        },
         { req, res, next }
     );
 };
 
 var actionUpdateLabSpace = function (options) {
-    let { req, res, next, space } = options;
-    let labID = req.params.labID;
+    let { req, res, next, space, depTeamID } = options;
+    //let labID = req.params.labID;
     let data = req.body.data;
     if (data.valid_from === '') {
         data.valid_from = null;
@@ -326,7 +367,7 @@ var actionUpdateLabSpace = function (options) {
         var querySQL = '';
         var places = [];
         querySQL = querySQL
-            + 'UPDATE labs_spaces'
+            + 'UPDATE teams_spaces'
             + ' SET percentage = ?,'
             + ' valid_from = ?,'
             + ' valid_until = ?'
@@ -352,7 +393,10 @@ var actionUpdateLabSpace = function (options) {
 };
 module.exports.updateLabSpace = function (req, res, next) {
     permissions.checkPermissions(
-        (options) => { getSpacePercentages(options, actionUpdateLabSpace) },
+        (options) => {
+            options.type = 'update';
+            actionGetTeamFromLab(options, getSpacePercentages)
+        },
         { req, res, next }
     );
 };
@@ -363,7 +407,7 @@ var actionDeleteLabSpace = function (options) {
     var querySQL = '';
     var places = [];
     querySQL = querySQL
-        + 'DELETE FROM labs_spaces WHERE id = ?'
+        + 'DELETE FROM teams_spaces WHERE id = ?'
         ;
     places.push(labSpaceID);
     return sql.makeSQLOperation(req, res, querySQL, places);
@@ -414,25 +458,32 @@ var getLabsAssociatedToSpace = function (options) {
     var querySQL = '';
     var places = [];
     querySQL = querySQL
-        + 'SELECT labs_spaces.*, labs.name'
-        + ' FROM labs_spaces'
-        + ' JOIN labs ON labs.id = labs_spaces.lab_id'
-        + ' WHERE labs_spaces.space_id = ?'
+        + 'SELECT teams_spaces.*, teams_department.name AS team_name,'
+        + ' labs.name AS lab_name, labs.id AS lab_id'
+        + ' FROM teams_spaces'
+        + ' JOIN teams_department ON teams_department.id = teams_spaces.team_id'
+        + ' JOIN labs ON labs.id = teams_department.lab_id'
+        + ' WHERE teams_spaces.space_id = ?'
         ;
     places.push(spaceID)
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             options.space.labs = resQuery;
-            if ( resQuery.length > 0) {
-                options.i = 0;
-                return getLabLeaderFromLabsAssociatedToSpace(options);
-            } else {
-                return getSupervisorsAssociatedToSpace(options);
-            }
-
+            return responses.sendJSONResponseOptions({
+                response: res,
+                status: 200,
+                message: {
+                    "status": "success",
+                    "statusCode": 200,
+                    "count": 1,
+                    "result": options.space,
+                }
+            });
         },
         options);
 };
+
+// Remove the following 3 functions ??
 var getLabLeaderFromLabsAssociatedToSpace = function (options) {
     let { req, res, next, space, i } = options;
     let lab = space.labs[i];
@@ -526,7 +577,9 @@ var getLabsFromSupervisorsAssociatedToSpace = function (options) {
 };
 module.exports.getSpaceInfo = function (req, res, next) {
     permissions.checkPermissions(
-        (options) => { actionGetSpaceInfo(options) },
+        (options) => {
+            actionGetTeamFromLab(options, actionGetSpaceInfo);
+        },
         { req, res, next }
     );
 };

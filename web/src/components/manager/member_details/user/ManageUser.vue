@@ -160,7 +160,7 @@ export default {
                         + '/' + this.data.userID,
                     body: this.data,
                 });
-                this.$http.all(
+                Promise.all(
                     urlUpdate.map(el =>
                         this.$http.put(el.url,
                             { data: el.body, },
@@ -169,7 +169,7 @@ export default {
                             },
                         }))
                 )
-                .then(this.$http.spread( () => {
+                .then( () => {
                     this.progress = false;
                     this.success = true;
                     setTimeout(() => {
@@ -177,7 +177,7 @@ export default {
                         //this.$refs.form.reset();
                     }, 1500);
                     this.initialize();
-                }))
+                })
                 .catch((error) => {
                     this.progress = false;
                     this.error = true;
@@ -200,7 +200,7 @@ export default {
                         + '/' + this.data.userID,
                     body: this.data,
                 });
-                this.$http.all(
+                Promise.all(
                     urlUpdate.map(el =>
                         this.$http.put(el.url,
                             { data: el.body, },
@@ -209,7 +209,7 @@ export default {
                             },
                         }))
                 )
-                .then(this.$http.spread( () => {
+                .then( () => {
                     this.progressPassword = false;
                     this.successPassword = true;
                     setTimeout(() => {
@@ -217,7 +217,7 @@ export default {
                         //this.$refs.form.reset();
                     }, 1500);
                     this.initialize();
-                }))
+                })
                 .catch((error) => {
                     this.progressPassword = false;
                     this.errorPassword = true;

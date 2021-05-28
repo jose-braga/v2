@@ -32,11 +32,12 @@ app.use(cookieParser());
 app.use('/api/v1', routesPublicLegacyAPI);
 app.use('/api/v1.1', routesPublicLegacyAPI_LAQV);
 app.use('/api/v2', routesPublicAPI);
+
 // Internal API routes below
+// TODO: create API routes for facilities, science mngmt offices and administrative
 app.use('/api/people', routesAPIPeople);
 app.use('/api/labs', routesAPILabs);
 app.use('/api/department-teams', routesAPIDepartmentTeams);
-// TODO: create API routes for facilities, science mngmt offices and administrative
 app.use('/api/managers', routesAPIManagers);
 app.use('/api/admins', routesAPIAdmins);
 app.use('/api/unit-areas', routesAPIAreas);

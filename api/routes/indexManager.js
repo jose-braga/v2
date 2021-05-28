@@ -58,6 +58,8 @@ const prizes = require('../controllers/people/prizes');
 const boards = require('../controllers/people/boards');
 const datasets = require('../controllers/people/datasets');
 const outreaches = require('../controllers/people/outreaches');
+const departmentTeams = require('../controllers/manager/unit/department_teams');
+const spaceManagement = require('../controllers/manager/spaces/spaces');
 
 
 const managePermissionsUnit = require('../controllers/manager/unit/manage_permissions');
@@ -345,6 +347,13 @@ router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/cost-centers
 router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/cost-centers', cors(corsOptions), costCenters.createCostCenters);
 router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/cost-centers/:costCenterID', cors(corsOptions), costCenters.updateCostCenters);
 router.delete('/:userID/units/:unitID/cities/:cityID/members/:personID/cost-centers/:costCenterID', cors(corsOptions), costCenters.deleteCostCenters);
+
+
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/department-teams', cors(corsOptions), departmentTeams.getPersonDepartmentTeam);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/department-teams', cors(corsOptions), departmentTeams.createPersonDepartmentTeam);
+router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/department-teams/:departmentTeamID', cors(corsOptions), departmentTeams.updatePersonDepartmentTeam);
+router.delete('/:userID/units/:unitID/cities/:cityID/members/:personID/department-teams/:departmentTeamID', cors(corsOptions), departmentTeams.deletePersonDepartmentTeam);
+
 
 router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/poles', cors(corsOptions), institutionalAffiliations.getPoles);
 router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/poles', cors(corsOptions), institutionalAffiliations.createPole);
@@ -742,6 +751,10 @@ router.post('/:userID/cities/:cityID/members/:personID/outreaches', cors(corsOpt
 router.put('/:userID/cities/:cityID/members/:personID/outreaches/:itemID', cors(corsOptions), outreaches.updatePersonItem);
 router.post('/:userID/cities/:cityID/members/:personID/outreaches/:itemID', cors(corsOptions), outreaches.createPersonItemAssociation);
 
+router.get('/:userID/cities/:cityID/members/:personID/department-teams', cors(corsOptions), departmentTeams.getPersonDepartmentTeam);
+router.post('/:userID/cities/:cityID/members/:personID/department-teams', cors(corsOptions), departmentTeams.createPersonDepartmentTeam);
+router.put('/:userID/cities/:cityID/members/:personID/department-teams/:departmentTeamID', cors(corsOptions), departmentTeams.updatePersonDepartmentTeam);
+router.delete('/:userID/cities/:cityID/members/:personID/department-teams/:departmentTeamID', cors(corsOptions), departmentTeams.deletePersonDepartmentTeam);
 
 
 /* Units*/
@@ -975,10 +988,23 @@ router.post('/:userID/units/:unitID/members/:personID/outreaches', cors(corsOpti
 router.put('/:userID/units/:unitID/members/:personID/outreaches/:itemID', cors(corsOptions), outreaches.updatePersonItem);
 router.post('/:userID/units/:unitID/members/:personID/outreaches/:itemID', cors(corsOptions), outreaches.createPersonItemAssociation);
 
-
+router.get('/:userID/units/:unitID/members/:personID/department-teams', cors(corsOptions), departmentTeams.getPersonDepartmentTeam);
+router.post('/:userID/units/:unitID/members/:personID/department-teams', cors(corsOptions), departmentTeams.createPersonDepartmentTeam);
+router.put('/:userID/units/:unitID/members/:personID/department-teams/:departmentTeamID', cors(corsOptions), departmentTeams.updatePersonDepartmentTeam);
+router.delete('/:userID/units/:unitID/members/:personID/department-teams/:departmentTeamID', cors(corsOptions), departmentTeams.deletePersonDepartmentTeam);
 
 /* All units at the same time */
 router.get('/:userID/current-members', cors(corsOptions), membersAll.getMembersList);
+
+// Spaces management
+router.get('/:userID/cities/:cityID/spaces', cors(corsOptions), spaceManagement.getSpacesList);
+router.put('/:userID/cities/:cityID/spaces/:spaceID', cors(corsOptions), spaceManagement.updateSpaceData);
+router.post('/:userID/cities/:cityID/spaces/:spaceID/teams', cors(corsOptions), spaceManagement.createSpaceTeam);
+router.put('/:userID/cities/:cityID/spaces/:spaceID/teams/:spaceTeamID', cors(corsOptions), spaceManagement.updateSpaceTeam);
+router.delete('/:userID/cities/:cityID/spaces/:spaceID/teams/:spaceTeamID', cors(corsOptions), spaceManagement.deleteSpaceTeam);
+router.post('/:userID/cities/:cityID/spaces/:spaceID/people', cors(corsOptions), spaceManagement.createSpacePerson);
+router.put('/:userID/cities/:cityID/spaces/:spaceID/people/:spacePersonID', cors(corsOptions), spaceManagement.updateSpacePerson);
+router.delete('/:userID/cities/:cityID/spaces/:spaceID/people/:spacePersonID', cors(corsOptions), spaceManagement.deleteSpacePerson);
 
 
 

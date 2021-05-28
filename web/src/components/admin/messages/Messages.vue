@@ -91,7 +91,7 @@ export default {
                     url: 'api/admins/messages',
                     body: message,
                 });
-                this.$http.all(
+                Promise.all(
                     urlCreate.map(el =>
                         this.$http.post(el.url,
                             { data: el.body, },
@@ -100,13 +100,13 @@ export default {
                             },
                         }))
                 )
-                .then(this.$http.spread( () => {
+                .then(() => {
                     this.progress = false;
                     this.success = true;
                     setTimeout(() => {this.success = false;}, 1500)
                     this.data.newMessage = '';
                     this.initialize();
-                }))
+                })
                 .catch((error) => {
                     this.progress = false;
                     this.error = true;
@@ -126,7 +126,7 @@ export default {
                     url: 'api/admins/messages',
                     body: messages,
                 });
-                this.$http.all(
+                Promise.all(
                     urlDelete.map(el =>
                         this.$http.delete(el.url,
                             { headers:
@@ -134,13 +134,13 @@ export default {
                             },
                         }))
                 )
-                .then(this.$http.spread( () => {
+                .then( () => {
                     this.progress = false;
                     this.success = true;
                     setTimeout(() => {this.success = false;}, 1500)
                     this.data.newMessage = '';
                     this.initialize();
-                }))
+                })
                 .catch((error) => {
                     this.progress = false;
                     this.error = true;

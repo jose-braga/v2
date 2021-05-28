@@ -539,7 +539,7 @@ export default {
                         this.data.publicationsDB.push(publications[ind]);
                     }
                 }
-                this.$http.all(
+                Promise.all(
                     urlCreateJournal.map(el =>
                         this.$http.post(el.url,
                             { data: el.body, },
@@ -548,7 +548,7 @@ export default {
                             },
                         }))
                 )
-                .then(this.$http.spread( (...createdJournals) => {
+                .then( (createdJournals) => {
                     for (let ind in createdJournals) {
                         let journalID = createdJournals[ind].data.result.journalID;
                         urlCreatePublications.push({
@@ -560,7 +560,7 @@ export default {
                             body: urlCreateJournal[ind].body,
                         });
                     }
-                    return this.$http.all(
+                    return Promise.all(
                         urlCreatePublications.map(el =>
                             this.$http.post(el.url,
                                 { data: el.body, },
@@ -569,8 +569,8 @@ export default {
                                 }
                         ))
                     )
-                }))
-                .then(this.$http.spread( (...createdPublications) => {
+                })
+                .then( (createdPublications) => {
                     for (let ind in createdPublications) {
                         let publicationID = createdPublications[ind].data.result.publicationID;
                         urlCreatePersonPublications.push({
@@ -588,7 +588,7 @@ export default {
                             body: urlCreatePublications[ind].body,
                         });
                     }
-                    return this.$http.all(
+                    return Promise.all(
                         urlCreatePersonPublications.map(el =>
                             this.$http.post(el.url,
                                 { data: el.body, },
@@ -597,9 +597,9 @@ export default {
                                 }
                         ))
                     )
-                }))
-                .then(this.$http.spread( () => {
-                    return this.$http.all(urlUpdatePublications.map(el =>
+                })
+                .then( () => {
+                    return Promise.all(urlUpdatePublications.map(el =>
                         this.$http.put(el.url,
                             { data: el.body, },
                             { headers:
@@ -607,14 +607,14 @@ export default {
                             }
                         )
                     ));
-                }))
-                .then(this.$http.spread( () => {
+                })
+                .then( () => {
                     this.progress = false;
                     this.success = true;
                     this.data.publications = removeExistingPublications(this.data.publications, this.data.publicationsDB);
                     this.$root.$emit('managerReloadPublicationsList');
                     setTimeout(() => {this.success = false;}, 1500)
-                }))
+                })
                 .catch((error) => {
                     this.progress = false;
                     this.error = true;
@@ -682,7 +682,7 @@ export default {
                     resultFiltered = removeExistingPublications(resultFiltered, this.data.publicationsDB);
                     this.data.publications = resultFiltered;
                     this.messageORCIDRequest = 'Processing results'
-                    return this.$http.all(
+                    return Promise.all(
                         this.data.publications.map(el => {
                             let resource = 'work';
                             let url = baseURL
@@ -696,7 +696,7 @@ export default {
                         }
                     ))
                 })
-                .then( this.$http.spread( (...details) => {
+                .then( (details) => {
                     for (let ind in details) {
                         this.$set(this.data.publications[ind], 'publication_id',
                                         parseInt(ind, 10));
@@ -711,7 +711,7 @@ export default {
                     this.onResize();
                     this.progressORCID = false;
                     this.finishedGetORCID = true;
-                }));
+                });
             }
         },
         updateData (publicationData) {

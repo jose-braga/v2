@@ -16,7 +16,7 @@
                 :key="i"
                 align="center"
             >
-                {{team.name}} ({{team.leaders_show}})
+                {{team.team_name}}:
                 <v-col cols="12" sm="2">
                     <v-text-field
                         v-model="team.percentage"
@@ -69,63 +69,6 @@
                     <v-divider></v-divider>
                 </v-col>
 
-            </v-row>
-            <v-row v-for="(supervisor, i) in spaceDetails.supervisors"
-                :key="'sup-' + i"
-                align="center"
-            >
-                {{supervisor.labs_show}} ({{ supervisor.colloquial_name }})
-                <v-col cols="12" sm="2">
-                    <v-text-field
-                        v-model="supervisor.percentage"
-                        :disabled="supervisor.can_edit !== true"
-                        label="% Occupation">
-                    </v-text-field>
-                </v-col>
-                <v-col cols="12" sm="2">
-                    <v-menu ref="date_menu"
-                        v-model="supervisor.show_valid_from"
-                        :close-on-content-click="false"
-                        :nudge-right="10"
-                        transition="scale-transition"
-                        offset-y min-width="290px">
-                        <template v-slot:activator="{ on }">
-                            <v-text-field v-model="supervisor.valid_from"
-                                :disabled="supervisor.can_edit !== true"
-                                label="Start date" v-on="on">
-                            </v-text-field>
-                        </template>
-                        <v-date-picker v-model="supervisor.valid_from"
-                            @input="supervisor.show_valid_from = false"
-                            no-title
-                        ></v-date-picker>
-                    </v-menu>
-                </v-col>
-                <v-col cols="12" sm="2">
-                    <v-menu ref="menu_end_date"
-                        v-model="supervisor.show_valid_until"
-                        :close-on-content-click="false"
-                        :nudge-right="10"
-                        transition="scale-transition"
-                        offset-y min-width="290px">
-                        <template v-slot:activator="{ on, attrs }">
-                            <v-text-field v-model="supervisor.valid_until"
-                                :disabled="supervisor.can_edit !== true"
-                                label="End date"
-                                v-on="on"
-                                v-bind="attrs"
-                            >
-                            </v-text-field>
-                        </template>
-                        <v-date-picker v-model="supervisor.valid_until"
-                            @click="supervisor.show_valid_until = false"
-                            no-title
-                        ></v-date-picker>
-                    </v-menu>
-                </v-col>
-                <v-col cols="12">
-                    <v-divider></v-divider>
-                </v-col>
             </v-row>
             <v-row align-content="center" justify="end">
                 <v-col cols="2" align-self="end">
@@ -195,29 +138,16 @@ export default {
                 for (let ind in result.labs) {
                     result.labs[ind].valid_from = time.momentToDate(result.labs[ind].valid_from);
                     result.labs[ind].valid_until = time.momentToDate(result.labs[ind].valid_until);
-                    if (result.labs[ind].lab_id === this.labId) {
-                        result.labs[ind].can_edit = true;
-                    }
-                    let leaders_show = ''
-                    for (let indLeader in result.labs[ind].leaders) {
-                        leaders_show = leaders_show + result.labs[ind].leaders[indLeader].colloquial_name;
-                        if (parseInt(indLeader,10) + 1 < result.labs[ind].leaders.length) {
-                            leaders_show = leaders_show + ',';
+                    if (this.labId !== undefined) {
+                        if (result.labs[ind].lab_id === this.labId) {
+                            result.labs[ind].can_edit = true;
                         }
                     }
-                    result.labs[ind].leaders_show = leaders_show;
-                }
-                for (let ind in result.supervisors) {
-                    result.supervisors[ind].valid_from = time.momentToDate(result.supervisors[ind].valid_from);
-                    result.supervisors[ind].valid_until = time.momentToDate(result.supervisors[ind].valid_until);
-                    let labs_show = ''
-                    for (let indLab in result.supervisors[ind].labs) {
-                        labs_show = labs_show + result.supervisors[ind].labs[indLab].name;
-                        if (parseInt(indLab,10) + 1 < result.supervisors[ind].labs.length) {
-                            labs_show = labs_show + ',';
+                    if (this.depTeamId !== undefined) {
+                        if (result.labs[ind].team_id === this.depTeamId) {
+                            result.labs[ind].can_edit = true;
                         }
                     }
-                    result.supervisors[ind].labs_show = labs_show;
                 }
                 this.spaceDetails = result;
             })
@@ -227,9 +157,17 @@ export default {
             let urlUpdateLab = [];
             for (let ind in this.spaceDetails.labs) {
                 let datum = this.spaceDetails.labs[ind];
+                let url;
+                if (this.labId !== undefined) {
+                    url = 'api/labs/' + this.labId
+                        + '/spaces/' + this.spaceId;
+                }
+                if (this.depTeamId !== undefined) {
+                    url = 'api/department-teams/' + this.depTeamId
+                        + '/spaces/' + this.spaceId;
+                }
                 urlUpdateLab.push({
-                    url: 'api/labs/' + this.labId
-                        + '/spaces/' + this.spaceId,
+                    url: url,
                     body: datum,
                 });
             }

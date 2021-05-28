@@ -6,6 +6,8 @@ const ValidateTab = () => import(/* webpackChunkName: "manager-validate-tab" */ 
 const ValidateTabHelp = () => import(/* webpackChunkName: "manager-validate-tab-help" */ '@/components/manager/members/ValidateTabHelp.vue')
 const UnknownAssociationsTab = () => import(/* webpackChunkName: "manager-unknown-tab" */ '@/components/manager/members/UnknownMembersTab.vue')
 const UnknownAssociationsTabHelp = () => import(/* webpackChunkName: "manager-unknown-tab-help" */ '@/components/manager/members/UnknownMembersTabHelp.vue')
+const ManagerSpacesTab = () => import(/* webpackChunkName: "manager-spaces-tab" */ '@/components/manager/spaces/SpacesTab.vue')
+const ManagerSpacesTabHelp = () => import(/* webpackChunkName: "manager-spaces-tab-help" */ '@/components/manager/spaces/SpacesTabHelp.vue')
 
 
 const routes = {
@@ -52,6 +54,13 @@ const routes = {
             components: {
                 default: ManagerMembersTab,
                 help: ManagerMembersTabHelp
+            }
+        },
+        {
+            path: 'spaces',
+            components: {
+                default: ManagerSpacesTab,
+                help: ManagerSpacesTabHelp
             }
         },
         //{ path: '', redirect: 'members' }

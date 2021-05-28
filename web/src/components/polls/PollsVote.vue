@@ -193,7 +193,7 @@ export default {
                         + '/people/' + personID,
                     body: { poll: this.poll },
                 });
-                this.$http.all(
+                Promise.all(
                     urlCreate.map(el =>
                         this.$http.post(el.url,
                             { data: el.body, },
@@ -203,12 +203,12 @@ export default {
                         )
                     )
                 )
-                .then(this.$http.spread( () => {
+                .then( () => {
                     this.progress = false;
                     this.success = true;
                     this.submitted = true;
                     setTimeout(() => {this.success = false;}, 3000)
-                }))
+                })
                 .catch((error) => {
                     this.progress = false;
                     this.error = true;

@@ -812,8 +812,12 @@ var getRecipientsGroupsPreReg = function (options, email_type_id) {
         (resQuery, options) => {
             options.recipientGroup = resQuery[0].id;
             actionSendUserMessage(options, resQuery)
-            .then(() => actionSendManagersMessage(options, resQuery))
-            .then(() => writeMessageDB(options))
+            .then(() => {
+                actionSendManagersMessage(options, resQuery)
+            })
+            .then(() => {
+                writeMessageDB(options)
+            })
             .catch((e) => {
                 console.log(e);
                 return writeMessageDB(options, e);
@@ -848,7 +852,7 @@ async function actionSendUserMessage(options, recipientEmails) {
         // send mail with defined transport object
         let info = await transporter.sendMail(mailOptions);
         console.log('Message %s sent: %s', info.messageId, info.response);
-        return writeMessageDB(options);
+        //return writeMessageDB(options);
 
     } else {
         // just for testing purposes
@@ -882,12 +886,12 @@ async function actionSendManagersMessage(options, recipientEmails) {
     let emailBody = 'Hi,\n\n'
         + 'Name: ' + person.name  + '\n'
         + 'Email: ' + person.personal_emails.email  + '\n'
-        + 'Comments: \n' + person.comments  + '\n\n'
+        + 'Comments: \n' + (person.comments ? person.comments : '')  + '\n\n'
         + 'Best regards,\nAdmin';
     let emailBodyHtml = '<p>Hi,</p><br>'
         + '<p>Name: ' + person.name + '.</p>'
         + '<p>Email: ' + person.personal_emails.email + '.</p>'
-        + '<p>Comments:<br>' + person.comments.replace(/(?:\r\n|\r|\n)/g,'<br>') + '.</p><br>'
+        + '<p>Comments:<br>' + (person.comments ? person.comments.replace(/(?:\r\n|\r|\n)/g,'<br>') : '') + '.</p><br>'
         + '<p>Best regards,</p>'
         + '<p>Admin</p>';
     options.subjectText = subjectText;
@@ -903,7 +907,7 @@ async function actionSendManagersMessage(options, recipientEmails) {
         // send mail with defined transport object
         let info = await transporter.sendMail(mailOptions);
         console.log('Message %s sent: %s', info.messageId, info.response);
-        return writeMessageDB(options);
+        //return writeMessageDB(options);
 
     } else {
         // just for testing purposes
@@ -917,7 +921,7 @@ async function actionSendManagersMessage(options, recipientEmails) {
         // send mail with defined transport object
         let info = await transporter.sendMail(mailOptions);
         console.log('Message %s sent: %s', info.messageId, info.response);
-        return writeMessageDB(options);
+        //return writeMessageDB(options);
     }
 };
 var writeMessageDB = function (options, error) {
@@ -928,7 +932,7 @@ var writeMessageDB = function (options, error) {
         + ' (sender_id, recipient_group_id, subject, message_text, date, solved)'
         + ' VALUES (?,?,?,?,?,?);';
     places.push(options.personID, recipientGroup, subjectText, emailBody, options.now, 0);
-    sql.makeSQLOperation(req, res, querySQL, places,
+    return sql.makeSQLOperation(req, res, querySQL, places,
         (options) => {
             if (error) {
                 return responses.sendJSONResponseOptions({
@@ -949,7 +953,6 @@ var writeMessageDB = function (options, error) {
             }
         },
         options);
-    return;
 };
 module.exports.preRegister = function (req, res, next) {
     permissions.checkPermissions(

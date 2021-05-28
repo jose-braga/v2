@@ -832,11 +832,7 @@ export default {
                     // eslint-disable-next-line
                     console.log(error)
                 })
-
-
-
             }
-
         },
         getResponsibleTypes() {
             var vm = this;

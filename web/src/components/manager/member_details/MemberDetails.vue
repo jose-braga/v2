@@ -138,6 +138,7 @@
                             :person-name="personName"
                             :manager-id="managerId"
                             :endpoint="endpoint"
+                            :is-laqv="isLAQV"
                         ></Roles>
                     </v-col>
                     <v-col cols="12" md="6">
@@ -292,6 +293,7 @@
                             ></SpacesManagement>
                         </v-expansion-panel-content>
                     </v-expansion-panel>
+                    <!--
                     <v-expansion-panel v-if="isLAQV && isSupervisor">
                         <v-expansion-panel-header>
                             <h3>Spaces associated to supervisor team</h3>
@@ -318,6 +320,7 @@
                             </LabSpaces>
                         </v-expansion-panel-content>
                     </v-expansion-panel>
+                    -->
                 </v-expansion-panels>
             </v-tab-item>
             <v-tab-item>
@@ -360,8 +363,8 @@ const ProfessionalSituations = () => import(/* webpackChunkName: "manager-detail
 const PublicationsList = () => import(/* webpackChunkName: "manager-details-publications-list" */ './productivity/publications/PublicationsList')
 const SupervisingList = () => import(/* webpackChunkName: "manager-details-supervising-list" */ './supervisor/SupervisingList')
 const SpacesManagement = () => import(/* webpackChunkName: "manager-details-supervising-list" */ './spaces/SpacesManagement')
-const LabSpaces = () => import(/* webpackChunkName: "manager-details-lab-spaces" */ './spaces/LabSpaces')
-const SupervisorSpaces = () => import(/* webpackChunkName: "manager-details-lab-spaces" */ './spaces/SupervisorSpaces')
+//const LabSpaces = () => import(/* webpackChunkName: "manager-details-lab-spaces" */ './spaces/LabSpaces')
+//const SupervisorSpaces = () => import(/* webpackChunkName: "manager-details-lab-spaces" */ './spaces/SupervisorSpaces')
 const AddFromDatabase = () => import(/* webpackChunkName: "manager-details-add-from-database" */ './productivity/publications/add-publications/AddFromDatabase')
 const AddFromOrcid = () => import(/* webpackChunkName: "manager-details-add-from-orcid" */ './productivity/publications/add-publications/AddFromOrcid')
 const AddFromRepository = () => import(/* webpackChunkName: "manager-details-add-from-repo" */ './productivity/publications/add-publications/AddFromRepository')
@@ -393,8 +396,8 @@ export default {
         PublicationsList,
         SupervisingList,
         SpacesManagement,
-        LabSpaces,
-        SupervisorSpaces,
+        //LabSpaces,
+        //SupervisorSpaces,
         AddFromDatabase,
         AddFromOrcid,
         AddFromRepository,
@@ -436,11 +439,49 @@ export default {
             this.isLabLeader = false;
             this.myLabs = [];
             if (this.$store.state.session.loggedIn) {
+                let urlSubmit;
+                urlSubmit = 'api' + this.endpoint
+                        + '/members'
+                        + '/' + this.personId
+                        + '/lab-affiliations';
+                subUtil.getInfoPopulate(this, urlSubmit, true)
+                .then( (result) => {
+                    let currentUnits = [];
+                    for (let ind in result) {
+                        let valid_from = time.momentToDate(result[ind].valid_from);
+                        let valid_until = time.momentToDate(result[ind].valid_until);
+                        let now = time.moment().format('YYYY-MM-DD');
+                        if ((valid_from === null || valid_from < now)
+                            && (valid_until === null || valid_until > now)
+                        ) {
+                            if (this.myLabs.indexOf(result[ind].lab_id) === -1) {
+                                this.myLabs.push(parseInt(result[ind].lab_id, 10));
+                            }
+                            // current lab, get current unit
+                            if (result[ind].lab_position_id === 11 || result[ind].lab_position_id === 2) {
+                                this.isLabLeader = true;
+                            }
+                            for (let indGrp in result[ind].groups) {
+                                for (let indUnit in result[ind].groups[indGrp].units) {
+                                    currentUnits.push( result[ind].groups[indGrp].units[indUnit].id);
+                                }
+                            }
+                        }
+                    }
+                    //console.log(currentUnits)
+                    if (currentUnits.indexOf(2) !== -1) {
+                        this.isLAQV = true;
+                    }
+                })
+
+                /*
                 //let this_session = this.$store.state.session;
                 let urlSubmit = 'api/v2/supervisors';
                 this.$http.get(urlSubmit)
                 .then((response) => {
                     let supervisors = response.data.result;
+                    //console.log('-----------------------------')
+                    //console.log(supervisors)
                     for (let ind in supervisors) {
                         if(this.personId === supervisors[ind].id) {
                             this.isSupervisor = true;
@@ -475,6 +516,7 @@ export default {
                                     }
                                 }
                             }
+                            //console.log(currentUnits)
                             if (currentUnits.length === 1
                                 && currentUnits[0] === 2
                             ) {
@@ -487,6 +529,7 @@ export default {
                         });
                     }
                 })
+                */
             }
         },
     },

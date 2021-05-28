@@ -986,7 +986,7 @@ export default {
                     });
                     console.log(urlCreate)
 
-                    this.$http.all(
+                    Promise.all(
                         urlCreate.map(el =>
                             this.$http.post(el.url,
                                 { data: el.body, },
@@ -995,7 +995,7 @@ export default {
                                 },
                             }))
                     )
-                    .then(this.$http.spread( () => {
+                    .then( () => {
                         this.progress = false;
                         this.success = true;
                         setTimeout(() => {
@@ -1041,7 +1041,7 @@ export default {
                             situation_id: null,
                             add_fct_mctes: false,
                         };
-                    }))
+                    })
                     .catch((error) => {
                         this.progress = false;
                         this.error = true;
@@ -1049,7 +1049,7 @@ export default {
                         // eslint-disable-next-line
                         console.log(error)
                     })
-                    
+
                 }
             }
         },

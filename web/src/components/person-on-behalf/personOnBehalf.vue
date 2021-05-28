@@ -120,10 +120,10 @@ export default {
                         urls.push(urlSubmit);
                     }
                 }
-                this.$http.all(
+                Promise.all(
                     urls.map(el => subUtil.getInfoPopulate(this, el, false))
                 )
-                .then(this.$http.spread( (...people) => {
+                .then( (people) => {
                     people.sort(function(a,b) {
                         if (a.colloquial_name.toLowerCase()
                                 < b.colloquial_name.toLowerCase()) return -1;
@@ -144,7 +144,7 @@ export default {
                             }
                         }
                     }
-                }))
+                })
             }
         },
 

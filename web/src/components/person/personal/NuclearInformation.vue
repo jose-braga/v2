@@ -205,16 +205,16 @@ export default {
                 if (this.$store.state.session.loggedIn) {
                     this.progress = true;
                     const personID = this.$store.state.session.personID;
-                    this.$http.all([
+                    Promise.all([
                         submitNuclearInformation(this, 'api/people/' + personID + '/nuclear-info'),
                         submitNationalities(this, 'api/people/' + personID + '/nationalities'),
                     ])
-                    .then(this.$http.spread( () => {
+                    .then( () => {
                         this.progress = false;
                         this.success = true;
                         setTimeout(() => {this.success = false;}, 1500)
                         this.initialize(true);
-                    }))
+                    })
                     .catch((error) => {
                         this.progress = false;
                         this.error = true;

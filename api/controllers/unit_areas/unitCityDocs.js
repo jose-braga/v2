@@ -47,14 +47,18 @@ var actionGetDocs = function (options) {
                 + ' JOIN document_types ON unit_city_documents.doc_type_id = document_types.id'
                 + ' WHERE unit_city_documents.unit_id = ? AND unit_city_documents.city_id = ?'
                 + ' AND ((unit_city_documents.valid_from <= CURRENT_DATE() OR unit_city_documents.valid_from IS NULL) '
-                + ' AND (unit_city_documents.valid_until >= CURRENT_DATE() OR unit_city_documents.valid_until IS NULL));';
+                + ' AND (unit_city_documents.valid_until >= CURRENT_DATE() OR unit_city_documents.valid_until IS NULL))'
+                + ' ORDER BY sort_order DESC'
+                ;
         places.push(unitID, cityID)
     } else {
         querySQL = querySQL
                 + 'SELECT unit_city_documents.*, document_types.name AS doc_type_name'
                 + ' FROM unit_city_documents'
                 + ' JOIN document_types ON unit_city_documents.doc_type_id = document_types.id'
-                + ' WHERE unit_city_documents.unit_id = ? AND unit_city_documents.city_id = ?;';
+                + ' WHERE unit_city_documents.unit_id = ? AND unit_city_documents.city_id = ?'
+                + ' ORDER BY sort_order DESC'
+                ;
         places.push(unitID, cityID)
     }
     return sql.makeSQLOperation(req, res, querySQL, places)
@@ -122,20 +126,22 @@ var createDocAddRemainingDataDB = function (req, res, next) {
     }
     let querySQL = '';
     let places = [];
-    querySQL = 'UPDATE unit_city_documents' +
-                    ' SET doc_type_id = ?,' +
-                    ' title = ?,' +
-                    ' content = ?,' +
-                    ' attachment_url = ?,' +
-                    ' valid_from = ?,' +
-                    ' valid_until = ?' +
-                    ' WHERE id = ?';
+    querySQL = 'UPDATE unit_city_documents'
+                + ' SET doc_type_id = ?,'
+                + ' title = ?,'
+                + ' content = ?,'
+                + ' attachment_url = ?,'
+                + ' valid_from = ?,'
+                + ' valid_until = ?,'
+                + ' sort_order = ?'
+                + ' WHERE id = ?'
     places.push(docData.doc_type_id,
                 docData.title,
                 docData.content,
                 url,
                 valid_from,
                 valid_until,
+                docData.sort_order,
                 req.docID);
     return sql.makeSQLOperation(req, res, querySQL, places);
 };
@@ -194,20 +200,22 @@ var updateDocDataDB = function (req, res, next) {
     }
     let querySQL = '';
     let places = [];
-    querySQL = 'UPDATE unit_city_documents' +
-                    ' SET doc_type_id = ?,' +
-                    ' title = ?,' +
-                    ' content = ?,' +
-                    ' attachment_url = ?,' +
-                    ' valid_from = ?,' +
-                    ' valid_until = ?' +
-                    ' WHERE id = ?';
+    querySQL = 'UPDATE unit_city_documents'
+                + ' SET doc_type_id = ?,'
+                + ' title = ?,'
+                + ' content = ?,'
+                + ' attachment_url = ?,'
+                + ' valid_from = ?,'
+                + ' valid_until = ?,'
+                + ' sort_order = ?'
+                + ' WHERE id = ?';
     places.push(docData.doc_type_id,
                 docData.title,
                 docData.content,
                 url,
                 valid_from,
                 valid_until,
+                docData.sort_order,
                 req.docID);
     return sql.makeSQLOperation(req, res, querySQL, places);
 };

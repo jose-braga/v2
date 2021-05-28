@@ -2,15 +2,26 @@
 <v-container>
     <v-row>
         <v-col cols="12" md="6">
-            <SearchPeople></SearchPeople>
+            <SearchPeople
+                :lab-id="labId"
+                :lab-data="labData"
+                :my-labs="myLabs"
+                :dep-team-id="depTeamId"
+                :dep-team-data="depTeamData"
+                :my-dep-teams="myDepTeams"
+                :lab-positions="labPositions"
+            ></SearchPeople>
         </v-col>
         <v-col cols="12" md="6">
             <!-- Add tabs for facilities/science management/administrative -->
             <UserPreRegistration
                 :lab-id="labId"
                 :lab-data="labData"
-                :lab-positions="labPositions"
                 :my-labs="myLabs"
+                :dep-team-id="depTeamId"
+                :dep-team-data="depTeamData"
+                :my-dep-teams="myDepTeams"
+                :lab-positions="labPositions"
             ></UserPreRegistration>
         </v-col>
     </v-row>
@@ -31,8 +42,11 @@ export default {
     props: {
         labId: Number,
         labData: Object,
-        labPositions: Array,
         myLabs: Array,
+        depTeamId: Number,
+        depTeamData: Object,
+        myDepTeams: Array,
+        labPositions: Array,
     },
     data() {
         return {

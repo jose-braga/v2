@@ -1075,7 +1075,7 @@ export default {
                     application
                 },
             });
-            this.$http.all(
+            Promise.all(
                 urlUpdate.map(el =>
                     this.$http.put(el.url,
                         { data: el.body, },
@@ -1085,13 +1085,13 @@ export default {
                     )
                 )
             )
-            .then(this.$http.spread( () => {
+            .then( () => {
                 this.progress = false;
                 this.success = true;
                 this.submitted = true;
                 this.getManagerCallApplications();
                 setTimeout(() => {this.success = false;}, 3000)
-            }))
+            })
             .catch((error) => {
                 this.progress = false;
                 this.error = true;

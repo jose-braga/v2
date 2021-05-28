@@ -135,7 +135,7 @@ export default {
                     }
                 }
 
-                this.$http.all(
+                Promise.all(
                     urlUpdate.map(el =>
                         this.$http.put(el.url,
                             { data: el.body, },
@@ -153,7 +153,7 @@ export default {
                             }))
                     )
                 )
-                .then(this.$http.spread( () => {
+                .then( () => {
                     this.progress = false;
                     this.success = true;
                     setTimeout(() => {
@@ -161,7 +161,7 @@ export default {
                         this.openPanel = undefined;
                     }, 1500)
                     this.initialize();
-                }))
+                })
                 .catch((error) => {
                     this.progress = false;
                     this.error = true;
@@ -192,7 +192,7 @@ export default {
                             + '/app-area-permissions/'
                             + permission.id
                     );
-                    this.$http.all(
+                    Promise.all(
                         urlDelete.map(el =>
                             this.$http.delete(el,
                                 { headers:
@@ -201,7 +201,7 @@ export default {
                             )
                         )
                     )
-                    .then(this.$http.spread( () => {
+                    .then( () => {
                         this.progress = false;
                         this.success = true;
                         setTimeout(() => {
@@ -209,7 +209,7 @@ export default {
                             this.openPanel = undefined;
                         }, 1500)
                         this.initialize();
-                    }))
+                    })
                     .catch((error) => {
                         this.progress = false;
                         this.error = true;
@@ -229,7 +229,7 @@ export default {
                     app_area_id: null,
                 },
                 ...this.data.permissions
-                ];
+            ];
         },
         getAppAreas () {
             var vm = this;

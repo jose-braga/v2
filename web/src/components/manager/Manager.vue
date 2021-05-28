@@ -22,6 +22,11 @@
         <v-tab to="/manager/validate">
             To validate
         </v-tab>
+        <v-tab to="/manager/spaces"
+            v-if="manageSpaces"
+        >
+            Spaces
+        </v-tab>
         <v-tabs-items>
             <!-- use :max="N" in keep-alive if necessary-->
             <keep-alive>
@@ -63,6 +68,7 @@ export default {
             cityID: undefined,
             currentUnit: undefined,
             currentCity: undefined,
+            manageSpaces: false,
             data: {
                 myUnitsCities: [],
                 myCities: [],
@@ -135,6 +141,7 @@ export default {
             let this_session = this.$store.state.session;
             let initialSegment = true;
             if (this_session.loggedIn) {
+                //console.log(this_session.permissionsEndpoints)
                 for (let ind in this_session.permissionsEndpoints) {
                     let decomposedPath = this_session.permissionsEndpoints[ind].decomposedPath
                     // TODO: modify condition when unsegmented. Special attention to that case
@@ -202,6 +209,14 @@ export default {
                                 this.cityID = result.city[0].id;
                             }
                         });
+                    }  else if (decomposedPath[0] === 'managers'
+                        && decomposedPath.length === 5
+                        && decomposedPath[2] === 'cities'
+                        && decomposedPath[3] === '1' // for now, only for Lisboa
+                        && decomposedPath[4] === 'spaces'
+                        && this_session.permissionsEndpoints[ind].allow_all_subpaths === 1
+                        && this_session.permissionsEndpoints[ind].method_name === 'GET') {
+                        this.manageSpaces = true;
                     }
                 }
             }

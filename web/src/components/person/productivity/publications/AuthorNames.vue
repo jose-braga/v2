@@ -111,7 +111,7 @@ export default {
                             + '/author-names/' + this.toDelete[ind].id,
                     });
                 }
-                this.$http.all(
+                Promise.all(
                     urlCreate.map(el =>
                         this.$http.post(el.url,
                             { data: el.body, },
@@ -127,14 +127,14 @@ export default {
                                 },
                             })))
                 )
-                .then(this.$http.spread( () => {
+                .then( () => {
                     this.progress = false;
                     this.success = true;
                     setTimeout(() => {this.success = false;}, 1500)
                     this.toDelete = [];
                     this.toCreate = [];
                     this.initialize();
-                }))
+                })
                 .catch((error) => {
                     this.progress = false;
                     this.error = true;

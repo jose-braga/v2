@@ -191,7 +191,7 @@ export default {
                     + '/order-management/orders/' + item.id,
                 body: item,
             });
-            this.$http.all(
+            Promise.all(
                 urlUpdate.map(el =>
                     this.$http.put(el.url,
                         { data: el.body, },
@@ -200,7 +200,7 @@ export default {
                         },
                     }))
             )
-            .then(this.$http.spread( () => {
+            .then( () => {
                 this.$set(item, 'progress', false);
                 this.$set(item, 'success', true);
                 setTimeout(() => {
@@ -208,7 +208,7 @@ export default {
                     this.initialize();
                 }
                 , 1000)
-            }))
+            })
             .catch((err) => {
                 this.$set(item, 'progress', false);
                 this.$set(item, 'error', true);
@@ -230,7 +230,7 @@ export default {
                     + '/order-management/orders/' + item.id,
                 body: item,
             });
-            this.$http.all(
+            Promise.all(
                 urlUpdate.map(el =>
                     this.$http.put(el.url,
                         { data: el.body, },
@@ -239,7 +239,7 @@ export default {
                         },
                     }))
             )
-            .then(this.$http.spread( () => {
+            .then( () => {
                 this.$set(item, 'progress', false);
                 this.$set(item, 'success', true);
                 setTimeout(() => {
@@ -247,7 +247,7 @@ export default {
                     this.initialize();
                 }
                 , 1000)
-            }))
+            })
             .catch((err) => {
                 this.$set(item, 'progress', false);
                 this.$set(item, 'error', true);
@@ -286,7 +286,7 @@ export default {
                     + '/order-management/orders/' + order.id,
                 body: order,
             });
-            this.$http.all(
+            Promise.all(
                 urlUpdate.map(el =>
                     this.$http.put(el.url,
                         { data: el.body, },
@@ -295,7 +295,7 @@ export default {
                         },
                     }))
             )
-            .then(this.$http.spread( () => {
+            .then( () => {
                 this.$set(order, 'progress', false);
                 this.$set(order, 'success', true);
                 setTimeout(() => {
@@ -303,7 +303,7 @@ export default {
                     this.initialize();
                 }
                 , 1000)
-            }))
+            })
             .catch((err) => {
                 this.$set(order, 'progress', false);
                 this.$set(order, 'error', true);

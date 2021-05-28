@@ -758,7 +758,7 @@ export default {
                         + permission.id,
                     body: permission,
                 });
-                this.$http.all(
+                Promise.all(
                     urlUpdate.map(el =>
                         this.$http.put(el.url,
                             { data: el.body, },
@@ -767,7 +767,7 @@ export default {
                             },
                         }))
                 )
-                .then(this.$http.spread( () => {
+                .then( () => {
                     this.progress = false;
                     this.success = true;
                     setTimeout(() => {
@@ -775,7 +775,7 @@ export default {
                         this.openPanel = undefined;
                     }, 1500)
                     this.initialize();
-                }))
+                })
                 .catch((error) => {
                     this.progress = false;
                     this.error = true;
@@ -806,7 +806,7 @@ export default {
                         body: {permission: permission, method_index: ind}
                     });
                 }
-                this.$http.all(
+                Promise.all(
                     urlCreate.map(el =>
                         this.$http.post(el.url,
                             { data: el.body, },
@@ -815,7 +815,7 @@ export default {
                             },
                         }))
                 )
-                .then(this.$http.spread( () => {
+                .then( () => {
                     this.progress = false;
                     this.success = true;
                     setTimeout(() => {
@@ -823,7 +823,7 @@ export default {
                         this.openPanel = undefined;
                     }, 1500)
                     this.initialize();
-                }))
+                })
                 .catch((error) => {
                     this.progress = false;
                     this.error = true;
@@ -856,7 +856,7 @@ export default {
                                 + permission.method_data[ind].id
                         );
                     }
-                    this.$http.all(
+                    Promise.all(
                         urlDelete.map(el =>
                             this.$http.delete(el,
                                 { headers:
@@ -865,7 +865,7 @@ export default {
                             )
                         )
                     )
-                    .then(this.$http.spread( () => {
+                    .then( () => {
                         this.progress = false;
                         this.success = true;
                         setTimeout(() => {
@@ -873,7 +873,7 @@ export default {
                             this.openPanel = undefined;
                         }, 1500)
                         this.initialize();
-                    }))
+                    })
                     .catch((error) => {
                         this.progress = false;
                         this.error = true;

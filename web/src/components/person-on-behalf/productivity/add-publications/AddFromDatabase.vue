@@ -203,7 +203,7 @@ export default {
                         });
                     }
                 }
-                this.$http.all(
+                Promise.all(
                     urlCreate.map(el =>
                         this.$http.post(el.url,
                             { data: el.body, },
@@ -212,8 +212,8 @@ export default {
                             },
                         }))
                 )
-                .then(this.$http.spread( () => {
-                    return this.$http.all(urlUpdatePublications.map(el =>
+                .then( () => {
+                    return Promise.all(urlUpdatePublications.map(el =>
                         this.$http.put(el.url,
                             { data: el.body, },
                             { headers:
@@ -221,14 +221,14 @@ export default {
                             }
                         )
                     ));
-                }))
-                .then(this.$http.spread( () => {
+                })
+                .then( () => {
                     this.progress = false;
                     this.success = true;
                     setTimeout(() => {this.success = false;}, 1500)
                     this.toDelete = [];
                     this.searchPublications (this.searchAuthors, this.searchTitle);
-                }))
+                })
                 .catch((error) => {
                     this.progress = false;
                     this.error = true;

@@ -134,13 +134,13 @@ export default {
                         { headers: {'Authorization': 'Bearer ' + localStorage['v2-token']}, }
                     ));
                 }
-                this.$http.all(requests)
-                    .then(this.$http.spread( () => {
+                Promise.all(requests)
+                    .then( () => {
                         this.progress = false;
                         this.success = true;
                         setTimeout(() => {this.success = false;}, 1500)
                         this.initialize();
-                    }))
+                    })
                     .catch((error) => {
                         this.progress = false;
                         this.error = true;

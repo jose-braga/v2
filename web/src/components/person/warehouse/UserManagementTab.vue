@@ -222,7 +222,7 @@ export default {
                         + '/users-management/users/' + this.toDelete[ind].accounts_people_id,
                 });
             }
-            this.$http.all(
+            Promise.all(
                 urlDelete.map(el =>
                     this.$http.delete(el.url,
                         { headers:
@@ -230,13 +230,13 @@ export default {
                         }
                 ))
             )
-            .then(this.$http.spread( () => {
+            .then( () => {
                 this.progress = false;
                 this.success = true;
                 setTimeout(() => {this.success = false;}, 1500)
                 this.toDelete = [];
                 this.initialize();
-            }))
+            })
             .catch((error) => {
                 this.progress = false;
                 this.error = true;
@@ -259,7 +259,7 @@ export default {
                         + '/users-management/users',
                     body: item,
                 });
-                this.$http.all(
+                Promise.all(
                     urlCreate.map(el =>
                         this.$http.post(el.url,
                             { data: el.body, },
@@ -268,7 +268,7 @@ export default {
                             }
                         ))
                 )
-                .then(this.$http.spread( () => {
+                .then( () => {
                     this.progressNew = false;
                     this.successNew = true;
                     setTimeout(() => {
@@ -283,7 +283,7 @@ export default {
                         this.initialize();
                     }, 1500);
 
-                }))
+                })
                 .catch((error) => {
                     this.progressNew = false;
                     this.errorNew = true;

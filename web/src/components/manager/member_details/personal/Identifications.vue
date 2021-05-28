@@ -165,7 +165,7 @@ export default {
                                     + '/' + personID
                                     + '/identifications/' + this.toDelete[ind].id);
                 }
-                this.$http.all(
+                Promise.all(
                     urlUpdate.map(el =>
                         this.$http.put(el.url,
                             { data: el.body, },
@@ -189,13 +189,13 @@ export default {
                                 },
                             })))
                 )
-                .then(this.$http.spread( () => {
+                .then( () => {
                     this.progress = false;
                     this.success = true;
                     setTimeout(() => {this.success = false;}, 1500)
                     this.toDelete = [];
                     this.initialize();
-                }))
+                })
                 .catch((error) => {
                     this.progress = false;
                     this.error = true;

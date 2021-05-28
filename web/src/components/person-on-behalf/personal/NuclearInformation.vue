@@ -209,7 +209,7 @@ export default {
             } else {
                 if (this.$store.state.session.loggedIn) {
                     this.progress = true;
-                    this.$http.all([
+                    Promise.all([
                         submitNuclearInformation(this,
                                 'api'
                                 + '/people'
@@ -221,7 +221,7 @@ export default {
                                 + '/' + this.otherPersonId
                                 + '/nationalities'),
                     ])
-                    .then(this.$http.spread( () => {
+                    .then( () => {
                         this.progress = false;
                         this.success = true;
                         if (this.currentPerson.colloquial_name !== this.data.colloquial_name ) {
@@ -229,7 +229,7 @@ export default {
                         }
                         setTimeout(() => {this.success = false;}, 1500)
                         this.initialize(true);
-                    }))
+                    })
                     .catch((error) => {
                         this.progress = false;
                         this.error = true;

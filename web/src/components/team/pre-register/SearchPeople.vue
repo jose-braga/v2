@@ -5,8 +5,9 @@
             <h3 class="headline">Search person in database</h3>
         </div>
     </v-card-title>
-    <v-card-text>Check if person to be registered is not already in the database.<br>
-        Proceed to pre-registration if not found.
+    <v-card-text>Check if person you want to add to the team is already in the database.
+        <br>
+        Proceed to pre-registration only if not found.
     </v-card-text>
     <v-container>
         <v-text-field
@@ -63,6 +64,11 @@
 import subUtil from '@/components/common/submit-utils'
 
 export default {
+    props: {
+        labId: Number,
+        depTeamId: Number,
+        labPositions: Array,
+    },
     data () {
         return {
             search: '',
@@ -86,12 +92,27 @@ export default {
                 if (this_session.loggedIn) {
                     for (let ind in this_session.permissionsEndpoints) {
                         let decomposedPath = this_session.permissionsEndpoints[ind].decomposedPath;
-                        if ( decomposedPath.length === 3
-                            && decomposedPath[0] === 'labs'
-                            && decomposedPath[2] === 'people'
+                        if ((
+                            (decomposedPath.length === 3
+                            && (decomposedPath[0] === 'labs' || decomposedPath[0] === 'department-teams')
+                            && decomposedPath[2] === 'people')
+                            ||
+                            (decomposedPath.length === 2
+                            && (decomposedPath[0] === 'labs' || decomposedPath[0] === 'department-teams')
+                            && this_session.permissionsEndpoints[ind].allow_all_subpaths === 1
+                            )
+
+                            )
+
                             && this_session.permissionsEndpoints[ind].method_name === 'GET') {
-                            let urlSubmit = this_session.permissionsEndpoints[ind].endpoint_url;
-                            urlSubmit = 'api' + urlSubmit
+                            let urlSubmit
+                            if (this.labId !== undefined) {
+                                urlSubmit = 'api/labs/' + this.labId + '/people';
+                            }
+                            if (this.depTeamId !== undefined) {
+                                urlSubmit = 'api/department-teams/' + this.depTeamId  + '/people';
+                            }
+                            urlSubmit = urlSubmit
                                         + '?limit=' + this.itemsPerPage
                                         + '&offset=' + (this.page - 1) * this.itemsPerPage
                                         + '&q=' + this.search;

@@ -425,7 +425,7 @@ export default {
                     body: this.data.cart,
                 });
 
-                this.$http.all(
+                Promise.all(
                     urlCreate.map(el =>
                         this.$http.post(el.url,
                             { data: el.body, },
@@ -434,7 +434,7 @@ export default {
                             },
                         }))
                 )
-                .then(this.$http.spread( () => {
+                .then( () => {
                     this.progress = false;
                     this.success = true;
                     setTimeout(() => {
@@ -447,7 +447,7 @@ export default {
                     , 2500)
                     this.toDelete = [];
 
-                }))
+                })
                 .catch((error) => {
                     this.progress = false;
                     this.error = true;

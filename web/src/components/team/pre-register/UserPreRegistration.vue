@@ -47,18 +47,42 @@
                     </div>
                 </v-col>
             </v-row>
+
+            <v-row  v-if="depTeamId !== undefined">
+                <v-col cols="12">
+                    <v-select
+                        v-model="$v.data.person.team_id.$model"
+                        :items="myDepTeams"
+                        item-value="id" item-text="name"
+                        :error="$v.data.person.team_id.$error"
+                        label="Team*">
+                    </v-select>
+                    <div v-if="$v.data.person.team_id.$error">
+                        <div v-if="!$v.data.person.team_id.required">
+                            <p class="caption red--text">Team is required.</p>
+                        </div>
+                    </div>
+                </v-col>
+            </v-row>
             <v-row>
                 <v-col cols="12" md="6">
-                    <v-select
+                    <v-select v-if="labId !== undefined"
                         v-model="$v.data.person.lab_id.$model"
                         :items="myLabs"
                         item-value="id" item-text="name"
                         :error="$v.data.person.lab_id.$error"
-                        label="Lab*">
+                        label="Lab/Group*">
+                    </v-select>
+                    <v-select v-if="depTeamId !== undefined"
+                        v-model="$v.data.person.lab_id.$model"
+                        :items="myDepTeams"
+                        item-value="lab_id" item-text="lab_name"
+                        :error="$v.data.person.lab_id.$error"
+                        label="Lab/Group*">
                     </v-select>
                     <div v-if="$v.data.person.lab_id.$error">
                         <div v-if="!$v.data.person.lab_id.required">
-                            <p class="caption red--text">Lab is required.</p>
+                            <p class="caption red--text">Lab/Group is required.</p>
                         </div>
                     </div>
                 </v-col>
@@ -181,14 +205,17 @@
  */
 
 import subUtil from '@/components/common/submit-utils'
-import { required, email, integer, between } from 'vuelidate/lib/validators'
+import { required, requiredIf, email, integer, between } from 'vuelidate/lib/validators'
 
 export default {
     props: {
         labId: Number,
         labData: Object,
-        labPositions: Array,
         myLabs: Array,
+        depTeamId: Number,
+        depTeamData: Object,
+        myDepTeams: Array,
+        labPositions: Array,
     },
     data() {
         return {
@@ -200,6 +227,7 @@ export default {
                 person: {
                     username: '',
                     email: '',
+                    team_id: null,
                     lab_id: null,
                     lab_position_id: null,
                     dedication: null,
@@ -209,12 +237,14 @@ export default {
             },
             poles: [],
             labs: [],
+            departmentTeams: [],
             //labPositions: [],
         }
     },
     mounted() {
         this.getPoles();
         this.getLabs();
+        this.getDepartmentTeams();
     },
     methods: {
         submitForm () {
@@ -226,12 +256,20 @@ export default {
                 let urlCreate = [];
                 if (this.$store.state.session.loggedIn) {
                     this.data.person.changedBy = this.$store.state.session.userID;
+                    let url
+                    if (this.labId !== undefined) {
+                        url = 'api/labs/' + this.labId
+                                + '/people';
+                    }
+                    if (this.depTeamId !== undefined) {
+                        url = 'api/department-teams/' + this.depTeamId
+                                + '/people';
+                    }
                     urlCreate.push({
-                        url: 'api/labs/' + this.labId
-                                + '/people',
+                        url: url,
                         body: this.data.person,
                     });
-                    this.$http.all(
+                    Promise.all(
                         urlCreate.map(el =>
                             this.$http.post(el.url,
                                 { data: el.body, },
@@ -240,7 +278,7 @@ export default {
                                 },
                             }))
                     )
-                    .then(this.$http.spread( () => {
+                    .then( () => {
                         this.progress = false;
                         this.success = true;
                         setTimeout(() => {
@@ -250,13 +288,14 @@ export default {
                         this.data.person = {
                             username: '',
                             email: '',
+                            team_id: null,
                             lab_id: null,
                             lab_position_id: null,
                             dedication: null,
                             city_id: null,
                             valid_from: null,
                         };
-                    }))
+                    })
                     .catch((error) => {
                         this.progress = false;
                         this.error = true;
@@ -279,6 +318,13 @@ export default {
             if (this.$store.state.session.loggedIn) {
                 const urlSubmit = 'api/v2/' + 'labs';
                 return subUtil.getPublicInfo(vm, urlSubmit, 'labs');
+            }
+        },
+        getDepartmentTeams() {
+            var vm = this;
+            if (this.$store.state.session.loggedIn) {
+                const urlSubmit = 'api/v2/' + 'department-teams';
+                return subUtil.getPublicInfo(vm, urlSubmit, 'departmentTeams');
             }
         },
     },
@@ -312,6 +358,11 @@ export default {
                     },
                 },
                 email: { required, email },
+                team_id: {
+                    required: requiredIf( function () {
+                        return this.depTeamId !== undefined;
+                    }
+                )},
                 lab_id: { required },
                 lab_position_id: { required },
                 dedication: { integer, between: between(0,100)},

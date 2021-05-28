@@ -25,8 +25,9 @@ const publications = require('../controllers/department_team/publications');
 const spaces = require('../controllers/department_team/spaces');
 
 router.get('/:depTeamID', cors(corsOptions), members.getDepartmentTeamInfo);
-//router.get('/:depTeamID/people', cors(corsOptions), members.searchAllPeople);
-//router.post('/:depTeamID/people', cors(corsOptions), members.preRegister); // pre-register new member
+router.get('/:depTeamID/people', cors(corsOptions), members.searchAllPeople);
+router.post('/:depTeamID/people', cors(corsOptions), members.preRegister); // pre-register new member
+//router.post('/:depTeamID/people/:personID', cors(corsOptions), members.addMemberFromDB); // pre-register new member
 router.get('/:depTeamID/members-affiliation', cors(corsOptions), members.getLabMembersAffiliations); // get team members, regardless of group to belongs now or belonged in the past
 router.delete('/:depTeamID/members-affiliation/:memberID', cors(corsOptions), members.deleteLabMember); //remove this member from team
 router.post('/:depTeamID/members-affiliation/:memberID/position', cors(corsOptions), members.createLabMemberPosition); // add new position to this member
@@ -45,7 +46,7 @@ router.get('/:depTeamID/spaces', cors(corsOptions), spaces.getLabSpaces);
 router.post('/:depTeamID/spaces', cors(corsOptions), spaces.addLabSpaces);
 router.get('/:depTeamID/spaces/:spaceID', cors(corsOptions), spaces.getSpaceInfo);
 router.put('/:depTeamID/spaces/:spaceID', cors(corsOptions), spaces.updateLabSpace);
-router.delete('/:depTeamID/spaces/:labSpaceID', cors(corsOptions), spaces.deleteLabSpace);
+router.delete('/:depTeamID/spaces/:teamSpaceID', cors(corsOptions), spaces.deleteLabSpace);
 
 
 
