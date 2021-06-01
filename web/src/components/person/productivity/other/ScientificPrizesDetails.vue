@@ -13,19 +13,25 @@
         <v-container>
             <v-row>
                 <v-col cols="12">
-                    <v-text-field v-model="itemDetails.item_details.recipients"
+                    <v-text-field
+                        v-model="$v.itemDetails.item_details.recipients.$model"
+                        :error="$v.itemDetails.item_details.recipients.$error"
                         label="Recipients"
                     ></v-text-field>
                 </v-col>
             </v-row>
             <v-row>
                 <v-col cols="12" sm="5">
-                    <v-text-field v-model="itemDetails.item_details.name"
+                    <v-text-field
+                        v-model="$v.itemDetails.item_details.name.$model"
+                        :error="$v.itemDetails.item_details.name.$error"
                         label="Prize name"
                     ></v-text-field>
                 </v-col>
                 <v-col cols="12" sm="4">
-                    <v-text-field v-model="itemDetails.item_details.organization"
+                    <v-text-field
+                        v-model="$v.itemDetails.item_details.organization.$model"
+                        :error="$v.itemDetails.item_details.organization.$error"
                         label="Entity giving prize"
                     ></v-text-field>
                 </v-col>
@@ -45,7 +51,8 @@
             <v-row>
                 <v-col cols="12">
                     <v-textarea
-                        v-model="itemDetails.item_details.notes"
+                        v-model="$v.itemDetails.item_details.notes.$model"
+                        :error="$v.itemDetails.item_details.notes.$error"
                         rows="3"
                         counter
                         label="Notes (<500 ca)">
@@ -152,7 +159,7 @@
 
 <script>
 import subUtil from '@/components/common/submit-utils'
-import {integer, decimal} from 'vuelidate/lib/validators'
+import {integer, decimal, maxLength} from 'vuelidate/lib/validators'
 
 function prepareStringComparison(str) {
     if (str === null || str === undefined) {
@@ -187,8 +194,11 @@ export default {
             itemDetails: {
                 item_details: {
                     name: '',
+                    recipients: null,
+                    organization: null,
                     year: null,
                     amount_euro: null,
+                    notes: null,
                 },
                 labs_details: [],
                 person_details: [],
@@ -217,7 +227,9 @@ export default {
             this.itemDetails = Object.assign({}, this.itemData);
         },
         submitForm () {
-            if (this.$store.state.session.loggedIn) {
+            if (this.$store.state.session.loggedIn
+                && !this.$v.$invalid
+            ) {
                 this.progress = true;
                 let personID = this.$store.state.session.personID;
                 this.itemDetails.toDeletePerson = this.toDeletePerson;
@@ -319,6 +331,10 @@ export default {
     validations: {
         itemDetails: {
             item_details: {
+                recipients: { maxLength: maxLength(500)},
+                name: { maxLength: maxLength(100)},
+                organization: { maxLength: maxLength(100)},
+                notes: { maxLength: maxLength(500)},
                 year: { integer },
                 amount_euro: { decimal }
             }

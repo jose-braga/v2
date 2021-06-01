@@ -64,7 +64,9 @@
                             @submit.prevent="submitForm">
                             <v-row>
                                 <v-col cols="12">
-                                    <v-text-field v-model="data.newProject.title"
+                                    <v-text-field
+                                        v-model="$v.data.newProject.title.$model"
+                                        :error="$v.data.newProject.title.$error"
                                         label="Title"
                                     ></v-text-field>
                                 </v-col>
@@ -133,12 +135,16 @@
                                 </v-col>
 
                                 <v-col cols="12" sm="3">
-                                    <v-text-field v-model="data.newProject.amount"
+                                    <v-text-field
+                                        v-model="$v.data.newProject.amount.$model"
+                                        :error="$v.data.newProject.amount.$error"
                                         label="Mngmt Entity Amount (€)"
                                     ></v-text-field>
                                 </v-col>
                                 <v-col cols="12" sm="3">
-                                    <v-text-field v-model="data.newProject.global_amount"
+                                    <v-text-field
+                                        v-model="$v.data.newProject.global_amount.$model"
+                                        :error="$v.data.newProject.global_amount.$error"
                                         label="Global amount (€)"
                                     ></v-text-field>
                                 </v-col>
@@ -302,7 +308,8 @@
                                 </v-col>
                                 <v-col cols="6">
                                     <v-textarea
-                                        v-model="data.newProject.notes"
+                                        v-model="$v.data.newProject.notes.$model"
+                                        :error="$v.data.newProject.notes.$error"
                                         rows="4"
                                         counter
                                         label="Notes (500 ca)">
@@ -396,6 +403,7 @@ import subUtil from '@/components/common/submit-utils'
 import time from '@/components/common/date-utils'
 
 import ProjectDetails from './IndustryProjectDetails'
+import { integer, maxLength } from 'vuelidate/lib/validators'
 
 function prepareStringComparison(str) {
     if (str === null || str === undefined) {
@@ -458,6 +466,10 @@ export default {
             },
             data: {
                 newProject: {
+                    title: '',
+                    amount: null,
+                    global_amount: null,
+                    notes: null,
                     confidential: false,
                     partners: [],
                     person_details: [],
@@ -563,7 +575,9 @@ export default {
             }
         },
         submitForm () {
-            if (this.$store.state.session.loggedIn) {
+            if (this.$store.state.session.loggedIn
+                && !this.$v.$invalid
+            ) {
                 this.progress = true;
                 let personID = this.otherPersonId;
 
@@ -713,7 +727,17 @@ export default {
             }
             return true;
         },
-    }
+    },
+    validations: {
+        data: {
+            newProject: {
+                title: { maxLength: maxLength(200) },
+                amount: { integer },
+                global_amount: { integer },
+                notes: { maxLength: maxLength(500) }
+            },
+        },
+    },
 }
 </script>
 

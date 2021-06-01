@@ -13,14 +13,18 @@
         <v-container>
             <v-row>
                 <v-col cols="12">
-                    <v-text-field v-model="itemDetails.item_details.authors_raw"
+                    <v-text-field
+                        v-model="$v.itemDetails.item_details.authors_raw.$model"
+                        :error="$v.itemDetails.item_details.authors_raw.$error"
                         label="Authors"
                     ></v-text-field>
                 </v-col>
             </v-row>
             <v-row>
                 <v-col cols="12">
-                    <v-text-field v-model="itemDetails.item_details.title"
+                    <v-text-field
+                        v-model="$v.itemDetails.item_details.title.$model"
+                        :error="$v.itemDetails.item_details.title.$error"
                         label="Title"
                     ></v-text-field>
                 </v-col>
@@ -69,7 +73,8 @@
             <v-row>
                 <v-col cols="12">
                     <v-textarea
-                        v-model="itemDetails.item_details.description"
+                        v-model="$v.itemDetails.item_details.description.$model"
+                        :error="$v.itemDetails.item_details.description.$error"
                         rows="3"
                         counter
                         label="Description (<1000 ca)">
@@ -176,6 +181,7 @@
 
 <script>
 import subUtil from '@/components/common/submit-utils'
+import { maxLength } from 'vuelidate/lib/validators'
 
 function prepareStringComparison(str) {
     if (str === null || str === undefined) {
@@ -213,6 +219,8 @@ export default {
             itemDetails: {
                 item_details: {
                     title: '',
+                    authors_raw: '',
+                    description: '',
                     reference_number1: '',
                 },
                 labs_details: [],
@@ -246,7 +254,9 @@ export default {
             this.itemDetails = Object.assign({}, this.itemData);
         },
         submitForm () {
-            if (this.$store.state.session.loggedIn) {
+            if (this.$store.state.session.loggedIn
+                && !this.$v.$invalid
+            ) {
                 this.progress = true;
                 let personID = this.otherPersonId;
                 this.itemDetails.toDeletePerson = this.toDeletePerson;
@@ -351,7 +361,16 @@ export default {
             }
             return true;
         },
-    }
+    },
+    validations: {
+        itemDetails: {
+            item_details: {
+                title: { maxLength: maxLength(300) },
+                authors_raw: { maxLength: maxLength(500) },
+                description: { maxLength: maxLength(1000) },
+            },
+        },
+    },
 
 }
 </script>

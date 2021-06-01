@@ -15,7 +15,9 @@
                 @submit.prevent="submitForm">
                 <v-row>
                     <v-col cols="12" sm="6">
-                        <v-text-field v-model="itemDetails.item_details.name"
+                        <v-text-field
+                            v-model="$v.itemDetails.item_details.name.$model"
+                            :error="$v.itemDetails.item_details.name.$error"
                             label="Event name"
                         ></v-text-field>
                     </v-col>
@@ -49,7 +51,8 @@
                 <v-row>
                     <v-col cols="12">
                         <v-textarea
-                            v-model="itemDetails.item_details.description"
+                            v-model="$v.itemDetails.item_details.description.$model"
+                            :error="$v.itemDetails.item_details.description.$error"
                             rows="3"
                             counter
                             label="Description (<500 ca)">
@@ -158,6 +161,7 @@
 
 <script>
 import subUtil from '@/components/common/submit-utils'
+import { maxLength } from 'vuelidate/lib/validators'
 
 function prepareStringComparison(str) {
     if (str === null || str === undefined) {
@@ -181,9 +185,8 @@ function prepareStringComparison(str) {
 
 export default {
     props: {
-         otherPersonId: Number,
-         itemData: Object,
-
+        otherPersonId: Number,
+        itemData: Object,
         itemId: Number,
     },
     data() {
@@ -195,6 +198,7 @@ export default {
             itemDetails: {
                 item_details: {
                     name: '',
+                    description: '',
                 },
                 labs_details: [],
                 person_details: [],
@@ -223,7 +227,9 @@ export default {
             this.itemDetails = Object.assign({}, this.itemData);
         },
         submitForm () {
-            if (this.$store.state.session.loggedIn) {
+            if (this.$store.state.session.loggedIn
+                && !this.$v.$invalid
+            ) {
                 this.progress = true;
                 let personID = this.otherPersonId;
                 this.itemDetails.toDeletePerson = this.toDeletePerson;
@@ -318,6 +324,14 @@ export default {
                 }
             }
             return true;
+        },
+    },
+    validations: {
+        itemDetails: {
+            item_details: {
+                name: { maxLength: maxLength(100) },
+                description: { maxLength: maxLength(500) },
+            },
         },
     },
 

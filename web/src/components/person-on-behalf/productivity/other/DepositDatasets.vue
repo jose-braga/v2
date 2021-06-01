@@ -66,7 +66,9 @@
                             @submit.prevent="submitForm">
                             <v-row>
                                 <v-col cols="12" sm="6">
-                                    <v-text-field v-model="data.newItem.database_name"
+                                    <v-text-field
+                                        v-model="$v.data.newItem.database_name.$model"
+                                        :error="$v.data.newItem.database_name.$error"
                                         label="Repository name"
                                     ></v-text-field>
                                 </v-col>
@@ -79,13 +81,15 @@
                                     </v-select>
                                 </v-col>
                                 <v-col cols="12" sm="2">
-                                    <v-text-field v-model="$v.data.newItem.number_sets.$model"
+                                    <v-text-field
+                                        v-model="$v.data.newItem.number_sets.$model"
                                         :error="$v.data.newItem.number_sets.$error"
                                         label="Number of sets"
                                     ></v-text-field>
                                 </v-col>
                                 <v-col cols="12" sm="1">
-                                    <v-text-field v-model="$v.data.newItem.year.$model"
+                                    <v-text-field
+                                        v-model="$v.data.newItem.year.$model"
                                         :error="$v.data.newItem.year.$error"
                                         label="Year"
                                     ></v-text-field>
@@ -93,7 +97,9 @@
                             </v-row>
                             <v-row>
                                 <v-col cols="12">
-                                    <v-text-field v-model="data.newItem.url"
+                                    <v-text-field
+                                        v-model="$v.data.newItem.url.$model"
+                                        :error="$v.data.newItem.url.$error"
                                         label="URL"
                                     ></v-text-field>
                                 </v-col>
@@ -101,7 +107,8 @@
                             <v-row>
                                 <v-col cols="12">
                                     <v-textarea
-                                        v-model="data.newItem.short_description"
+                                        v-model="$v.data.newItem.short_description.$model"
+                                        :error="$v.data.newItem.short_description.$error"
                                         rows="3"
                                         counter
                                         label="Description (<400 ca)">
@@ -252,7 +259,7 @@
                 <v-col cols="2" align-self="end">
                     <v-row justify="end">
                         <v-btn type="submit"
-                        outlined color="blue">Add to your prizes</v-btn>
+                        outlined color="blue">Add to your datasets</v-btn>
                     </v-row>
                 </v-col>
                 <v-col cols="1">
@@ -272,7 +279,7 @@
 <script>
 import subUtil from '@/components/common/submit-utils'
 //import time from '@/components/common/date-utils'
-import {integer, } from 'vuelidate/lib/validators'
+import {integer, maxLength } from 'vuelidate/lib/validators'
 
 import ItemDetails from './DepositDatasetsDetails'
 
@@ -340,6 +347,9 @@ export default {
             },
             data: {
                 newItem: {
+                    url: '',
+                    short_description: '',
+                    database_name: '',
                     year:null,
                     number_sets: null,
                     person_details: [],
@@ -553,7 +563,10 @@ export default {
         data: {
             newItem: {
                 year: { integer },
-                number_sets: { integer }
+                number_sets: { integer },
+                short_description: { maxLength: maxLength(400) },
+                database_name: { maxLength: maxLength(100) },
+                url: { maxLength: maxLength(100) },
             }
         }
     },

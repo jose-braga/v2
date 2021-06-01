@@ -117,7 +117,9 @@
                 <div v-else>
                     <v-row>
                         <v-col cols="12">
-                            <v-textarea v-model="itemDetails.communication_raw"
+                            <v-textarea
+                                v-model="$v.itemDetails.communication_raw.$model"
+                                :error="$v.itemDetails.communication_raw.$error"
                                 label="Communications (unstructured data)"
                                 rows="2"
                             ></v-textarea>
@@ -185,6 +187,7 @@
 
 <script>
 import subUtil from '@/components/common/submit-utils'
+import { requiredIf, maxLength } from 'vuelidate/lib/validators'
 
 function prepareStringComparison(str) {
     if (str === null || str === undefined) {
@@ -208,9 +211,8 @@ function prepareStringComparison(str) {
 
 export default {
     props: {
-         otherPersonId: Number,
-         itemData: Object,
-
+        otherPersonId: Number,
+        itemData: Object,
         itemId: Number,
     },
     data() {
@@ -223,6 +225,7 @@ export default {
             convertToStructured: false,
             searchCountries: '',
             itemDetails: {
+                communication_raw: null,
                 labs_details: [],
             },
             searchLabs: [],
@@ -263,7 +266,9 @@ export default {
             }
         },
         submitForm () {
-            if (this.$store.state.session.loggedIn) {
+            if (this.$store.state.session.loggedIn
+                && !this.$v.$invalid
+            ) {
                 this.progress = true;
                 let personID = this.otherPersonId;
                 this.itemDetails.isUnstructured = this.isUnstructured;
@@ -372,6 +377,15 @@ export default {
                 }
             }
             return true;
+        },
+    },
+    validations: {
+        itemDetails: {
+            communication_raw: {
+                required: requiredIf(function () { return this.isUnstructured}),
+                maxLength: maxLength(3000),
+
+            }
         },
     },
 

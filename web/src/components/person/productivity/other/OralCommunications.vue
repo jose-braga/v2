@@ -75,7 +75,9 @@
                         <span> New Communications data </span><br>
                     </v-card-title>
                     <v-container>
-                        <div class="small-text"> Please insert only communications you presented </div>
+                        <div class="small-text"> Please insert only communications you presented.
+                            If you select "unstructured data" below you can feed a plain list of communications.
+                        </div>
                         <v-form ref="form"
                             @submit.prevent="submitForm">
                             <v-switch v-model="isUnstructured"
@@ -257,6 +259,7 @@
 <script>
 import subUtil from '@/components/common/submit-utils'
 import time from '@/components/common/date-utils'
+//import { requiredIf } from 'vuelidate/lib/validators'
 
 import ItemDetails from './OralCommunicationDetails'
 
@@ -311,6 +314,7 @@ export default {
             },
             data: {
                 newItem: {
+                    //communication_raw: null,
                     international: false,
                     labs_details: [],
                 },
@@ -512,10 +516,18 @@ export default {
             }
             return true;
         },
-    }
-
-
-
+    },
+    validations: {
+        /*
+        data: {
+            newItem: {
+                communication_raw: {
+                    required: requiredIf(function () { return this.isUnstructured}),
+                }
+            }
+        },
+        */
+    },
 }
 </script>
 

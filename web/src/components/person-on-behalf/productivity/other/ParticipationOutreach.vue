@@ -66,7 +66,9 @@
                             @submit.prevent="submitForm">
                             <v-row>
                                 <v-col cols="12" sm="6">
-                                    <v-text-field v-model="data.newItem.name"
+                                    <v-text-field
+                                        v-model="$v.data.newItem.name.$model"
+                                        :error="$v.data.newItem.name.$error"
                                         label="Event name"
                                     ></v-text-field>
                                 </v-col>
@@ -100,7 +102,8 @@
                             <v-row>
                                 <v-col cols="12">
                                     <v-textarea
-                                        v-model="data.newItem.short_description"
+                                        v-model="$v.data.newItem.description.$model"
+                                        :error="$v.data.newItem.description.$error"
                                         rows="3"
                                         counter
                                         label="Description (<500 ca)">
@@ -271,6 +274,7 @@
 <script>
 import subUtil from '@/components/common/submit-utils'
 import time from '@/components/common/date-utils'
+import { maxLength } from 'vuelidate/lib/validators'
 
 import ItemDetails from './ParticipationOutreachDetails'
 
@@ -334,6 +338,8 @@ export default {
             },
             data: {
                 newItem: {
+                    name: '',
+                    description: '',
                     international: false,
                     person_details: [],
                     labs_details: [],
@@ -418,7 +424,9 @@ export default {
             }
         },
         submitForm () {
-            if (this.$store.state.session.loggedIn) {
+            if (this.$store.state.session.loggedIn
+                && !this.$v.$invalid
+            ) {
                 this.progress = true;
                 let personID = this.otherPersonId;
 
@@ -545,6 +553,14 @@ export default {
                 }
             }
             return true;
+        },
+    },
+    validations: {
+        data: {
+            newItem: {
+                name: { maxLength: maxLength(100) },
+                description: { maxLength: maxLength(500) },
+            },
         },
     },
 }

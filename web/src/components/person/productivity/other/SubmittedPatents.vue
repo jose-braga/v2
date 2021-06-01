@@ -65,14 +65,18 @@
                             @submit.prevent="submitForm">
                             <v-row>
                                 <v-col cols="12">
-                                    <v-text-field v-model="data.newItem.authors_raw"
+                                    <v-text-field
+                                        v-model="$v.data.newItem.authors_raw.$model"
+                                        :error="$v.data.newItem.authors_raw.$error"
                                         label="Authors"
                                     ></v-text-field>
                                 </v-col>
                             </v-row>
                             <v-row>
                                 <v-col cols="12">
-                                    <v-text-field v-model="data.newItem.title"
+                                    <v-text-field
+                                        v-model="$v.data.newItem.title.$model"
+                                        :error="$v.data.newItem.title.$error"
                                         label="Title"
                                     ></v-text-field>
                                 </v-col>
@@ -121,7 +125,8 @@
                             <v-row>
                                 <v-col cols="12">
                                     <v-textarea
-                                        v-model="data.newItem.description"
+                                        v-model="$v.data.newItem.description.$model"
+                                        :error="$v.data.newItem.description.$error"
                                         rows="3"
                                         counter
                                         label="Description (<1000 ca)">
@@ -292,6 +297,7 @@
 <script>
 import subUtil from '@/components/common/submit-utils'
 import time from '@/components/common/date-utils'
+import { maxLength } from 'vuelidate/lib/validators'
 
 import ItemDetails from './SubmittedPatentsDetails'
 
@@ -358,6 +364,9 @@ export default {
             },
             data: {
                 newItem: {
+                    title: '',
+                    authors_raw: '',
+                    description: '',
                     person_details: [],
                     labs_details: [],
                 },
@@ -439,7 +448,9 @@ export default {
             }
         },
         submitForm () {
-            if (this.$store.state.session.loggedIn) {
+            if (this.$store.state.session.loggedIn
+                && !this.$v.$invalid
+            ) {
                 this.progress = true;
                 let personID = this.$store.state.session.personID;
 
@@ -576,10 +587,16 @@ export default {
             }
             return true;
         },
-
     },
-
-
+    validations: {
+        data: {
+            newItem: {
+                title: { maxLength: maxLength(300) },
+                authors_raw: { maxLength: maxLength(500) },
+                description: { maxLength: maxLength(1000) },
+            },
+        },
+    },
 }
 </script>
 

@@ -15,7 +15,9 @@
                 @submit.prevent="submitForm">
                 <v-row>
                     <v-col cols="12" sm="5">
-                        <v-text-field v-model="itemDetails.item_details.board_name"
+                        <v-text-field
+                            v-model="$v.itemDetails.item_details.board_name.$model"
+                            :error="$v.itemDetails.item_details.board_name.$error"
                             label="Board name"
                         ></v-text-field>
                     </v-col>
@@ -38,7 +40,9 @@
                 </v-row>
                 <v-row>
                     <v-col cols="12" sm="5">
-                        <v-text-field v-model="itemDetails.item_details.role"
+                        <v-text-field
+                            v-model="$v.itemDetails.item_details.role.$model"
+                            :error="$v.itemDetails.item_details.role.$error"
                             label="Role"
                         ></v-text-field>
                     </v-col>
@@ -82,7 +86,8 @@
                 <v-row>
                     <v-col cols="12">
                         <v-textarea
-                            v-model="itemDetails.item_details.short_description"
+                            v-model="$v.itemDetails.item_details.short_description.$model"
+                            :error="$v.itemDetails.item_details.short_description.$error"
                             rows="3"
                             counter
                             label="Description (<400 ca)">
@@ -190,7 +195,7 @@
 
 <script>
 import subUtil from '@/components/common/submit-utils'
-//import {integer, decimal} from 'vuelidate/lib/validators'
+import { maxLength } from 'vuelidate/lib/validators'
 
 function prepareStringComparison(str) {
     if (str === null || str === undefined) {
@@ -214,9 +219,8 @@ function prepareStringComparison(str) {
 
 export default {
     props: {
-         otherPersonId: Number,
-         itemData: Object,
-
+        otherPersonId: Number,
+        itemData: Object,
         itemId: Number,
     },
     data() {
@@ -228,6 +232,8 @@ export default {
             itemDetails: {
                 item_details: {
                     board_name: '',
+                    short_description: '',
+                    role: '',
                 },
                 labs_details: [],
                 person_details: [],
@@ -258,7 +264,9 @@ export default {
             this.itemDetails = Object.assign({}, this.itemData);
         },
         submitForm () {
-            if (this.$store.state.session.loggedIn) {
+            if (this.$store.state.session.loggedIn
+                && !this.$v.$invalid
+            ) {
                 this.progress = true;
                 let personID = this.otherPersonId;
                 this.itemDetails.toDeletePerson = this.toDeletePerson;
@@ -361,6 +369,13 @@ export default {
         },
     },
     validations: {
+        itemDetails: {
+            item_details: {
+                short_description: { maxLength: maxLength(400) },
+                board_name: { maxLength: maxLength(100) },
+                role: { maxLength: maxLength(45) }
+            },
+        },
     },
 
 }

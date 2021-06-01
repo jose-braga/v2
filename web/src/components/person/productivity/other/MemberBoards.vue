@@ -65,7 +65,9 @@
                             @submit.prevent="submitForm">
                             <v-row>
                                 <v-col cols="12" sm="5">
-                                    <v-text-field v-model="data.newItem.board_name"
+                                    <v-text-field
+                                        v-model="$v.data.newItem.board_name.$model"
+                                        :error="$v.data.newItem.board_name.$error"
                                         label="Board name"
                                     ></v-text-field>
                                 </v-col>
@@ -88,7 +90,9 @@
                             </v-row>
                             <v-row>
                                 <v-col cols="12" sm="5">
-                                    <v-text-field v-model="data.newItem.role"
+                                    <v-text-field
+                                        v-model="$v.data.newItem.role.$model"
+                                        :error="$v.data.newItem.role.$error"
                                         label="Role"
                                     ></v-text-field>
                                 </v-col>
@@ -132,7 +136,8 @@
                             <v-row>
                                 <v-col cols="12">
                                     <v-textarea
-                                        v-model="data.newItem.short_description"
+                                        v-model="$v.data.newItem.short_description.$model"
+                                        :error="$v.data.newItem.short_description.$error"
                                         rows="3"
                                         counter
                                         label="Description (<400 ca)">
@@ -304,7 +309,7 @@
 <script>
 import subUtil from '@/components/common/submit-utils'
 import time from '@/components/common/date-utils'
-//import {integer, decimal} from 'vuelidate/lib/validators'
+import { maxLength } from 'vuelidate/lib/validators'
 
 import ItemDetails from './MemberBoardsDetails'
 
@@ -371,6 +376,9 @@ export default {
             },
             data: {
                 newItem: {
+                    board_name: '',
+                    short_description: '',
+                    role: '',
                     international: false,
                     person_details: [],
                     labs_details: [],
@@ -472,7 +480,9 @@ export default {
             }
         },
         submitForm () {
-            if (this.$store.state.session.loggedIn) {
+            if (this.$store.state.session.loggedIn
+                && !this.$v.$invalid
+            ) {
                 this.progress = true;
                 let personID = this.$store.state.session.personID;
 
@@ -608,6 +618,13 @@ export default {
         },
     },
     validations: {
+        data: {
+            newItem: {
+                short_description: { maxLength: maxLength(400) },
+                board_name: { maxLength: maxLength(100) },
+                role: { maxLength: maxLength(45) },
+            },
+        },
     },
 
 }

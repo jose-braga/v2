@@ -159,12 +159,16 @@
                                 </v-col>
 
                                 <v-col cols="12" sm="3">
-                                    <v-text-field v-model="data.newProject.amount"
+                                    <v-text-field
+                                        v-model="$v.data.newProject.amount.$model"
+                                        :error="$v.data.newProject.amount.$error"
                                         label="Mngmt Entity Amount (€)"
                                     ></v-text-field>
                                 </v-col>
                                 <v-col cols="12" sm="3">
-                                    <v-text-field v-model="data.newProject.global_amount"
+                                    <v-text-field
+                                        v-model="$v.data.newProject.global_amount.$model"
+                                        :error="$v.data.newProject.global_amount.$error"
                                         label="Global amount (€)"
                                     ></v-text-field>
                                 </v-col>
@@ -252,7 +256,8 @@
                             <v-row>
                                 <v-col cols="12">
                                     <v-textarea
-                                        v-model="data.newProject.notes"
+                                        v-model="$v.data.newProject.notes.$model"
+                                        :error="$v.data.newProject.notes.$error"
                                         rows="4"
                                         counter
                                         label="Notes (500 ca)">
@@ -344,6 +349,7 @@
 <script>
 import subUtil from '@/components/common/submit-utils'
 import time from '@/components/common/date-utils'
+import { integer, maxLength } from 'vuelidate/lib/validators'
 
 import ProjectDetails from './TrainingNetworkDetails'
 
@@ -410,6 +416,9 @@ export default {
             },
             data: {
                 newProject: {
+                    amount: '',
+                    global_amount: '',
+                    notes: '',
                     person_details: [],
                     labs_details: [],
                 },
@@ -510,7 +519,9 @@ export default {
             }
         },
         submitForm () {
-            if (this.$store.state.session.loggedIn) {
+            if (this.$store.state.session.loggedIn
+                && !this.$v.$invalid
+            ) {
                 this.progress = true;
                 let personID = this.$store.state.session.personID;
 
@@ -653,7 +664,17 @@ export default {
             }
             return true;
         },
-    }
+    },
+    validations: {
+        data: {
+            newProject: {
+                amount: { integer },
+                global_amount: { integer },
+                notes: { maxLength: maxLength(500) }
+            },
+        },
+    },
+
 }
 </script>
 

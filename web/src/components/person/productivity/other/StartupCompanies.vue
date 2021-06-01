@@ -109,7 +109,8 @@
                             <v-row>
                                 <v-col cols="12">
                                     <v-textarea
-                                        v-model="data.newItem.short_description"
+                                        v-model="$v.data.newItem.short_description.$model"
+                                        :error="$v.data.newItem.short_description.$error"
                                         rows="3"
                                         counter
                                         label="Description (<500 ca)">
@@ -280,6 +281,7 @@
 <script>
 import subUtil from '@/components/common/submit-utils'
 import time from '@/components/common/date-utils'
+import { maxLength } from 'vuelidate/lib/validators'
 
 import ItemDetails from './StartupCompaniesDetails'
 
@@ -344,6 +346,7 @@ export default {
             },
             data: {
                 newItem: {
+                    short_description: null,
                     person_details: [],
                     labs_details: [],
                 },
@@ -429,7 +432,9 @@ export default {
             }
         },
         submitForm () {
-            if (this.$store.state.session.loggedIn) {
+            if (this.$store.state.session.loggedIn
+                && !this.$v.$invalid
+            ) {
                 this.progress = true;
                 let personID = this.$store.state.session.personID;
 
@@ -555,6 +560,13 @@ export default {
                 }
             }
             return true;
+        },
+    },
+    validations: {
+        data: {
+            newItem: {
+                short_description: { maxLength: maxLength(500) }
+            },
         },
     },
 }

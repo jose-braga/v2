@@ -14,7 +14,9 @@
 
             <v-row>
                 <v-col cols="12">
-                    <v-text-field v-model="projectDetails.project_details.title"
+                    <v-text-field
+                        v-model="$v.projectDetails.project_details.title.$model"
+                        :error="$v.projectDetails.project_details.title.$error"
                         label="Title"
                     ></v-text-field>
                 </v-col>
@@ -83,12 +85,16 @@
                 </v-col>
 
                 <v-col cols="12" sm="3">
-                    <v-text-field v-model="projectDetails.project_details.management_entities.amount"
+                    <v-text-field
+                        v-model="$v.projectDetails.project_details.management_entities.amount.$model"
+                        :error="$v.projectDetails.project_details.management_entities.amount.$error"
                         label="Mngmt Entity Amount (€)"
                     ></v-text-field>
                 </v-col>
                 <v-col cols="12" sm="3">
-                    <v-text-field v-model="projectDetails.project_details.global_amount"
+                    <v-text-field
+                        v-model="$v.projectDetails.project_details.global_amount.$model"
+                        :error="$v.projectDetails.project_details.global_amount.$error"
                         label="Global amount (€)"
                     ></v-text-field>
                 </v-col>
@@ -250,7 +256,8 @@
                 </v-col>
                 <v-col cols="6">
                     <v-textarea
-                        v-model="projectDetails.project_details.notes"
+                        v-model="$v.projectDetails.project_details.notes.$model"
+                        :error="$v.projectDetails.project_details.notes.$error"
                         rows="4"
                         counter
                         label="Notes (500 ca)">
@@ -278,6 +285,7 @@
 
 <script>
 import subUtil from '@/components/common/submit-utils'
+import { integer, maxLength } from 'vuelidate/lib/validators'
 
 function prepareStringComparison(str) {
     if (str === null || str === undefined) {
@@ -303,6 +311,7 @@ export default {
     props: {
         projectData: Object,
         projectId: Number,
+        otherPersonId: Number,
     },
     data() {
         return {
@@ -313,9 +322,13 @@ export default {
             projectDetails: {
                 project_details: {
                     title: '',
-                    management_entities: {},
+                    management_entities: {
+                        amount: null,
+                    },
+                    global_amount: null,
                     project_areas: [],
                     partners: [],
+                    notes: null,
                 },
                 labs_details: [],
                 person_details: [],
@@ -359,7 +372,9 @@ export default {
             }
         },
         submitForm () {
-            if (this.$store.state.session.loggedIn) {
+            if (this.$store.state.session.loggedIn
+                && !this.$v.$invalid
+            ) {
                 this.progress = true;
                 let personID = this.otherPersonId;
                 this.projectDetails.toDeletePerson = this.toDeletePerson;
@@ -486,6 +501,18 @@ export default {
                 }
             }
             return true;
+        },
+    },
+    validations: {
+        projectDetails: {
+            project_details: {
+                title: { maxLength: maxLength(200) },
+                management_entities: {
+                    amount: { integer },
+                },
+                global_amount: { integer },
+                notes: { maxLength: maxLength(500) },
+            },
         },
     },
 

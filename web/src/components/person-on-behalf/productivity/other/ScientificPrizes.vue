@@ -66,19 +66,25 @@
                             @submit.prevent="submitForm">
                             <v-row>
                                 <v-col cols="12">
-                                    <v-text-field v-model="data.newItem.recipients"
+                                    <v-text-field
+                                        v-model="$v.data.newItem.recipients.$model"
+                                        :error="$v.data.newItem.recipients.$error"
                                         label="Recipients"
                                     ></v-text-field>
                                 </v-col>
                             </v-row>
                             <v-row>
                                 <v-col cols="12" sm="5">
-                                    <v-text-field v-model="data.newItem.name"
+                                    <v-text-field
+                                        v-model="$v.data.newItem.name.$model"
+                                        :error="$v.data.newItem.name.$error"
                                         label="Prize name"
                                     ></v-text-field>
                                 </v-col>
                                 <v-col cols="12" sm="4">
-                                    <v-text-field v-model="data.newItem.organization"
+                                    <v-text-field
+                                        v-model="$v.data.newItem.organization.$model"
+                                        :error="$v.data.newItem.organization.$error"
                                         label="Entity giving prize"
                                     ></v-text-field>
                                 </v-col>
@@ -99,7 +105,8 @@
                             <v-row>
                                 <v-col cols="12">
                                     <v-textarea
-                                        v-model="data.newItem.notes"
+                                        v-model="$v.data.newItem.notes.$model"
+                                        :error="$v.data.newItem.notes.$error"
                                         rows="3"
                                         counter
                                         label="Notes (<500 ca)">
@@ -270,7 +277,7 @@
 <script>
 import subUtil from '@/components/common/submit-utils'
 //import time from '@/components/common/date-utils'
-import {integer, decimal} from 'vuelidate/lib/validators'
+import { integer, decimal, maxLength } from 'vuelidate/lib/validators'
 
 import ItemDetails from './ScientificPrizesDetails'
 
@@ -338,8 +345,12 @@ export default {
             },
             data: {
                 newItem: {
+                    name: '',
+                    recipients: null,
+                    organization: null,
                     year:null,
                     amount_euro: null,
+                    notes: null,
                     person_details: [],
                     labs_details: [],
                 },
@@ -541,6 +552,10 @@ export default {
     validations: {
         data: {
             newItem: {
+                recipients: { maxLength: maxLength(500)},
+                name: { maxLength: maxLength(100)},
+                organization: { maxLength: maxLength(100)},
+                notes: { maxLength: maxLength(500)},
                 year: { integer },
                 amount_euro: { decimal }
             }

@@ -16,7 +16,9 @@
 
                 <v-row>
                     <v-col cols="12" sm="6">
-                        <v-text-field v-model="itemDetails.item_details.database_name"
+                        <v-text-field
+                            v-model="$v.itemDetails.item_details.database_name.$model"
+                            :error="$v.itemDetails.item_details.database_name.$error"
                             label="Repository name"
                         ></v-text-field>
                     </v-col>
@@ -29,13 +31,15 @@
                         </v-select>
                     </v-col>
                     <v-col cols="12" sm="2">
-                        <v-text-field v-model="$v.itemDetails.item_details.number_sets.$model"
+                        <v-text-field
+                            v-model="$v.itemDetails.item_details.number_sets.$model"
                             :error="$v.itemDetails.item_details.number_sets.$error"
                             label="Number of sets"
                         ></v-text-field>
                     </v-col>
                     <v-col cols="12" sm="1">
-                        <v-text-field v-model="$v.itemDetails.item_details.year.$model"
+                        <v-text-field
+                            v-model="$v.itemDetails.item_details.year.$model"
                             :error="$v.itemDetails.item_details.year.$error"
                             label="Year"
                         ></v-text-field>
@@ -43,7 +47,9 @@
                 </v-row>
                 <v-row>
                     <v-col cols="12">
-                        <v-text-field v-model="itemDetails.item_details.url"
+                        <v-text-field
+                            v-model="$v.itemDetails.item_details.url.$model"
+                            :error="$v.itemDetails.item_details.url.$error"
                             label="URL"
                         ></v-text-field>
                     </v-col>
@@ -51,7 +57,8 @@
                 <v-row>
                     <v-col cols="12">
                         <v-textarea
-                            v-model="itemDetails.item_details.short_description"
+                            v-model="$v.itemDetails.item_details.short_description.$model"
+                            :error="$v.itemDetails.item_details.short_description.$error"
                             rows="3"
                             counter
                             label="Description (<400 ca)">
@@ -160,7 +167,7 @@
 
 <script>
 import subUtil from '@/components/common/submit-utils'
-import { integer } from 'vuelidate/lib/validators'
+import { integer, maxLength } from 'vuelidate/lib/validators'
 
 function prepareStringComparison(str) {
     if (str === null || str === undefined) {
@@ -195,7 +202,9 @@ export default {
             formError: false,
             itemDetails: {
                 item_details: {
-                    dataset_name: '',
+                    url: '',
+                    short_description: '',
+                    database_name: '',
                     year: null,
                     number_sets: null,
                 },
@@ -228,7 +237,9 @@ export default {
             this.itemDetails = Object.assign({}, this.itemData);
         },
         submitForm () {
-            if (this.$store.state.session.loggedIn) {
+            if (this.$store.state.session.loggedIn
+                && !this.$v.$invalid
+            ) {
                 this.progress = true;
                 let personID = this.$store.state.session.personID;
                 this.itemDetails.toDeletePerson = this.toDeletePerson;
@@ -338,7 +349,10 @@ export default {
         itemDetails: {
             item_details: {
                 year: { integer },
-                number_sets: { integer }
+                number_sets: { integer },
+                short_description: { maxLength: maxLength(400) },
+                database_name: { maxLength: maxLength(100) },
+                url: { maxLength: maxLength(100) },
             }
         }
     },
