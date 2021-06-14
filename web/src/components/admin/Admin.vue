@@ -7,6 +7,12 @@
         <v-tab to="/admin/messages">
             Messages
         </v-tab>
+        <v-tab to="/admin/user-contacts">
+            Bugs & Suggestions
+        </v-tab>
+        <v-tab to="/admin/email-definitions">
+            Email Definitions
+        </v-tab>
         <v-tabs-items>
             <!-- use :max="N" in keep-alive if necessary-->
             <keep-alive>

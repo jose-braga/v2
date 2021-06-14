@@ -794,6 +794,30 @@ var getDatasetTypes = function (req, res, next) {
     sql.makeSQLOperation(req, res, querySQL, places);
     return;
 };
+var getContactTypes = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM contact_types;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getPermissionLevels = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM permission_levels;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+var getEmailTypes = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM email_types;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
 
 module.exports.listItems = function (req, res, next) {
     let category = req.params.listCategory;
@@ -971,6 +995,14 @@ module.exports.listItems = function (req, res, next) {
     if (category === 'dataset-types') {
         getDatasetTypes(req, res, next);
     }
-
+    if (category === 'contact-types') {
+        getContactTypes(req, res, next);
+    }
+    if (category === 'permission-levels') {
+        getPermissionLevels(req, res, next);
+    }
+    if (category === 'email-types') {
+        getEmailTypes(req, res, next);
+    }
 };
 

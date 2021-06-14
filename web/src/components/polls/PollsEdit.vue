@@ -714,14 +714,18 @@ export default {
                 let pollID = this.$route.params.pollId;
                 let managerID = this.$store.state.session.personID;
                 let urlAddPeople = [];
+                let usedPersonID = []; // to filter people that appear several times
                 for (let ind in list) {
-                    if (list[ind].selected === true) {
+                    if (list[ind].selected === true
+                        && usedPersonID.indexOf(list[ind].person_id) === -1
+                    ) {
                         urlAddPeople.push({
                             url: 'api/polls/' + pollID
                                 + '/managers/'+ managerID
                                 + '/people',
                             body: list[ind],
                         });
+                        usedPersonID.push(list[ind].person_id)
                     }
                 }
                 Promise.all(

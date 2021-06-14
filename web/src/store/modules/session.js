@@ -9,6 +9,7 @@ const session = {
     state: {
         loggedIn: false,
         showLogin: false,
+        showContact: false,
         personID: undefined,
         personName: undefined,
         userID: undefined,
@@ -67,6 +68,9 @@ const session = {
                     router.push({ path: payload.path });
                 }
             }
+        },
+        makeContact(state, payload) {
+            state.showContact = payload.val;
         },
         makeLogin(state, payload) {
             state.showLogin = payload.val;

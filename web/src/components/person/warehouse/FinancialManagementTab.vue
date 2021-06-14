@@ -320,7 +320,7 @@ export default {
                             + '/financial-management/cost-centers/' + item.id,
                         body: item,
                     });
-                    action = this.Promise.all(
+                    action = Promise.all(
                         url.map(el =>
                             this.$http.put(el.url,
                                 { data: el.body, },
@@ -335,7 +335,7 @@ export default {
                             + '/financial-management/cost-centers',
                         body: item,
                     });
-                    action = this.Promise.all(
+                    action = Promise.all(
                         url.map(el =>
                             this.$http.post(el.url,
                                 { data: el.body, },
@@ -353,7 +353,7 @@ export default {
                             + '/accounts/' + item.id,
                         body: item,
                     });
-                    action = this.Promise.all(
+                    action = Promise.all(
                         url.map(el =>
                             this.$http.put(el.url,
                                 { data: el.body, },
@@ -369,7 +369,7 @@ export default {
                             + '/accounts',
                         body: item,
                     });
-                    action = this.Promise.all(
+                    action = Promise.all(
                         url.map(el =>
                             this.$http.post(el.url,
                                 { data: el.body, },
@@ -423,7 +423,7 @@ export default {
                         body: item.accounts[ind],
                     });
                 }
-                action = this.Promise.all(
+                action = Promise.all(
                     url.map(el =>
                         this.$http.put(el.url,
                             { data: el.body, },
@@ -440,7 +440,7 @@ export default {
                         + '/accounts/' + item.id,
                     body: item,
                 });
-                action = this.Promise.all(
+                action = Promise.all(
                     url.map(el =>
                         this.$http.put(el.url,
                             { data: el.body, },
@@ -503,7 +503,7 @@ export default {
                     }
                 }
             }
-            this.Promise.all(
+            Promise.all(
                 urlUpdate.map(el =>
                     this.$http.put(el.url,
                         { data: el.body, },

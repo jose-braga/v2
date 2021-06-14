@@ -63,6 +63,7 @@ const manageStock = require('../controllers/store/manage_stock');
 const manageFinances = require('../controllers/store/manage_finances');
 const websiteTexts = require('../controllers/people/website_texts');
 const users = require('../controllers/people/users');
+const userContacts = require('../controllers/people/user_contacts');
 
 //const permissions = require('../controllers/manager/unit/manage_permissions');
 const preRegister = require('../controllers/team/members');
@@ -72,6 +73,8 @@ const preRegister = require('../controllers/team/members');
 //router.use('/:personID/users-on-behalf', routesAPIUserOnBehalf)
 
 router.get('/:personID/users/:username', cors(corsOptions), users.checkUserExistence);
+
+router.post('/:personID/user-contacts', cors(corsOptions), userContacts.createUserContact);
 
 router.get('/:personID/external-api-authorization', cors(corsOptions), externalAPI.getAuthorization);
 router.put('/:personID/external-api-authorization', cors(corsOptions), externalAPI.updateAuthorization);

@@ -202,8 +202,11 @@ module.exports.checkPermissions = function (callback, callbackOptions) {
         // admin can do whatever he wants, no checking is necessary
         return callback(callbackOptions);
     } else if (permissionsLevel === 2) {
-        // super-managers are also highly unrestricted (only they don't send messages)
-        if (!reqEndpoint.includes('server-messages')) {
+        // super-managers are also highly unrestricted
+        // (only they don't send messages via sockets and they don't manage user contacts)
+        if (!reqEndpoint.includes('messages')
+            && !reqEndpoint.includes('user-contacts')
+        ) {
             return callback(callbackOptions);
         } else {
             responses.sendJSONResponse(res, 403, {

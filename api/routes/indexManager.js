@@ -61,7 +61,7 @@ const outreaches = require('../controllers/people/outreaches');
 const departmentTeams = require('../controllers/manager/unit/department_teams');
 const spaceManagement = require('../controllers/manager/spaces/spaces');
 
-
+const managePermissionLevels = require('../controllers/manager/unit/manage_permission_levels');
 const managePermissionsUnit = require('../controllers/manager/unit/manage_permissions');
 const manageAppAreaPermissionsUnit = require('../controllers/manager/unit/manage_app_area_permissions');
 
@@ -186,10 +186,16 @@ router.get('/:userID/members/:personID/app-area-permissions', cors(corsOptions),
 router.post('/:userID/members/:personID/app-area-permissions', cors(corsOptions), manageAppAreaPermissionsUnit.createPermissions);
 router.put('/:userID/members/:personID/app-area-permissions/:permissionID', cors(corsOptions), manageAppAreaPermissionsUnit.updatePermissions);
 router.delete('/:userID/members/:personID/app-area-permissions/:permissionID', cors(corsOptions), manageAppAreaPermissionsUnit.deletePermissions);
+
 router.get('/:userID/members/:personID/permissions', cors(corsOptions), managePermissionsUnit.getPermissions);
 router.post('/:userID/members/:personID/permissions', cors(corsOptions), managePermissionsUnit.createPermissions);
 router.put('/:userID/members/:personID/permissions/:permissionID', cors(corsOptions), managePermissionsUnit.updatePermissions);
 router.delete('/:userID/members/:personID/permissions/:permissionID', cors(corsOptions), managePermissionsUnit.deletePermissions);
+
+router.get('/:userID/members/:personID/permission-levels', cors(corsOptions), managePermissionLevels.getPermissionLevel);
+router.put('/:userID/members/:personID/permission-levels', cors(corsOptions), managePermissionLevels.updatePermissionLevel);
+
+
 //Supervisor
 router.get('/:userID/members/:personID/students', cors(corsOptions), supervising.getStudents);
 router.post('/:userID/members/:personID/students', cors(corsOptions), supervising.addStudent);
@@ -432,6 +438,9 @@ router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/permissions'
 router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/permissions', cors(corsOptions), managePermissionsUnit.createPermissions);
 router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/permissions/:permissionID', cors(corsOptions), managePermissionsUnit.updatePermissions);
 router.delete('/:userID/units/:unitID/cities/:cityID/members/:personID/permissions/:permissionID', cors(corsOptions), managePermissionsUnit.deletePermissions);
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/permission-levels', cors(corsOptions), managePermissionLevels.getPermissionLevel);
+router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/permission-levels', cors(corsOptions), managePermissionLevels.updatePermissionLevel);
+
 //Supervisor
 router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/students', cors(corsOptions), supervising.getStudents);
 router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/students', cors(corsOptions), supervising.addStudent);
@@ -659,6 +668,9 @@ router.get('/:userID/cities/:cityID/members/:personID/permissions', cors(corsOpt
 router.post('/:userID/cities/:cityID/members/:personID/permissions', cors(corsOptions), managePermissionsUnit.createPermissions);
 router.put('/:userID/cities/:cityID/members/:personID/permissions/:permissionID', cors(corsOptions), managePermissionsUnit.updatePermissions);
 router.delete('/:userID/cities/:cityID/members/:personID/permissions/:permissionID', cors(corsOptions), managePermissionsUnit.deletePermissions);
+router.get('/:userID/cities/:cityID/members/:personID/permission-levels', cors(corsOptions), managePermissionLevels.getPermissionLevel);
+router.put('/:userID/cities/:cityID/members/:personID/permission-levels', cors(corsOptions), managePermissionLevels.updatePermissionLevel);
+
 //Supervisor
 router.get('/:userID/cities/:cityID/members/:personID/students', cors(corsOptions), supervising.getStudents);
 router.post('/:userID/cities/:cityID/members/:personID/students', cors(corsOptions), supervising.addStudent);
@@ -896,6 +908,10 @@ router.get('/:userID/units/:unitID/members/:personID/permissions', cors(corsOpti
 router.post('/:userID/units/:unitID/members/:personID/permissions', cors(corsOptions), managePermissionsUnit.createPermissions);
 router.put('/:userID/units/:unitID/members/:personID/permissions/:permissionID', cors(corsOptions), managePermissionsUnit.updatePermissions);
 router.delete('/:userID/units/:unitID/members/:personID/permissions/:permissionID', cors(corsOptions), managePermissionsUnit.deletePermissions);
+
+router.get('/:userID/units/:unitID/members/:personID/permission-levels', cors(corsOptions), managePermissionLevels.getPermissionLevel);
+router.put('/:userID/units/:unitID/members/:personID/permission-levels', cors(corsOptions), managePermissionLevels.updatePermissionLevel);
+
 //Supervisor
 router.get('/:userID/units/:unitID/members/:personID/students', cors(corsOptions), supervising.getStudents);
 router.post('/:userID/units/:unitID/members/:personID/students', cors(corsOptions), supervising.addStudent);

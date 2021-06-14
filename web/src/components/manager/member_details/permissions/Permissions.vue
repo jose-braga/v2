@@ -2,6 +2,38 @@
 <v-card>
     <v-card-title primary-title>
         <div>
+            <h3 class="headline">Permission Level</h3>
+        </div>
+    </v-card-title>
+    <v-card-text></v-card-text>
+    <v-container>
+        <v-row align="center">
+            <v-col cols="12" sm="3">
+                <v-select v-model="data.permissionLevel.permission_level_id"
+                    :items="permissionLevels"
+                    item-value="id" item-text="name_en"
+                    label="Permission Level"
+                    dense>
+                </v-select>
+            </v-col>
+            <v-col cols="2" align-self="end">
+                <v-row justify="end">
+                    <v-btn @click="submitPermissionLevel(data.permissionLevel)"
+                    outlined color="blue">Update</v-btn>
+                </v-row>
+            </v-col>
+            <v-col cols="1">
+                <v-progress-circular indeterminate
+                        v-show="progressLevel"
+                        :size="20" :width="2"
+                        color="primary"></v-progress-circular>
+                <v-icon v-show="successLevel" color="green">mdi-check</v-icon>
+                <v-icon v-show="errorLevel" color="red">mdi-alert-circle-outline</v-icon>
+            </v-col>
+        </v-row>
+    </v-container>
+    <v-card-title primary-title>
+        <div>
             <h3 class="headline">Endpoint Permissions</h3>
         </div>
     </v-card-title>
@@ -622,11 +654,16 @@ export default {
             progress: false,
             success: false,
             error: false,
+            progressLevel: false,
+            successLevel: false,
+            errorLevel: false,
             formError: false,
             openPanel: undefined,
             data: {
+                permissionLevel: {},
                 permissions: [],
             },
+            permissionLevels: [],
             requestMethods: [],
             resourceTypes: [],
             people: [],
@@ -639,6 +676,7 @@ export default {
     },
     mounted () {
         this.initialize();
+        this.getPermissionLevels();
         this.getRequestMethods();
         this.getResourceTypes();
         this.getPeople();
@@ -714,7 +752,14 @@ export default {
                             this.$set(this.data.permissions[ind], 'resource4_hasID', true);
                         }
                     }
-                    this.data.permissions = makeEndpointURL(this.data.permissions)
+                    this.data.permissions = makeEndpointURL(this.data.permissions);
+                    return subUtil.getInfoPopulate(this, 'api' + this.endpoint
+                                + '/members'
+                                + '/' + this.personId
+                                + '/permission-levels', false)
+                })
+                .then( (result) => {
+                    this.data.permissionLevel = result;
                 })
             }
         },
@@ -781,6 +826,44 @@ export default {
                     this.error = true;
                     this.initialize();
                     setTimeout(() => {this.error = false;}, 6000)
+                    // eslint-disable-next-line
+                    console.log(error)
+                });
+            }
+        },
+        submitPermissionLevel (data) {
+            if (this.$store.state.session.loggedIn) {
+                this.progressLevel = true;
+                let urlUpdate = [];
+                urlUpdate.push({
+                    url: 'api' + this.endpoint
+                        + '/members'
+                        + '/' + this.personId
+                        + '/permission-levels',
+                    body: data,
+                });
+                Promise.all(
+                    urlUpdate.map(el =>
+                        this.$http.put(el.url,
+                            { data: el.body, },
+                            { headers:
+                                {'Authorization': 'Bearer ' + localStorage['v2-token']
+                            },
+                        }))
+                )
+                .then( () => {
+                    this.progressLevel = false;
+                    this.successLevel = true;
+                    setTimeout(() => {
+                        this.successLevel = false;
+                    }, 1500)
+                    this.initialize();
+                })
+                .catch((error) => {
+                    this.progressLevel = false;
+                    this.errorLevel = true;
+                    this.initialize();
+                    setTimeout(() => {this.errorLevel = false;}, 6000)
                     // eslint-disable-next-line
                     console.log(error)
                 });
@@ -908,6 +991,13 @@ export default {
                 },
                 ...this.data.permissions
                 ];
+        },
+        getPermissionLevels () {
+            var vm = this;
+            if (this.$store.state.session.loggedIn) {
+                const urlSubmit = 'api/v2/' + 'permission-levels';
+                return subUtil.getPublicInfo(vm, urlSubmit, 'permissionLevels');
+            }
         },
         getRequestMethods () {
             var vm = this;

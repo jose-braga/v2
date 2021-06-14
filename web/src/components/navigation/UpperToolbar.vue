@@ -4,6 +4,14 @@
         <v-app-bar-nav-icon @click.stop="changeDrawer"></v-app-bar-nav-icon>
         <v-toolbar-title>{{toolbarText}}</v-toolbar-title>
         <v-spacer></v-spacer>
+        <v-tooltip bottom  v-if="loggedIn">
+            <template v-slot:activator="{ on }">
+                <v-btn icon v-on="on" @click.stop="showContact">
+                    <v-icon>mdi-comment-alert-outline</v-icon>
+                </v-btn>
+            </template>
+            <span>Report bug / Suggestions</span>
+        </v-tooltip>
         <v-tooltip bottom v-if="!loggedIn">
             <template v-slot:activator="{ on }">
                 <v-btn icon v-on="on" @click.stop="showLogin">
@@ -30,15 +38,18 @@
         </v-tooltip>
     </v-app-bar>
     <Login></Login>
+    <ContactForm></ContactForm>
     </div>
 </template>
 
 <script>
 import Login from '../login/Login'
+import ContactForm from '../contact/ContactForm'
 
 export default {
     components: {
         Login,
+        ContactForm,
     },
     data() {
         return {
@@ -62,6 +73,10 @@ export default {
         },
         logout: function () {
             this.$store.commit('logoutProcedure');
+        },
+        showContact: function () {
+            this.$store.commit('makeContact',
+                {val: true});
         },
         showLogin: function () {
             this.$store.commit('makeLogin',
