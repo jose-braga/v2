@@ -1,6 +1,27 @@
 <template>
 <div>
 <v-card>
+    <v-container class="ml-4">
+        <v-row align-content="center" align="center">
+            <v-col cols="2" align-self="end">
+                <v-switch
+                    v-model="data.canSupervise"
+                    label="Can supervise?"
+                    @change="submitChangeSupervising"
+                    :false-value="0"
+                    :true-value="1"
+                ></v-switch>
+            </v-col>
+            <v-col cols="1">
+                <v-progress-circular indeterminate
+                        v-show="progressSupervisor"
+                        :size="20" :width="2"
+                        color="primary"></v-progress-circular>
+                <v-icon v-show="successSupervisor" color="green">mdi-check</v-icon>
+                <v-icon v-show="errorSupervisor" color="red">mdi-alert-circle-outline</v-icon>
+            </v-col>
+        </v-row>
+    </v-container>
     <v-card-title primary-title>
         <div>
             <h3 class="headline">People you currently supervise</h3>
@@ -209,6 +230,9 @@ export default {
             dialogPast: false,
             editedIndex: -1,
             editedItem: {},
+            progressSupervisor: false,
+            successSupervisor: false,
+            errorSupervisor: false,
             progress: false,
             success: false,
             error: false,
@@ -219,6 +243,7 @@ export default {
             isLAQV: false,
             roles: ['Scientific', 'Technical', 'Science Management', 'Administrative'],
             data: {
+                canSupervise: 0,
                 newStudent: {
                     username: '',
                     email: '',
@@ -292,6 +317,7 @@ export default {
                     this.isLAQV = true;
                 }
                 */
+
                 this.data.students = [];
                 this.data.pastStudents = [];
                 let today = time.momentToDate(time.moment())
@@ -420,9 +446,51 @@ export default {
                                 + '/' + personID + '/lab-affiliations', true)
                 .then( (result2) => {
                     this.myLabs = result2;
+                });
+                subUtil.getInfoPopulate(this, 'api' + this.endpoint
+                                + '/members'
+                                + '/' + personID + '/is-supervisor', false)
+                .then( (result) => {
+                    this.data.canSupervise = result.can_supervise;
                 })
             }
             this.initialized = true;
+        },
+        submitChangeSupervising () {
+            if (this.$store.state.session.loggedIn) {
+                this.progressSupervisor = true;
+                let url = [];
+                let personID = this.personId;
+                url.push({
+                    url: 'api' + this.endpoint
+                        + '/members'
+                        + '/' + personID
+                        + '/is-supervisor',
+                    body: {canSupervise: this.data.canSupervise},
+                });
+                Promise.all(
+                    url.map(el =>
+                        this.$http.put(el.url,
+                            { data: el.body, },
+                            { headers:
+                                {'Authorization': 'Bearer ' + localStorage['v2-token']
+                            },
+                        }))
+                )
+                .then( () => {
+                    this.progressSupervisor = false;
+                    this.successSupervisor = true;
+                    setTimeout(() => {this.successSupervisor = false;}, 1500)
+                    this.initialize();
+                })
+                .catch((error) => {
+                    this.progressSupervisor = false;
+                    this.errorSupervisor = true;
+                    setTimeout(() => {this.errorSupervisor = false;}, 6000)
+                    // eslint-disable-next-line
+                    console.log(error)
+                })
+            }
         },
         submitForm () {
             if (this.$store.state.session.loggedIn) {

@@ -73,7 +73,8 @@ const preRegister = require('../controllers/team/members');
 //router.use('/:personID/users-on-behalf', routesAPIUserOnBehalf)
 
 router.get('/:personID/users/:username', cors(corsOptions), users.checkUserExistence);
-
+router.get('/:personID/is-supervisor', cors(corsOptions), nuclearInformation.checkSupervising);
+router.put('/:personID/is-supervisor', cors(corsOptions), nuclearInformation.updateSupervising);
 router.post('/:personID/user-contacts', cors(corsOptions), userContacts.createUserContact);
 
 router.get('/:personID/external-api-authorization', cors(corsOptions), externalAPI.getAuthorization);

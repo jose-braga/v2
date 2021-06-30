@@ -435,6 +435,24 @@ export default {
                     this.data.members = [];
                 }
             }
+            //Admins and super-managers can see teams (the same ways as team manager)
+            if (this_session.permissionsLevel < 3) {
+                if (this.labId !== undefined) {
+                    let urlSubmit = 'api' + '/labs/' + this.labId + '/members-affiliation';
+                    subUtil.getInfoPopulate(this, urlSubmit, true)
+                    .then( (result) => {
+                        let pastMembers = processResults(this, result);
+                        this.data.members = pastMembers;
+                    });
+                } else if (this.depTeamId !== undefined) {
+                    let urlSubmit = 'api' + '/department-teams/' + this.depTeamId + '/members-affiliation';
+                    subUtil.getInfoPopulate(this, urlSubmit, true)
+                    .then( (result) => {
+                        let pastMembers = processResults(this, result);
+                        this.data.members = pastMembers;
+                    });
+                }
+            }
         },
         editItem (member) {
             this.dialog = true;
@@ -487,7 +505,6 @@ export default {
                     for (let indPos in member.past_history) {
                         let pos = member.past_history[indPos];
                         pos.changed_by = this_session.userID;
-                        //console.log(pos)
                         reqUpdate = '/labs/' + this.labId
                                     + '/members-affiliation/' + memberID
                                     + '/position/' + pos.id;
@@ -554,7 +571,6 @@ export default {
                     for (let indPos in member.past_history) {
                         let pos = member.past_history[indPos];
                         pos.changed_by = this_session.userID;
-                        //console.log(pos)
                         reqUpdate = '/department-teams/' + this.depTeamId
                                     + '/members-affiliation/' + memberID
                                     + '/position/' + pos.id;
@@ -593,6 +609,68 @@ export default {
                             }
                         }
 
+                    }
+                }
+                if (requests.length === 0
+                    && this_session.permissionsLevel < 3
+                ) {
+                    member.newer_data.changed_by = this_session.userID;
+                    if (this.depTeamId !== undefined) {
+                        member.newer_data.lab_id = this.depTeamData.lab_id;
+                    }
+
+                    if (Object.keys(member.newer_data).length > 0) {
+                        member.newer_data.changed_by = this_session.userID;
+                        requests.push(this.$http.post(urlCreate,
+                            {
+                                data: member.newer_data
+                            },
+                            {
+                                headers: {'Authorization': 'Bearer ' + localStorage['v2-token']},
+                            }
+                        ));
+                    }
+                    for (let indPos in member.past_history) {
+                        let pos = member.past_history[indPos];
+                        pos.changed_by = this_session.userID;
+                        if (this.labId !== undefined) {
+                            reqUpdate = '/labs/' + this.labId
+                                        + '/members-affiliation/' + memberID
+                                        + '/position/' + pos.id;
+                            urlUpdate = 'api' + reqUpdate;
+                            reqDelete = '/labs/' + this.labId
+                                        + '/members-affiliation/' + memberID
+                                        + '/position/' + pos.id;
+                            urlDelete = 'api' + reqDelete;
+                        }
+                        if (this.depTeamId !== undefined) {
+                            reqUpdate = '/department-teams/' + this.depTeamId
+                                        + '/members-affiliation/' + memberID
+                                        + '/position/' + pos.id;
+                            urlUpdate = 'api' + reqUpdate;
+                            reqDelete = '/department-teams/' + this.depTeamId
+                                        + '/members-affiliation/' + memberID
+                                        + '/position/' + pos.id;
+                            urlDelete = 'api' + reqDelete;
+                        }
+                        if (!pos.to_delete) {
+                            requests.push(this.$http.put(urlUpdate,
+                                {
+                                    data: pos
+                                },
+                                {
+                                headers: {'Authorization': 'Bearer ' + localStorage['v2-token']},
+                                }
+                            ));
+                        }
+                        if (pos.to_delete) {
+                            requests.push(this.$http.delete(urlDelete,
+                                {
+                                    headers: {'Authorization': 'Bearer ' + localStorage['v2-token']},
+                                    data: { data: pos },
+                                }
+                            ));
+                        }
                     }
                 }
                 Promise.all(requests)

@@ -16,6 +16,51 @@
             </p>
         </v-card-text>
         <v-container>
+            <v-form ref="form" class="my-2 ml-2"
+                v-if="depTeamId !== undefined"
+                @submit.prevent="submitNewMember"
+            >
+                <v-row>
+                    <v-col cols="6">
+                        <v-btn
+                            @click="showFromDB()"
+                            outlined color="blue"
+                        >
+                            Add person already in DB
+                        </v-btn>
+
+                    </v-col>
+                </v-row>
+                <v-row v-if="addingFromDB" align-content="center">
+                    <v-col cols="12" sm="6">
+                        <v-autocomplete
+                            v-model="data.newStudent.person_id"
+                            :items="people" item-value="id" item-text="colloquial_name"
+                            :search-input.sync="searchPeople"
+                            :filter="customSearch"
+                            cache-items
+                            flat
+                            hide-no-data
+                            hide-details
+                            label="People">
+                        </v-autocomplete>
+                    </v-col>
+                    <v-col cols="2" align-self="center">
+                        <v-row justify="end">
+                            <v-btn type="submit"
+                            outlined color="red">Add</v-btn>
+                        </v-row>
+                    </v-col>
+                    <v-col cols="1" align-self="center">
+                        <v-progress-circular indeterminate
+                                v-show="progress"
+                                :size="20" :width="2"
+                                color="primary"></v-progress-circular>
+                        <v-icon v-show="success" color="green">mdi-check</v-icon>
+                        <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
+                    </v-col>
+                </v-row>
+            </v-form>
             <v-text-field
                 v-model="search"
                 append-icon="mdi-magnify"
@@ -283,6 +328,11 @@ function processResults(vm, result) {
                 break;
             }
         }
+        if (result[ind].history.length === 0) {
+            result[ind].most_recent_data = {}
+            result[ind].newer_data = {}
+            currentMembers.push(result[ind]);
+        }
     }
     return currentMembers;
 }
@@ -304,6 +354,25 @@ function processForSpreadsheet(members) {
     }
     return membersCurated;
 }
+function prepareStringComparison(str) {
+    if (str === null || str === undefined) {
+        return null;
+    } else {
+        return str.toLocaleLowerCase()
+            .replace(/[áàãâä]/g, 'a')
+            .replace(/[éèêë]/g, 'e')
+            .replace(/[íìîï]/g, 'i')
+            .replace(/[óòõôö]/g, 'o')
+            .replace(/[úùûü]/g, 'u')
+            .replace(/[ç]/g, 'c')
+            .replace(/[ñ]/g, 'n')
+            .replace(/(\.\s)/g, '')
+            .replace(/(\.)/g, '')
+            .replace(/[-:()]/g, ' ')
+            .trim()
+            ;
+    }
+}
 
 export default {
     props: {
@@ -319,11 +388,15 @@ export default {
         return {
             dialog: false,
             formError: false,
+            progress: false,
+            success: false,
+            error: false,
             editedIndex: -1,
             editedItem: {
                 most_recent_data: {},
                 newer_data: {},
             },
+            addingFromDB: false,
             search: '',
             headers: [
                 { text: 'Name', value:'name' },
@@ -337,8 +410,13 @@ export default {
                 'items-per-page-options': [10,20,50,-1]
             },
             data: {
+                newStudent: {
+                   person_id: null,
+                },
                 members: [],
             },
+            searchPeople: null,
+            people: [],
             labs: [],
         }
     },
@@ -349,6 +427,7 @@ export default {
             this.initialize();
         });
         this.getLabs();
+        this.getPeople();
     },
     computed: {
         currentGroup () {
@@ -442,6 +521,24 @@ export default {
                     this.data.members = [];
                 }
             }
+            //Admins and super-managers can see teams (the same ways as team manager)
+            if (this_session.permissionsLevel < 3) {
+                if (this.labId !== undefined) {
+                    let urlSubmit = 'api' + '/labs/' + this.labId + '/members-affiliation';
+                    subUtil.getInfoPopulate(this, urlSubmit, true)
+                    .then( (result) => {
+                        let currentMembers = processResults(this, result);
+                        this.data.members = currentMembers;
+                    });
+                } else if (this.depTeamId !== undefined) {
+                    let urlSubmit = 'api' + '/department-teams/' + this.depTeamId + '/members-affiliation';
+                    subUtil.getInfoPopulate(this, urlSubmit, true)
+                    .then( (result) => {
+                        let currentMembers = processResults(this, result);
+                        this.data.members = currentMembers;
+                    });
+                }
+            }
         },
         editItem (member) {
             this.dialog = true;
@@ -458,6 +555,66 @@ export default {
         discardNewer (member) {
             member.newer_data = {};
             member.most_recent_data.show_add_more_recent = true;
+        },
+        submitNewMember () {
+            if (this.$store.state.session.loggedIn) {
+                this.progress = true;
+                let urlCreate = '';
+                //let personID = this.$store.state.session.personID;
+                let this_session = this.$store.state.session;
+                let reqCreate;
+                let requests = [];
+                if (this.depTeamId !== undefined) {
+                    reqCreate = '/department-teams/' + this.depTeamId
+                                + '/members';
+                    urlCreate =  'api' + reqCreate;
+                }
+                for (let ind in this_session.permissionsEndpoints) {
+                    if (subUtil.checkPermissions(reqCreate, 'POST',
+                        this_session.permissionsEndpoints[ind].endpoint_url,
+                        this_session.permissionsEndpoints[ind].method_name,
+                        this_session.permissionsEndpoints[ind].allow_all_subpaths)
+                    ) {
+                        requests.push(this.$http.post(urlCreate,
+                            {
+                                data: this.data.newStudent
+                            },
+                            {
+                            headers: {'Authorization': 'Bearer ' + localStorage['v2-token']},
+                            }
+                        ));
+                    }
+                }
+                if (requests.length === 0
+                    && this_session.permissionsLevel < 3
+                ) {
+                    requests.push(this.$http.post(urlCreate,
+                        {
+                            data: this.data.newStudent
+                        },
+                        {
+                        headers: {'Authorization': 'Bearer ' + localStorage['v2-token']},
+                        }
+                    ));
+                }
+                Promise.all(requests)
+                .then( () => {
+                    this.progress = false;
+                    this.success = true;
+                    setTimeout(() => {this.success = false;}, 1500)
+                    this.data.newStudent = {}
+                    this.addingFromDB = false;
+                    this.$root.$emit('updatePastTeamMembers')
+                    this.initialize();
+                })
+                .catch((error) => {
+                    this.progress = false;
+                    this.error = true;
+                    setTimeout(() => {this.error = false;}, 6000)
+                    // eslint-disable-next-line
+                    console.log(error)
+                })
+            }
         },
         submitForm (member) {
             if (this.$v.$invalid) {
@@ -551,6 +708,43 @@ export default {
                             ));
                         }
                     }
+                    if (requests.length === 0
+                        && this_session.permissionsLevel < 3
+                    ) {
+                        if (!member.most_recent_data.to_delete) {
+                            requests.push(this.$http.put(urlUpdate,
+                                {
+                                    data: member.most_recent_data
+                                },
+                                {
+                                headers: {'Authorization': 'Bearer ' + localStorage['v2-token']},
+                                }
+                            ));
+                        }
+                        if (Object.keys(member.newer_data).length > 0
+                            && !alreadyCreate
+                        ) {
+                            alreadyCreate = true;
+                            member.newer_data.changed_by = this_session.userID;
+                            member.newer_data.lab_id = this.depTeamData.lab_id;
+                            requests.push(this.$http.post(urlCreate,
+                                {
+                                    data: member.newer_data
+                                },
+                                {
+                                headers: {'Authorization': 'Bearer ' + localStorage['v2-token']},
+                                }
+                            ));
+                        }
+                        if (member.most_recent_data.to_delete) {
+                            requests.push(this.$http.delete(urlDelete,
+                                {
+                                headers: {'Authorization': 'Bearer ' + localStorage['v2-token']},
+                                data: { data: member.most_recent_data },
+                                }
+                            ));
+                        }
+                    }
                     Promise.all(requests)
                         .then( () => {
                             member.progress = false;
@@ -594,6 +788,16 @@ export default {
                             }
                         ));
                     }
+                }
+                if (requests.length === 0
+                    && this_session.permissionsLevel < 3
+                ) {
+                    requests.push(this.$http.delete(urlDelete,
+                        {
+                        headers: {'Authorization': 'Bearer ' + localStorage['v2-token']},
+                        data: { data: member.most_recent_data },
+                        }
+                    ));
                 }
                 Promise.all(requests)
                     .then( () => {
@@ -667,6 +871,28 @@ export default {
                 const urlSubmit = 'api/v2/' + 'labs';
                 return subUtil.getPublicInfo(vm, urlSubmit, 'labs');
             }
+        },
+        getPeople () {
+            let vm = this;
+            const urlSubmit = 'api/v2/' + 'people-simple';
+            return subUtil.getPublicInfo(vm, urlSubmit, 'people');
+        },
+        showFromDB () {
+            this.addingFromDB = !this.addingFromDB;
+            this.data.newStudent = {
+                person_id: null,
+            };
+        },
+        customSearch (item, queryText, itemText) {
+            let queryPre = prepareStringComparison(queryText);
+            let query = queryPre.split(' ');
+            let text = prepareStringComparison(itemText);
+            for (let ind in query) {
+                if (text.indexOf(query[ind]) === -1) {
+                    return false;
+                }
+            }
+            return true;
         },
     },
     //editedItem.most_recent_data.valid_until

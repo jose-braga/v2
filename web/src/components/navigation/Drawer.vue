@@ -69,7 +69,7 @@ export default {
             this.$store.state.navigation.activeTile = ind;
         },
         initialize() {
-            for(let ind in this.tiles) {
+            for (let ind in this.tiles) {
                 if (this.tiles[ind].text === 'Team') {
                     /*
                     let this_session = this.$store.state.session;

@@ -101,6 +101,42 @@
                         </v-col>
                     </v-row>
                 </v-col>
+                <v-col cols="12">
+                    <v-row>
+                        <v-col cols="12">
+                            <p>In case of doubt, check the maps provided below:</p>
+                        </v-col>
+                        <v-col v-for="(map, i) in maps"
+                            :key="'maps-' + i"
+                            cols="3"
+                        >
+                            <v-btn @click="showMap(map)"
+                                color="primary"
+                                text
+                            >
+                                {{map.name}}
+                            </v-btn>
+                        </v-col>
+                    </v-row>
+                </v-col>
+                <v-dialog v-model="dialogMaps"
+                    max-width="1600px"
+                >
+                    <v-card>
+                        <v-card-text>
+                            <span>
+                                Scroll to zoom, click to grab and move image
+                            </span>
+                        </v-card-text>
+                        <panZoom ref="mapImage"
+                            :options="currentMap.options"
+                        >
+                            <v-img
+                                :src="currentMap.final_link"
+                            ></v-img>
+                        </panZoom>
+                    </v-card>
+                </v-dialog>
             </v-row>
         </v-form>
         <v-data-table
@@ -181,6 +217,7 @@ export default {
     data() {
         return {
             dialog: false,
+            dialogMaps: false,
             progress: false,
             success: false,
             error: false,
@@ -193,6 +230,19 @@ export default {
                 newSpaces: {},
                 spaces: [],
             },
+            maps: [
+                {name: 'Piso 0 - Ambiente', link:'Piso-0-Ambiente-2021.jpg'},
+                {name: 'Piso 1 - Ambiente', link:'Piso-1-Ambiente-2021.jpg'},
+                {name: 'Piso 1 - DQ', link:'Piso-1-DQ-2021.jpg'},
+                {name: 'Piso 2 - DQ', link:'Piso-2-DQ-2021.jpg'},
+                {name: 'Piso 3 - DQ', link:'Piso-3-DQ-2021.jpg'},
+                {name: 'Piso 4 - DQ', link:'Piso-4-DQ-2021.jpg'},
+                {name: 'Piso 5 - DQ', link:'Piso-5-DQ-2021.jpg'},
+                {name: 'Piso 6 - DQ', link:'Piso-6-DQ-2021.jpg'},
+            ],
+            currentMap: {},
+            mapOptions: { initialZoom: 1 },
+            publicPath: process.env.VUE_APP_REQUEST_ORIGIN,
             search: '',
             headers: [
                 { text: 'Room #', value:'reference' },
@@ -316,7 +366,7 @@ export default {
             })
         },
         showNewSpace () {
-            this.addingNewSpace = true;
+            this.addingNewSpace = !this.addingNewSpaceShowsdsd;
         },
         editItem (item) {
             this.dialog = true;
@@ -359,6 +409,18 @@ export default {
                     // eslint-disable-next-line
                     console.log(error)
                 })
+            }
+        },
+        showMap (map) {
+            this.dialogMaps = true;
+            this.currentMap = map;
+            this.$set(this.currentMap, 'final_link',
+                this.publicPath  + '/images/dq-spaces/' + map.link
+            );
+            this.$set(this.currentMap, 'options', { initialZoom: 1 });
+            if (this.$refs.mapImage !== undefined) {
+                this.$refs.mapImage.$panZoomInstance.moveTo(0, 0);
+                this.$refs.mapImage.$panZoomInstance.zoomAbs( 0, 0, 1 );
             }
         },
         customSearch (item, queryText, itemText) {

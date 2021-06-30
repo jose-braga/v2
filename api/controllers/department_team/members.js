@@ -159,8 +159,10 @@ var getMembersLabPositions = function (members, options, i) {
                         + ' FROM people_labs'
                         + ' JOIN labs ON labs.id = people_labs.lab_id'
                         + ' LEFT JOIN lab_positions ON lab_positions.id = people_labs.lab_position_id'
-                        + ' WHERE people_labs.lab_id = ? AND people_labs.person_id = ?;';
-    places.push(members[i].lab_id, members[i].person_id);
+                        + ' WHERE people_labs.person_id = ?;';
+                        //+ ' WHERE people_labs.lab_id = ? AND people_labs.person_id = ?;';
+    places.push(members[i].person_id);
+    //places.push(members[i].lab_id, members[i].person_id);
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             members[i].history = resQuery;
@@ -186,7 +188,8 @@ var getMemberDetails = function (members, options, i) {
                     response: res,
                     status: 200,
                     message: {
-                        "status": "success", "statusCode": 200,
+                        "status": "success",
+                        "statusCode": 200,
                         "count": members.length,
                         "result": members
                     }
@@ -202,8 +205,8 @@ var actionGetLabMembers = function (options) {
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'SELECT DISTINCT people.id AS person_id, people.name, people.colloquial_name, teams_department.lab_id '
-                        + ' FROM people'
-                        + ' JOIN people_team_department ON people_team_department.person_id = people.id'
+                        + ' FROM people_team_department'
+                        + ' JOIN people ON people_team_department.person_id = people.id'
                         + ' JOIN teams_department ON teams_department.id = people_team_department.team_id'
                         + ' WHERE people_team_department.team_id = ? AND people.status = ?;';
     places.push(depTeamID, 1)
@@ -817,6 +820,27 @@ var writeMessageDB = function (options, error) {
 module.exports.preRegister = function (req, res, next) {
     permissions.checkPermissions(
         (options) => { actionAddUser(options) },
+        { req, res, next }
+    );
+};
+
+var actionAddMemberDepTeam = function (options) {
+    let { req, res, next } = options;
+    let depTeamID = req.params.depTeamID;
+    let person = req.body.data;
+    let places = [];
+    querySQL = 'INSERT INTO people_team_department'
+        + ' (person_id, team_id)'
+        + ' VALUES (?, ?);';
+    places.push(
+        person.person_id,
+        depTeamID
+    );
+    return sql.makeSQLOperation(req, res, querySQL, places);
+};
+module.exports.addMember = function (req, res, next) {
+    permissions.checkPermissions(
+        (options) => { actionAddMemberDepTeam(options) },
         { req, res, next }
     );
 };

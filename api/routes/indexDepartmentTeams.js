@@ -27,6 +27,7 @@ const spaces = require('../controllers/department_team/spaces');
 router.get('/:depTeamID', cors(corsOptions), members.getDepartmentTeamInfo);
 router.get('/:depTeamID/people', cors(corsOptions), members.searchAllPeople);
 router.post('/:depTeamID/people', cors(corsOptions), members.preRegister); // pre-register new member
+router.post('/:depTeamID/members', cors(corsOptions), members.addMember); // add person to department team
 //router.post('/:depTeamID/people/:personID', cors(corsOptions), members.addMemberFromDB); // pre-register new member
 router.get('/:depTeamID/members-affiliation', cors(corsOptions), members.getLabMembersAffiliations); // get team members, regardless of group to belongs now or belonged in the past
 router.delete('/:depTeamID/members-affiliation/:memberID', cors(corsOptions), members.deleteLabMember); //remove this member from team

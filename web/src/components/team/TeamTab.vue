@@ -44,7 +44,7 @@ export default {
     },
     data () {
         return {
-            //coisa: true
+
         }
     },
     mounted () {
@@ -74,6 +74,9 @@ export default {
     },
     watch: {
         labId () {
+            this.initialize();
+        },
+        depTeamId () {
             this.initialize();
         },
     },

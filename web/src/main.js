@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Vuelidate from 'vuelidate'
 import axios from 'axios'
+import panZoom from 'vue-panzoom'
 import time from './components/common/date-utils'
 
 import App from './App.vue'
@@ -12,6 +13,7 @@ import vuetify from './plugins/vuetify'
 Vue.config.productionTip = false
 Vue.use(VueRouter)
 Vue.use(Vuelidate)
+Vue.use(panZoom);
 
 Vue.prototype.$http = axios
 Vue.prototype.$http.defaults.baseURL = process.env.VUE_APP_API_BASE_URL

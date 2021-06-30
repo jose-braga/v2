@@ -226,40 +226,40 @@ export default {
                     }
                 }
                 Promise.all(
-                        urlUpdate.map(el =>
-                            this.$http.put(el.url,
-                                { data: el.body, },
+                    urlUpdate.map(el =>
+                        this.$http.put(el.url,
+                            { data: el.body, },
+                            { headers:
+                                {'Authorization': 'Bearer ' + localStorage['v2-token']
+                            },
+                        }))
+                    .concat(
+                        urlDelete.map(el =>
+                            this.$http.delete(el,
                                 { headers:
                                     {'Authorization': 'Bearer ' + localStorage['v2-token']
                                 },
-                            }))
-                        .concat(
-                            urlDelete.map(el =>
-                                this.$http.delete(el,
-                                    { headers:
-                                        {'Authorization': 'Bearer ' + localStorage['v2-token']
-                                    },
-                                })))
-                    )
-                    .then( () => {
-                        this.progress = false;
-                        this.success = true;
-                        setTimeout(() => {this.success = false;}, 1500)
-                        this.toDelete = [];
-                        this.toUpdate = [];
-                        this.$root.$emit('updateLabPublications')
-                        this.initialize();
-                    })
-                    .catch((error) => {
-                        this.progress = false;
-                        this.error = true;
-                        this.toDelete = [];
-                        this.toUpdate = [];
-                        this.initialize();
-                        setTimeout(() => {this.error = false;}, 6000)
-                        // eslint-disable-next-line
-                        console.log(error)
-                    })
+                            })))
+                )
+                .then( () => {
+                    this.progress = false;
+                    this.success = true;
+                    setTimeout(() => {this.success = false;}, 1500)
+                    this.toDelete = [];
+                    this.toUpdate = [];
+                    this.$root.$emit('updateLabPublications')
+                    this.initialize();
+                })
+                .catch((error) => {
+                    this.progress = false;
+                    this.error = true;
+                    this.toDelete = [];
+                    this.toUpdate = [];
+                    this.initialize();
+                    setTimeout(() => {this.error = false;}, 6000)
+                    // eslint-disable-next-line
+                    console.log(error)
+                })
             }
         },
         dissociateItem(item) {

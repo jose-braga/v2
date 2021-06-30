@@ -79,6 +79,10 @@ router.post('/:userID/units/:unitID/members', cors(corsOptions), addMember.addMe
 router.get('/:userID/unknown-associations', cors(corsOptions), membersUnknown.getMembersList);
 router.get('/:userID/members/:personID/users/:username', cors(corsOptions), users.checkUserExistence);
 router.get('/:userID/members/:personID/users', cors(corsOptions), users.getUsername);
+
+router.get('/:userID/members/:personID/is-supervisor', cors(corsOptions), nuclearInformation.checkSupervising);
+router.put('/:userID/members/:personID/is-supervisor', cors(corsOptions), nuclearInformation.updateSupervising);
+
 router.put('/:userID/members/:personID/users/:userID', cors(corsOptions), users.updateUsername);
 router.put('/:userID/members/:personID/password/:userID', cors(corsOptions), users.updatePassword);
 router.get('/:userID/members/:personID/nuclear-info', cors(corsOptions), nuclearInformation.getNuclearInfo);
@@ -292,6 +296,8 @@ router.post('/:userID/members/:personID/outreaches/:itemID', cors(corsOptions), 
 
 // --------------------------------------------------------------
 /* Units & Cities*/
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/is-supervisor', cors(corsOptions), nuclearInformation.checkSupervising);
+router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/is-supervisor', cors(corsOptions), nuclearInformation.updateSupervising);
 router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/external-api-authorization', cors(corsOptions), externalAPI.getAuthorization);
 //router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/external-api-authorization', cors(corsOptions), externalAPI.updateAuthorization);
 router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/users/:username', cors(corsOptions), users.checkUserExistence);
@@ -534,6 +540,9 @@ router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/outreaches/:
 router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/outreaches/:itemID', cors(corsOptions), outreaches.createPersonItemAssociation);
 
 /* Cities*/
+router.get('/:userID/cities/:cityID/members/:personID/is-supervisor', cors(corsOptions), nuclearInformation.checkSupervising);
+router.put('/:userID/cities/:cityID/members/:personID/is-supervisor', cors(corsOptions), nuclearInformation.updateSupervising);
+
 router.get('/:userID/cities/:cityID/members/:personID/external-api-authorization', cors(corsOptions), externalAPI.getAuthorization);
 //router.put('/:userID/cities/:cityID/members/:personID/external-api-authorization', cors(corsOptions), externalAPI.updateAuthorization);
 router.get('/:userID/cities/:cityID/members/:personID/users/:username', cors(corsOptions), users.checkUserExistence);
@@ -770,6 +779,8 @@ router.delete('/:userID/cities/:cityID/members/:personID/department-teams/:depar
 
 
 /* Units*/
+router.get('/:userID/units/:unitID/members/:personID/is-supervisor', cors(corsOptions), nuclearInformation.checkSupervising);
+router.put('/:userID/units/:unitID/members/:personID/is-supervisor', cors(corsOptions), nuclearInformation.updateSupervising);
 router.get('/:userID/units/:unitID/members/:personID/external-api-authorization', cors(corsOptions), externalAPI.getAuthorization);
 router.get('/:userID/units/:unitID/members/:personID/users/:username', cors(corsOptions), users.checkUserExistence);
 router.get('/:userID/units/:unitID/members/:personID/users', cors(corsOptions), users.getUsername);

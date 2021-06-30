@@ -249,4 +249,35 @@ module.exports.updateNuclearInfo = function (req, res, next) {
     );
 };
 
-
+var actionCheckSupervising = function (options) {
+    let { req, res, next } = options;
+    let personID = req.params.personID;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT can_supervise from people WHERE id = ?;';
+    places.push(personID)
+    sql.makeSQLOperation(req, res, querySQL, places);
+};
+module.exports.checkSupervising = function (req, res, next) {
+    permissions.checkPermissions(
+        (options) => { actionCheckSupervising(options) },
+        { req, res, next }
+    );
+};
+var actionUpdateSupervising = function (options) {
+    let { req, res, next } = options;
+    let personID = req.params.personID;
+    let data = req.body.data;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'UPDATE people SET can_supervise = ? WHERE id = ?;';
+    places.push(data.canSupervise, personID)
+    sql.makeSQLOperation(req, res, querySQL, places);
+};
+module.exports.updateSupervising = function (req, res, next) {
+    permissions.checkPermissions(
+        (options) => { actionUpdateSupervising(options) },
+        { req, res, next }
+    );
+};
