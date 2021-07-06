@@ -42,27 +42,47 @@
                         :nudge-right="10"
                         transition="scale-transition"
                         offset-y min-width="290px">
-                        <template v-slot:activator="{ on }">
-                            <v-text-field v-model="data.birth_date"
-                                label="Birth date" v-on="on">
-                            </v-text-field>
+                        <template v-slot:activator="{ on: date_menu }">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on: tooltip }">
+                                    <v-text-field v-model="data.birth_date"
+                                        label="Birth date" v-on="{...tooltip,...date_menu}">
+                                    </v-text-field>
+                                </template>
+                                <span>
+                                    Click to navigate dates.<br>
+                                    <span class="smaller-text">
+                                        Click header 1 time to navigate by month.
+                                    </span><br>
+                                    <span class="smaller-text">
+                                        Click header 2 times to navigate by year.
+                                    </span>
+                                </span>
+                            </v-tooltip>
                         </template>
                         <v-date-picker v-model="data.birth_date" @input="date_menu = false" no-title></v-date-picker>
                     </v-menu>
                 </v-col>
                 <v-col cols="12" sm="4">
-                    <v-autocomplete
-                        v-model="data.countries" multiple
-                        :loading="loadingCountries"
-                        :items="countries" item-value="id" item-text="name"
-                        :search-input.sync="searchCountries"
-                        return-object
-                        cache-items
-                        flat
-                        hide-no-data
-                        hide-details
-                        label="Nationalities">
-                    </v-autocomplete>
+                    <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                            <v-autocomplete
+                                v-model="data.countries"
+                                multiple
+                                v-on="on"
+                                :loading="loadingCountries"
+                                :items="countries" item-value="id" item-text="name"
+                                :search-input.sync="searchCountries"
+                                return-object
+                                cache-items
+                                flat
+                                hide-no-data
+                                hide-details
+                                label="Nationalities">
+                            </v-autocomplete>
+                        </template>
+                        <span>Type text to find country.</span>
+                    </v-tooltip>
                 </v-col>
             </v-row>
             <v-row align-content="center" justify="end">
@@ -244,5 +264,8 @@ export default {
 </script>
 
 <style scoped>
+.smaller-text {
+    font-size: 0.8em;
+}
 
 </style>

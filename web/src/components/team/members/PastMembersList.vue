@@ -120,7 +120,7 @@
                                                 <div v-if="editedItem.show_add_more_recent">
                                                     <v-btn @click="editedItem.show_add_more_recent = false"
                                                             small outlined color="red">
-                                                        Add newer position
+                                                        Add other position
                                                     </v-btn>
                                                 </div>
                                                 <div v-if="!editedItem.show_add_more_recent">

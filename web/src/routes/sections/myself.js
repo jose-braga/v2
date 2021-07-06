@@ -78,35 +78,35 @@ const routes = {
                     path: 'supervisor',
                     components: {
                         default: SupervisorTab,
-                        help: SupervisorTabHelp
+                        help2: SupervisorTabHelp
                     }
                 },
                 {
                     path: 'publications',
                     components: {
                         default: PublicationsTab,
-                        help: PublicationsTabHelp
+                        help2: PublicationsTabHelp
                     }
                 },
                 {
                     path: 'add-publications',
                     components: {
                         default: AddPublicationsTab,
-                        help: AddPublicationsTabHelp
+                        help2: AddPublicationsTabHelp
                     }
                 },
                 {
                     path: 'projects',
                     components: {
                         default: ProjectsTab,
-                        help: ProjectsTabHelp
+                        help2: ProjectsTabHelp
                     }
                 },
                 {
                     path: 'other',
                     components: {
                         default: OtherProductivityTab,
-                        help: OtherProductivityTabHelp
+                        help2: OtherProductivityTabHelp
                     }
                 },
                 { path: '', redirect: 'publications' }
@@ -127,35 +127,35 @@ const routes = {
                     path: 'store',
                     components: {
                         default: StoreTab,
-                        help: StoreTabHelp
+                        help2: StoreTabHelp
                     }
                 },
                 {
                     path: 'stock-management',
                     components: {
                         default: StockManagementTab,
-                        help: StockManagementTabHelp
+                        help2: StockManagementTabHelp
                     }
                 },
                 {
                     path: 'order-management',
                     components: {
                         default: OrderManagementTab,
-                        help: OrderManagementTabHelp
+                        help2: OrderManagementTabHelp
                     }
                 },
                 {
                     path: 'user-management',
                     components: {
                         default: UserManagementTab,
-                        help: UserManagementTabHelp
+                        help2: UserManagementTabHelp
                     }
                 },
                 {
                     path: 'financial-management',
                     components: {
                         default: FinancialManagementTab,
-                        help: FinancialManagementTabHelp
+                        help2: FinancialManagementTabHelp
                     }
                 },
                 { path: '', redirect: 'store' }

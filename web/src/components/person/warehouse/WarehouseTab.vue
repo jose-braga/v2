@@ -22,6 +22,9 @@
                 <router-view
                 ></router-view>
             </keep-alive>
+            <v-dialog v-model="showHelp2a" content-class="help">
+                <router-view name="help2"></router-view>
+            </v-dialog>
         </v-tabs-items>
     </v-tabs>
 </div>
@@ -31,6 +34,17 @@
 
 export default {
     computed: {
+        showHelp2a: {
+            get() {
+                return this.$store.state.navigation.showHelp2a;
+            },
+            set(state) {
+                if (state !== this.$store.state.navigation.showHelp2a) {
+                    this.$store.dispatch('showHelp2a')
+                }
+            }
+
+        },
         accessStore () {
             return this.$store.state.session.storeAccess.accessStore;
         },

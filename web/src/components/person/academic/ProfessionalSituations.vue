@@ -244,15 +244,31 @@
                     </v-col>
                     <v-divider vertical class="my-6"></v-divider>
                     <v-col cols="12" md="1">
-                        <v-btn icon @click="seeDetails(v.$model)" class="mt-3" v-if="!v.$model.showDetails">
-                            <v-icon color="black darken">mdi-unfold-more-horizontal</v-icon>
-                        </v-btn>
-                        <v-btn icon @click="seeDetails(v.$model)" class="mt-3" v-if="v.$model.showDetails">
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                <v-btn icon
+                                    v-on="on"
+                                    @click="seeDetails(v.$model)" class="mt-3" v-show="!v.$model.showDetails"
+                                >
+                                    <v-icon color="black darken">mdi-unfold-more-horizontal</v-icon>
+                                </v-btn>
+                            </template>
+                            <span>Click to get more details on this professional situation.</span>
+                        </v-tooltip>
+                        <v-btn icon @click="seeDetails(v.$model)" class="mt-3" v-show="v.$model.showDetails">
                             <v-icon color="black darken">mdi-unfold-less-horizontal</v-icon>
                         </v-btn>
-                        <v-btn icon @click="removeItem(data.situations, i)" class="mt-3">
-                            <v-icon color="red darken">mdi-delete</v-icon>
-                        </v-btn>
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                <v-btn icon
+                                    v-on="on"
+                                    @click="removeItem(data.situations, i)" class="mt-3"
+                                >
+                                    <v-icon color="red darken">mdi-delete</v-icon>
+                                </v-btn>
+                            </template>
+                            <span>This deletes the respective situation and all its data.</span>
+                        </v-tooltip>
                     </v-col>
                 </v-row>
                 <v-row>

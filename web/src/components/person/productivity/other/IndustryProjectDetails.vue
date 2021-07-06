@@ -237,7 +237,7 @@
                         v-model="projectDetails.project_details.project_areas"
                         append-icon
                         chips
-                        label="Write Project areas"
+                        label="Write Project areas (for each area press return)"
                         prefix="Project Areas: "
                         multiple
                         solo

@@ -162,13 +162,13 @@ export default {
                 link: '/unit-area/LAQV',
                 isActive: false,
             },
-            {
-                text: 'Polls',
-                icon: 'mdi-poll',
-                image: false,
-                link: '/polls',
-                isActive: false,
-            },
+            //{
+            //    text: 'Polls',
+            //    icon: 'mdi-poll',
+            //    image: false,
+            //    link: '/polls',
+            //    isActive: false,
+            //},
         ]
     })
 }

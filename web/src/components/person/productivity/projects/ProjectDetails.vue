@@ -161,7 +161,7 @@
             </v-row>
             <v-row>
                 <v-col cols="12">
-                    <h3>Project areas</h3>
+                    <h3>Project areas (press 'return' after each keyword)</h3>
                 </v-col>
                 <v-col cols="12">
                     <v-combobox

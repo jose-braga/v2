@@ -112,6 +112,9 @@
                         </v-col>
                     </v-row>
                 </v-col>
+                <v-col>
+                    <v-divider></v-divider>
+                </v-col>
                 <v-dialog v-model="dialogMaps"
                     max-width="1600px"
                 >

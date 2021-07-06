@@ -4,6 +4,8 @@ const navigation = {
         toolbarText: '',
         activeTile: 0,
         showHelp: false,
+        showHelp2: false,
+        showHelp2a: false,
     },
     mutations: {
         setActiveTile(state, payload) {
@@ -15,10 +17,22 @@ const navigation = {
                 state.drawer = true;
             } else {
                 state.drawer = !state.drawer;
-            }            
+            }
         },
         showHelp(state) {
             state.showHelp = !state.showHelp;
+            state.showHelp2 = false;
+            state.showHelp2a = false;
+        },
+        showHelp2(state) {
+            state.showHelp2 = !state.showHelp2;
+            state.showHelp = false;
+            state.showHelp2a = false;
+        },
+        showHelp2a(state) {
+            state.showHelp2a = !state.showHelp2a;
+            state.showHelp = false;
+            state.showHelp2 = false;
         },
     },
     actions: {
@@ -27,6 +41,12 @@ const navigation = {
         },
         showHelp({ commit }) {
             commit('showHelp')
+        },
+        showHelp2({ commit }) {
+            commit('showHelp2')
+        },
+        showHelp2a({ commit }) {
+            commit('showHelp2a')
         },
 
     }

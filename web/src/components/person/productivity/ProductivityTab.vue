@@ -23,6 +23,9 @@
                         :current-tab="currentTab"
                 ></router-view>
             </keep-alive>
+            <v-dialog v-model="showHelp2" content-class="help">
+                <router-view name="help2"></router-view>
+            </v-dialog>
         </v-tabs-items>
     </v-tabs>
 </div>
@@ -41,6 +44,19 @@ export default {
     },
     mounted() {
         this.initialize()
+    },
+    computed: {
+        showHelp2: {
+            get() {
+                return this.$store.state.navigation.showHelp2;
+            },
+            set(state) {
+                if (state !== this.$store.state.navigation.showHelp2) {
+                    this.$store.dispatch('showHelp2')
+                }
+            }
+
+        },
     },
     methods: {
         initialize() {

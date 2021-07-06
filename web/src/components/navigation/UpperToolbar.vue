@@ -30,7 +30,7 @@
         </v-tooltip>
         <v-tooltip bottom>
             <template v-slot:activator="{ on }">
-                <v-btn icon v-on="on" @click.stop="showHelp">
+                <v-btn icon v-on="on" @click.stop="showHelp(); showHelp2()">
                     <v-icon>mdi-help</v-icon>
                 </v-btn>
             </template>
@@ -83,7 +83,24 @@ export default {
                 {val: true});
         },
         showHelp: function () {
-            this.$store.commit('showHelp');
+            if (
+                !(this.$route.path.includes('/person/productivity/')
+                    ||
+                 this.$route.path.includes('/person/warehouse/')
+                )
+            ) {
+                this.$store.commit('showHelp');
+            }
+        },
+        showHelp2: function () {
+            if (this.$route.path.includes('/person/productivity/')) {
+                this.$store.commit('showHelp2');
+            }
+            if (this.$route.path.includes('/person/warehouse/')) {
+                this.$store.commit('showHelp2a');
+            }
+
+
         },
     }
 }
