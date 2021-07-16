@@ -23,6 +23,7 @@ router.options('*', cors())
 const members = require('../controllers/department_team/members');
 const publications = require('../controllers/department_team/publications');
 const spaces = require('../controllers/department_team/spaces');
+const professionalSituations = require('../controllers/people/professional_situations');
 
 router.get('/:depTeamID', cors(corsOptions), members.getDepartmentTeamInfo);
 router.get('/:depTeamID/people', cors(corsOptions), members.searchAllPeople);
@@ -34,6 +35,18 @@ router.delete('/:depTeamID/members-affiliation/:memberID', cors(corsOptions), me
 router.post('/:depTeamID/members-affiliation/:memberID/position', cors(corsOptions), members.createLabMemberPosition); // add new position to this member
 router.put('/:depTeamID/members-affiliation/:memberID/position/:positionID', cors(corsOptions), members.updateLabMemberPosition); // update this member team position
 router.delete('/:depTeamID/members-affiliation/:memberID/position/:positionID', cors(corsOptions), members.deleteLabMemberPosition); // delete this members position
+
+//Professional Situation
+router.get('/:depTeamID/members-affiliation/:personID/professional-situations', cors(corsOptions), professionalSituations.getProfessionalSituations);
+router.post('/:depTeamID/members-affiliation/:personID/professional-situations', cors(corsOptions), professionalSituations.createProfessionalSituations);
+router.put('/:depTeamID/members-affiliation/:personID/professional-situations/:jobID', cors(corsOptions), professionalSituations.updateProfessionalSituations);
+router.delete('/:depTeamID/members-affiliation/:personID/professional-situations/:jobID', cors(corsOptions), professionalSituations.deleteProfessionalSituations);
+router.post('/:depTeamID/members-affiliation/:personID/professional-situations/:jobID/fellowships', cors(corsOptions), professionalSituations.createProfessionalSituationsFellowships);
+router.put('/:depTeamID/members-affiliation/:personID/professional-situations/:jobID/fellowships/:fellowshipID', cors(corsOptions), professionalSituations.updateProfessionalSituationsFellowships);
+router.delete('/:depTeamID/members-affiliation/:personID/professional-situations/:jobID/fellowships/:fellowshipID', cors(corsOptions), professionalSituations.deleteProfessionalSituationsFellowships);
+router.post('/:depTeamID/members-affiliation/:personID/professional-situations/:jobID/contracts', cors(corsOptions), professionalSituations.createProfessionalSituationsContracts);
+router.put('/:depTeamID/members-affiliation/:personID/professional-situations/:jobID/contracts/:contractID', cors(corsOptions), professionalSituations.updateProfessionalSituationsContracts);
+router.delete('/:depTeamID/members-affiliation/:personID/professional-situations/:jobID/contracts/:contractID', cors(corsOptions), professionalSituations.deleteProfessionalSituationsContracts);
 
 //Publications
 //router.get('/:depTeamID/publications', cors(corsOptions), publications.getTeamPublications); // these are the team publications

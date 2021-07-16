@@ -3,6 +3,7 @@ const time = require('../utilities/time');
 const responses = require('../utilities/responses');
 const permissions = require('../utilities/permissions');
 //const notifications = require('../utilities/notifications');
+const privateAgreements = require('./private_agreements');
 
 function compareTwoStrings(first, second) {
     //https://github.com/aceakash/string-similarity/blob/master/compare-strings.js
@@ -51,7 +52,48 @@ var actionGetAllProjects = function (options) {
         let qraw = req.query.q;
         q = '%' + qraw.replace(/\s/gi,'%') + '%';
         querySQL = querySQL
-            + 'SELECT DISTINCT projects.*, project_types.name, call_types.name'
+            + 'SELECT DISTINCT private_agreements.id,'
+            + ' NULL AS project_type_id,'
+            + ' NULL AS project_type_name,'
+            + ' NULL AS call_type_id,'
+            + ' NULL AS call_type_name,'
+            + ' private_agreements.agreement_type_id,'
+            + ' private_agreement_types.name AS agreement_type_name,'
+            + ' private_agreements.title,'
+            + ' private_agreements.acronym,'
+            + ' private_agreements.reference,'
+            + ' private_agreements.confidential,'
+            + ' private_agreements.start,'
+            + ' private_agreements.end,'
+            + ' private_agreements.global_amount,'
+            + ' private_agreements.website,'
+            + ' private_agreements.notes,'
+            + ' 1 AS industry_project'
+            + ' FROM private_agreements'
+            + ' LEFT JOIN private_agreement_types ON private_agreement_types.id = private_agreements.agreement_type_id'
+            + ' LEFT JOIN people_private_agreements ON people_private_agreements.agreement_id = private_agreements.id'
+            + ' WHERE (private_agreements.title LIKE ? OR private_agreements.acronym LIKE ? OR private_agreements.reference LIKE ?)'
+            + ' AND private_agreements.id NOT IN ('
+            +       'SELECT agreement_id FROM people_private_agreements WHERE person_id = ?'
+            + ')'
+            + ' UNION '
+            + 'SELECT DISTINCT projects.id,'
+            + ' projects.project_type_id,'
+            + ' project_types.name AS project_type_name,'
+            + ' projects.call_type_id,'
+            + ' call_types.name AS call_type_name,'
+            + ' NULL AS agreement_type_id,'
+            + ' NULL AS agreement_type_name,'
+            + ' projects.title,'
+            + ' projects.acronym,'
+            + ' projects.reference,'
+            + ' NULL AS confidential,'
+            + ' projects.start,'
+            + ' projects.end,'
+            + ' projects.global_amount,'
+            + ' projects.website,'
+            + ' projects.notes,'
+            + ' 0 AS industry_project'
             + ' FROM projects'
             + ' LEFT JOIN project_types ON project_types.id = projects.project_type_id'
             + ' LEFT JOIN call_types ON call_types.id = projects.call_type_id'
@@ -61,10 +103,14 @@ var actionGetAllProjects = function (options) {
             +       'SELECT project_id FROM people_projects WHERE person_id = ?'
             + ')'
             + ';'
-        places.push(q, q, q, personID);
+        places.push(
+            q, q, q, personID,
+            q, q, q, personID
+        );
     } else {
+        // change this
         querySQL = querySQL
-            + 'SELECT projects.*, project_types.name, call_types.name'
+            + 'SELECT projects.*, project_types.name AS project_type_name, call_types.name AS call_type_name'
             + ' FROM projects'
             + ' LEFT JOIN project_types ON project_types.id = projects.project_type_id'
             + ' LEFT JOIN call_types ON call_types.id = projects.call_type_id'
@@ -119,7 +165,8 @@ var getProjectDetails = function (options) {
     var querySQL = '';
     var places = [];
     querySQL = querySQL
-        + 'SELECT projects.*, project_types.name AS project_type_name, call_types.name AS call_type_name'
+        + 'SELECT projects.*, project_types.name AS project_type_name, call_types.name AS call_type_name,'
+        + ' 0 AS industry_project'
         + ' FROM projects'
         + ' LEFT JOIN project_types ON project_types.id = projects.project_type_id'
         + ' LEFT JOIN call_types ON call_types.id = projects.call_type_id'
@@ -1031,7 +1078,23 @@ var updateCreateProjectLab = function (options) {
 };
 module.exports.updatePersonProject = function (req, res, next) {
     permissions.checkPermissions(
-        (options) => { actionUpdateProject(options) },
+        (options) => {
+            let project = req.body.data;
+            let isIndustryProject = 0;
+            if (project.industry_project !== undefined) {
+                isIndustryProject = project.industry_project;
+            } else if (project.project_details !== undefined
+                && project.project_details.industry_project !== undefined
+            ) {
+                isIndustryProject = project.project_details.industry_project;
+            }
+            if (isIndustryProject === 0) {
+                actionUpdateProject(options)
+            } else {
+                req.body.data.operation = 'from-project'
+                return privateAgreements.createPersonProjectAssociation(req, res, next);
+            }
+        },
         { req, res, next }
     );
 };
@@ -1058,9 +1121,419 @@ var actionCreatePersonProjectAssociation = function (options) {
     );
     return sql.makeSQLOperation(req, res, querySQL, places);
 };
+
+var getThisProjectAreas = function (options) {
+    let { req, res, next, project } = options;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'SELECT *'
+        + ' FROM private_agreement_areas'
+        + ' WHERE agreement_id = ?'
+        + ';';
+    if (project.industry_project === 1) {
+        places = [ project.id ]
+    }
+    if (project.operation === 'from-industry-project') {
+        places = [ project.agreement_id ]
+    }
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            let researchAreas = [];
+            for (let ind in resQuery) {
+                researchAreas.push(resQuery[ind].research_area);
+            }
+            options.project.project_areas = researchAreas;
+            return getThisProjectManagementEntities(options);
+        },
+        options);
+
+}
+var getThisProjectManagementEntities = function (options) {
+    let { req, res, next, project } = options;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'SELECT private_agreements_management_entities.*,'
+        + ' management_entities.official_name, management_entities.short_name'
+        + ' FROM private_agreements_management_entities'
+        + ' JOIN management_entities ON management_entities.id = private_agreements_management_entities.management_entity_id'
+        + ' WHERE private_agreements_management_entities.agreement_id = ?'
+        + ';';
+    if (project.industry_project === 1) {
+        places = [ project.id ]
+    }
+    if (project.operation === 'from-industry-project') {
+        places = [ project.agreement_id ]
+    }
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            if (resQuery.length > 0) {
+                options.project.management_entities = resQuery[0];
+            } else {
+                options.project.management_entities = {};
+            }
+            return getThisLabProjectDetails(options);
+        },
+        options);
+}
+var getThisLabProjectDetails = function (options) {
+    let { req, res, next, project } = options;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'SELECT labs_private_agreements.*,'
+        + ' labs.name AS lab_name, labs.short_name AS lab_short_name'
+        + ' FROM labs_private_agreements'
+        + ' JOIN labs ON labs.id = labs_private_agreements.lab_id'
+        + ' WHERE labs_private_agreements.agreement_id = ?'
+        + ';';
+    if (project.industry_project === 1) {
+        places = [ project.id ]
+    }
+    if (project.operation === 'from-industry-project') {
+        places = [ project.agreement_id ]
+    }
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            options.project.labs_details = resQuery;
+            return getThisPersonProjectDetails(options);
+        },
+        options);
+};
+var getThisPersonProjectDetails = function (options) {
+    let { req, res, next, project } = options;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'SELECT people_private_agreements.*,'
+        + ' people.name AS person_name, people.colloquial_name AS person_colloquial_name'
+        + ' FROM people_private_agreements'
+        + ' JOIN people ON people.id = people_private_agreements.person_id'
+        + ' WHERE people_private_agreements.agreement_id = ?'
+        + ';';
+    if (project.industry_project === 1) {
+        places = [ project.id ]
+    }
+    if (project.operation === 'from-industry-project') {
+        places = [ project.agreement_id ]
+    }
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            options.project.person_details = resQuery;
+            return moveIndustryProjectToProject(options)
+        },
+        options);
+};
+var moveIndustryProjectToProject = function (options) {
+    let { req, res, next, project } = options;
+    let data = project;
+    if (project.operation === 'from-industry-project') {
+        data = project.project_details;
+    }
+    if (data.start === '') data.start = null;
+    if (data.end === '') data.end = null;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'INSERT INTO projects'
+        + ' (title, acronym, reference, start, end, global_amount, website, notes)'
+        +' VALUES (?,?,?,?,?,?,?,?);';
+    places.push(
+        data.title,
+        data.acronym,
+        data.reference,
+        data.start,
+        data.end,
+        data.global_amount,
+        data.website,
+        data.notes
+    )
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            options.projectID = resQuery.insertId;
+            return addThisProjectManagementEntity(options);
+        },
+        options);
+};
+var addThisProjectManagementEntity = function (options) {
+    let { req, res, next, projectID, project } = options;
+    let data = project.management_entities;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'INSERT INTO projects_management_entities'
+        + ' (project_id, management_entity_id, amount)'
+        +' VALUES (?,?,?);';
+    places.push(
+        projectID,
+        data.management_entity_id,
+        data.amount
+    )
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            options.i = 0;
+            if (project.project_areas !== undefined
+                    && project.project_areas !== null
+                    && project.project_areas.length > 0) {
+                return addThisProjectAreas(options);
+            } else if (project.person_details !== undefined
+                    && project.person_details !== null
+                    && project.person_details.length > 0) {
+                options.i = 0;
+                return addThisPersonProject(options);
+            } else if (project.labs_details !== undefined
+                    && project.labs_details !== null
+                    && project.labs_details.length > 0) {
+                options.i = 0;
+                return addThisLabProject(options);
+            } else {
+                return insertRequesterIntoPeopleProject(options);
+            }
+        },
+        options);
+};
+var addThisProjectAreas = function (options) {
+    let { req, res, next, projectID, project, i } = options;
+    let data = project.project_areas;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'INSERT INTO project_areas'
+        + ' (project_id, research_area)'
+        +' VALUES (?,?);';
+    places.push(
+        projectID,
+        data[i]
+    )
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            if (i + 1 < project.project_areas.length) {
+                options.i = i + 1;
+                return addThisProjectAreas(options);
+            } else if (project.person_details !== undefined
+                    && project.person_details !== null
+                    && project.person_details.length > 0) {
+                options.i = 0;
+                return addThisPersonProject(options);
+            } else if (project.labs_details !== undefined
+                    && project.labs_details !== null
+                    && project.labs_details.length > 0) {
+                options.i = 0;
+                return addThisLabProject(options);
+            } else {
+                return insertRequesterIntoPeopleProject(options);
+            }
+        },
+        options);
+};
+var addThisPersonProject = function (options) {
+    let { req, res, next, projectID, project, i } = options;
+    let data = project;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'INSERT INTO people_projects'
+        + ' (person_id, project_id)'
+        +' VALUES (?,?);';
+    places.push(
+        data.person_details[i].person_id,
+        projectID
+    );
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            if (i + 1 < project.person_details.length) {
+                options.i = i + 1;
+                return addThisPersonProject(options);
+            } else if (project.labs_details !== undefined
+                    && project.labs_details !== null
+                    && project.labs_details.length > 0) {
+                options.i = 0;
+                return addThisLabProject(options);
+            } else {
+                return insertRequesterIntoPeopleProject(options);
+            }
+        },
+        options)
+};
+var addThisLabProject = function (options) {
+    let { req, res, next, projectID, project, i } = options;
+    let data = project;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'INSERT INTO labs_projects'
+        + ' (lab_id, project_id)'
+        +' VALUES (?,?);';
+    places.push(
+        data.labs_details[i].lab_id,
+        projectID
+    );
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            if (i + 1 < project.labs_details.length) {
+                options.i = i + 1;
+                return addThisLabProject(options);
+            } else {
+                return insertRequesterIntoPeopleProject(options);
+            }
+        },
+        options)
+};
+var insertRequesterIntoPeopleProject = function (options) {
+    let { req, res, next, projectID } = options;
+    let personID = req.params.personID;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'INSERT INTO people_projects'
+        + ' (person_id, project_id)'
+        + ' SELECT ?, ? FROM DUAL'
+        + ' WHERE NOT EXISTS (SELECT *'
+        +       ' FROM people_projects'
+        +       ' WHERE person_id = ? AND project_id = ?'
+        +    ');';
+    places.push(
+        personID,
+        projectID,
+        personID,
+        projectID
+    );
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            return deleteOriginalPeopleProject(options);
+        },
+        options)
+};
+var deleteOriginalPeopleProject = function (options) {
+    let { req, res, next, project } = options;
+    //let personID = req.params.personID;
+    let agreementID = project.id;
+    if (project.operation === 'from-industry-project') {
+        agreementID = project.project_details.id;
+    }
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'DELETE FROM people_private_agreements WHERE agreement_id = ?;'
+    places.push(agreementID);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            return deleteOriginalLabProject(options);
+        },
+        options);
+};
+var deleteOriginalLabProject = function (options) {
+    let { req, res, next, project } = options;
+    //let personID = req.params.personID;
+    let agreementID = project.id;
+    if (project.operation === 'from-industry-project') {
+        agreementID = project.project_details.id;
+    }
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'DELETE FROM labs_private_agreements WHERE agreement_id = ?;'
+    places.push(agreementID);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            return deleteOriginalAreasProject(options);
+        },
+        options);
+};
+var deleteOriginalAreasProject = function (options) {
+    let { req, res, next, project } = options;
+    //let personID = req.params.personID;
+    let agreementID = project.id;
+    if (project.operation === 'from-industry-project') {
+        agreementID = project.project_details.id;
+    }
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'DELETE FROM private_agreement_areas WHERE agreement_id = ?;'
+    places.push(agreementID);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            return deleteOriginalPartnersProject(options);
+        },
+        options);
+};
+var deleteOriginalPartnersProject = function (options) {
+    let { req, res, next, project } = options;
+    //let personID = req.params.personID;
+    let agreementID = project.id;
+    if (project.operation === 'from-industry-project') {
+        agreementID = project.project_details.id;
+    }
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'DELETE FROM private_agreements_partners WHERE agreement_id = ?;'
+    places.push(agreementID);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            return deleteOriginalManagementEntitiesProject(options);
+        },
+        options);
+};
+var deleteOriginalManagementEntitiesProject = function (options) {
+    let { req, res, next, project } = options;
+    //let personID = req.params.personID;
+    let agreementID = project.id;
+    if (project.operation === 'from-industry-project') {
+        agreementID = project.project_details.id;
+    }
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'DELETE FROM private_agreements_management_entities WHERE agreement_id = ?;'
+    places.push(agreementID);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            return deleteOriginalProject(options);
+        },
+        options);
+};
+var deleteOriginalProject = function (options) {
+    let { req, res, next, project } = options;
+    //let personID = req.params.personID;
+    let agreementID = project.id;
+    if (project.operation === 'from-industry-project') {
+        agreementID = project.project_details.id;
+    }
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'DELETE FROM private_agreements WHERE id = ?;'
+    places.push(agreementID);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            responses.sendJSONResponseOptions({
+                response: res,
+                status: 200,
+                message: {
+                    "status": "success", "statusCode": 200,
+                    "message": 'Project successfully created.'
+                }
+            });
+            return;
+        },
+        options);
+};
 module.exports.createPersonProjectAssociation = function (req, res, next) {
     permissions.checkPermissions(
-        (options) => { actionCreatePersonProjectAssociation(options) },
+        (options) => {
+            let { req, res, next } = options;
+            let project = req.body.data;
+            if (project.industry_project === 0 && project.operation !== 'from-industry-project') {
+                actionCreatePersonProjectAssociation(options);
+            } else if (project.industry_project === 1 || project.operation === 'from-industry-project') {
+                // we get all the project details to move the data to industry projects
+                options.project = project;
+                getThisProjectAreas(options)
+            }
+        },
         { req, res, next }
     );
 };

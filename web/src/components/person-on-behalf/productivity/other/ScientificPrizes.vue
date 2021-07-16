@@ -212,7 +212,7 @@
             </v-dialog>
         </v-row>
         <v-row>
-            <p class="mt-2"> To avoid duplications, please search below to find if prize isn't
+            <p class="mt-2"> To avoid duplicates, please search below to find if prize isn't
                 already in the database
             </p>
         </v-row>

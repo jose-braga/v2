@@ -335,8 +335,10 @@
             </v-dialog>
         </v-row>
         <v-row>
-            <p class="mt-2"> To avoid duplications, please search below to find if industry project isn't
-                already in the database
+            <p class="mt-2"> To avoid duplicates, please search below to find if project isn't
+                already in the database. This icon <v-icon>mdi-factory</v-icon> tags
+                a project with industry (or other private entities). The search will yield
+                results for both industry projects and other types of funding.
             </p>
         </v-row>
         <v-row>
@@ -370,6 +372,9 @@
                 :sort-desc="[true, true, false]"
                 multi-sort
             >
+                <template v-slot:item.industry_project="{ item }">
+                    <v-icon v-if="item.industry_project === 1">mdi-factory</v-icon>
+                </template>
                 <template v-slot:item.associate="{ item }">
                     <v-checkbox
                         v-model="item.to_associate"
@@ -380,7 +385,7 @@
                 <v-col cols="2" align-self="end">
                     <v-row justify="end">
                         <v-btn type="submit"
-                        outlined color="blue">Add to your projects</v-btn>
+                        outlined color="blue">Add to your industry projects</v-btn>
                     </v-row>
                 </v-col>
                 <v-col cols="1">
@@ -454,6 +459,7 @@ export default {
             },
             headersSearch: [
                 { text: 'Title', value:'title' },
+                { text: 'Type', value:'industry_project' },
                 { text: 'Start', value:'start' },
                 { text: 'End', value:'end' },
                 { text: 'To add', value: 'associate', sortable: false},
