@@ -135,6 +135,10 @@ router.get('/:personID/academic-affiliations', cors(corsOptions), academicAffili
 router.post('/:personID/academic-affiliations', cors(corsOptions), academicAffiliations.createAcademicAffiliations);
 router.put('/:personID/academic-affiliations/:affiliationID', cors(corsOptions), academicAffiliations.updateAcademicAffiliations);
 router.delete('/:personID/academic-affiliations/:affiliationID', cors(corsOptions), academicAffiliations.deleteAcademicAffiliations);
+router.get('/:personID/workplaces', cors(corsOptions), academicAffiliations.getPersonWorkplace);
+router.post('/:personID/workplaces', cors(corsOptions), academicAffiliations.createPersonWorkplace);
+router.put('/:personID/workplaces/:workplaceID', cors(corsOptions), academicAffiliations.updatePersonWorkplace);
+
 
 router.get('/:personID/research-interests', cors(corsOptions), researchInterests.getResearchInterests);
 router.post('/:personID/research-interests', cors(corsOptions), researchInterests.createResearchInterests);

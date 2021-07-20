@@ -159,7 +159,10 @@ var actionGetNuclearInfo = function (options) {
     let personID = req.params.personID;
     var querySQL = '';
     var places = [];
-    querySQL = querySQL + 'SELECT * from people WHERE id = ?';
+    querySQL = querySQL
+        + 'SELECT id, user_id, name, colloquial_name, gender, birth_date,'
+        + ' visible_public, can_supervise, active_from, active_until'
+        + ' FROM people WHERE id = ?';
     places.push(personID)
     sql.makeSQLOperation(req, res, querySQL, places);
 };
@@ -181,6 +184,46 @@ module.exports.getNuclearInfo = function (req, res, next) {
         { req, res, next }
     );
 };
+
+var actionGetPersonComments = function (options) {
+    let { req, res, next } = options;
+    let personID = req.params.personID;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'SELECT id, name, colloquial_name, comments'
+        + ' FROM people WHERE id = ?';
+    places.push(personID)
+    sql.makeSQLOperation(req, res, querySQL, places);
+};
+module.exports.getPersonComments = function (req, res, next) {
+    permissions.checkPermissions(
+        (options) => {
+            return actionGetPersonComments(options)
+        },
+        { req, res, next }
+    );
+};
+var actionUpdatePersonComments = function (options) {
+    let { req, res, next } = options;
+    let personID = req.params.personID;
+    let comments = req.body.data;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'UPDATE people SET comments = ? WHERE id = ?';
+    places.push(comments, personID)
+    sql.makeSQLOperation(req, res, querySQL, places);
+};
+module.exports.updatePersonComments = function (req, res, next) {
+    permissions.checkPermissions(
+        (options) => {
+            return actionUpdatePersonComments(options)
+        },
+        { req, res, next }
+    );
+};
+
 
 var actionAddPeopleHistory = function (options) {
     let { req, res, next, data, personID } = options;

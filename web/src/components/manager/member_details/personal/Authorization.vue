@@ -41,7 +41,7 @@ export default {
         managerId: Number,
         endpoint: String,
     },
-    data() {
+    data () {
         return {
             data: {
                 visible_public: false
@@ -72,7 +72,6 @@ export default {
                     }
                 });
             }
-
         },
     }
 }

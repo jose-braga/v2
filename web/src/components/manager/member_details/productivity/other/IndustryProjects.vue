@@ -20,6 +20,7 @@
                         :other-person-id="otherPersonId"
                         :project-data="editedItem"
                         :project-id="itemID"
+                        :endpoint="endpoint"
                     >
                     </ProjectDetails>
                 </v-dialog>

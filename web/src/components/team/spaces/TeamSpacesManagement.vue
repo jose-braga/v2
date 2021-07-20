@@ -169,6 +169,16 @@
                     color="red">mdi-delete</v-icon>
             </template>
         </v-data-table>
+        <v-row justify="center" align="center" class="mt-4">
+            <v-col cols="12" align="center">
+                <v-row justify="center" align="center">
+                    <span class="mr-4">Export to spreadsheet</span>
+                    <v-btn fab color="green" @click="generateSpreadsheet(data.spaces)">
+                        <v-icon color="white" x-large>mdi-file-excel</v-icon>
+                    </v-btn>
+                </v-row>
+            </v-col>
+        </v-row>
     </v-container>
 
 </v-card>
@@ -178,8 +188,27 @@
 <script>
 import subUtil from '@/components/common/submit-utils'
 import time from '@/components/common/date-utils'
+import XLSX from 'xlsx'
 
 const SpaceDetails = () => import(/* webpackChunkName: "space-lab-details" */ './SpaceLabDetails')
+
+function processForSpreadsheet(members) {
+    let membersCurated = [];
+    for (let ind in members) {
+        let thisMember = {};
+        thisMember.room_number = members[ind].reference;
+        thisMember.room_number_short = members[ind].short_reference;
+        thisMember.space_type = members[ind].space_type_name_en;
+        thisMember.space_name_en = members[ind].space_name_en;
+        thisMember.space_name_pt = members[ind].space_name_pt;
+        thisMember.area = members[ind].area;
+        thisMember.percentage_occupied = members[ind].percentage;
+        thisMember.valid_from = members[ind].valid_from;
+        thisMember.valid_until = members[ind].valid_until;
+        membersCurated.push(thisMember);
+    }
+    return membersCurated;
+}
 
 function prepareStringComparison(str) {
     if (str === null || str === undefined) {
@@ -247,6 +276,7 @@ export default {
             headers: [
                 { text: 'Room #', value:'reference' },
                 { text: 'Name', value:'space_name_pt' },
+                { text: 'Area (m2)', value:'area' },
                 { text: '%', value:'percentage' },
                 { text: 'Dates', value:'spaces_dates_show' },
                 { text: 'Type', value:'space_type_name_en' },
@@ -257,6 +287,7 @@ export default {
             },
             spaces: [],
             searchSpaces: '',
+            componentType: 'lab',   // might be 'lab' or 'team'
         }
     },
     mounted() {
@@ -272,9 +303,11 @@ export default {
         initialize () {
             let urlSubmit
             if (this.labId !== undefined) {
+                this.componentType = 'lab';
                 urlSubmit = 'api/labs/' + this.labId + '/spaces';
             }
             if (this.depTeamId !== undefined) {
+                this.componentType = 'team';
                 urlSubmit = 'api/department-teams/' + this.depTeamId + '/spaces';
             }
             subUtil.getInfoPopulate(this, urlSubmit, true)
@@ -342,8 +375,60 @@ export default {
                 })
             }
         },
+        generateSpreadsheet(members) {
+            console.log(members)
+            let today = time.moment();
+            let dateFile = time.momentToDate(today, 'Europe/Lisbon', 'YYYY-MM-DDTHHmmss');
+            let filename = '';
+            if (this.componentType === 'lab') {
+                filename = this.labData.name.replace(/[^a-z0-9]/gi, '_');
+            }
+            if (this.componentType === 'team') {
+                filename = this.depTeamData.name.replace(/[^a-z0-9]/gi, '_');
+            }
+            let membersCurated = processForSpreadsheet(members);
+            let wb = XLSX.utils.book_new();
+            let ws  = XLSX.utils.json_to_sheet(membersCurated);
+            XLSX.utils.book_append_sheet(wb, ws, 'Current Team');
+            XLSX.writeFile(wb, filename + '_team-spaces_' + dateFile + '.xlsx');
+            /*
+            let url = [];
+            for (let ind in members) {
+                let urlGet = '';
+                if (this.componentType === 'lab') {
+                    urlGet = 'api'
+                        + '/labs/' + this.labId
+                        + '/members-affiliation/' + members[ind].person_id
+                        + '/professional-situations'
+                    ;
+                }
+                if (this.componentType === 'team') {
+                    urlGet = 'api'
+                        + '/department-teams/' + this.depTeamId
+                        + '/members-affiliation/' + members[ind].person_id
+                        + '/professional-situations'
+                    ;
+                }
+                url.push(urlGet);
+            }
+            Promise.all(
+                url.map(el =>
+                    this.$http.get(el,
+                        { headers: {'Authorization': 'Bearer ' + localStorage['v2-token'] } }
+                ))
+            )
+            .then( (situations) => {
+                for (let ind in situations) {
+                    members[ind].situations = situations[ind].data.result;
+                }
 
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+            */
 
+        },
         getSpaces () {
             let personID = this.$store.state.session.personID;
             const urlSubmit = 'api/people/' + personID + '/all-spaces';

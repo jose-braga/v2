@@ -296,6 +296,8 @@ router.post('/:userID/members/:personID/outreaches/:itemID', cors(corsOptions), 
 
 // --------------------------------------------------------------
 /* Units & Cities*/
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/comments', cors(corsOptions), nuclearInformation.getPersonComments);
+router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/comments', cors(corsOptions), nuclearInformation.updatePersonComments);
 router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/is-supervisor', cors(corsOptions), nuclearInformation.checkSupervising);
 router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/is-supervisor', cors(corsOptions), nuclearInformation.updateSupervising);
 router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/external-api-authorization', cors(corsOptions), externalAPI.getAuthorization);
@@ -539,7 +541,10 @@ router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/outreaches'
 router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/outreaches/:itemID', cors(corsOptions), outreaches.updatePersonItem);
 router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/outreaches/:itemID', cors(corsOptions), outreaches.createPersonItemAssociation);
 
+
 /* Cities*/
+router.get('/:userID/cities/:cityID/members/:personID/comments', cors(corsOptions), nuclearInformation.getPersonComments);
+router.put('/:userID/cities/:cityID/members/:personID/comments', cors(corsOptions), nuclearInformation.updatePersonComments);
 router.get('/:userID/cities/:cityID/members/:personID/is-supervisor', cors(corsOptions), nuclearInformation.checkSupervising);
 router.put('/:userID/cities/:cityID/members/:personID/is-supervisor', cors(corsOptions), nuclearInformation.updateSupervising);
 
@@ -779,6 +784,8 @@ router.delete('/:userID/cities/:cityID/members/:personID/department-teams/:depar
 
 
 /* Units*/
+router.get('/:userID/units/:unitID/members/:personID/comments', cors(corsOptions), nuclearInformation.getPersonComments);
+router.put('/:userID/units/:unitID/members/:personID/comments', cors(corsOptions), nuclearInformation.updatePersonComments);
 router.get('/:userID/units/:unitID/members/:personID/is-supervisor', cors(corsOptions), nuclearInformation.checkSupervising);
 router.put('/:userID/units/:unitID/members/:personID/is-supervisor', cors(corsOptions), nuclearInformation.updateSupervising);
 router.get('/:userID/units/:unitID/members/:personID/external-api-authorization', cors(corsOptions), externalAPI.getAuthorization);

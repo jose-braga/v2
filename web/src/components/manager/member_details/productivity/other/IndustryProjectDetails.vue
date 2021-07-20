@@ -11,7 +11,16 @@
         <v-card-text>
         </v-card-text>
         <v-container>
-
+            <v-row>
+                <v-col cols="12">
+                    <v-checkbox
+                        v-model="projectDetails.project_details.industry_project"
+                        :false-value="0"
+                        :true-value="1"
+                        label="Project with industry and other private entities"
+                    ></v-checkbox>
+                </v-col>
+            </v-row>
             <v-row>
                 <v-col cols="12">
                     <v-text-field v-model="projectDetails.project_details.title"
@@ -303,6 +312,8 @@ export default {
     props: {
         projectData: Object,
         projectId: Number,
+        otherPersonId: Number,
+        endpoint: String,
     },
     data() {
         return {

@@ -26,6 +26,16 @@
             </v-row>
             <v-row>
                 <v-col cols="12">
+                    <v-checkbox
+                        v-model="projectDetails.project_details.industry_project"
+                        :false-value="0"
+                        :true-value="1"
+                        label="Project with industry and other private entities"
+                    ></v-checkbox>
+                </v-col>
+            </v-row>
+            <v-row>
+                <v-col cols="12">
                     <v-text-field v-model="projectDetails.project_details.title"
                         label="Title"
                     ></v-text-field>

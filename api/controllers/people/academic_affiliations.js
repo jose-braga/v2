@@ -98,3 +98,62 @@ module.exports.deleteAcademicAffiliations = function (req, res, next) {
     );
 };
 
+var actionGetPersonWorkplace = function (options) {
+    let { req, res, next } = options;
+    let personID = req.params.personID;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT *'
+                        + ' FROM workplaces'
+                        + ' WHERE person_id = ?;';
+    places.push(personID)
+    return sql.makeSQLOperation(req, res, querySQL, places);
+};
+module.exports.getPersonWorkplace = function (req, res, next) {
+    permissions.checkPermissions(
+        (options) => { actionGetPersonWorkplace(options) },
+        { req, res, next }
+        );
+};
+
+var actionCreatePersonWorkplace = function (options) {
+    let { req, res, next } = options;
+    let personID = req.params.personID;
+    let workplace = req.body.data.workplace;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'INSERT INTO workplaces'
+        + ' (person_id, workplace)'
+        + ' VALUES (?, ?);';
+    places.push(personID, workplace);
+    return sql.makeSQLOperation(req, res, querySQL, places);
+};
+module.exports.createPersonWorkplace = function (req, res, next) {
+    permissions.checkPermissions(
+        (options) => { actionCreatePersonWorkplace(options) },
+        { req, res, next }
+        );
+};
+
+var actionUpdatePersonWorkplace = function (options) {
+    let { req, res, next } = options;
+    let personID = req.params.personID;
+    let workplaceID = req.params.workplaceID;
+    let workplace = req.body.data.workplace;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'UPDATE workplaces'
+        + ' SET workplace = ?'
+        + ' WHERE id = ?;';
+    places.push(workplace, workplaceID);
+    return sql.makeSQLOperation(req, res, querySQL, places);
+};
+
+module.exports.updatePersonWorkplace = function (req, res, next) {
+    permissions.checkPermissions(
+        (options) => { actionUpdatePersonWorkplace(options) },
+        { req, res, next }
+        );
+};

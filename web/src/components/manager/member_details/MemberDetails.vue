@@ -42,6 +42,15 @@
             </v-tab-item>
             <v-tab-item>
                 <v-row>
+                    <v-col cols="12">
+                        <PersonComments
+                            :person-id="personId"
+                            :manager-id="managerId"
+                            :endpoint="endpoint"
+                        ></PersonComments>
+                    </v-col>
+                </v-row>
+                <v-row>
                     <v-col cols="12" md="6">
                         <Authorization
                             :person-id="personId"
@@ -345,6 +354,7 @@ import time from '@/components/common/date-utils'
 const AppAreaPermissions = () => import(/* webpackChunkName: "manager-details-app-area-permissions" */ './permissions/AppAreaPermissions')
 const Permissions = () => import(/* webpackChunkName: "manager-details-permissions" */ './permissions/Permissions')
 const ManageUser = () => import(/* webpackChunkName: "manager-details-user" */ './user/ManageUser')
+const PersonComments = () => import(/* webpackChunkName: "manager-details-person-comments" */ './personal/PersonComments')
 const Authorization = () => import(/* webpackChunkName: "manager-details-authorization" */ './personal/Authorization')
 const NuclearInformation = () => import(/* webpackChunkName: "manager-details-nuclear-information" */ './personal/NuclearInformation')
 const Photo = () => import(/* webpackChunkName: "manager-details-photo" */ './personal/Photo')
@@ -379,6 +389,7 @@ export default {
         Permissions,
         ManageUser,
         Authorization,
+        PersonComments,
         NuclearInformation,
         Photo,
         PersonalContacts,
