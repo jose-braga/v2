@@ -112,11 +112,21 @@ export default {
             baseURL: '/polls/',
         }
     },
+    computed: {
+        loggedIn () {
+            return this.$store.state.session.loggedIn;
+        }
+    },
     mounted: function () {
         this.$store.commit('setActiveTile', {
             newTile: 9,
             newToolbarText: 'Choose a poll'
         });
+    },
+    watch: {
+        loggedIn () {
+            this.initialize();
+        },
     },
     created () {
         this.initialize();

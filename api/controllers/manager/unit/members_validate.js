@@ -2,6 +2,8 @@ const sql = require('../../utilities/sql');
 const time = require('../../utilities/time');
 const responses = require('../../utilities/responses');
 const permissions = require('../../utilities/permissions');
+const nodemailer = require('../../../config/emailer');
+let transporter = nodemailer.transporter;
 
 var actionGetMembersValidate = function (options) {
     let { req, res, next } = options;
@@ -127,11 +129,282 @@ var addPersonHistory = function (options) {
         + ' (person_id, status, operation, updated)'
         + ' VALUES (?, ?, ?, NOW());';
     places.push(personID, 1, 'U');
-    return sql.makeSQLOperation(req, res, querySQL, places);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            return getPersonCars(options);
+        },
+        options);
+};
+var getPersonCars = function (options) {
+    let { req, res, next } = options;
+    let personID = req.params.personID;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + ' SELECT * FROM cars WHERE person_id = ?;';
+    places.push(personID);
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            if (resQuery.length > 0) {
+                options.cars = resQuery;
+                return getRecipientsGroupCar(options, 3, 1);
+            } else {
+                return getPersonPersonalEmail(options);
+            }
+        },
+        options);
+}
+var getRecipientsGroupCar = function (options, email_type_id, city_id) {
+    let { req, res, next } = options;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT recipient_groups.*, emails.person_id, emails.email'
+        + ' FROM recipient_groups'
+        + ' LEFT JOIN people_recipient_groups ON people_recipient_groups.recipient_group_id = recipient_groups.id'
+        + ' LEFT JOIN emails ON emails.person_id = people_recipient_groups.person_id'
+        + ' WHERE recipient_groups.city_id = ?'
+        + ' AND recipient_groups.any_cities = 0'
+        + ' AND recipient_groups.email_type_id = ?;';
+    places.push(city_id, email_type_id);
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            if (resQuery.length > 0) {
+                options.recipientGroupCar = resQuery[0].id;
+                actionSendCarManagerMessage(options, resQuery)
+                .then(() => {
+                    getPersonPersonalEmail(options)
+                })
+                .catch((e) => {
+                    console.log(e);
+                    return getPersonPersonalEmail(options);
+                });
+
+            } else {
+                return getPersonPersonalEmail(options);
+            }
+
+        },
+        options);
+};
+async function actionSendCarManagerMessage(options, recipientEmails) {
+    let { req, res, next } = options;
+    let personName = ''
+    let cars = options.cars;
+    if (req.body.data !== undefined) {
+        personName = req.body.data.name;
+    }
+    let recipients = '';
+    for (let el in recipientEmails) {
+        recipients = recipients + recipientEmails[el].email + ', ';
+    }
+    let mailOptions;
+    let subjectText = 'LAQV/UCIBIO Data Management - Car access request by ' + personName;
+    let emailBody = 'Hi,\n\n'
+        + 'The recently added user ' + personName + ' requests access to the FCT campus.\n\n'
+        + 'Below follows the relevant data:\n'
+        + ' License ID: ' + cars[0].license + '\n'
+    for (let ind in cars) {
+        emailBody = emailBody + '\nCar ' + (ind + 1) + ':\n';
+        emailBody = emailBody + 'Brand: ' + cars[ind].brand + '\n';
+        emailBody = emailBody + 'Model: ' + cars[ind].model + '\n';
+        emailBody = emailBody + 'Color: ' + cars[ind].color + '\n';
+        emailBody = emailBody + 'Plate: ' + cars[ind].plate + '\n';
+    }
+    emailBody = emailBody + '\nBest regards,\nAdmin';
+    let emailBodyHtml = '<p>Hi,</p><br>'
+        + '<p>The recently added user ' + personName + ' requests access to the FCT campus.</p>'
+        + '<p>Below follows the relevant data:</p><br>'
+        + '<p>License ID: ' + cars[0].license + '</p>'
+    for (let ind in cars) {
+        emailBodyHtml = emailBodyHtml + '<p>Car ' + (ind + 1) + ':</p>';
+        emailBodyHtml = emailBodyHtml + '<p>Brand: ' + cars[ind].brand + '</p>';
+        emailBodyHtml = emailBodyHtml + '<p>Model: ' + cars[ind].model + '</p>';
+        emailBodyHtml = emailBodyHtml + '<p>Color: ' + cars[ind].color + '</p>';
+        emailBodyHtml = emailBodyHtml + '<p>Plate: ' + cars[ind].plate + '</p>';
+    }
+
+    emailBodyHtml = emailBodyHtml + '<br><p>Best regards,</p>'
+            + '<p>Admin</p>';
+    options.subjectText = subjectText;
+    options.emailBody = emailBody;
+    if (process.env.NODE_ENV === 'production') {
+        mailOptions = {
+            from: '"Admin" <admin@laqv-ucibio.info>', // sender address
+            to: recipients, // list of receivers (comma-separated)
+            subject: subjectText, // Subject line
+            text: emailBody,
+            html: emailBodyHtml,
+        };
+        // send mail with defined transport object
+        let info = await transporter.sendMail(mailOptions);
+        console.log('Message %s sent: %s', info.messageId, info.response);
+        //return writeMessageDB(options);
+
+    } else {
+        // just for testing purposes
+        mailOptions = {
+            from: '"Admin" <admin@laqv-ucibio.info>', // sender address
+            to: recipients, // list of receivers (comma-separated)
+            subject: 'TESTING: ' + subjectText, // Subject line
+            text: emailBody,
+            html: emailBodyHtml,
+        };
+        // send mail with defined transport object
+        let info = await transporter.sendMail(mailOptions);
+        console.log('Message %s sent: %s', info.messageId, info.response);
+    }
+};
+
+var getPersonPersonalEmail = function (options) {
+    let { req, res, next } = options;
+    let personID = req.params.personID;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + ' SELECT * FROM personal_emails WHERE person_id = ?;';
+    places.push(personID);
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            if (resQuery.length > 0) {
+                options.personal_email = resQuery[0].email;
+            } else {
+                options.personal_email = '';
+            }
+            return getPersonWorkEmail(options);
+        },
+        options);
+}
+var getPersonWorkEmail = function (options) {
+    let { req, res, next } = options;
+    let personID = req.params.personID;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + ' SELECT * FROM emails WHERE person_id = ?;';
+    places.push(personID);
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            if (resQuery.length > 0) {
+                options.work_email = resQuery[0].email;
+            } else {
+                options.work_email = '';
+            }
+            return getRecipientsGroupValidation(options, 11);
+        },
+        options);
+}
+var getRecipientsGroupValidation = function (options, email_type_id) {
+    let { req, res, next } = options;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT recipient_groups.*, emails.person_id, emails.email'
+        + ' FROM recipient_groups'
+        + ' LEFT JOIN people_recipient_groups ON people_recipient_groups.recipient_group_id = recipient_groups.id'
+        + ' LEFT JOIN emails ON emails.person_id = people_recipient_groups.person_id'
+        + ' WHERE recipient_groups.city_id IS NULL'
+        + ' AND recipient_groups.any_cities = 1'
+        + ' AND recipient_groups.email_type_id = ?;';
+    places.push(email_type_id);
+
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            options.recipientGroup = resQuery[0].id;
+            actionSendUserMessage(options)
+            .then(() => {
+                writeMessageDB(options)
+            })
+            .catch((e) => {
+                console.log(e);
+                return writeMessageDB(options, e);
+            }); // even if the email fails it writes the message to the DB
+        },
+        options);
+};
+async function actionSendUserMessage(options) {
+    let { req, res, next } = options;
+    let recipients = '';
+    if (options.personal_email !== '') {
+        recipients = recipients + options.personal_email  + ', ';
+    }
+    if (options.work_email !== '') {
+        recipients = recipients + options.work_email  + ', ';
+    }
+    let mailOptions;
+    let subjectText = 'LAQV/UCIBIO Data Management - Registration validated';
+    let emailBody = 'Hi,\n\n'
+        + 'A data manager validated your registration.\n\n'
+        + 'You can now head to ' + process.env.PATH_PREFIX + ' and add more data to your profile.\n\n'
+        + 'Best regards,\nAdmin';
+    let emailBodyHtml = '<p>Hi,</p><br>'
+        + '<p>A data manager validated your registration.</p>'
+        + '<p>You can now head to ' + process.env.PATH_PREFIX + ' and add more data to your profile.</p><br>'
+        + '<p>Best regards,</p>'
+        + '<p>Admin</p>';
+    options.subjectText = subjectText;
+    options.emailBody = emailBody;
+    if (process.env.NODE_ENV === 'production') {
+        mailOptions = {
+            from: '"Admin" <admin@laqv-ucibio.info>', // sender address
+            to: recipients, // list of receivers (comma-separated)
+            subject: subjectText, // Subject line
+            text: emailBody,
+            html: emailBodyHtml,
+        };
+        // send mail with defined transport object
+        let info = await transporter.sendMail(mailOptions);
+        console.log('Message %s sent: %s', info.messageId, info.response);
+        //return writeMessageDB(options);
+
+    } else {
+        // just for testing purposes
+        mailOptions = {
+            from: '"Admin" <admin@laqv-ucibio.info>', // sender address
+            to: recipients, // list of receivers (comma-separated)
+            subject: 'TESTING: ' + subjectText, // Subject line
+            text: emailBody,
+            html: emailBodyHtml,
+        };
+        // send mail with defined transport object
+        let info = await transporter.sendMail(mailOptions);
+        console.log('Message %s sent: %s', info.messageId, info.response);
+    }
+};
+var writeMessageDB = function (options, error) {
+    let { req, res, next, recipientGroup, subjectText, emailBody } = options;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'INSERT INTO email_messages'
+        + ' (sender_id, recipient_group_id, subject, message_text, date, solved)'
+        + ' VALUES (?,?,?,?,?,?);';
+    places.push(options.personID, recipientGroup, subjectText, emailBody, options.now, 1);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            if (error) {
+                return responses.sendJSONResponseOptions({
+                    response: res,
+                    status: 500,
+                    message: { "message": "Error sending email, but database OK!", "error": error.message }
+                });
+            } else {
+                return responses.sendJSONResponseOptions({
+                    response: res,
+                    status: 200,
+                    message: {
+                        "status": "success",
+                        "statusCode": 200,
+                        "message": "Done!",
+                    }
+                });
+            }
+        },
+        options);
 };
 module.exports.validateRegistration = function (req, res, next) {
     permissions.checkPermissions(
-        (options) => { actionValidate(options) },
+        (options) => {
+            options.now = time.momentToDate(time.moment(), undefined, 'YYYY-MM-DD HH:mm:ss');
+            actionValidate(options)
+        },
         { req, res, next }
     );
 };

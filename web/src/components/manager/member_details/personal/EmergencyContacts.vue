@@ -87,6 +87,7 @@ export default {
     },
     methods: {
         initialize () {
+            this.data.emergencyContacts = [];
             if (this.$store.state.session.loggedIn) {
                 let personID = this.personId;
                 subUtil.getInfoPopulate(this,

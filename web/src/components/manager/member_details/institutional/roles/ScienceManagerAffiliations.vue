@@ -141,6 +141,7 @@ export default {
     methods: {
         initialize () {
             this.data.current_positions = [];
+            this.data.roles = [];
              if (this.$store.state.session.loggedIn) {
                 let personID = this.personId;
                 subUtil.getInfoPopulate(this, 'api' + this.endpoint

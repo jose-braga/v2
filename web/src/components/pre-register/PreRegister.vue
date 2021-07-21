@@ -56,6 +56,7 @@
                     <Responsibles ref="responsibles"></Responsibles>
                     <AcademicAffiliations ref="academicAffiliations"></AcademicAffiliations>
                     <ScientificIdentifications ref="scientificIdentifications"></ScientificIdentifications>
+                    <Cars ref="cars"></Cars>
                 </v-col>
             </v-row>
             <v-row align-content="center" justify="center">
@@ -95,6 +96,7 @@ import Password from './Password'
 import NuclearInformation from './NuclearInformation'
 import Authorization from './Authorization'
 import Photo from './Photo'
+import Cars from './Cars'
 import PersonalContacts from './PersonalContacts'
 import InstitutionalContacts from './InstitutionalContacts'
 import Labs from './Labs'
@@ -118,6 +120,7 @@ export default {
         NuclearInformation,
         Authorization,
         Photo,
+        Cars,
         PersonalContacts,
         InstitutionalContacts,
         Labs,

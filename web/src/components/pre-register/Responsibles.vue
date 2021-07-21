@@ -120,10 +120,9 @@ export default {
 
         getPeople() {
             var vm = this;
-            if (this.$store.state.session.loggedIn) {
-                const urlSubmit = 'api/v2/' + 'supervisors';
-                return subUtil.getPublicInfo(vm, urlSubmit, 'people', 'colloquial_name');
-            }
+            const urlSubmit = 'api/v2/' + 'supervisors';
+            return subUtil.getPublicInfo(vm, urlSubmit, 'people', 'colloquial_name');
+
         },
         addItem(list) {
             list.push({

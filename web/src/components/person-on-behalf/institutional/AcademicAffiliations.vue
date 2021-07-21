@@ -127,6 +127,7 @@ export default {
     },
     methods: {
         initialize () {
+            this.data.academicAffiliations = [];
             if (this.$store.state.session.loggedIn) {
                 let personID = this.otherPersonId;
                 subUtil.getInfoPopulate(this, 'api/people/' + personID + '/academic-affiliations', true)

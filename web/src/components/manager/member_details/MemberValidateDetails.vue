@@ -43,6 +43,11 @@
                 </v-row>
                 <v-row>
                     <v-col cols="12" md="6">
+                        <Authorization
+                            :person-id="personId"
+                            :manager-id="managerId"
+                            :endpoint="endpoint"
+                        ></Authorization>
                         <NuclearInformation
                             :person-id="personId"
                             :manager-id="managerId"
@@ -219,6 +224,7 @@
 <script>
 
 const ManageUser = () => import(/* webpackChunkName: "manager-details-user" */ './user/ManageUser')
+const Authorization = () => import(/* webpackChunkName: "manager-details-authorization" */ './personal/Authorization')
 const NuclearInformation = () => import(/* webpackChunkName: "manager-details-nuclear-information" */ './personal/NuclearInformation')
 const Photo = () => import(/* webpackChunkName: "manager-details-photo" */ './personal/Photo')
 const PersonalContacts = () => import(/* webpackChunkName: "manager-details-personal-contacts" */ './personal/PersonalContacts')
@@ -239,6 +245,7 @@ const AddFromRepository = () => import(/* webpackChunkName: "manager-details-add
 export default {
     components: {
         ManageUser,
+        Authorization,
         NuclearInformation,
         Photo,
         PersonalContacts,
@@ -277,6 +284,7 @@ export default {
     },
     watch: {
         personId () {
+            console.log('oi!top!')
             this.initialize();
         },
     },
@@ -289,7 +297,7 @@ export default {
                             + '/validate-members'
                             + '/' + this.personId;
             this.$http.put(urlSubmit,
-                { },
+                { data: { name: this.personName } },
                 {
                     headers: { 'Authorization': 'Bearer ' + localStorage['v2-token'] },
                 }

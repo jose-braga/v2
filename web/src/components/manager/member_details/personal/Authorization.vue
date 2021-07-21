@@ -55,6 +55,11 @@ export default {
     created () {
         this.initialize();
     },
+    watch: {
+        personId () {
+            this.initialize();
+        },
+    },
     methods: {
         initialize () {
             if (this.$store.state.session.loggedIn) {

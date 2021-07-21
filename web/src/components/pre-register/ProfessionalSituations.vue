@@ -309,31 +309,25 @@ export default {
         },
         getSituationsCategories() {
             var vm = this;
-            if (this.$store.state.session.loggedIn) {
-                const urlSubmit = 'api/v2/' + 'situations-categories';
-                return subUtil.getPublicInfo(vm, urlSubmit, 'situationsCategories');
-            }
+            const urlSubmit = 'api/v2/' + 'situations-categories';
+            return subUtil.getPublicInfo(vm, urlSubmit, 'situationsCategories');
+
         },
         getFellowshipTypes() {
             var vm = this;
-            if (this.$store.state.session.loggedIn) {
-                const urlSubmit = 'api/v2/' + 'fellowship-types';
-                return subUtil.getPublicInfo(vm, urlSubmit, 'fellowshipTypes');
-            }
+            const urlSubmit = 'api/v2/' + 'fellowship-types';
+            return subUtil.getPublicInfo(vm, urlSubmit, 'fellowshipTypes');
+
         },
         getManagementEntities() {
             var vm = this;
-            if (this.$store.state.session.loggedIn) {
-                const urlSubmit = 'api/v2/' + 'management-entities';
-                return subUtil.getPublicInfo(vm, urlSubmit, 'managementEntities');
-            }
+            const urlSubmit = 'api/v2/' + 'management-entities';
+            return subUtil.getPublicInfo(vm, urlSubmit, 'managementEntities');
         },
         getFundingAgencies() {
             var vm = this;
-            if (this.$store.state.session.loggedIn) {
-                const urlSubmit = 'api/v2/' + 'funding-agencies';
-                return subUtil.getPublicInfo(vm, urlSubmit, 'fundingAgencies');
-            }
+            const urlSubmit = 'api/v2/' + 'funding-agencies';
+            return subUtil.getPublicInfo(vm, urlSubmit, 'fundingAgencies');
         },
         updateViewCategories (situation) {
             let categoriesFiltered = [];

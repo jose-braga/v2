@@ -480,6 +480,9 @@ var getJobCategorySituationID = function (options) {
                 }
             },
             options);
+    } else if (person.cars.length > 0) {
+        options.i = 0;
+        return actionCreateCar(options);
     } else {
         return actionUpdatePersonFinal(options);
     }
@@ -517,6 +520,9 @@ var actionCreateJob = function (options) {
             } else if (i + 1 < person.situations.length) {
                 options.i = i + 1;
                 return getJobCategorySituationID(options);
+            } else if (person.cars.length > 0) {
+                options.i = 0;
+                return actionCreateCar(options);
             } else {
                 return actionUpdatePersonFinal(options);
             }
@@ -633,6 +639,9 @@ var actionCreateJobFellowshipRelationship = function (options) {
             } else if (i + 1 < person.situations.length) {
                 options.i = i + 1;
                 return getJobCategorySituationID(options);
+            } else if (person.cars.length > 0) {
+                options.i = 0;
+                return actionCreateCar(options);
             } else {
                 return actionUpdatePersonFinal(options);
             }
@@ -743,6 +752,38 @@ var actionCreateJobContractRelationship = function (options) {
             } else if (i + 1 < person.situations.length) {
                 options.i = i + 1;
                 return getJobCategorySituationID(options);
+            } else if (person.cars.length > 0) {
+                options.i = 0;
+                return actionCreateCar(options);
+            } else {
+                return actionUpdatePersonFinal(options);
+            }
+        },
+        options);
+};
+var actionCreateCar = function (options) {
+    let { req, res, next, i } = options;
+    let personID = req.params.personID;
+    let person = req.body.data;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'INSERT INTO cars'
+                    + ' (person_id, license, brand, model, color, plate)'
+                    + ' VALUES (?,?,?,?,?,?);';
+    places.push(
+        personID,
+        person.cars[i].license,
+        person.cars[i].brand,
+        person.cars[i].model,
+        person.cars[i].color,
+        person.cars[i].plate
+    );
+    sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            options.this_job_id = resQuery.insertId;
+            if (i + 1 < person.cars.length) {
+                options.i = i + 1;
+                return actionCreateCar(options);
             } else {
                 return actionUpdatePersonFinal(options);
             }

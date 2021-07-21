@@ -140,7 +140,9 @@ export default {
     },
     methods: {
         initialize () {
-             if (this.$store.state.session.loggedIn) {
+            this.data.roles = [];
+            this.data.current_positions = [];
+            if (this.$store.state.session.loggedIn) {
                 let personID = this.personId;
                 subUtil.getInfoPopulate(this, 'api' + this.endpoint
                                 + '/members'

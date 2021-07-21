@@ -157,6 +157,7 @@ export default {
     },
     methods: {
         initialize () {
+            this.data.cars = []
             if (this.$store.state.session.loggedIn) {
                 let personID = this.personId;
                 subUtil.getInfoPopulate(this, 'api' + this.endpoint

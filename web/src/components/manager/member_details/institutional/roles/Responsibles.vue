@@ -151,6 +151,7 @@ export default {
     },
     methods: {
         initialize() {
+            this.data.responsibles = [];
             if (this.$store.state.session.loggedIn) {
                 let urlSubmit = 'api' + this.endpoint
                                 + '/members'

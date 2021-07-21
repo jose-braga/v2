@@ -95,10 +95,9 @@ export default {
         },
         getDepartments () {
             let vm = this;
-            if (this.$store.state.session.loggedIn) {
-                const urlSubmit = 'api/v2/' + 'departments';
-                return subUtil.getPublicInfo(vm, urlSubmit, 'departments');
-            }
+            const urlSubmit = 'api/v2/' + 'departments';
+            return subUtil.getPublicInfo(vm, urlSubmit, 'departments');
+
         },
         addItem() {
             this.data.academicAffiliations.push({id: 'new', department_id: null,

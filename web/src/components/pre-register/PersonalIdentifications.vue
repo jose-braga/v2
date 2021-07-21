@@ -83,10 +83,8 @@ export default {
         },
         getCardTypes () {
             let vm = this;
-            if (this.$store.state.session.loggedIn) {
-                const urlSubmit = 'api/v2/' + 'card-types';
-                return subUtil.getPublicInfo(vm, urlSubmit, 'cardTypes');
-            }
+            const urlSubmit = 'api/v2/' + 'card-types';
+            subUtil.getPublicInfo(vm, urlSubmit, 'cardTypes');
         },
         addItem() {
             this.data.identifications.push({id: 'new', card_type_id: null,
