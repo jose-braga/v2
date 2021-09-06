@@ -8,7 +8,7 @@
         :to="link + '/publications'">
         Publications
     </v-tab>
-    <v-tab
+    <v-tab v-if="accessSpaces"
         :to="link + '/spaces'">
         Spaces
     </v-tab>
@@ -70,6 +70,15 @@ export default {
                     this.$store.dispatch('showHelp')
                 }
             }
+        },
+        accessSpaces () {
+            let departments = this.$store.state.session.currentDepartments;
+            for (let ind in departments) {
+                if (departments[ind].department_id === 1) {
+                    return true;
+                }
+            }
+            return false;
         },
     },
     watch: {
