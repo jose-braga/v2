@@ -2,7 +2,7 @@
     <div>
     <v-app-bar app>
         <v-app-bar-nav-icon @click.stop="changeDrawer"></v-app-bar-nav-icon>
-        <v-toolbar-title>{{toolbarText}}</v-toolbar-title>
+        <v-toolbar-title>{{toolbarText}} - v1</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-tooltip bottom  v-if="loggedIn">
             <template v-slot:activator="{ on }">
