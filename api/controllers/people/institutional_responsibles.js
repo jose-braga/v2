@@ -39,10 +39,11 @@ var actionCreateResponsibles = function (options) {
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'INSERT INTO people_responsibles'
-        + ' (person_id, responsible_id, valid_from, valid_until)'
-        + ' VALUES (?,?,?,?);';
+        + ' (person_id, responsible_id, responsible_type_id, valid_from, valid_until)'
+        + ' VALUES (?,?,?,?,?);';
     places.push(personID,
         data.responsible_id,
+        data.responsible_type_id,
         data.valid_from,
         data.valid_until
         );
@@ -68,10 +69,12 @@ var actionUpdateResponsibles = function (options) {
     var places = [];
     querySQL = querySQL + 'UPDATE people_responsibles'
                         + ' SET responsible_id = ?,'
+                        + ' responsible_type_id = ?,'
                         + ' valid_from = ?,'
                         + ' valid_until = ?'
                         + ' WHERE id = ?;';
     places.push(data.responsible_id,
+        data.responsible_type_id,
         data.valid_from,
         data.valid_until,
         data.id)

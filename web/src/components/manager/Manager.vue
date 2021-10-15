@@ -27,6 +27,10 @@
         >
             Spaces
         </v-tab>
+        <v-tab to="/manager/export"
+        >
+            Export
+        </v-tab>
         <v-tabs-items>
             <!-- use :max="N" in keep-alive if necessary-->
             <keep-alive>

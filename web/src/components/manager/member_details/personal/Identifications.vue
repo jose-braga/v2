@@ -19,7 +19,7 @@
                         label="Card ID number">
                     </v-text-field>
                 </v-col>
-                <v-col cols="12" sm="3">
+                <v-col cols="12" sm="2">
                     <v-menu ref="identification.show_date_end"
                         v-model="identification.show_date_end"
                         :close-on-content-click="false"

@@ -8,6 +8,8 @@ const UnknownAssociationsTab = () => import(/* webpackChunkName: "manager-unknow
 const UnknownAssociationsTabHelp = () => import(/* webpackChunkName: "manager-unknown-tab-help" */ '@/components/manager/members/UnknownMembersTabHelp.vue')
 const ManagerSpacesTab = () => import(/* webpackChunkName: "manager-spaces-tab" */ '@/components/manager/spaces/SpacesTab.vue')
 const ManagerSpacesTabHelp = () => import(/* webpackChunkName: "manager-spaces-tab-help" */ '@/components/manager/spaces/SpacesTabHelp.vue')
+const ExportTab = () => import(/* webpackChunkName: "manager-export-tab" */ '@/components/manager/export/ExportTab.vue')
+const ExportTabHelp = () => import(/* webpackChunkName: "manager-export-tab-help" */ '@/components/manager/export/ExportTabHelp.vue')
 
 
 const routes = {
@@ -61,6 +63,13 @@ const routes = {
             components: {
                 default: ManagerSpacesTab,
                 help: ManagerSpacesTabHelp
+            }
+        },
+        {
+            path: 'export',
+            components: {
+                default: ExportTab,
+                help: ExportTabHelp
             }
         },
         //{ path: '', redirect: 'members' }

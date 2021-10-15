@@ -12,7 +12,7 @@
     <v-row
         v-for="(v,i) in data.responsibles"
         :key="i">
-        <v-col cols="12" sm="5">
+        <v-col cols="12" sm="8">
             <v-autocomplete
                 v-model="v.responsible_id"
                 :loading="loadingPeople"
@@ -25,6 +25,12 @@
                 hide-details
                 label="Responsible">
             </v-autocomplete>
+        </v-col>
+        <v-col cols="12" sm="4">
+            <v-select v-model="v.responsible_type_id"
+                :items="responsibleTypes" item-value="id" item-text="name_en"
+                label="Type">
+            </v-select>
         </v-col>
         <v-col cols="12" sm="3">
             <v-menu ref="v.show_date_start" v-model="v.show_date_start"
@@ -62,6 +68,9 @@
             <v-btn icon @click="removeItem(data.responsibles, i)" class="mt-3">
                 <v-icon color="red darken">mdi-delete</v-icon>
             </v-btn>
+        </v-col>
+        <v-col cols="12">
+            <v-divider></v-divider>
         </v-col>
     </v-row>
     <v-row align-content="center" justify="end">
@@ -133,6 +142,7 @@ export default {
             data: {
                 responsibles: [],
             },
+            responsibleTypes: [],
             toDelete: [],
             people: [],
             loadingPeople: false,
@@ -141,6 +151,7 @@ export default {
     mounted() {
         this.initialize();
         this.getPeople();
+        this.getResponsibleTypes();
     },
     watch: {
         personId () {
@@ -228,6 +239,13 @@ export default {
             if (this.$store.state.session.loggedIn) {
                 const urlSubmit = 'api/v2/' + 'supervisors';
                 return subUtil.getPublicInfo(vm, urlSubmit, 'people', 'colloquial_name');
+            }
+        },
+        getResponsibleTypes() {
+            var vm = this;
+            if (this.$store.state.session.loggedIn) {
+                const urlSubmit = 'api/v2/' + 'responsible-types';
+                return subUtil.getPublicInfo(vm, urlSubmit, 'responsibleTypes');
             }
         },
         addItem(list) {

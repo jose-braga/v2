@@ -16,7 +16,7 @@
                 <v-row>
                     <v-col cols="12" sm="3">
                         <v-select v-model="permission.method_id"
-                        multiple
+                            multiple
                             :items="requestMethods"
                             item-value="id" item-text="name"
                             label="Methods">

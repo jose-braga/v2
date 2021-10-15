@@ -18,6 +18,7 @@ router.options('*', cors())
 
 const externalAPI = require('../controllers/people/external_api'); //authorization of visibility to external partners
 const addMember = require('../controllers/manager/addMember');
+const dataExport = require('../controllers/manager/data_export');
 const membersAll = require('../controllers/manager/all/members');
 const membersUnit = require('../controllers/manager/unit/members');
 const membersUnitValidate = require('../controllers/manager/unit/members_validate');
@@ -65,6 +66,13 @@ const managePermissionLevels = require('../controllers/manager/unit/manage_permi
 const managePermissionsUnit = require('../controllers/manager/unit/manage_permissions');
 const manageAppAreaPermissionsUnit = require('../controllers/manager/unit/manage_app_area_permissions');
 
+//endpoint for retrieving data to export to speadsheet
+router.get('/:userID/export-data/people', cors(corsOptions), dataExport.getData);
+router.get('/:userID/export-data/productivity', cors(corsOptions), dataExport.getProductivityData);
+router.get('/:userID/export-data/spaces', cors(corsOptions), dataExport.getSpacesData);
+router.get('/:userID/export-data/supervision', cors(corsOptions), dataExport.getSupervisionData);
+
+//
 router.get('/:userID/units/:unitID/cities/:cityID', cors(corsOptions), membersUnitCity.getUnitCityInfo);
 router.get('/:userID/cities/:cityID', cors(corsOptions), membersCity.getCityInfo);
 router.get('/:userID/units/:unitID/', cors(corsOptions), membersUnit.getUnitInfo);
