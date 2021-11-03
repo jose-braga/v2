@@ -53,6 +53,7 @@ const projects = require('../controllers/people/projects');
 const industryProjects = require('../controllers/people/private_agreements');
 const trainingNetworks = require('../controllers/people/training_networks');
 const communications = require('../controllers/people/communications');
+const organizationMeetings = require('../controllers/people/organization_meetings');
 const patents = require('../controllers/people/patents');
 const startups = require('../controllers/people/startups');
 const prizes = require('../controllers/people/prizes');
@@ -263,6 +264,14 @@ router.get('/:userID/members/:personID/communications', cors(corsOptions), commu
 router.post('/:userID/members/:personID/communications', cors(corsOptions), communications.createPersonItem);
 router.put('/:userID/members/:personID/communications/:itemID', cors(corsOptions), communications.updatePersonItem);
 router.delete('/:userID/members/:personID/communications/:itemID', cors(corsOptions), communications.deletePersonItem);
+
+//Organization of meetings
+router.get('/:userID/members/:personID/all-organization-meetings', cors(corsOptions), organizationMeetings.getAllItems);
+router.get('/:userID/members/:personID/organization-meetings', cors(corsOptions), organizationMeetings.getPersonItems);
+router.post('/:userID/members/:personID/organization-meetings', cors(corsOptions), organizationMeetings.createPersonItem);
+router.put('/:userID/members/:personID/organization-meetings/:itemID', cors(corsOptions), organizationMeetings.updatePersonItem);
+router.post('/:userID/members/:personID/organization-meetings/:itemID', cors(corsOptions), organizationMeetings.createPersonItemAssociation);
+
 //Patents
 router.get('/:userID/members/:personID/all-patents', cors(corsOptions), patents.getAllItems);
 router.get('/:userID/members/:personID/patents', cors(corsOptions), patents.getPersonItems);
@@ -442,6 +451,7 @@ router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/journals/:j
 router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/all-projects', cors(corsOptions), projects.getAllProjects);
 router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/projects', cors(corsOptions), projects.getPersonProjects);
 router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/projects', cors(corsOptions), projects.createPersonProject);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/manual-projects', cors(corsOptions), projects.createPersonProjectManually); // for manual project creation
 router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/projects/:projectID', cors(corsOptions), projects.getProjectInfo);
 router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/projects/:projectID', cors(corsOptions), projects.updatePersonProject);
 router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/projects/:projectID', cors(corsOptions), projects.createPersonProjectAssociation);
@@ -512,6 +522,14 @@ router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/communicatio
 router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/communications', cors(corsOptions), communications.createPersonItem);
 router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/communications/:itemID', cors(corsOptions), communications.updatePersonItem);
 router.delete('/:userID/units/:unitID/cities/:cityID/members/:personID/communications/:itemID', cors(corsOptions), communications.deletePersonItem);
+//Organization of meetings
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/all-organization-meetings', cors(corsOptions), organizationMeetings.getAllItems);
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/organization-meetings', cors(corsOptions), organizationMeetings.getPersonItems);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/organization-meetings', cors(corsOptions), organizationMeetings.createPersonItem);
+router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/organization-meetings/:itemID', cors(corsOptions), organizationMeetings.updatePersonItem);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/organization-meetings/:itemID', cors(corsOptions), organizationMeetings.createPersonItemAssociation);
+
+
 //Patents
 router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/all-patents', cors(corsOptions), patents.getAllItems);
 router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/patents', cors(corsOptions), patents.getPersonItems);
@@ -678,6 +696,7 @@ router.post('/:userID/cities/:cityID/members/:personID/journals/:journalID/publi
 router.get('/:userID/cities/:cityID/members/:personID/all-projects', cors(corsOptions), projects.getAllProjects);
 router.get('/:userID/cities/:cityID/members/:personID/projects', cors(corsOptions), projects.getPersonProjects);
 router.post('/:userID/cities/:cityID/members/:personID/projects', cors(corsOptions), projects.createPersonProject);
+router.post('/:userID/cities/:cityID/members/:personID/manual-projects', cors(corsOptions), projects.createPersonProjectManually); // for manual project creation
 router.get('/:userID/cities/:cityID/members/:personID/projects/:projectID', cors(corsOptions), projects.getProjectInfo);
 router.put('/:userID/cities/:cityID/members/:personID/projects/:projectID', cors(corsOptions), projects.updatePersonProject);
 router.post('/:userID/cities/:cityID/members/:personID/projects/:projectID', cors(corsOptions), projects.createPersonProjectAssociation);
@@ -748,6 +767,13 @@ router.get('/:userID/cities/:cityID/members/:personID/communications', cors(cors
 router.post('/:userID/cities/:cityID/members/:personID/communications', cors(corsOptions), communications.createPersonItem);
 router.put('/:userID/cities/:cityID/members/:personID/communications/:itemID', cors(corsOptions), communications.updatePersonItem);
 router.delete('/:userID/cities/:cityID/members/:personID/communications/:itemID', cors(corsOptions), communications.deletePersonItem);
+//Organization of meetings
+router.get('/:userID/cities/:cityID/members/:personID/all-organization-meetings', cors(corsOptions), organizationMeetings.getAllItems);
+router.get('/:userID/cities/:cityID/members/:personID/organization-meetings', cors(corsOptions), organizationMeetings.getPersonItems);
+router.post('/:userID/cities/:cityID/members/:personID/organization-meetings', cors(corsOptions), organizationMeetings.createPersonItem);
+router.put('/:userID/cities/:cityID/members/:personID/organization-meetings/:itemID', cors(corsOptions), organizationMeetings.updatePersonItem);
+router.post('/:userID/cities/:cityID/members/:personID/organization-meetings/:itemID', cors(corsOptions), organizationMeetings.createPersonItemAssociation);
+
 //Patents
 router.get('/:userID/cities/:cityID/members/:personID/all-patents', cors(corsOptions), patents.getAllItems);
 router.get('/:userID/cities/:cityID/members/:personID/patents', cors(corsOptions), patents.getPersonItems);
@@ -922,6 +948,7 @@ router.post('/:userID/units/:unitID/members/:personID/journals/:journalID/public
 router.get('/:userID/units/:unitID/members/:personID/all-projects', cors(corsOptions), projects.getAllProjects);
 router.get('/:userID/units/:unitID/members/:personID/projects', cors(corsOptions), projects.getPersonProjects);
 router.post('/:userID/units/:unitID/members/:personID/projects', cors(corsOptions), projects.createPersonProject);
+router.post('/:userID/units/:unitID/members/:personID/manual-projects', cors(corsOptions), projects.createPersonProjectManually); // for manual project creation
 router.get('/:userID/units/:unitID/members/:personID/projects/:projectID', cors(corsOptions), projects.getProjectInfo);
 router.put('/:userID/units/:unitID/members/:personID/projects/:projectID', cors(corsOptions), projects.updatePersonProject);
 router.post('/:userID/units/:unitID/members/:personID/projects/:projectID', cors(corsOptions), projects.createPersonProjectAssociation);
@@ -993,6 +1020,14 @@ router.get('/:userID/units/:unitID/members/:personID/communications', cors(corsO
 router.post('/:userID/units/:unitID/members/:personID/communications', cors(corsOptions), communications.createPersonItem);
 router.put('/:userID/units/:unitID/members/:personID/communications/:itemID', cors(corsOptions), communications.updatePersonItem);
 router.delete('/:userID/units/:unitID/members/:personID/communications/:itemID', cors(corsOptions), communications.deletePersonItem);
+
+//Organization of meetings
+router.get('/:userID/units/:unitID/members/:personID/all-organization-meetings', cors(corsOptions), organizationMeetings.getAllItems);
+router.get('/:userID/units/:unitID/members/:personID/organization-meetings', cors(corsOptions), organizationMeetings.getPersonItems);
+router.post('/:userID/units/:unitID/members/:personID/organization-meetings', cors(corsOptions), organizationMeetings.createPersonItem);
+router.put('/:userID/units/:unitID/members/:personID/organization-meetings/:itemID', cors(corsOptions), organizationMeetings.updatePersonItem);
+router.post('/:userID/units/:unitID/members/:personID/organization-meetings/:itemID', cors(corsOptions), organizationMeetings.createPersonItemAssociation);
+
 //Patents
 router.get('/:userID/units/:unitID/members/:personID/all-patents', cors(corsOptions), patents.getAllItems);
 router.get('/:userID/units/:unitID/members/:personID/patents', cors(corsOptions), patents.getPersonItems);

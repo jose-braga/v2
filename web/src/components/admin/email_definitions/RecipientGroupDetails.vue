@@ -7,7 +7,6 @@
             <span> Check data for group "{{itemDetails.name_en}}"
             </span>
         </v-card-title>
-        {{itemDetails}}
         <v-container>
             <v-row>
                 <v-col cols="4">

@@ -9,7 +9,7 @@
                     </div>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
-                    <IndustryProjects id="other-person-industry-projects"
+                    <IndustryProjects id="manager-person-industry-projects"
                             :other-person-id="otherPersonId"
                             :manager-id="managerId"
                             :endpoint="endpoint"
@@ -23,7 +23,7 @@
                     </div>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
-                    <TrainingNetworks id="other-person-training-networks"
+                    <TrainingNetworks id="manager-person-training-networks"
                             :manager-id="managerId"
                     :endpoint="endpoint"
                             :other-person-id="otherPersonId"
@@ -37,7 +37,7 @@
                     </div>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
-                    <StartupCompanies id="other-person-startups"
+                    <StartupCompanies id="manager-person-startups"
                             :manager-id="managerId"
                             :endpoint="endpoint"
                             :other-person-id="otherPersonId"
@@ -52,7 +52,7 @@
                     </div>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
-                    <OralCommunications id="other-person-communications"
+                    <OralCommunications id="manager-person-communications"
                             :manager-id="managerId"
                             :endpoint="endpoint"
                             :other-person-id="otherPersonId"
@@ -62,11 +62,25 @@
             <v-expansion-panel>
                 <v-expansion-panel-header>
                     <div>
+                        <h3 class="headline">Organization of meetings, conferences, seminars, workshops</h3>
+                    </div>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <OrganizationMeetings id="manager-person-organization-meetings"
+                            :manager-id="managerId"
+                            :endpoint="endpoint"
+                            :other-person-id="otherPersonId"
+                    ></OrganizationMeetings>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <div>
                         <h3 class="headline">Scientific Prizes</h3>
                     </div>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
-                    <ScientificPrizes id="other-person-prizes"
+                    <ScientificPrizes id="manager-person-prizes"
                             :manager-id="managerId"
                             :endpoint="endpoint"
                             :other-person-id="otherPersonId"
@@ -81,7 +95,7 @@
                     </div>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
-                    <MemberBoards id="other-person-boards"
+                    <MemberBoards id="manager-person-boards"
                             :manager-id="managerId"
                             :endpoint="endpoint"
                             :other-person-id="otherPersonId"
@@ -95,7 +109,7 @@
                     </div>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
-                    <SubmittedPatents id="other-person-patents"
+                    <SubmittedPatents id="manager-person-patents"
                             :manager-id="managerId"
                             :endpoint="endpoint"
                             :other-person-id="otherPersonId"
@@ -109,7 +123,7 @@
                     </div>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
-                    <DepositDatasets id="other-person-datasets"
+                    <DepositDatasets id="manager-person-datasets"
                             :manager-id="managerId"
                             :endpoint="endpoint"
                             :other-person-id="otherPersonId"
@@ -123,7 +137,7 @@
                     </div>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
-                    <ParticipationOutreach id="other-person-outreach"
+                    <ParticipationOutreach id="manager-person-outreach"
                             :manager-id="managerId"
                             :endpoint="endpoint"
                             :other-person-id="otherPersonId"
@@ -139,6 +153,7 @@
 const IndustryProjects = () => import(/* webpackChunkName: "manager-industry-projects" */ './other/IndustryProjects')
 const TrainingNetworks = () => import(/* webpackChunkName: "manager-training-networks" */ './other/TrainingNetworks')
 const OralCommunications = () => import(/* webpackChunkName: "manager-communications" */ './other/OralCommunications')
+const OrganizationMeetings = () => import(/* webpackChunkName: "other-person-organization-meetings" */ './other/OrganizationMeetings')
 const StartupCompanies = () => import(/* webpackChunkName: "manager-startups" */ './other/StartupCompanies')
 const ScientificPrizes = () => import(/* webpackChunkName: "manager-prizes" */ './other/ScientificPrizes')
 const MemberBoards = () => import(/* webpackChunkName: "manager-boards" */ './other/MemberBoards')
@@ -151,6 +166,7 @@ export default {
         IndustryProjects,
         TrainingNetworks,
         OralCommunications,
+        OrganizationMeetings,
         StartupCompanies,
         ScientificPrizes,
         MemberBoards,

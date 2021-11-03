@@ -380,11 +380,17 @@ function processResults(vm, people) {
 }
 function processForSpreadsheet(members) {
     let membersCurated = [];
-    ///let today = time.moment();
+    let today = time.moment();
     for (let ind in members) {
         let thisMember = {};
         thisMember.Name = members[ind].name;
         thisMember['Colloquial Name'] = members[ind].colloquial_name;
+        thisMember['Birth Date'] = '';
+        thisMember['Age'] = '';
+        if (members[ind].birth_date !== null && members[ind].birth_date !== undefined) {
+            thisMember['Birth Date'] = time.momentToDate(members[ind].birth_date);
+            thisMember['Age'] = today.diff(time.moment(members[ind].birth_date),'years');
+        }
         thisMember['Gender'] = members[ind].gender;
         thisMember.Email = '';
         if (members[ind].personal_email.length > 0) {
@@ -628,6 +634,7 @@ function processResultsProductivity(vm, people) {
     let peoplePublications = [];
     let usedPubIDs = [];
     let publications = [];
+    let publicationsTeams = [];
     for (let indPeople in people) {
         let person = people[indPeople];
         for (let indPub in person.publications) {
@@ -665,9 +672,26 @@ function processResultsProductivity(vm, people) {
                 dataUnique['WOS'] = publication.wos;
                 dataUnique['Pub. Type'] = publicationTypes;
                 publications.push(dataUnique);
+                publicationsTeams.push({ publication, dataUnique })
                 usedPubIDs.push(publication.publication_id);
             }
         }
+    }
+    let publicationTeamsLabs = [];
+    for (let indPub in publicationsTeams) {
+        let data = publicationsTeams[indPub].dataUnique;
+        let textTeams = '';
+        for (let indTeam in publicationsTeams[indPub].publication.teams) {
+            textTeams = textTeams + publicationsTeams[indPub].publication.teams[indTeam].name + ',\n';
+
+        }
+        let textLabs = '';
+        for (let indLab in publicationsTeams[indPub].publication.labs) {
+            textLabs = textLabs + publicationsTeams[indPub].publication.labs[indLab].name + ',\n';
+        }
+        data['Teams'] = textTeams;
+        data['Labs'] = textLabs;
+        publicationTeamsLabs.push(data)
     }
     let peopleProjects = [];
     let usedIDs = [];
@@ -871,6 +895,7 @@ function processResultsProductivity(vm, people) {
             data['Position Start'] = time.momentToDate(item.valid_from);
             data['Position End'] = time.momentToDate(item.valid_until);
             data['Startup DB ID'] = item.startup_id;
+            data['Startup Name'] = item.startup_name;
             data['Startup Start'] = time.momentToDate(item.startup_start);
             data['Startup End'] = time.momentToDate(item.startup_end);
             data['Description'] = item.short_description;
@@ -912,6 +937,41 @@ function processResultsProductivity(vm, people) {
             data['Comm. Date'] = time.momentToDate(item.date);
             data['Raw Data'] = item.communication_raw;
             peopleCommunications.push(data)
+        }
+    }
+
+    usedIDs = [];
+    let peopleOrganizationMeetings = [];
+    let organizationMeetings = [];
+    for (let indPeople in people) {
+        let person = people[indPeople];
+        for (let indItem in person.organization_meetings) {
+            let data = {};
+            let dataUnique = {};
+            let item = person.organization_meetings[indItem];
+            data['Researcher Name'] = person.name;
+            data['Organizer Role'] = item.role;
+            data['Meet. Organization DB ID'] = item.id;
+            data['Meeting Name'] = item.meeting_name;
+            data['Meeting Type'] = item.meeting_type_name;
+            data['International'] = item.international;
+            data['Country'] = item.country_name;
+            data['Start date'] = time.momentToDate(item.start);
+            data['End date'] = time.momentToDate(item.end);
+            data['Notes'] = item.description;
+            peopleOrganizationMeetings.push(data);
+            if (usedIDs.indexOf(item.id) === -1) {
+                dataUnique['Meet. Organization DB ID'] = data['Meet. Organization DB ID'];
+                dataUnique['Meeting Name'] = data['Meeting Name'];
+                dataUnique['Meeting Type'] = data['Meeting Type'];
+                dataUnique['International'] = data['International'];
+                dataUnique['Country'] = data['Country'];
+                dataUnique['Start date'] = data['Start date'];
+                dataUnique['End date'] = data['End date'];
+                dataUnique['Notes'] = data['Notes'];
+                organizationMeetings.push(dataUnique);
+                usedIDs.push(item.id);
+            }
         }
     }
 
@@ -1087,6 +1147,7 @@ function processResultsProductivity(vm, people) {
 
     return {
         peoplePublications,
+        publicationTeamsLabs,
         publications,
         peopleProjects,
         projects,
@@ -1097,6 +1158,8 @@ function processResultsProductivity(vm, people) {
         peopleStartups,
         startups,
         peopleCommunications,
+        peopleOrganizationMeetings,
+        organizationMeetings,
         peoplePrizes,
         prizes,
         peopleBoards,
@@ -1156,13 +1219,12 @@ function processResultsSupervision(vm, dataSupervisors) {
     let peopleSupervisors = [];
     //let usedIDs = [];
     //let publications = [];
-    console.log(dataSupervisors)
     for (let indPeople in dataSupervisors) {
         let person = dataSupervisors[indPeople];
         for (let indSupervisor in person.supervisors) {
             let data = {};
             let supervisor = person.supervisors[indSupervisor];
-            data['Name'] = supervisor.student_name;
+            data['Student Name'] = supervisor.student_name;
             data['Supervisor Name'] = supervisor.supervisor_name;
             data['Supervisor Type'] = supervisor.supervisor_type_name;
             data['Supervision From'] = time.momentToDate(supervisor.valid_from);
@@ -1170,7 +1232,7 @@ function processResultsSupervision(vm, dataSupervisors) {
             data['Dep. Team Name'] = supervisor.department_team_name;
             data['Degree'] = supervisor.degree_name;
             data['Degree Start'] = time.momentToDate(supervisor.degree_start);
-            data['Degree Est. End'] = time.momentToDate(supervisor.degree_estimate_end);
+            data['Degree Estimated End'] = time.momentToDate(supervisor.degree_estimate_end);
             data['Degree End'] = time.momentToDate(supervisor.degree_end);
             data['Degree Program'] = supervisor.degree_program;
             peopleSupervisors.push(data);
@@ -1385,8 +1447,14 @@ export default {
             XLSX.utils.book_append_sheet(wb, ws, 'People-Publications');
             ws  = XLSX.utils.json_to_sheet(data.publications);
             XLSX.utils.book_append_sheet(wb, ws, 'Publications');
+            ws  = XLSX.utils.json_to_sheet(data.publicationTeamsLabs);
+            XLSX.utils.book_append_sheet(wb, ws, 'Teams-Publications');
             ws  = XLSX.utils.json_to_sheet(data.peopleCommunications);
             XLSX.utils.book_append_sheet(wb, ws, 'People-Communications');
+            ws  = XLSX.utils.json_to_sheet(data.peopleOrganizationMeetings);
+            XLSX.utils.book_append_sheet(wb, ws, 'People-Org.Meetings');
+            ws  = XLSX.utils.json_to_sheet(data.organizationMeetings);
+            XLSX.utils.book_append_sheet(wb, ws, 'Org.Meetings');
             ws  = XLSX.utils.json_to_sheet(data.peopleProjects);
             XLSX.utils.book_append_sheet(wb, ws, 'People-Projects');
             ws  = XLSX.utils.json_to_sheet(data.projects);
@@ -1399,7 +1467,6 @@ export default {
             XLSX.utils.book_append_sheet(wb, ws, 'People-Training Networks');
             ws  = XLSX.utils.json_to_sheet(data.trainingNetworks);
             XLSX.utils.book_append_sheet(wb, ws, 'Training Networks');
-
             ws  = XLSX.utils.json_to_sheet(data.peopleStartups);
             XLSX.utils.book_append_sheet(wb, ws, 'People-Startups');
             ws  = XLSX.utils.json_to_sheet(data.startups);
@@ -1408,22 +1475,18 @@ export default {
             XLSX.utils.book_append_sheet(wb, ws, 'People-Prizes');
             ws  = XLSX.utils.json_to_sheet(data.prizes);
             XLSX.utils.book_append_sheet(wb, ws, 'Prizes');
-
             ws  = XLSX.utils.json_to_sheet(data.peopleBoards);
             XLSX.utils.book_append_sheet(wb, ws, 'People-Boards');
             ws  = XLSX.utils.json_to_sheet(data.boards);
             XLSX.utils.book_append_sheet(wb, ws, 'Boards');
-
             ws  = XLSX.utils.json_to_sheet(data.peoplePatents);
             XLSX.utils.book_append_sheet(wb, ws, 'People-Patents');
             ws  = XLSX.utils.json_to_sheet(data.patents);
             XLSX.utils.book_append_sheet(wb, ws, 'Patents');
-
             ws  = XLSX.utils.json_to_sheet(data.peopleDatasets);
             XLSX.utils.book_append_sheet(wb, ws, 'People-Datasets');
             ws  = XLSX.utils.json_to_sheet(data.datasets);
             XLSX.utils.book_append_sheet(wb, ws, 'Datasets');
-
             ws  = XLSX.utils.json_to_sheet(data.peopleOutreach);
             XLSX.utils.book_append_sheet(wb, ws, 'People-Outreach');
             ws  = XLSX.utils.json_to_sheet(data.outreach);

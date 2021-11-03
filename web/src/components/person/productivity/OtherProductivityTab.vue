@@ -54,6 +54,18 @@
             <v-expansion-panel>
                 <v-expansion-panel-header>
                     <div>
+                        <h3 class="headline">Organization of meetings, conferences, seminars, workshops</h3>
+                    </div>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <OrganizationMeetings id="person-organization-meetings"
+                            :current-tab="currentTab"
+                    ></OrganizationMeetings>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <div>
                         <h3 class="headline">Scientific Prizes</h3>
                     </div>
                 </v-expansion-panel-header>
@@ -121,6 +133,7 @@
 const IndustryProjects = () => import(/* webpackChunkName: "person-industry-projects" */ './other/IndustryProjects')
 const TrainingNetworks = () => import(/* webpackChunkName: "person-training-networks" */ './other/TrainingNetworks')
 const OralCommunications = () => import(/* webpackChunkName: "person-communications" */ './other/OralCommunications')
+const OrganizationMeetings = () => import(/* webpackChunkName: "person-organization-meetings" */ './other/OrganizationMeetings')
 const StartupCompanies = () => import(/* webpackChunkName: "person-startups" */ './other/StartupCompanies')
 const ScientificPrizes = () => import(/* webpackChunkName: "person-prizes" */ './other/ScientificPrizes')
 const MemberBoards = () => import(/* webpackChunkName: "person-boards" */ './other/MemberBoards')
@@ -134,6 +147,7 @@ export default {
         IndustryProjects,
         TrainingNetworks,
         OralCommunications,
+        OrganizationMeetings,
         StartupCompanies,
         ScientificPrizes,
         MemberBoards,

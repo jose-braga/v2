@@ -565,18 +565,6 @@ var getPublicationsPerson = function (options) {
             } else {
                 options.i = 0;
                 return getProjectsPerson(options);
-                /*
-                return responses.sendJSONResponseOptions({
-                    response: res,
-                    status: 200,
-                    message: {
-                        "status": "success",
-                        "statusCode": 200,
-                        "count": people.length,
-                        "result": people
-                    }
-                });
-                */
             }
         },
         options);
@@ -599,29 +587,106 @@ var getPublicationsDescriptions = function (options) {
             if (j + 1 < person.publications.length) {
                 options.j = j + 1;
                 return getPublicationsDescriptions(options);
+            } else {
+                options.j = 0;
+                return getPublicationTeams(options);
+            }
+        },
+        options);
+};
+
+var getPublicationTeams = function (options) {
+    let { req, res, next, people, i, j } = options;
+    let person = people[i];
+    let publication = person.publications[j];
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'SELECT teams_department.*'
+        + ' FROM department_teams_publications'
+        + ' JOIN teams_department ON teams_department.id = department_teams_publications.department_team_id'
+        + ' WHERE department_teams_publications.publication_id = ?';
+    places.push(publication.publication_id);
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            people[i].publications[j].teams = resQuery;
+            return getPublicationLabs(options)
+        },
+        options);
+};
+var getPublicationLabs = function (options) {
+    let { req, res, next, people, i, j } = options;
+    let person = people[i];
+    let publication = person.publications[j];
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'SELECT labs.*'
+        + ' FROM labs_publications'
+        + ' JOIN labs ON labs.id = labs_publications.lab_id'
+        + ' WHERE labs_publications.publication_id = ?';
+    places.push(publication.publication_id);
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            people[i].publications[j].labs = resQuery;
+            if (j + 1 < person.publications.length) {
+                options.j = j + 1;
+                return getPublicationTeams(options);
             } else if (i + 1 < people.length) {
                 options.i = i + 1;
                 return getPublicationsPerson(options);
             } else {
                 options.i = 0;
                 return getProjectsPerson(options)
-                /*
-                return responses.sendJSONResponseOptions({
-                    response: res,
-                    status: 200,
-                    message: {
-                        "status": "success",
-                        "statusCode": 200,
-                        "count": people.length,
-                        "result": people
-                    }
-                });
-                */
             }
         },
         options);
 };
 
+/*
+var getPublicationsPersonTeams = function (options) {
+    let { req, res, next, people, i } = options;
+    let person = people[i]
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'SELECT DISTINCT teams_department.*,'
+        + ' FROM people_team_department'
+        + ' JOIN teams_department ON teams_department.id = people_team_department.team_id'
+        + ' WHERE people_team_department.person_id = ?';
+    places.push(person.id);
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            people[i].department_teams = resQuery;
+            return getPublicationsPersonLabs(options);
+        },
+        options);
+};
+var getPublicationsPersonLabs = function (options) {
+    let { req, res, next, people, i } = options;
+    let person = people[i]
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'SELECT DISTINCT labs.*,'
+        + ' FROM people_labs'
+        + ' JOIN labs ON lab.id = people_labs.lab_id'
+        + ' WHERE people_labs.person_id = ?';
+    places.push(person.id);
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            people[i].labs = resQuery;
+            if (i + 1 < people.length) {
+                options.i = i + 1;
+                return getPublicationsPersonTeams(options);
+            } else {
+                options.i = 0;
+                return getProjectsPerson(options);
+            }
+        },
+        options);
+};
+*/
 var getProjectsPerson = function (options) {
     let { req, res, next, people, i } = options;
     let person = people[i]
@@ -962,7 +1027,6 @@ var getStartupsPerson = function (options) {
         },
         options);
 };
-
 var getCommunicationsPerson = function (options) {
     let { req, res, next, people, i } = options;
     let person = people[i]
@@ -987,12 +1051,40 @@ var getCommunicationsPerson = function (options) {
                 return getCommunicationsPerson(options);
             } else {
                 options.i = 0;
+                return getOrganizationMeetingsPerson(options);
+            }
+        },
+        options);
+};
+var getOrganizationMeetingsPerson = function (options) {
+    let { req, res, next, people, i } = options;
+    let person = people[i]
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'SELECT organization_meetings.*,'
+        + ' people_organization_meetings.role,'
+        + ' meeting_types.name AS meeting_type_name,'
+        + ' countries.name AS country_name'
+        + ' FROM people_organization_meetings'
+        + ' JOIN organization_meetings ON organization_meetings.id = people_organization_meetings.meeting_id'
+        + ' LEFT JOIN meeting_types ON meeting_types.id = organization_meetings.meeting_type_id'
+        + ' LEFT JOIN countries ON countries.id = organization_meetings.country_id'
+        + ' WHERE people_organization_meetings.person_id = ?';
+    places.push(person.id);
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            people[i].organization_meetings = resQuery;
+            if (i + 1 < people.length) {
+                options.i = i + 1;
+                return getOrganizationMeetingsPerson(options);
+            } else {
+                options.i = 0;
                 return getPrizesPerson(options);
             }
         },
         options);
 };
-
 var getPrizesPerson = function (options) {
     let { req, res, next, people, i } = options;
     let person = people[i]

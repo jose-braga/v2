@@ -22,6 +22,7 @@
                         :other-person-id="otherPersonId"
                         :item-data="editedItem"
                         :item-id="itemID"
+                        :endpoint="endpoint"
                     >
                     </ItemDetails>
                 </v-dialog>

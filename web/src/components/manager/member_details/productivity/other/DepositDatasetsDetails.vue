@@ -187,6 +187,7 @@ export default {
         otherPersonId: Number,
         itemData: Object,
         itemId: Number,
+        endpoint: String,
     },
     data() {
         return {

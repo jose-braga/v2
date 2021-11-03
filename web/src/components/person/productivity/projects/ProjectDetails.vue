@@ -138,6 +138,13 @@
                 </v-col>
             </v-row>
             <v-row>
+                <v-col cols="12">
+                    <v-text-field v-model="projectDetails.project_details.website"
+                        label="Website"
+                    ></v-text-field>
+                </v-col>
+            </v-row>
+            <v-row>
                 <v-col cols="12" sm="4">
                     <v-row>
                         <v-col cols="12">

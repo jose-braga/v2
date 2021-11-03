@@ -5,7 +5,7 @@
             <v-expansion-panel>
                 <v-expansion-panel-header>
                     <div>
-                        <h3 class="headline">Projects with your participation</h3>
+                        <h3 class="headline">Participation in Projects</h3>
                     </div>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>

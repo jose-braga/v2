@@ -253,8 +253,10 @@ function prepareStringComparison(str) {
 
 export default {
     props: {
+        otherPersonId: Number,
         projectData: Object,
         projectId: Number,
+        endpoint: String,
     },
     data() {
         return {

@@ -4,75 +4,103 @@
         @submit.prevent="submitForm"
     >
         <v-card-title>
-            <span> Edit data for patent
-                    <b>{{ itemDetails.item_details.title }}</b> ({{ itemDetails.item_details.reference_number1 }})
+            <span> Edit data for event
+                    <b>{{ itemDetails.meeting_name }}</b>
             </span>
         </v-card-title>
         <v-card-text>
         </v-card-text>
         <v-container>
             <v-row>
-                <v-col cols="12">
-                    <v-text-field v-model="itemDetails.item_details.authors_raw"
-                        label="Authors"
-                    ></v-text-field>
-                </v-col>
-            </v-row>
-            <v-row>
-                <v-col cols="12">
-                    <v-text-field v-model="itemDetails.item_details.title"
-                        label="Title"
+                <v-col cols="12" sm="12">
+                    <v-text-field
+                        v-model="$v.itemDetails.meeting_name.$model"
+                        :error="$v.itemDetails.meeting_name.$error"
+                        label="Meeting Name"
                     ></v-text-field>
                 </v-col>
             </v-row>
             <v-row>
                 <v-col cols="12" sm="3">
-                    <v-text-field v-model="itemDetails.item_details.reference_number1"
-                        label="Patent Reference"
-                    ></v-text-field>
-                </v-col>
-                <v-col cols="12" sm="4">
-                    <v-select v-model="itemDetails.item_details.patent_type_id"
-                        :items="patentTypes"
+                    <v-select v-model="itemDetails.meeting_type_id"
+                        :items="meetingTypes"
                         item-value="id"
-                        item-text="name_en"
-                        label="Patent Type">
+                        item-text="name"
+                        label="Meeting Type">
                     </v-select>
                 </v-col>
-                <v-col cols="6" sm="2">
-                    <v-select v-model="itemDetails.item_details.status_id"
-                        :items="patentStatusTypes"
-                        item-value="id"
-                        item-text="name_en"
-                        label="Patent Status">
-                    </v-select>
+                <v-col cols="12" sm="4" md="3" lg="2">
+                    <v-switch v-model="itemDetails.international"
+                        :label="'International:' + itemDetails.international"
+                        dense
+                        hide-details
+                    >
+                    </v-switch>
                 </v-col>
-                <v-col cols="6" sm="2">
-                    <v-menu ref="date_menu"
-                        v-model="itemDetails.item_details.show_date"
-                        :close-on-content-click="false"
-                        :nudge-right="10"
-                        transition="scale-transition"
-                        offset-y min-width="290px">
-                        <template v-slot:activator="{ on }">
-                            <v-text-field v-model="itemDetails.item_details.status_date"
-                                label="Status date" v-on="on">
-                            </v-text-field>
-                        </template>
-                        <v-date-picker v-model="itemDetails.item_details.status_date"
-                            @input="itemDetails.item_details.show_date = false"
-                            no-title
-                        ></v-date-picker>
-                    </v-menu>
+                <v-col cols="12" sm="3">
+                    <v-autocomplete
+                        v-model="itemDetails.country_id"
+                        :items="countries" item-value="id" item-text="name"
+                        :search-input.sync="searchCountries"
+                        :filter="customSearch"
+                        cache-items
+                        flat
+                        hide-no-data
+                        hide-details
+                        label="Country">
+                    </v-autocomplete>
                 </v-col>
             </v-row>
             <v-row>
-                <v-col cols="12">
+                <v-col cols="4">
+                    <v-row>
+                        <v-col cols="12">
+                            <v-menu ref="date_menu"
+                                v-model="itemDetails.show_start"
+                                :close-on-content-click="false"
+                                :nudge-right="10"
+                                transition="scale-transition"
+                                offset-y min-width="290px">
+                                <template v-slot:activator="{ on }">
+                                    <v-text-field v-model="itemDetails.start"
+                                        label="Start" v-on="on">
+                                    </v-text-field>
+                                </template>
+                                <v-date-picker v-model="itemDetails.start"
+                                    @input="itemDetails.show_start = false"
+                                    no-title
+                                ></v-date-picker>
+                            </v-menu>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12">
+                            <v-menu ref="date_menu2"
+                                v-model="itemDetails.show_end"
+                                :close-on-content-click="false"
+                                :nudge-right="10"
+                                transition="scale-transition"
+                                offset-y min-width="290px">
+                                <template v-slot:activator="{ on }">
+                                    <v-text-field v-model="itemDetails.end"
+                                        label="End" v-on="on">
+                                    </v-text-field>
+                                </template>
+                                <v-date-picker v-model="itemDetails.end"
+                                    @input="itemDetails.show_end = false"
+                                    no-title
+                                ></v-date-picker>
+                            </v-menu>
+                        </v-col>
+                    </v-row>
+                </v-col>
+                <v-col cols="8">
                     <v-textarea
-                        v-model="itemDetails.item_details.description"
-                        rows="3"
+                        v-model="$v.itemDetails.description.$model"
+                        :error="$v.itemDetails.description.$error"
+                        rows="4"
                         counter
-                        label="Description (<1000 ca)">
+                        label="Description (<2000 ca)">
                     </v-textarea>
                 </v-col>
             </v-row>
@@ -83,9 +111,9 @@
                     </v-row>
                     <v-row v-for="(person,i) in itemDetails.person_details"
                         :key="i"
-                        align="center"
+                        align="stretch"
                     >
-                        <v-col cols="12" sm="9">
+                        <v-col cols="12" sm="7">
                             <v-autocomplete
                                 v-model="person.person_id"
                                 :items="people" item-value="id" item-text="colloquial_name"
@@ -98,8 +126,13 @@
                                 label="People">
                             </v-autocomplete>
                         </v-col>
+                        <v-col cols="12" sm="3">
+                            <v-text-field v-model="person.role"
+                                label="Role"
+                            ></v-text-field>
+                        </v-col>
 
-                        <v-col cols="3">
+                        <v-col cols="2"  class="mt-2">
                             <v-btn icon @click="removeItem(itemDetails.person_details, i, 'person')">
                                 <v-icon color="red darken">mdi-delete</v-icon>
                             </v-btn>
@@ -119,7 +152,7 @@
                 <v-divider vertical></v-divider>
                 <v-col cols="12" sm="">
                     <v-row justify="center">
-                        <h3>Labs associated with patent</h3>
+                        <h3>Labs associated with item</h3>
                     </v-row>
                     <v-row v-for="(lab,i) in itemDetails.labs_details"
                         :key="'labs-' + i"
@@ -158,7 +191,7 @@
             <v-row align-content="center" justify="center" class="pt-6">
                 <div>
                     <v-btn type="submit"
-                        outlined color="blue">Update</v-btn>
+                        outlined color="blue">Save</v-btn>
                 </div>
                 <div class="request-status-container">
                     <v-progress-circular indeterminate
@@ -176,6 +209,7 @@
 
 <script>
 import subUtil from '@/components/common/submit-utils'
+import { maxLength } from 'vuelidate/lib/validators'
 
 function prepareStringComparison(str) {
     if (str === null || str === undefined) {
@@ -199,10 +233,10 @@ function prepareStringComparison(str) {
 
 export default {
     props: {
+        endpoint: String,
         otherPersonId: Number,
         itemData: Object,
         itemId: Number,
-        endpoint: String,
     },
     data() {
         return {
@@ -210,14 +244,13 @@ export default {
             success: false,
             error: false,
             formError: false,
+            searchCountries: '',
             itemDetails: {
-                item_details: {
-                    title: '',
-                    reference_number1: '',
-                },
-                labs_details: [],
+                meeting_name: undefined,
+                description: undefined,
+                international: false,
                 person_details: [],
-
+                labs_details: [],
             },
             searchPeople: [],
             searchLabs: [],
@@ -225,8 +258,8 @@ export default {
             toDeleteLab: [],
             people: [],
             labs: [],
-            patentTypes: [],
-            patentStatusTypes: [],
+            countries: [],
+            meetingTypes: [],
         }
     },
     watch: {
@@ -237,16 +270,18 @@ export default {
     mounted () {
         this.initialize();
         this.getPeople();
+        this.getCountries();
         this.getLabs();
-        this.getPatentTypes();
-        this.getPatentStatusTypes();
+        this.getMeetingTypes();
     },
     methods: {
         initialize () {
             this.itemDetails = Object.assign({}, this.itemData);
         },
         submitForm () {
-            if (this.$store.state.session.loggedIn) {
+            if (this.$store.state.session.loggedIn
+                && !this.$v.$invalid
+            ) {
                 this.progress = true;
                 let personID = this.otherPersonId;
                 this.itemDetails.toDeletePerson = this.toDeletePerson;
@@ -256,7 +291,7 @@ export default {
                         url: 'api' + this.endpoint
                             + '/members'
                             + '/' + personID
-                            + '/patents/' + this.itemDetails.patent_id,
+                            + '/organization-meetings/' + this.itemDetails.meeting_id,
                         body: this.itemDetails,
                     }
                 ];
@@ -271,14 +306,12 @@ export default {
                 .then(() => {
                     this.progress = false;
                     this.success = true;
-                    this.$root.$emit('updatedPatent')
+                    this.$root.$emit('updatedMeetingOrganization')
                     setTimeout(() => {
                         this.success = false;
                         this.toDeletePerson = [];
                         this.toDeleteLab = [];
                         this.itemDetails = {
-                            labs_details: [],
-                            person_details: [],
                         };
                         //this.$root.$emit('updatedPatent')
                         this.initialize();
@@ -298,6 +331,11 @@ export default {
             const urlSubmit = 'api/v2/' + 'people-simple';
             return subUtil.getPublicInfo(vm, urlSubmit, 'people');
         },
+        getCountries() {
+            var this_vm = this;
+            const urlSubmit = 'api/v2/' + 'countries';
+            subUtil.getPublicInfo(this_vm, urlSubmit, 'countries');
+        },
         getLabs() {
             var vm = this;
             if (this.$store.state.session.loggedIn) {
@@ -305,17 +343,13 @@ export default {
                 return subUtil.getPublicInfo(vm, urlSubmit, 'labs');
             }
         },
-        getPatentTypes () {
-            let vm = this;
-            const urlSubmit = 'api/v2/' + 'patent-types';
-            return subUtil.getPublicInfo(vm, urlSubmit, 'patentTypes');
+        getMeetingTypes() {
+            var vm = this;
+            if (this.$store.state.session.loggedIn) {
+                const urlSubmit = 'api/v2/' + 'meeting-types';
+                return subUtil.getPublicInfo(vm, urlSubmit, 'meetingTypes');
+            }
         },
-        getPatentStatusTypes () {
-            let vm = this;
-            const urlSubmit = 'api/v2/' + 'patent-status-types';
-            return subUtil.getPublicInfo(vm, urlSubmit, 'patentStatusTypes');
-        },
-
         addItem(list, type) {
             if (type === 'person') {
                 list.push({
@@ -341,7 +375,6 @@ export default {
             }
             list.splice(ind, 1);
         },
-
         customSearch (item, queryText, itemText) {
             let queryPre = prepareStringComparison(queryText);
             let query = queryPre.split(' ');
@@ -353,7 +386,13 @@ export default {
             }
             return true;
         },
-    }
+    },
+    validations: {
+        itemDetails: {
+            meeting_name: { maxLength: maxLength(1000)},
+            description: { maxLength: maxLength(2000)},
+        }
+    },
 
 }
 </script>

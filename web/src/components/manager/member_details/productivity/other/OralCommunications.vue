@@ -22,7 +22,7 @@
                     <ItemDetails
                         :other-person-id="otherPersonId"
                         :item-data="editedItem"
-
+                        :endpoint="endpoint"
                         :item-id="itemID"
                     >
                     </ItemDetails>

@@ -609,6 +609,233 @@ module.exports.createPersonProject = function (req, res, next) {
     );
 };
 
+var actionCreateProjectManually = function (options) {
+    let { req, res, next } = options;
+    let data = req.body.data;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'INSERT INTO projects'
+        + ' (project_type_id, call_type_id, title, reference, acronym,'
+        + ' start, end, global_amount, website, notes)'
+        +' VALUES (?,?,?,?,?,?,?,?,?,?);';
+    places.push(
+        data.project_type_id,
+        data.call_type_id,
+        data.title,
+        data.reference,
+        data.acronym,
+        data.start,
+        data.end,
+        data.global_amount,
+        data.website,
+        data.notes
+    )
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            options.projectID = resQuery.insertId;
+            options.i = 0;
+            return actionAddProjectFundingAgencies(options);
+        },
+        options);
+}
+var actionAddProjectFundingAgencies = function (options) {
+    let { req, res, next, projectID, i } = options;
+    let data = req.body.data;
+    if (data.funding_agencies.length > 0) {
+        let fundingAgency = data.funding_agencies[i];
+        var querySQL = '';
+        var places = [];
+        querySQL = querySQL
+            + 'INSERT INTO projects_funding_entities'
+            + ' (project_id, funding_entity_id)'
+            +' VALUES (?,?);';
+        places.push(
+            projectID,
+            fundingAgency.id,
+        )
+        return sql.getSQLOperationResult(req, res, querySQL, places,
+            (resQuery, options) => {
+                if (i + 1 < data.funding_agencies.length) {
+                    options.i = i + 1;
+                    return actionAddProjectFundingAgencies(options);
+                } else {
+                    return actionAddProjectOtherFundingAgencies(options);
+                }
+            },
+            options);
+    } else {
+        return actionAddProjectOtherFundingAgencies(options);
+    }
+
+};
+var actionAddProjectOtherFundingAgencies = function (options) {
+    let { req, res, next, projectID} = options;
+    let data = req.body.data;
+    let fundingAgency = data.other_funding_agencies;
+    if (fundingAgency.name !== undefined) {
+        var querySQL = '';
+        var places = [];
+        querySQL = querySQL
+            + 'INSERT INTO projects_other_funding_entities'
+            + ' (project_id, name)'
+            +' VALUES (?,?);';
+        places.push(
+            projectID,
+            fundingAgency.name,
+        )
+        return sql.getSQLOperationResult(req, res, querySQL, places,
+            (resQuery, options) => {
+                return actionAddProjectManagementEntities(options);
+            },
+            options);
+    } else {
+        return actionAddProjectManagementEntities(options);
+    }
+
+};
+var actionAddProjectManagementEntities = function (options) {
+    let { req, res, next, projectID} = options;
+    let data = req.body.data;
+    let item = data.management_entities;
+    if (item.management_entity_id !== undefined) {
+        var querySQL = '';
+        var places = [];
+        querySQL = querySQL
+            + 'INSERT INTO projects_management_entities'
+            + ' (project_id, management_entity_id, amount)'
+            +' VALUES (?,?,?);';
+        places.push(
+            projectID,
+            item.management_entity_id,
+            data.amount,
+        )
+        return sql.getSQLOperationResult(req, res, querySQL, places,
+            (resQuery, options) => {
+                options.i = 0;
+                return actionAddProjectPerson(options);
+            },
+            options);
+    } else {
+        options.i = 0;
+        return actionAddProjectPerson(options);
+    }
+
+};
+var actionAddProjectPerson = function (options) {
+    let { req, res, next, projectID, i} = options;
+    let data = req.body.data;
+    if (data.person_details.length > 0) {
+        let item = data.person_details[i];
+        var querySQL = '';
+        var places = [];
+        querySQL = querySQL
+            + 'INSERT INTO people_projects'
+            + ' (person_id, project_id)'
+            +' VALUES (?,?);';
+        places.push(
+            item.person_id,
+            projectID,
+        )
+        return sql.getSQLOperationResult(req, res, querySQL, places,
+            (resQuery, options) => {
+                if (i + 1 < data.person_details.length) {
+                    options.i = i + 1;
+                    return actionAddProjectPerson(options);
+                } else {
+                    options.i = 0;
+                    return actionAddProjectLabs(options);
+                }
+            },
+            options);
+    } else {
+        options.i = 0;
+        return actionAddProjectLabs(options);
+    }
+};
+var actionAddProjectLabs = function (options) {
+    let { req, res, next, projectID, i} = options;
+    let data = req.body.data;
+    if (data.labs_details.length > 0) {
+        let item = data.labs_details[i];
+        var querySQL = '';
+        var places = [];
+        querySQL = querySQL
+            + 'INSERT INTO labs_projects'
+            + ' (lab_id, project_id)'
+            +' VALUES (?,?);';
+        places.push(
+            item.lab_id,
+            projectID,
+        )
+        return sql.getSQLOperationResult(req, res, querySQL, places,
+            (resQuery, options) => {
+                if (i + 1 < data.labs_details.length) {
+                    options.i = i + 1;
+                    return actionAddProjectLabs(options);
+                } else {
+                    options.i = 0;
+                    return actionAddProjectAreas(options);
+                }
+            },
+            options);
+    } else {
+        options.i = 0;
+        return actionAddProjectAreas(options);
+    }
+};
+var actionAddProjectAreas = function (options) {
+    let { req, res, next, projectID, i} = options;
+    let data = req.body.data;
+    if (data.project_areas.length > 0) {
+        let item = data.project_areas[i];
+        var querySQL = '';
+        var places = [];
+        querySQL = querySQL
+            + 'INSERT INTO project_areas'
+            + ' (project_id, research_area)'
+            +' VALUES (?,?);';
+        places.push(
+            projectID,
+            item
+        )
+        return sql.getSQLOperationResult(req, res, querySQL, places,
+            (resQuery, options) => {
+                if (i + 1 < data.labs_details.length) {
+                    options.i = i + 1;
+                    return actionAddProjectLabs(options);
+                } else {
+                    responses.sendJSONResponseOptions({
+                        response: res,
+                        status: 200,
+                        message: {
+                            "status": "success", "statusCode": 200,
+                            "message": 'Project successfully created.'
+                        }
+                    });
+                    return;
+                }
+            },
+            options);
+    } else {
+        responses.sendJSONResponseOptions({
+            response: res,
+            status: 200,
+            message: {
+                "status": "success", "statusCode": 200,
+                "message": 'Project successfully created.'
+            }
+        });
+        return;
+    }
+};
+
+module.exports.createPersonProjectManually = function (req, res, next) {
+    permissions.checkPermissions(
+        (options) => { actionCreateProjectManually(options) },
+        { req, res, next }
+    );
+};
 
 var actionUpdateProject = function (options) {
     let { req, res, next } = options;

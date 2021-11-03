@@ -44,6 +44,7 @@ const projects = require('../controllers/people/projects');
 const industryProjects = require('../controllers/people/private_agreements');
 const trainingNetworks = require('../controllers/people/training_networks');
 const communications = require('../controllers/people/communications');
+const organizationMeetings = require('../controllers/people/organization_meetings');
 const patents = require('../controllers/people/patents');
 const startups = require('../controllers/people/startups');
 const prizes = require('../controllers/people/prizes');
@@ -221,7 +222,8 @@ router.delete('/:personID/author-names/:authorID', cors(corsOptions), authorName
 //Projects
 router.get('/:personID/all-projects', cors(corsOptions), projects.getAllProjects);
 router.get('/:personID/projects', cors(corsOptions), projects.getPersonProjects);
-router.post('/:personID/projects', cors(corsOptions), projects.createPersonProject);
+router.post('/:personID/projects', cors(corsOptions), projects.createPersonProject); // for creation from ORDCID data
+router.post('/:personID/manual-projects', cors(corsOptions), projects.createPersonProjectManually); // for manual project creation
 router.get('/:personID/projects/:projectID', cors(corsOptions), projects.getProjectInfo);
 router.put('/:personID/projects/:projectID', cors(corsOptions), projects.updatePersonProject);
 router.post('/:personID/projects/:projectID', cors(corsOptions), projects.createPersonProjectAssociation);
@@ -245,6 +247,15 @@ router.get('/:personID/communications', cors(corsOptions), communications.getPer
 router.post('/:personID/communications', cors(corsOptions), communications.createPersonItem);
 router.put('/:personID/communications/:itemID', cors(corsOptions), communications.updatePersonItem);
 router.delete('/:personID/communications/:itemID', cors(corsOptions), communications.deletePersonItem);
+
+//Organization of meetings
+router.get('/:personID/all-organization-meetings', cors(corsOptions), organizationMeetings.getAllItems);
+router.get('/:personID/organization-meetings', cors(corsOptions), organizationMeetings.getPersonItems);
+router.post('/:personID/organization-meetings', cors(corsOptions), organizationMeetings.createPersonItem);
+router.put('/:personID/organization-meetings/:itemID', cors(corsOptions), organizationMeetings.updatePersonItem);
+router.post('/:personID/organization-meetings/:itemID', cors(corsOptions), organizationMeetings.createPersonItemAssociation);
+
+
 //Patents
 router.get('/:personID/all-patents', cors(corsOptions), patents.getAllItems);
 router.get('/:personID/patents', cors(corsOptions), patents.getPersonItems);

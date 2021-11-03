@@ -762,6 +762,14 @@ var getConferenceTypes = function (req, res, next) {
     sql.makeSQLOperation(req, res, querySQL, places);
     return;
 };
+var getMeetingTypes = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM meeting_types;';
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
 var getPatentTypes = function (req, res, next) {
     var querySQL = '';
     var places = [];
@@ -982,6 +990,12 @@ module.exports.listItems = function (req, res, next) {
     }
     if (category === 'conference-types') {
         getConferenceTypes(req, res, next);
+    }
+    if (category === 'meeting-types') { // by mistake I created 2 tables with the same data
+        getMeetingTypes(req, res, next);
+    }
+    if (category === 'communication-types') {
+        getCommunicationTypes(req, res, next);
     }
     if (category === 'patent-types') {
         getPatentTypes(req, res, next);
