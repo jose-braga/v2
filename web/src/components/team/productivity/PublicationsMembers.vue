@@ -83,7 +83,11 @@ export default {
         labData: Object,
         labPositions: Array,
         myLabs: Array,
+        depTeamId: Number,
+        depTeamData: Object,
+        myDepTeams: Array,
         publications: Array,
+        componentType: String,
     },
     data() {
         return {
@@ -116,6 +120,9 @@ export default {
         labId () {
             this.initialize();
         },
+        depTeamId () {
+            this.initialize();
+        },
         publications () {
             this.initialize();
         },
@@ -132,14 +139,24 @@ export default {
                 let publications = this.data.selectedPublications;
                 this.progress = true;
                 for (let ind in publications) {
-                    urlCreateAssociation.push({
-                        url: 'api/labs/' + this.labId
-                                + '/publications',
-                        body: {
-                            publication: publications[ind],
-                            labData: this.labData
-                        },
-                    });
+                    if (this.componentType === 'lab') {
+                        urlCreateAssociation.push({
+                            url: 'api/labs/' + this.labId
+                                    + '/publications',
+                            body: {
+                                publication: publications[ind],
+                                labData: this.labData
+                            },
+                        });
+                    } else if (this.componentType === 'team') {
+                        urlCreateAssociation.push({
+                            url: 'api/department-teams/' + this.depTeamId
+                                    + '/publications',
+                            body: {
+                                publication: publications[ind],
+                            },
+                        });
+                    }
                 }
                 Promise.all(
                     urlCreateAssociation.map(el =>

@@ -4,7 +4,7 @@
     <v-tab :to="link + '/members'">
         Members
     </v-tab>
-    <v-tab v-if="labId !== undefined"
+    <v-tab
         :to="link + '/publications'">
         Publications
     </v-tab>

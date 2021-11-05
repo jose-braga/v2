@@ -34,7 +34,8 @@ var actionCreateIdentification = function (options) {
 };
 module.exports.createIdentification = function (req, res, next) {
     permissions.checkPermissions(
-        (options) => { actionCreateIdentification(options) },
+        (options) => {
+            actionCreateIdentification(options) },
         { req, res, next }
     );
 };
@@ -42,10 +43,10 @@ module.exports.createIdentification = function (req, res, next) {
 var actionUpdateIdentification = function (options) {
     let { req, res, next } = options;
     let identificationID = req.params.identificationID;
+    let data = req.body.data;
     if (data.valid_until === '') {
         data.valid_until = null;
     }
-    let data = req.body.data;
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'UPDATE identifications'

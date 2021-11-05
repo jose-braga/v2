@@ -147,6 +147,9 @@ export default {
                     urlDelete.push('api/people/' + personID
                                 + '/identifications/' + this.toDelete[ind].id);
                 }
+                console.log(urlUpdate)
+                console.log(urlCreate)
+                console.log(urlDelete)
                 Promise.all(
                     urlUpdate.map(el =>
                         this.$http.put(el.url,

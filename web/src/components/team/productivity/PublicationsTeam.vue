@@ -69,7 +69,7 @@
                                         color="green darken-1"
                                         @click="dissociateItem(item)">mdi-link</v-icon>
                                 </template>
-                                <span>Publication associatd with team.<br>
+                                <span>Publication associated with team.<br>
                                     Click to dissociate.
                                 </span>
                             </v-tooltip>
@@ -82,7 +82,7 @@
                                         color="red darken-1"
                                         @click="associateItem(item)">mdi-link-off</v-icon>
                                 </template>
-                                <span>Association to publication will be removed.<br>
+                                <span>Association to publication will be removed (after pushing "Update").<br>
                                     Click to undo the removal this association.
                                 </span>
                             </v-tooltip>
@@ -160,7 +160,11 @@ export default {
         labData: Object,
         labPositions: Array,
         myLabs: Array,
+        depTeamId: Number,
+        depTeamData: Object,
+        myDepTeams: Array,
         publications: Array,
+        componentType: String,
     },
     data() {
         return {
@@ -197,6 +201,9 @@ export default {
         labId () {
             this.initialize();
         },
+        depTeamId () {
+            this.initialize();
+        },
         publications () {
             this.initialize();
         },
@@ -205,6 +212,15 @@ export default {
         initialize () {
             this.data.publications = this.publications;
             this.onResize();
+            if (this.componentType === 'team') {
+                this.headers = [
+                    { text: 'Title', value:'title_show' },
+                    { text: 'Authors', value:'authors_raw_show' },
+                    { text: 'Journal', value:'journal_short_name' },
+                    { text: 'Year', value:'year' },
+                    { text: 'Status', value: 'action', sortable: false},
+                ]
+            }
         },
         submitForm() {
             if (this.$store.state.session.loggedIn) {
@@ -213,16 +229,30 @@ export default {
                 let publications = this.data.publications;
                 this.progress = true;
                 for (let ind in publications) {
-                    if (publications[ind].toUpdate && !publications[ind].dissociate) {
-                        urlUpdate.push({
-                            url: 'api/labs/' + this.labId
-                                    + '/publications/' + publications[ind].id,
-                            body: publications[ind],
-                        });
-                    } else if (publications[ind].toUpdate && publications[ind].dissociate) {
-                        urlDelete.push('api/labs/' + this.labId
-                                    + '/publications/' + publications[ind].id
-                        );
+                    if (this.componentType === 'lab') {
+                        if (publications[ind].toUpdate && !publications[ind].dissociate) {
+                           urlUpdate.push({
+                                url: 'api/labs/' + this.labId
+                                        + '/publications/' + publications[ind].id,
+                                body: publications[ind],
+                            });
+                        } else if (publications[ind].toUpdate && publications[ind].dissociate) {
+                            urlDelete.push('api/labs/' + this.labId
+                                        + '/publications/' + publications[ind].id
+                            );
+                        }
+                    } else if (this.componentType === 'team') {
+                        if (publications[ind].toUpdate && !publications[ind].dissociate) {
+                           urlUpdate.push({
+                                url: 'api/department-teams/' + this.depTeamId
+                                        + '/publications/' + publications[ind].id,
+                                body: publications[ind],
+                            });
+                        } else if (publications[ind].toUpdate && publications[ind].dissociate) {
+                            urlDelete.push('api/department-teams/' + this.depTeamId
+                                        + '/publications/' + publications[ind].id
+                            );
+                        }
                     }
                 }
                 Promise.all(
@@ -281,7 +311,13 @@ export default {
             let wb = XLSX.utils.book_new();
             let ws  = XLSX.utils.json_to_sheet(itemsCurated);
             XLSX.utils.book_append_sheet(wb, ws, 'Team Publications');
-            let filename = this.labData.name.replace(/[^a-z0-9]/gi, '_')
+            let filename = ''
+            if (this.componentType === 'lab') {
+                filename = this.labData.name.replace(/[^a-z0-9]/gi, '_');
+            } else if (this.componentType === 'team') {
+                filename = this.depTeamData.name.replace(/[^a-z0-9]/gi, '_');
+            }
+
             XLSX.writeFile(wb, filename + '_publications_' + dateFile + '.xlsx');
         },
         customSort (items, sortBy, sortDesc) {

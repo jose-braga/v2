@@ -49,11 +49,11 @@ router.put('/:depTeamID/members-affiliation/:personID/professional-situations/:j
 router.delete('/:depTeamID/members-affiliation/:personID/professional-situations/:jobID/contracts/:contractID', cors(corsOptions), professionalSituations.deleteProfessionalSituationsContracts);
 
 //Publications
-//router.get('/:depTeamID/publications', cors(corsOptions), publications.getTeamPublications); // these are the team publications
-//router.post('/:depTeamID/publications', cors(corsOptions), publications.associateTeamPublication); // simply associates publication to lab
-//router.put('/:depTeamID/publications/:publicationID', cors(corsOptions), publications.updateTeamPublication); // update association state of publication
-//router.delete('/:depTeamID/publications/:publicationID', cors(corsOptions), publications.dissociateTeamPublication); // simply removes association to lab
-//router.get('/:depTeamID/members-publications', cors(corsOptions), publications.getMembersPublications); // these are the publications reported by team members
+router.get('/:depTeamID/publications', cors(corsOptions), publications.getTeamPublications); // these are the team publications
+router.post('/:depTeamID/publications', cors(corsOptions), publications.associateTeamPublication); // simply associates publication to lab
+router.put('/:depTeamID/publications/:publicationID', cors(corsOptions), publications.updateTeamPublication); // update association state of publication
+router.delete('/:depTeamID/publications/:publicationID', cors(corsOptions), publications.dissociateTeamPublication); // simply removes association to lab
+router.get('/:depTeamID/members-publications', cors(corsOptions), publications.getMembersPublications); // these are the publications reported by team members
 
 //Spaces
 router.get('/:depTeamID/spaces', cors(corsOptions), spaces.getLabSpaces);
