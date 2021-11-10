@@ -383,6 +383,7 @@ function processForSpreadsheet(members) {
     let today = time.moment();
     for (let ind in members) {
         let thisMember = {};
+        thisMember['Person ID'] = members[ind].id;
         thisMember.Name = members[ind].name;
         thisMember['Colloquial Name'] = members[ind].colloquial_name;
         thisMember['Birth Date'] = '';
