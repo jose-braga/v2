@@ -4,7 +4,7 @@ var notifyWebsiteAPI = function (options) {
     let { entityType, entityID, operation, baseURL} = options;
     if (baseURL === undefined) {
         if (process.env.NODE_ENV === 'production') {
-            baseURL = 'https://www.requimte.pt/ucibio/api'
+            baseURL = 'https://ucibio.pt/api'
         } else {
             baseURL = 'http://host.docker.internal/ucibio/api'
         }
