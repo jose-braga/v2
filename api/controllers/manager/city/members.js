@@ -7,15 +7,25 @@ var actionGetCurrentMembersList = function (options) {
     let { req, res, next } = options;
     let today = time.moment().format('YYYY-MM-DD');
     let cityID = req.params.cityID;
-    let q = '%'
+    let qArray = []
     let lab = '%'
     let group = '%'
     let limit = 10;
     let offset = 0;
     let sortOrder = 'ASC';
+    let likeNameExpression = ''
     if (req.query.q !== undefined) {
         let qraw = req.query.q;
-        q = '%' + qraw.replace(/\s/gi,'%') + '%'
+        let qSplit = qraw.split(' ');
+        for (let ind in qSplit) {
+            qArray.push('%' + qSplit[ind] + '%');
+            if (likeNameExpression === '') {
+                likeNameExpression = likeNameExpression + ' AND (people.name LIKE ?';
+            } else {
+                likeNameExpression = likeNameExpression + ' AND people.name LIKE ?';
+            }
+        }
+        likeNameExpression = likeNameExpression + ')';
     }
     if (req.query.lab !== undefined) {
         let labraw = req.query.lab;
@@ -58,7 +68,7 @@ var actionGetCurrentMembersList = function (options) {
         + ' JOIN groups_units ON groups_units.group_id = `groups`.id'
         + ' WHERE people.status = 1'
         + ' AND people_institution_city.city_id = ?'
-        + ' AND people.name LIKE ?'
+        + likeNameExpression
         + ' AND (labs.name LIKE ? OR labs.short_name = ?)'
         + ' AND (groups.name LIKE ? OR groups.short_name = ?)'
         + ' AND ((people_labs.valid_from IS NULL AND people_labs.valid_until IS NULL)'
@@ -76,7 +86,7 @@ var actionGetCurrentMembersList = function (options) {
         + ' JOIN technicians_units ON technicians_units.technician_id = technicians.id'
         + ' WHERE people.status = 1'
         + ' AND people_institution_city.city_id = ?'
-        + ' AND people.name LIKE ?'
+        + likeNameExpression
         + ' AND (technician_offices.name_en LIKE ? OR technician_offices.name_pt LIKE ?)'
         + ' AND ((technicians.valid_from IS NULL AND technicians.valid_until IS NULL)'
         + '    OR (technicians.valid_from <= ? AND technicians.valid_until IS NULL)'
@@ -93,7 +103,7 @@ var actionGetCurrentMembersList = function (options) {
         + ' JOIN science_managers_units ON science_managers_units.science_manager_id = science_managers.id'
         + ' WHERE people.status = 1'
         + ' AND people_institution_city.city_id = ?'
-        + ' AND people.name LIKE ?'
+        + likeNameExpression
         + ' AND (science_manager_offices.name_en LIKE ? OR science_manager_offices.name_pt LIKE ?)'
         + ' AND ((science_managers.valid_from IS NULL AND science_managers.valid_until IS NULL)'
         + '    OR (science_managers.valid_from <= ? AND science_managers.valid_until IS NULL)'
@@ -110,7 +120,7 @@ var actionGetCurrentMembersList = function (options) {
         + ' JOIN people_administrative_units ON people_administrative_units.administrative_id = people_administrative_offices.id'
         + ' WHERE people.status = 1'
         + ' AND people_institution_city.city_id = ?'
-        + ' AND people.name LIKE ?'
+        + likeNameExpression
         + ' AND (administrative_offices.name_en LIKE ? OR administrative_offices.name_pt LIKE ?)'
         + ' AND ((people_administrative_offices.valid_from IS NULL AND people_administrative_offices.valid_until IS NULL)'
         + '    OR (people_administrative_offices.valid_from <= ? AND people_administrative_offices.valid_until IS NULL)'
@@ -119,11 +129,11 @@ var actionGetCurrentMembersList = function (options) {
         + ' AND ((people_institution_city.valid_from IS NULL OR people_institution_city.valid_from <= ?)'
         + '    AND (people_institution_city.valid_until IS NULL OR people_institution_city.valid_until >= ?))'
         + ' ORDER BY `name` ' + sortOrder;
-    places.push(
-        cityID, q, lab, lab, group, group, today, today, today, today, today, today,
-        cityID, q, lab, lab, today, today, today, today, today, today,
-        cityID, q, lab, lab,today, today, today, today, today, today,
-        cityID, q, lab, lab,today, today, today, today, today, today);
+    places = [cityID].concat(qArray).concat([lab, lab, group, group, today, today, today, today, today, today])
+        .concat([cityID]).concat(qArray).concat([lab, lab, today, today, today, today, today, today])
+        .concat([cityID]).concat(qArray).concat([lab, lab, today, today, today, today, today, today])
+        .concat([cityID]).concat(qArray).concat([lab, lab, today, today, today, today, today, today])
+    ;
     if (!options.moreDetails) {
         querySQL = querySQL + ' LIMIT ?, ?';
         places.push(offset, limit);
@@ -158,12 +168,22 @@ var actionGetCurrentMembersList = function (options) {
 var actionCountTotal = function (people, options) {
     let { req, res, next, today } = options;
     let cityID = req.params.cityID;
-    let q = '%';
+    let qArray = [];
     let lab = '%'
     let group = '%'
+    let likeNameExpression = '';
     if (req.query.q !== undefined) {
         let qraw = req.query.q;
-        q = '%' + qraw.replace(/\s/gi, '%') + '%'
+        let qSplit = qraw.split(' ');
+        for (let ind in qSplit) {
+            qArray.push('%' + qSplit[ind] + '%');
+            if (likeNameExpression === '') {
+                likeNameExpression = likeNameExpression + ' AND (people.name LIKE ?';
+            } else {
+                likeNameExpression = likeNameExpression + ' AND people.name LIKE ?';
+            }
+        }
+        likeNameExpression = likeNameExpression + ')';
     }
     if (req.query.lab !== undefined) {
         let labraw = req.query.lab;
@@ -188,7 +208,7 @@ var actionCountTotal = function (people, options) {
         + ' JOIN groups_units ON groups_units.group_id = `groups`.id'
         + ' WHERE people.status = 1'
         + ' AND people_institution_city.city_id = ?'
-        + ' AND people.name LIKE ?'
+        + likeNameExpression
         + ' AND (labs.name LIKE ? OR labs.short_name = ?)'
         + ' AND (groups.name LIKE ? OR groups.short_name = ?)'
         + ' AND ((people_labs.valid_from IS NULL AND people_labs.valid_until IS NULL)'
@@ -206,7 +226,7 @@ var actionCountTotal = function (people, options) {
         + ' JOIN technicians_units ON technicians_units.technician_id = technicians.id'
         + ' WHERE people.status = 1'
         + ' AND people_institution_city.city_id = ?'
-        + ' AND people.name LIKE ?'
+        + likeNameExpression
         + ' AND (technician_offices.name_en LIKE ? OR technician_offices.name_pt LIKE ?)'
         + ' AND ((technicians.valid_from IS NULL AND technicians.valid_until IS NULL)'
         + '    OR (technicians.valid_from <= ? AND technicians.valid_until IS NULL)'
@@ -223,7 +243,7 @@ var actionCountTotal = function (people, options) {
         + ' JOIN science_managers_units ON science_managers_units.science_manager_id = science_managers.id'
         + ' WHERE people.status = 1'
         + ' AND people_institution_city.city_id = ?'
-        + ' AND people.name LIKE ?'
+        + likeNameExpression
         + ' AND (science_manager_offices.name_en LIKE ? OR science_manager_offices.name_pt LIKE ?)'
         + ' AND ((science_managers.valid_from IS NULL AND science_managers.valid_until IS NULL)'
         + '    OR (science_managers.valid_from <= ? AND science_managers.valid_until IS NULL)'
@@ -240,7 +260,7 @@ var actionCountTotal = function (people, options) {
         + ' JOIN people_administrative_units ON people_administrative_units.administrative_id = people_administrative_offices.id'
         + ' WHERE people.status = 1'
         + ' AND people_institution_city.city_id = ?'
-        + ' AND people.name LIKE ?'
+        + likeNameExpression
         + ' AND (administrative_offices.name_en LIKE ? OR administrative_offices.name_pt LIKE ?)'
         + ' AND ((people_administrative_offices.valid_from IS NULL AND people_administrative_offices.valid_until IS NULL)'
         + '    OR (people_administrative_offices.valid_from <= ? AND people_administrative_offices.valid_until IS NULL)'
@@ -250,12 +270,11 @@ var actionCountTotal = function (people, options) {
         + '    AND (people_institution_city.valid_until IS NULL OR people_institution_city.valid_until >= ?))'
         + ') AS unit_people'
         ;
-    places.push(
-        cityID, q, lab, lab, group, group, today, today, today, today, today, today,
-        cityID, q, lab, lab, today, today, today, today, today, today,
-        cityID, q, lab, lab, today, today, today, today, today, today,
-        cityID, q, lab, lab, today, today, today, today, today, today
-    );
+    places = [cityID].concat(qArray).concat([lab, lab, group, group, today, today, today, today, today, today])
+        .concat([cityID]).concat(qArray).concat([lab, lab, today, today, today, today, today, today])
+        .concat([cityID]).concat(qArray).concat([lab, lab, today, today, today, today, today, today])
+        .concat([cityID]).concat(qArray).concat([lab, lab, today, today, today, today, today, today])
+    ;
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             if (resQuery.length === 1) {
@@ -272,15 +291,25 @@ var actionGetPastMembersList = function (options) {
     let { req, res, next } = options;
     let today = time.moment().format('YYYY-MM-DD');
     let cityID = req.params.cityID;
-    let q = '%'
+    let qArray = [];
     let lab = '%'
     let group = '%'
     let limit = 10;
     let offset = 0;
     let sortOrder = 'ASC';
+    let likeNameExpression = '';
     if (req.query.q !== undefined) {
         let qraw = req.query.q;
-        q = '%' + qraw.replace(/\s/gi,'%') + '%'
+        let qSplit = qraw.split(' ');
+        for (let ind in qSplit) {
+            qArray.push('%' + qSplit[ind] + '%');
+            if (likeNameExpression === '') {
+                likeNameExpression = likeNameExpression + ' AND (people.name LIKE ?';
+            } else {
+                likeNameExpression = likeNameExpression + ' AND people.name LIKE ?';
+            }
+        }
+        likeNameExpression = likeNameExpression + ')';
     }
     if (req.query.lab !== undefined) {
         let labraw = req.query.lab;
@@ -323,7 +352,7 @@ var actionGetPastMembersList = function (options) {
         + ' JOIN groups_units ON groups_units.group_id = `groups`.id'
         + ' WHERE people.status = 1'
         + ' AND people_institution_city.city_id = ?'
-        + ' AND people.name LIKE ?'
+        + likeNameExpression
         + ' AND (labs.name LIKE ? OR labs.short_name = ?)'
         + ' AND (groups.name LIKE ? OR groups.short_name = ?)'
         + ' AND ((people_labs.valid_from < ? OR people_labs.valid_from IS NULL)'
@@ -340,7 +369,7 @@ var actionGetPastMembersList = function (options) {
         + ' JOIN technicians_units ON technicians_units.technician_id = technicians.id'
         + ' WHERE people.status = 1'
         + ' AND people_institution_city.city_id = ?'
-        + ' AND people.name LIKE ?'
+        + likeNameExpression
         + ' AND (technician_offices.name_en LIKE ? OR technician_offices.name_pt LIKE ?)'
         + ' AND ((technicians.valid_from < ? OR technicians.valid_from)'
         + '    AND (technicians.valid_until IS NOT NULL AND technicians.valid_until < ?)'
@@ -356,7 +385,7 @@ var actionGetPastMembersList = function (options) {
         + ' JOIN science_managers_units ON science_managers_units.science_manager_id = science_managers.id'
         + ' WHERE people.status = 1'
         + ' AND people_institution_city.city_id = ?'
-        + ' AND people.name LIKE ?'
+        + likeNameExpression
         + ' AND (science_manager_offices.name_en LIKE ? OR science_manager_offices.name_pt LIKE ?)'
         + ' AND ((science_managers.valid_from < ? OR science_managers.valid_from IS NULL)'
         + '    AND (science_managers.valid_until IS NOT NULL AND science_managers.valid_until < ?)'
@@ -372,7 +401,7 @@ var actionGetPastMembersList = function (options) {
         + ' JOIN people_administrative_units ON people_administrative_units.administrative_id = people_administrative_offices.id'
         + ' WHERE people.status = 1'
         + ' AND people_institution_city.city_id = ?'
-        + ' AND people.name LIKE ?'
+        + likeNameExpression
         + ' AND (administrative_offices.name_en LIKE ? OR administrative_offices.name_pt LIKE ?)'
         + ' AND (( people_administrative_offices.valid_from < ? OR people_administrative_offices.valid_from IS NULL)'
         + '    AND (people_administrative_offices.valid_until IS NOT NULL AND people_administrative_offices.valid_until < ?)'
@@ -380,12 +409,11 @@ var actionGetPastMembersList = function (options) {
         //+ ' AND (( people_institution_city.valid_from < ? OR people_institution_city.valid_from IS NULL)'
         //+ '    AND (people_institution_city.valid_until IS NOT NULL AND people_institution_city.valid_until < ?))'
         + ' ORDER BY `name` ' + sortOrder;
-    places.push(
-        cityID, q, lab, lab, group, group, today, today, //today, today,
-        cityID, q, lab, lab, today, today, //today, today,
-        cityID, q, lab, lab, today, today, //today, today,
-        cityID, q, lab, lab, today, today, //today, today
-        );
+    places = [cityID].concat(qArray).concat([lab, lab, group, group, today, today])
+        .concat([cityID]).concat(qArray).concat([lab, lab, today, today])
+        .concat([cityID]).concat(qArray).concat([lab, lab, today, today])
+        .concat([cityID]).concat(qArray).concat([lab, lab, today, today])
+    ;
     if (!options.moreDetails) {
         querySQL = querySQL + ' LIMIT ?, ?';
         places.push(offset, limit);
@@ -421,12 +449,22 @@ var actionCountPastTotal = function (people, options) {
     let { req, res, next, today } = options;
     let unitID = req.params.unitID;
     let cityID = req.params.cityID;
-    let q = '%';
+    let qArray = [];
     let lab = '%'
     let group = '%'
+    let likeNameExpression = '';
     if (req.query.q !== undefined) {
         let qraw = req.query.q;
-        q = '%' + qraw.replace(/\s/gi, '%') + '%'
+        let qSplit = qraw.split(' ');
+        for (let ind in qSplit) {
+            qArray.push('%' + qSplit[ind] + '%');
+            if (likeNameExpression === '') {
+                likeNameExpression = likeNameExpression + ' AND (people.name LIKE ?';
+            } else {
+                likeNameExpression = likeNameExpression + ' AND people.name LIKE ?';
+            }
+        }
+        likeNameExpression = likeNameExpression + ')';
     }
     if (req.query.lab !== undefined) {
         let labraw = req.query.lab;
@@ -451,7 +489,7 @@ var actionCountPastTotal = function (people, options) {
             + ' JOIN groups_units ON groups_units.group_id = `groups`.id'
             + ' WHERE people.status = 1'
             + ' AND people_institution_city.city_id = ?'
-            + ' AND people.name LIKE ?'
+            + likeNameExpression
             + ' AND (labs.name LIKE ? OR labs.short_name = ?)'
             + ' AND (groups.name LIKE ? OR groups.short_name = ?)'
             + ' AND ((people_labs.valid_from < ? OR people_labs.valid_from IS NULL)'
@@ -468,7 +506,7 @@ var actionCountPastTotal = function (people, options) {
             + ' JOIN technicians_units ON technicians_units.technician_id = technicians.id'
             + ' WHERE people.status = 1'
             + ' AND people_institution_city.city_id = ?'
-            + ' AND people.name LIKE ?'
+            + likeNameExpression
             + ' AND (technician_offices.name_en LIKE ? OR technician_offices.name_pt LIKE ?)'
             + ' AND ((technicians.valid_from < ? OR technicians.valid_from)'
             + '    AND (technicians.valid_until IS NOT NULL AND technicians.valid_until < ?)'
@@ -484,7 +522,7 @@ var actionCountPastTotal = function (people, options) {
             + ' JOIN science_managers_units ON science_managers_units.science_manager_id = science_managers.id'
             + ' WHERE people.status = 1'
             + ' AND people_institution_city.city_id = ?'
-            + ' AND people.name LIKE ?'
+            + likeNameExpression
             + ' AND (science_manager_offices.name_en LIKE ? OR science_manager_offices.name_pt LIKE ?)'
             + ' AND ((science_managers.valid_from < ? OR science_managers.valid_from IS NULL)'
             + '    AND (science_managers.valid_until IS NOT NULL AND science_managers.valid_until < ?)'
@@ -500,7 +538,7 @@ var actionCountPastTotal = function (people, options) {
             + ' JOIN people_administrative_units ON people_administrative_units.administrative_id = people_administrative_offices.id'
             + ' WHERE people.status = 1'
             + ' AND people_institution_city.city_id = ?'
-            + ' AND people.name LIKE ?'
+            + likeNameExpression
             + ' AND (administrative_offices.name_en LIKE ? OR administrative_offices.name_pt LIKE ?)'
             + ' AND (( people_administrative_offices.valid_from < ? OR people_administrative_offices.valid_from IS NULL)'
             + '    AND (people_administrative_offices.valid_until IS NOT NULL AND people_administrative_offices.valid_until < ?)'
@@ -508,12 +546,11 @@ var actionCountPastTotal = function (people, options) {
             //+ ' AND (( people_institution_city.valid_from < ? OR people_institution_city.valid_from IS NULL)'
             //+ '    AND (people_institution_city.valid_until IS NOT NULL AND people_institution_city.valid_until < ?))'
         + ') AS unit_people'
-    places.push(
-        cityID, q, lab, lab, group, group, today, today, //today, today,
-        cityID, q, lab, lab, today, today, //today, today,
-        cityID, q, lab, lab, today, today, //today, today,
-        cityID, q, lab, lab, today, today, //today, today
-    );
+    places = [cityID].concat(qArray).concat([lab, lab, group, group, today, today])
+        .concat([cityID]).concat(qArray).concat([lab, lab, today, today])
+        .concat([cityID]).concat(qArray).concat([lab, lab, today, today])
+        .concat([cityID]).concat(qArray).concat([lab, lab, today, today])
+    ;
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             if (resQuery.length === 1) {
