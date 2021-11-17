@@ -105,7 +105,6 @@ var createDocAddRemainingDataDB = function (req, res, next) {
     var docData = req.body;
     let valid_from = null;
     let valid_until = null;
-    console.log(docData)
     if (docData.valid_from !== null && docData.valid_from !== undefined && docData.valid_from !== '') {
         valid_from = time.momentToDate(docData.valid_from);
     }
@@ -175,7 +174,6 @@ var updateDocwriteFile = function (options) {
 };
 var updateDocDataDB = function (req, res, next) {
     var docData = req.body;
-    console.log(docData)
     let valid_from = null;
     let valid_until = null;
     if (docData.valid_from !== null && docData.valid_from !== undefined && docData.valid_from !== '') {

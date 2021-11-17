@@ -231,7 +231,7 @@ var actionDeleteDoc = function (options) {
     let { req, res, next } = options;
     let docID = req.params.docID;
     let unitID = req.params.unitID;
-
+    let cityID = req.params.cityID;
     let deleteDirectory = 'documents/units/' + unitID
                         + '/cities/'+ cityID
                         + '/' + docID;
