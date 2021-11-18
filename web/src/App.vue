@@ -95,7 +95,7 @@ export default {
     methods: {
         initialize () {
             if (!this.socketConnected) {
-                this.socket = io(process.env.VUE_APP_API_BASE_URL);
+                this.socket = io(process.env.VUE_APP_API_BASE_URL, { withCredentials: true, });
                 this.socket.on('connect', () => {
                     this.socketConnected = true;
                 });

@@ -12,8 +12,8 @@ var actionAdminSendMessageAll = function (options) {
 
 var actionAdminMessagesClear = function (options) {
     let { req, res, next } = options;
-    var option = req.params.option;
-    sockets.adminMessagesClear(option);
+    //var option = req.params.option;
+    sockets.adminMessagesClear();
     responses.sendJSONResponse(res, 200,
         {"status": "success", "statusCode": 200});
 };
