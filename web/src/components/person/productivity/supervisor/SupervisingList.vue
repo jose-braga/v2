@@ -280,7 +280,9 @@
             :sort-desc="[false]"
         >
             <template v-slot:top>
-                <v-dialog v-model="dialog" max-width="1600px">
+                <v-dialog v-model="dialog" max-width="1600px"
+                    width="100%"
+                >
                     <StudentDetails
                         :item-id="editedItem.id"
                         :student-id="editedItem.person_id"

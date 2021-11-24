@@ -116,6 +116,7 @@
                     <v-divider></v-divider>
                 </v-col>
                 <v-dialog v-model="dialogMaps"
+                    width="100%"
                     max-width="1600px"
                 >
                     <v-card>
@@ -152,7 +153,10 @@
             </ul>
         </v-form>
     </v-container>
-    <v-dialog v-model="dialog" max-width="1600px">
+    <v-dialog v-model="dialog"
+        width="100%"
+        max-width="1600px"
+    >
         <SpaceDetails
             :item-id="editedItem.space_id"
             :person-id="editedItem.person_id"

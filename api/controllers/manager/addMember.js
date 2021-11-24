@@ -259,8 +259,31 @@ var addInstitutionalAffiliations = function (options) {
                     return addInstitutionalAffiliations(options);
                 } else {
                     options.i = 0;
-                    return addCostCenters(options);
+                    return addWorkplaces(options);
                 }
+            },
+            options);
+    } else {
+        options.i = 0;
+        return addWorkplaces(options);
+    }
+};
+var addWorkplaces = function (options) {
+    let { req, res, next, personID } = options;
+    let data = req.body.data;
+    if (data.workplace !== null && data.workplace !== null && data.workplace !== '') {
+        let places = [];
+        querySQL = 'INSERT INTO workplaces'
+            + ' (person_id, workplace)'
+            + ' VALUES (?, ?);';
+        places.push(
+            personID,
+            data.workplace
+        );
+        return sql.getSQLOperationResult(req, res, querySQL, places,
+            (resQuery, options) => {
+                options.i = 0;
+                return addCostCenters(options);
             },
             options);
     } else {
@@ -313,22 +336,8 @@ var addPole = function (options) {
             if (data.roles.length > 0) {
                 options.i = 0;
                 return addRole(options);
-            } else if (data.add_fct_mctes) {
-                // send email to managers with the data necessary
-                // for addition to FCT/MCTES team
-                return addFCTMCTESstatus(options)
-
-            } else {
-                //finish
-                responses.sendJSONResponseOptions({
-                    response: res,
-                    status: 200,
-                    message: {
-                        "status": "success", "statusCode": 200,
-                        "message": "Success!"
-                    }
-                });
-                return;
+            }  else {
+                return addJob(options);
             }
         },
         options);
@@ -363,22 +372,8 @@ var addRole = function (options) {
                 } else if (data.adm_current_positions.length > 0) {
                     options.i = 0;
                     return addAdministrative(options);
-                } else if (data.add_fct_mctes) {
-                    // send email to managers with the data necessary
-                    // for addition to FCT/MCTES team
-                    return addFCTMCTESstatus(options)
-
                 } else {
-                    //finish
-                    responses.sendJSONResponseOptions({
-                        response: res,
-                        status: 200,
-                        message: {
-                            "status": "success", "statusCode": 200,
-                            "message": "Success!"
-                        }
-                    });
-                    return;
+                    return addJob(options);
                 }
             }
         },
@@ -418,22 +413,8 @@ var addLab = function (options) {
                 } else if (data.adm_current_positions.length > 0) {
                     options.i = 0;
                     return addAdministrative(options);
-                } else if (data.add_fct_mctes) {
-                    // send email to managers with the data necessary
-                    // for addition to FCT/MCTES team
-                    return addFCTMCTESstatus(options)
-
                 } else {
-                    //finish
-                    responses.sendJSONResponseOptions({
-                        response: res,
-                        status: 200,
-                        message: {
-                            "status": "success", "statusCode": 200,
-                            "message": "Success!"
-                        }
-                    });
-                    return;
+                    return addJob(options);
                 }
             }
         },
@@ -486,21 +467,8 @@ var addFacilityUnit = function (options) {
                 } else if (data.adm_current_positions.length > 0) {
                     options.i = 0;
                     return addAdministrative(options);
-                } else if (data.add_fct_mctes) {
-                    // send email to managers with the data necessary
-                    // for addition to FCT/MCTES team
-                    return addFCTMCTESstatus(options)
                 } else {
-                    //finish
-                    responses.sendJSONResponseOptions({
-                        response: res,
-                        status: 200,
-                        message: {
-                            "status": "success", "statusCode": 200,
-                            "message": "Success!"
-                        }
-                    });
-                    return;
+                    return addJob(options);
                 }
             }
         },
@@ -550,21 +518,8 @@ var addScienceManagementUnit = function (options) {
                 if (data.adm_current_positions.length > 0) {
                     options.i = 0;
                     return addAdministrative(options);
-                } else if (data.add_fct_mctes) {
-                    // send email to managers with the data necessary
-                    // for addition to FCT/MCTES team
-                    return addFCTMCTESstatus(options);
                 } else {
-                    //finish
-                    responses.sendJSONResponseOptions({
-                        response: res,
-                        status: 200,
-                        message: {
-                            "status": "success", "statusCode": 200,
-                            "message": "Success!"
-                        }
-                    });
-                    return;
+                    return addJob(options);
                 }
             }
         },
@@ -610,11 +565,179 @@ var addAdministrativeUnit = function (options) {
             if (i + 1 < data.adm_current_positions.length) {
                 options.i = i + 1;
                 return addAdministrative(options);
-            } else if (data.add_fct_mctes) {
+            } else {
+                return addJob(options);
+            }
+        },
+        options);
+};
+var addJob = function (options) {
+    let { req, res, next, personID } = options;
+    let data = req.body.data;
+    let profSituation = data.professional_situation;
+    let places = [];
+    let querySQL = '';
+    if (profSituation.situation_id !== null && profSituation.situation_id !== undefined
+        && profSituation.category_id !== null && profSituation.category_id !== undefined
+    ) {
+        querySQL = querySQL + 'INSERT INTO jobs'
+            + ' (person_id, organization, dedication, valid_from, valid_until)'
+            + ' VALUES (?,?,?,?,?);';
+        places.push(personID,
+            profSituation.organization,
+            profSituation.dedication,
+            profSituation.valid_from,
+            profSituation.valid_until
+        );
+
+        return sql.getSQLOperationResult(req, res, querySQL, places,
+            (resQuery, options) => {
+                options.jobID = resQuery.insertId;
+                return getCategorySituationID(options);
+            },
+            options);
+
+    } else {
+        if (data.add_fct_mctes) {
+            // send email to managers with the data necessary
+            // for addition to FCT/MCTES team
+            return addFCTMCTESstatus(options);
+        } else {
+            //finish
+            responses.sendJSONResponseOptions({
+                response: res,
+                status: 200,
+                message: {
+                    "status": "success", "statusCode": 200,
+                    "message": "Success!"
+                }
+            });
+            return;
+        }
+    }
+};
+var getCategorySituationID = function (options) {
+    let { req, res, next } = options;
+    let data = req.body.data;
+    let profSituation = data.professional_situation;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM categories_situations'
+                        + ' WHERE category_id = ? AND situation_id = ?;';
+    places.push(profSituation.category_id, profSituation.situation_id)
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            if (resQuery.length === 1) {
+                options.new_category_situation_id = resQuery[0].id;
+                return updateJobCategorySituationID(options);
+            } else {
+                // if no row or if more that 1 row
+                responses.sendJSONResponseOptions({
+                    response: res,
+                    status: 400,
+                    message: {
+                        "status": "error", "statusCode": 400,
+                        "message": "An error occurred: situation and category IDs are not compatible",
+                    }
+                });
+                return;
+            }
+        },
+        options);
+};
+var updateJobCategorySituationID = function (options) {
+    let { req, res, next, jobID, new_category_situation_id } = options;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'UPDATE jobs'
+                        + ' SET category_situation_id = ?'
+                        + ' WHERE id = ?;';
+    places.push(new_category_situation_id, jobID);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            return addFellowship(options);
+        },
+        options);
+};
+
+var addFellowship = function (options) {
+    let { req, res, next, jobID } = options;
+    let data = req.body.data;
+    let profSituation = data.professional_situation;
+    let fellowship = profSituation.fellowship;
+    if ((fellowship.reference !== null && fellowship.reference !== undefined && fellowship.reference !== '')
+        || (fellowship.fellowship_type_id !== null && fellowship.fellowship_type_id !== undefined)
+    ) {
+        var querySQL = '';
+        var places = [];
+        querySQL = querySQL + 'INSERT INTO fellowships'
+                            + ' (fellowship_type_id, reference)'
+                            + ' VALUES (?, ?);';
+        places.push(fellowship.fellowship_type_id, fellowship.reference);
+        return sql.getSQLOperationResult(req, res, querySQL, places,
+            (resQuery, options) => {
+                options.fellowshipID = resQuery.insertId;
+                return addJobFellowshipRelation(options);
+            },
+            options);
+
+    } else {
+        return addContract(options);
+    }
+};
+var addJobFellowshipRelation = function (options) {
+    let { req, res, next, jobID, fellowshipID } = options;
+    let data = req.body.data;
+    let profSituation = data.professional_situation;
+    let fellowship = profSituation.fellowship;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'INSERT INTO jobs_fellowships'
+                        + ' (job_id, fellowship_id)'
+                        + ' VALUES (?, ?);';
+    places.push(jobID, fellowshipID);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            return addFellowshipFundingAgency(options);
+        },
+        options);
+};
+var addFellowshipFundingAgency = function (options) {
+    let { req, res, next, fellowshipID } = options;
+    let data = req.body.data;
+    let profSituation = data.professional_situation;
+    let fellowship = profSituation.fellowship;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'INSERT INTO fellowships_funding_agencies'
+                        + ' (fellowship_id, funding_agency_id)'
+                        + ' VALUES (?, ?);';
+    places.push(fellowshipID, fellowship.funding_agency_id);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            return addFellowshipManagementEntity(options);
+        },
+        options);
+};
+var addFellowshipManagementEntity = function (options) {
+    let { req, res, next, fellowshipID } = options;
+    let data = req.body.data;
+    let profSituation = data.professional_situation;
+    let fellowship = profSituation.fellowship;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'INSERT INTO fellowships_management_entities'
+                        + ' (fellowship_id, management_entity_id)'
+                        + ' VALUES (?, ?);';
+    places.push(fellowshipID, fellowship.management_entity_id);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            // in principle it should only have fellowship related to the job
+            // so it ends here
+            if (data.add_fct_mctes) {
                 // send email to managers with the data necessary
                 // for addition to FCT/MCTES team
                 return addFCTMCTESstatus(options);
-
             } else {
                 //finish
                 responses.sendJSONResponseOptions({
@@ -630,6 +753,114 @@ var addAdministrativeUnit = function (options) {
         },
         options);
 };
+
+var addContract = function (options) {
+    let { req, res, next, jobID } = options;
+    let data = req.body.data;
+    let profSituation = data.professional_situation;
+    let contract = profSituation.contract;
+    if ((contract.reference !== null && contract.reference !== undefined && contract.reference !== '')
+        || (contract.management_entity_id !== null && contract.management_entity_id !== undefined)
+        || (contract.funding_agency_id !== null && contract.funding_agency_id !== undefined)
+    ) {
+        var querySQL = '';
+        var places = [];
+        querySQL = querySQL + 'INSERT INTO contracts'
+                            + ' (reference)'
+                            + ' VALUES (?);';
+        places.push(contract.reference);
+        return sql.getSQLOperationResult(req, res, querySQL, places,
+            (resQuery, options) => {
+                options.contractID = resQuery.insertId;
+                return addJobContractRelation(options);
+            },
+            options);
+    } else {
+        if (data.add_fct_mctes) {
+            return addFCTMCTESstatus(options);
+        } else {
+            //finish
+            responses.sendJSONResponseOptions({
+                response: res,
+                status: 200,
+                message: {
+                    "status": "success", "statusCode": 200,
+                    "message": "Success!"
+                }
+            });
+            return;
+        }
+    }
+};
+var addJobContractRelation = function (options) {
+    let { req, res, next, jobID, contractID } = options;
+    let data = req.body.data;
+    let profSituation = data.professional_situation;
+    let contract = profSituation.contract;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'INSERT INTO jobs_contracts'
+                        + ' (job_id, contract_id)'
+                        + ' VALUES (?, ?);';
+    places.push(jobID, contractID);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            return addContractFundingAgency(options);
+        },
+        options);
+};
+var addContractFundingAgency = function (options) {
+    let { req, res, next, contractID } = options;
+    let data = req.body.data;
+    let profSituation = data.professional_situation;
+    let contract = profSituation.contract;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'INSERT INTO contracts_funding_agencies'
+                        + ' (contract_id, funding_agency_id)'
+                        + ' VALUES (?, ?);';
+    places.push(contractID, contract.funding_agency_id);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            return addContractManagementEntity(options);
+        },
+        options);
+};
+var addContractManagementEntity = function (options) {
+    let { req, res, next, contractID } = options;
+    let data = req.body.data;
+    let profSituation = data.professional_situation;
+    let contract = profSituation.contract;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'INSERT INTO contracts_management_entities'
+                        + ' (contract_id, management_entity_id)'
+                        + ' VALUES (?, ?);';
+    places.push(contractID, contract.management_entity_id);
+    return sql.makeSQLOperation(req, res, querySQL, places,
+        (options) => {
+            // in principle it should only have fellowship related to the job
+            // so it ends here
+            if (data.add_fct_mctes) {
+                // send email to managers with the data necessary
+                // for addition to FCT/MCTES team
+                return addFCTMCTESstatus(options);
+            } else {
+                //finish
+                responses.sendJSONResponseOptions({
+                    response: res,
+                    status: 200,
+                    message: {
+                        "status": "success", "statusCode": 200,
+                        "message": "Success!"
+                    }
+                });
+                return;
+            }
+        },
+        options);
+};
+
 var addFCTMCTESstatus = function(options) {
     let { req, res, next, personID } = options;
     let data = req.body.data;

@@ -288,16 +288,21 @@ var actionAccountFinances = function (options) {
     places.push(accountID)
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
-            responses.sendJSONResponseOptions({
-                response: res,
-                status: 200,
-                message: {
-                    "status": "success",
-                    "statusCode": 200,
-                    "result": resQuery,
-                }
-            });
-            return;
+            if (options.checkFinancesBeforeOrder) {
+                options.myFinances = resQuery;
+                return checkFinances(options);
+            } else {
+                responses.sendJSONResponseOptions({
+                    response: res,
+                    status: 200,
+                    message: {
+                        "status": "success",
+                        "statusCode": 200,
+                        "result": resQuery,
+                    }
+                });
+                return;
+            }
         },
         options);
 };
@@ -365,7 +370,8 @@ var checkInventory = function (options) {
     }
     if (inventoryOK) {
         options.cart = cart;
-        return initiateOrder(options);
+        options.checkFinancesBeforeOrder = true;
+        return actionAccountFinances(options);
 
     } else {
         responses.sendJSONResponseOptions({
@@ -376,6 +382,39 @@ var checkInventory = function (options) {
                 "statusCode": 403,
                 "message": "Current inventory levels not compatible with order!\n"
                             + " None of the order items were ordered.",
+            }
+        });
+        return;
+    }
+};
+var checkFinances = function (options) {
+    let { req, res, next, myFinances } = options;
+    let cart = req.body.data;
+    let financesOK = false;
+    let currentYear = parseInt(time.moment().year(), 10);
+    // we only check if finances for that year exist
+    // and if they have a value (we do not check if that value is greater than the order)
+    for (let ind in myFinances) {
+        let financeYear = parseInt(myFinances[ind].year, 10)
+        if (financeYear !== null
+            && financeYear === currentYear
+            && financeYear >= 0
+        ) {
+            financesOK = true;
+        }
+    }
+    if (financesOK) {
+        return initiateOrder(options);
+    } else {
+        responses.sendJSONResponseOptions({
+            response: res,
+            status: 403,
+            message: {
+                "status": "success",
+                "statusCode": 403,
+                "message": "Contact warehouse manager to check your account finances."
+                            +"\nOrder was not placed."
+                ,
             }
         });
         return;

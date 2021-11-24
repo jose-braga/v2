@@ -10,38 +10,40 @@
                 <v-card-title>
                     <span class="headline">I forgot my password...</span>
                 </v-card-title>
-                <v-row class="px-2">
-                    <v-col cols="12">
-                        <v-text-field
-                            v-model.trim="$v.data.recoveryString.$model"
-                            label="Email or username*">
-                        </v-text-field>
-                        <div v-if="!$v.data.recoveryString.required">
-                            <p class="caption red--text">Email or username needed.</p>
-                        </div>
-                    </v-col>
-                </v-row>
-                <v-row class="pa-2">
-                    <v-col v-if="formError" cols="12">
-                        <div>
-                            <p class="caption red--text">Unable to submit form.</p>
-                        </div>
-                    </v-col>
-                    <v-col cols="12" v-if="errorRecovery">
-                        <p class="caption red--text">{{ errorRecoveryMessage }}</p>
-                    </v-col>
-                    <v-col cols="12" v-if="recovered">
-                        <p class="caption blue--text">Success! Check your email.</p>
-                    </v-col>
-                    <v-col cols="12">
-                        <v-btn color="red darken-1" outlined
-                                @click="recover">Send recovery email</v-btn>
-                    </v-col>
-                    <v-col cols="12">
-                        <v-btn color="blue darken-1" outlined
-                                @click="showForgot">Back</v-btn>
-                    </v-col>
-                </v-row>
+                <v-container>
+                    <v-row class="px-2">
+                        <v-col cols="12">
+                            <v-text-field
+                                v-model.trim="$v.data.recoveryString.$model"
+                                label="Email or username*">
+                            </v-text-field>
+                            <div v-if="!$v.data.recoveryString.required">
+                                <p class="caption red--text">Email or username needed.</p>
+                            </div>
+                        </v-col>
+                    </v-row>
+                    <v-row class="pa-2">
+                        <v-col v-if="formError" cols="12">
+                            <div>
+                                <p class="caption red--text">Unable to submit form.</p>
+                            </div>
+                        </v-col>
+                        <v-col cols="12" v-if="errorRecovery">
+                            <p class="caption red--text">{{ errorRecoveryMessage }}</p>
+                        </v-col>
+                        <v-col cols="12" v-if="recovered">
+                            <p class="caption blue--text">Success! Check your email.</p>
+                        </v-col>
+                        <v-col cols="12">
+                            <v-btn color="red darken-1" outlined
+                                    @click="recover">Send recovery email</v-btn>
+                        </v-col>
+                        <v-col cols="12">
+                            <v-btn color="blue darken-1" outlined
+                                    @click="showForgot">Back</v-btn>
+                        </v-col>
+                    </v-row>
+                </v-container>
             </v-card>
             <v-card v-show="!forgotPassword" class="pa-2">
                 <v-card-title>
@@ -100,41 +102,42 @@
                             </div>
                         </v-col>
                     </v-row>
-                </v-container>
-                <v-row class="pa-2"
-                    justify="center"
-                    align-content="center"
-                >
-                    <v-col cols="5" v-show="!showChangePassword">
-                        <v-btn type="submit"
-                                v-show="!showChangePassword"
-                                color="blue darken-1" outlined>
-                                Login</v-btn>
-                    </v-col>
-                    <v-col cols="7" v-show="!showChangePassword">
-                        <v-btn color="blue darken-1" outlined
-                                v-show="!showChangePassword"
-                                @click="changePassword">Change Password</v-btn>
-                    </v-col>
-                    <v-col cols="6" v-show="showChangePassword">
-                        <v-btn color="blue darken-1" outlined
-                                v-show="showChangePassword"
-                                @click="submitChange">Submit</v-btn>
-                    </v-col>
-                    <v-col cols="12" v-if="loginError">
-                        <p class="caption red--text">There was a problem with your login!</p>
-                    </v-col>
-                    <v-col cols="12" v-if="changePasswordError">
-                        <p class="caption red--text">There was a problem changing password!</p>
-                    </v-col>
 
-                </v-row>
-                <v-row class="pa-2">
-                    <v-col cols="12">
-                        <v-btn color="red darken-1" outlined
-                                @click="showForgot()">I forgot my credentials</v-btn>
-                    </v-col>
-                </v-row>
+                    <v-row class="pa-2"
+                        justify="center"
+                        align-content="center"
+                    >
+                        <v-col cols="5" v-show="!showChangePassword">
+                            <v-btn type="submit"
+                                    v-show="!showChangePassword"
+                                    color="blue darken-1" outlined>
+                                    Login</v-btn>
+                        </v-col>
+                        <v-col cols="7" v-show="!showChangePassword">
+                            <v-btn color="blue darken-1" outlined
+                                    v-show="!showChangePassword"
+                                    @click="changePassword">Change Password</v-btn>
+                        </v-col>
+                        <v-col cols="6" v-show="showChangePassword">
+                            <v-btn color="blue darken-1" outlined
+                                    v-show="showChangePassword"
+                                    @click="submitChange">Submit</v-btn>
+                        </v-col>
+                        <v-col cols="12" v-if="loginError">
+                            <p class="caption red--text">There was a problem with your login!</p>
+                        </v-col>
+                        <v-col cols="12" v-if="changePasswordError">
+                            <p class="caption red--text">There was a problem changing password!</p>
+                        </v-col>
+
+                    </v-row>
+                    <v-row class="pa-2">
+                        <v-col cols="12">
+                            <v-btn color="red darken-1" outlined
+                                    @click="showForgot()">I forgot my credentials</v-btn>
+                        </v-col>
+                    </v-row>
+                </v-container>
             </v-card>
         </v-form>
     </v-dialog>

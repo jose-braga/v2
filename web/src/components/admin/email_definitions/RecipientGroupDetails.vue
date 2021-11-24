@@ -41,7 +41,10 @@
                     </v-select>
                 </v-col>
             </v-row>
-            <v-row><h3>People within group</h3>
+            <v-row>
+                <v-col>
+                    <h3>People within group</h3>
+                </v-col>
             </v-row>
             <v-row class="mt-2">
                 <v-btn small outlined class="ml-8"
@@ -78,7 +81,7 @@
                     </v-row>
                 </v-col>
             </v-row>
-            <v-row align-content="center" justify="center" class="pt-6">
+            <v-row align-content="center" justify="center" class="mb-1">
                 <div>
                     <v-btn type="submit"
                         outlined color="blue">Save</v-btn>

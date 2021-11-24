@@ -27,7 +27,10 @@
             :sort-desc="[false]"
         >
             <template v-slot:top>
-                <v-dialog v-model="dialog" max-width="1600px">
+                <v-dialog v-model="dialog"
+                    max-width="1600px"
+                    width="100%"
+                >
                     <v-card>
                         <v-card-title>
                             <span> Edit document data</span>
@@ -129,7 +132,7 @@
                                         </v-textarea>
                                     </v-col>
                                 </v-row>
-                                <v-row align-content="center" justify="end">
+                                <v-row align-content="center" justify="end" class="mb-1">
                                     <v-col cols="3" v-if="formError">
                                         <v-row justify="end">
                                             <p class="caption red--text">Unable to submit form.</p>
@@ -172,7 +175,7 @@
                 </v-row>
             </template>
         </v-data-table>
-        <v-row  justify="end">
+        <v-row  justify="end" class="mt-4 mb-1">
             <v-col cols="2" align-self="end">
                 <v-row justify="end">
                     <v-btn

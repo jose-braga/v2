@@ -30,7 +30,10 @@
                 class="elevation-1"
             >
                 <template v-slot:top>
-                    <v-dialog v-model="dialog" max-width="1600px">
+                    <v-dialog v-model="dialog"
+                        max-width="1600px"
+                        width="100%"
+                    >
                         <v-card>
                             <v-card-title primary-title>
                                 <h3 class="headline"><span class="headline">{{ editedItem.name }}</span></h3>
@@ -493,7 +496,9 @@
                                                         <v-divider></v-divider>
                                                     </v-row>
                                                 </div>
-                                                <v-row align-content="center" justify="end" class="mt-4">
+                                                <v-row align-content="center" justify="end"
+                                                    class="mt-6 mb-1"
+                                                >
                                                     <v-col cols="3" v-if="formError">
                                                         <v-row justify="end">
                                                             <p class="caption red--text">Unable to submit form.</p>
@@ -526,7 +531,7 @@
                     <v-icon @click="editItem(item)">mdi-pencil</v-icon>
                 </template>
             </v-data-table>
-            <v-row justify="center" align="center" class="mt-4">
+            <v-row justify="center" align="center" class="mt-4 mb-2">
                 <v-col cols="12" align="center">
                     <v-row justify="center" align="center">
                         <span class="mr-4">Export to spreadsheet</span>

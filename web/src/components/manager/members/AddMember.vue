@@ -3,10 +3,8 @@
     @submit.prevent="submitForm()">
     <v-card-text>
         <v-row>
-            <h2 class="black--text">User</h2>
-        </v-row>
-        <v-row>
-            <v-col>
+            <v-col cols="12" md="6">
+                <h2 class="black--text">User</h2>
                 <v-text-field
                     v-model="$v.data.username.$model"
                     :error="$v.data.username.$error"
@@ -43,12 +41,8 @@
                     </div>
                 </div>
             </v-col>
-        </v-row>
-        <v-row>
-            <h2 class="black--text">Personal Data</h2>
-        </v-row>
-        <v-row>
-            <v-col>
+            <v-col cols="12" md="6">
+                <h2 class="black--text">Personal Data</h2>
                 <v-text-field
                     v-model="$v.data.name.$model"
                     :error="$v.data.name.$error"
@@ -114,16 +108,12 @@
             </v-col>
         </v-row>
         <v-row>
-            <h2 class="black--text">Personal Contacts</h2>
-        </v-row>
-        <v-row>
-            <v-col cols="12" sm="6">
+            <v-col cols="12" md="6">
+                <h2 class="black--text">Personal Contacts</h2>
                 <v-text-field
                     v-model="data.personal_phones.phone"
                     label="Personal Phone">
                 </v-text-field>
-            </v-col>
-            <v-col cols="12" sm="6">
                 <v-text-field
                     v-model="$v.data.personal_emails.email.$model"
                     :error="$v.data.personal_emails.email.$error"
@@ -135,12 +125,8 @@
                     </div>
                 </div>
             </v-col>
-        </v-row>
-        <v-row>
-            <h2 class="black--text">Highest Academic Degree</h2>
-        </v-row>
-        <v-row>
-            <v-col cols="12" sm="5">
+            <v-col cols="12" md="6">
+                <h2 class="black--text">Highest Academic Degree</h2>
                 <v-select
                     v-model="data.degree"
                     :items="degrees" item-value="id" item-text="name_en"
@@ -150,39 +136,27 @@
             </v-col>
         </v-row>
         <v-row>
-            <h2 class="black--text">Scientific Identifiers</h2>
-        </v-row>
-        <v-row>
             <v-col cols="12" sm="6">
+                <h2 class="black--text">Scientific Identifiers</h2>
                 <v-text-field
                     v-model="data.ciencia_id"
                     label="Ciência ID (wwww-wwww-wwww)">
                 </v-text-field>
-            </v-col>
-            <v-col cols="12" sm="6">
                 <v-text-field
                     v-model="data.ORCID"
                     label="ORCID (dddd-dddd-dddd-dddd)">
                 </v-text-field>
             </v-col>
-        </v-row>
-        <v-row>
-            <h2 class="black--text">Institutional Contacts</h2>
-        </v-row>
-        <v-row>
-            <v-col cols="12" sm="4">
+            <v-col cols="12" sm="6">
+                <h2 class="black--text">Institutional Contacts</h2>
                 <v-text-field
                     v-model="data.phones.phone"
                     label="Institutional Phone">
                 </v-text-field>
-            </v-col>
-            <v-col cols="12" sm="4">
                 <v-text-field
                     v-model="data.phones.extension"
                     label="Extension">
                 </v-text-field>
-            </v-col>
-            <v-col cols="12" sm="4">
                 <v-text-field
                     v-model="$v.data.emails.email.$model"
                     :error="$v.data.emails.email.$error"
@@ -195,70 +169,76 @@
                 </div>
             </v-col>
         </v-row>
-        <v-row>
-            <h2 class="black--text">Institutional Affiliations</h2>
-        </v-row>
-        <v-row v-for="(aff, i) in data.current_institutional_affiliations"
-            :key="'aff-' + i"
-            align="center"
+        <v-row
         >
-            <v-col cols="12" sm="5">
-                <v-select
-                    v-model="aff.department_id"
-                    :items="departments" item-value="id" item-text="short_str_department_en"
-                    label="Academic Institution">
-                </v-select>
+            <v-col cols="12" md="6">
+                <h2 class="black--text">Institutional Affiliations</h2>
+                <div v-for="(aff, i) in data.current_institutional_affiliations"
+                    :key="'aff-' + i"
+                >
+                    <v-col cols="12">
+                        <v-select
+                            v-model="aff.department_id"
+                            :items="departments" item-value="id" item-text="short_str_department_en"
+                            label="Academic Institution">
+                        </v-select>
+                    </v-col>
+                    <v-row align="center">
+                        <v-col cols="12" md="5">
+                            <v-menu ref="aff.show_valid_from"
+                                v-model="aff.show_valid_from"
+                                :close-on-content-click="false"
+                                :nudge-right="10"
+                                transition="scale-transition"
+                                offset-y min-width="290px">
+                                <template v-slot:activator="{ on }">
+                                    <v-text-field v-model="aff.valid_from"
+                                        label="From" v-on="on">
+                                    </v-text-field>
+                                </template>
+                                <v-date-picker v-model="aff.valid_from"
+                                        @input="aff.show_valid_from = false"
+                                        no-title></v-date-picker>
+                            </v-menu>
+                        </v-col>
+                        <v-col cols="12" md="5">
+                            <v-menu ref="aff.show_valid_until"
+                                v-model="aff.show_valid_until"
+                                :close-on-content-click="false"
+                                :nudge-right="10"
+                                transition="scale-transition"
+                                offset-y min-width="290px">
+                                <template v-slot:activator="{ on }">
+                                    <v-text-field v-model="aff.valid_until"
+                                        label="Until" v-on="on">
+                                    </v-text-field>
+                                </template>
+                                <v-date-picker v-model="aff.valid_until"
+                                        @input="aff.show_valid_until = false"
+                                        no-title></v-date-picker>
+                            </v-menu>
+                        </v-col>
+                        <v-col cols="2">
+                            <v-btn icon @click.stop="removeItem(data.current_institutional_affiliations, i)">
+                                <v-icon color="red darken">mdi-delete</v-icon>
+                            </v-btn>
+                        </v-col>
+                    </v-row>
+                </div>
+                <v-row class="mt-2 mb-8">
+                    <v-btn class="ml-2" outlined @click="addItem('institutional-affiliation')">
+                        Add an affiliation
+                    </v-btn>
+                </v-row>
+                <v-row>
+                    <v-text-field
+                        v-model="data.workplace"
+                        label="Workplace (Organization and/or address)">
+                    </v-text-field>
+                </v-row>
             </v-col>
-            <v-col cols="12" sm="3">
-                <v-menu ref="aff.show_valid_from"
-                    v-model="aff.show_valid_from"
-                    :close-on-content-click="false"
-                    :nudge-right="10"
-                    transition="scale-transition"
-                    offset-y min-width="290px">
-                    <template v-slot:activator="{ on }">
-                        <v-text-field v-model="aff.valid_from"
-                            label="From" v-on="on">
-                        </v-text-field>
-                    </template>
-                    <v-date-picker v-model="aff.valid_from"
-                            @input="aff.show_valid_from = false"
-                            no-title></v-date-picker>
-                </v-menu>
-            </v-col>
-            <v-col cols="12" sm="3">
-                <v-menu ref="aff.show_valid_until"
-                    v-model="aff.show_valid_until"
-                    :close-on-content-click="false"
-                    :nudge-right="10"
-                    transition="scale-transition"
-                    offset-y min-width="290px">
-                    <template v-slot:activator="{ on }">
-                        <v-text-field v-model="aff.valid_until"
-                            label="Until" v-on="on">
-                        </v-text-field>
-                    </template>
-                    <v-date-picker v-model="aff.valid_until"
-                            @input="aff.show_valid_until = false"
-                            no-title></v-date-picker>
-                </v-menu>
-            </v-col>
-            <v-col cols="1">
-                <v-btn icon @click.stop="removeItem(data.current_institutional_affiliations, i)">
-                    <v-icon color="red darken">mdi-delete</v-icon>
-                </v-btn>
-            </v-col>
-        </v-row>
-        <v-row class="mt-2 mb-8">
-            <v-btn class="ml-2" outlined @click="addItem('institutional-affiliation')">
-                Add an affiliation
-            </v-btn>
-        </v-row>
-        <v-row>
-            <h2 class="black--text">Research Units Affiliations</h2>
-        </v-row>
-        <v-row>
-            <v-col cols="12" sm="4">
+            <v-col cols="12" sm="6">
+                <h2 class="black--text">Research Units Affiliations</h2>
                 <v-select v-if="cityId === undefined || cityId === null"
                     v-model="$v.data.poles.$model"
                     :error="$v.data.poles.$error"
@@ -279,8 +259,6 @@
                         <p class="caption red--text">Pole is required.</p>
                     </div>
                 </div>
-            </v-col>
-            <v-col cols="12" sm="4">
                 <v-select v-model="$v.data.roles.$model"
                     :error="$v.data.roles.$error"
                     multiple
@@ -397,7 +375,7 @@
                                 </v-row>
                                 <v-divider></v-divider>
                             </div>
-                            <v-row class="mt-4">
+                            <v-row class="mt-4 mb-1">
                                 <v-btn class="ml-2" outlined @click="addItem('scientific')">
                                     Add an affiliation
                                 </v-btn>
@@ -493,7 +471,7 @@
                                 </v-row>
                                 <v-divider></v-divider>
                             </div>
-                            <v-row class="mt-4">
+                            <v-row class="mt-4 mb-1">
                                 <v-btn class="ml-2" outlined @click="addItem('technical')">
                                     Add an affiliation
                                 </v-btn>
@@ -588,7 +566,7 @@
                                 </v-row>
                                 <v-divider></v-divider>
                             </div>
-                            <v-row class="mt-4">
+                            <v-row class="mt-4 mb-1">
                                 <v-btn class="ml-2" outlined @click="addItem('scienceManagement')">
                                     Add an affiliation
                                 </v-btn>
@@ -683,7 +661,7 @@
                                 </v-row>
                                 <v-divider></v-divider>
                             </div>
-                            <v-row class="mt-4">
+                            <v-row class="mt-4 mb-1">
                                 <v-btn class="ml-2" outlined @click="addItem('administrative')">
                                     Add an affiliation
                                 </v-btn>
@@ -715,7 +693,146 @@
             </v-col>
         </v-row>
         <v-row>
-            <h2 class="black--text">Cost Centers</h2>
+            <h2 class="black--text">Current Professional Situation</h2>
+        </v-row>
+        <v-row>
+            <v-col cols="12" sm="5">
+                <v-select
+                    v-model="data.professional_situation.situation_id"
+                    @change="updateViewCategories(data.professional_situation.situation_id)"
+                    :items="situationsCategories.situations"
+                    item-value="id" item-text="name_en"
+                    label="Situations">
+                </v-select>
+            </v-col>
+            <v-col cols="12" md="4">
+                <v-select v-model="data.professional_situation.category_id"
+                    :items="data.categoriesFiltered"
+                    item-value="category_id" item-text="category_name_en"
+                    label="Categories">
+                </v-select>
+            </v-col>
+            <v-col cols="12" md="3">
+                <v-text-field v-model="data.professional_situation.organization"
+                    label="Organization">
+                </v-text-field>
+            </v-col>
+        </v-row>
+        <v-row align="center">
+            <v-col cols="12" md="3">
+                <v-text-field v-model="data.professional_situation.dedication"
+                    label="Dedication (%)">
+                </v-text-field>
+            </v-col>
+            <v-col cols="12" md="3">
+                <v-menu ref="data.professional_situation.show_date_start" v-model="data.professional_situation.show_date_start"
+                    :close-on-content-click="false"
+                    :nudge-right="10"
+                    transition="scale-transition"
+                    offset-y min-width="290px">
+                    <template v-slot:activator="{ on }">
+                        <v-text-field v-model="data.professional_situation.valid_from"
+                            label="Started" v-on="on">
+                        </v-text-field>
+                    </template>
+                    <v-date-picker v-model="data.professional_situation.valid_from"
+                            @input="data.professional_situation.show_date_start = false"
+                            no-title></v-date-picker>
+                </v-menu>
+            </v-col>
+            <v-col cols="12" md="3">
+                <v-menu ref="data.professional_situation.show_date_start" v-model="data.professional_situation.show_date_end"
+                    :close-on-content-click="false"
+                    :nudge-right="10"
+                    transition="scale-transition"
+                    offset-y min-width="290px">
+                    <template v-slot:activator="{ on }">
+                        <v-text-field v-model="data.professional_situation.valid_until"
+                            label="Ended" v-on="on">
+                        </v-text-field>
+                    </template>
+                    <v-date-picker v-model="data.professional_situation.valid_until"
+                            @input="data.professional_situation.show_date_end = false"
+                            no-title></v-date-picker>
+                </v-menu>
+            </v-col>
+            <v-col cols="12" md="3">
+                <v-radio-group v-model="data.professional_situation.typeSituation">
+                    <v-radio
+                        label="Contract"
+                        value="contract"
+                    ></v-radio>
+                    <v-radio
+                        label="Fellowship"
+                        value="fellowship"
+                    ></v-radio>
+                </v-radio-group>
+
+            </v-col>
+        </v-row>
+        <v-row v-if="data.professional_situation.typeSituation === 'contract'">
+            <v-col cols="12">
+                <h4>Contract data</h4>
+            </v-col>
+            <v-col cols="12" md="4">
+                <v-text-field v-model="data.professional_situation.contract.reference"
+                    label="Reference">
+                </v-text-field>
+            </v-col>
+            <v-col cols="12" md="4">
+                <v-select v-model="data.professional_situation.contract.management_entity_id"
+                    :items="managementEntities"
+                    item-value="id"
+                    item-text="official_name"
+                    label="Management Entities">
+                </v-select>
+            </v-col>
+            <v-col cols="12" md="4">
+                <v-select v-model="data.professional_situation.contract.funding_agency_id"
+                    :items="fundingAgencies"
+                    item-value="id"
+                    item-text="official_name"
+                    label="Funding Agencies">
+                </v-select>
+            </v-col>
+        </v-row>
+        <v-row v-if="data.professional_situation.typeSituation === 'fellowship'">
+            <v-col cols="12">
+                <h4>Fellowship data</h4>
+            </v-col>
+            <v-col cols="12" md="3">
+                <v-select v-model="data.professional_situation.fellowship.fellowship_type_id"
+                    multiple
+                    :items="fellowshipTypes"
+                    item-value="id"
+                    item-text="name"
+                    label="Fellowship Type">
+                </v-select>
+            </v-col>
+            <v-col cols="12" md="3">
+                <v-text-field v-model="data.professional_situation.fellowship.reference"
+                    label="Reference">
+                </v-text-field>
+            </v-col>
+            <v-col cols="12" md="3">
+                <v-select v-model="data.professional_situation.fellowship.management_entity_id"
+                    :items="managementEntities"
+                    item-value="id"
+                    item-text="official_name"
+                    label="Management Entities">
+                </v-select>
+            </v-col>
+            <v-col cols="12" md="3">
+                <v-select v-model="data.professional_situation.fellowship.funding_agency_id"
+                    :items="fundingAgencies"
+                    item-value="id"
+                    item-text="official_name"
+                    label="Funding Agencies">
+                </v-select>
+            </v-col>
+        </v-row>
+        <v-row>
+            <h2 class="black--text mb-4">Cost Centers</h2>
         </v-row>
         <v-row v-for="(cost, i) in data.costCenters"
             :key="'cCenters-' + i"
@@ -774,25 +891,7 @@
             </v-btn>
         </v-row>
         <v-row>
-            <h2 class="black--text">Current Professional Situation</h2>
-        </v-row>
-        <v-row>
-            <v-col cols="12" sm="5">
-                <v-select
-                    v-model="data.situation_id"
-                    :items="situationsCategories.situations"
-                    item-value="id" item-text="name_en"
-                    label="Situations">
-                </v-select>
-            </v-col>
-            <!--
-            <v-col cols="12" sm="5">
-                <v-text-field
-                    v-model="data.username"
-                    label="Username">
-                </v-text-field>
-            </v-col>
-            -->
+            <v-divider></v-divider>
         </v-row>
         <v-row>
             <v-checkbox
@@ -874,7 +973,6 @@ export default {
                 degrees: [],
                 ciencia_id: null,
                 ORCID: null,
-
                 current_institutional_affiliations: [],
                 poles: null,
                 roles: [],
@@ -888,7 +986,18 @@ export default {
                 scm_current_positions: [],
                 adm_current_positions: [],
                 costCenters: [],
-                situation_id: null,
+                professional_situation: {
+                    situation_id: null,
+                    category_id: null,
+                    organization: null,
+                    dedication: null,
+                    valid_from: null,
+                    valid_until: null,
+                    typeSituation: null,
+                    contract: {},
+                    fellowship: {},
+                },
+                categoriesFiltered: [],
                 add_fct_mctes: false,
             },
             genders: [
@@ -899,8 +1008,9 @@ export default {
             loadingCountries: false,
             searchCountries: null,
             departments: [],
+            workplace: '',
             roles: [],
-            poles: null,
+            poles: [],
             units: [],
             facilities: [],
             labPositions: [],
@@ -912,6 +1022,9 @@ export default {
             costCenters: [],
             degrees: [],
             situationsCategories: {},
+            managementEntities: [],
+            fundingAgencies: [],
+            fellowshipTypes: [],
         }
     },
     mounted () {
@@ -931,6 +1044,9 @@ export default {
         this.getCostCenters();
         this.getDegrees();
         this.getSituationsCategories();
+        this.getFellowshipTypes();
+        this.getManagementEntities();
+        this.getFundingAgencies();
     },
     watch: {
         unitId () {
@@ -949,6 +1065,7 @@ export default {
             this.data.isScienceManagement = false;
             this.data.isAdministrative = false;
             this.data.current_institutional_affiliations = [];
+            this.data.workplace = '';
             this.data.roles = [];
             this.data.currentUnit = this.unitId;
             this.data.current_positions = [];
@@ -961,6 +1078,17 @@ export default {
                 this.data.poles = null;
             }
             this.data.costCenters = [];
+            this.data.professional_situation = {
+                situation_id: null,
+                category_id: null,
+                organization: null,
+                dedication: null,
+                valid_from: null,
+                valid_until: null,
+                typeSituation: null,
+                contract: {},
+                fellowship: {},
+            }
 
         },
         submitForm() {
@@ -1025,7 +1153,10 @@ export default {
                                 extension: undefined,
                             },
                             degrees: [],
+                            ciencia_id: null,
+                            ORCID: null,
                             current_institutional_affiliations: [],
+                            workplace: '',
                             poles: null,
                             roles: [],
                             currentUnit: null,
@@ -1038,7 +1169,18 @@ export default {
                             scm_current_positions: [],
                             adm_current_positions: [],
                             costCenters: [],
-                            situation_id: null,
+                            professional_situation: {
+                                situation_id: null,
+                                category_id: null,
+                                organization: null,
+                                dedication: null,
+                                valid_from: null,
+                                valid_until: null,
+                                typeSituation: null,
+                                contract: {},
+                                fellowship: {},
+                            },
+                            categoriesFiltered: [],
                             add_fct_mctes: false,
                         };
                     })
@@ -1155,6 +1297,27 @@ export default {
             if (this.$store.state.session.loggedIn) {
                 const urlSubmit = 'api/v2/' + 'situations-categories';
                 return subUtil.getPublicInfo(vm, urlSubmit, 'situationsCategories');
+            }
+        },
+        getManagementEntities() {
+            var vm = this;
+            if (this.$store.state.session.loggedIn) {
+                const urlSubmit = 'api/v2/' + 'management-entities';
+                return subUtil.getPublicInfo(vm, urlSubmit, 'managementEntities');
+            }
+        },
+        getFundingAgencies() {
+            var vm = this;
+            if (this.$store.state.session.loggedIn) {
+                const urlSubmit = 'api/v2/' + 'funding-agencies';
+                return subUtil.getPublicInfo(vm, urlSubmit, 'fundingAgencies');
+            }
+        },
+        getFellowshipTypes() {
+            var vm = this;
+            if (this.$store.state.session.loggedIn) {
+                const urlSubmit = 'api/v2/' + 'fellowship-types';
+                return subUtil.getPublicInfo(vm, urlSubmit, 'fellowshipTypes');
             }
         },
         addItem(role) {
@@ -1313,6 +1476,20 @@ export default {
                     }
                     break;
                 }
+            }
+        },
+        updateViewCategories (situation_id) {
+            let categoriesFiltered = [];
+            if (situation_id !== undefined
+                    && situation_id !== null) {
+                for (let ind in this.situationsCategories.relationships) {
+                    if (this.situationsCategories.relationships[ind].situation_id === situation_id) {
+                        categoriesFiltered.push(this.situationsCategories.relationships[ind]);
+                    }
+                }
+                this.data.categoriesFiltered = categoriesFiltered;
+            } else {
+                this.data.categoriesFiltered = [];
             }
         },
     },

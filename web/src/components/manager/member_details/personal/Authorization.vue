@@ -6,7 +6,7 @@
             </div>
         </v-card-title>
         <v-container>
-            <v-row align="center">
+            <v-row align="center" class="mb-1">
                 <v-col cols="12">
                     <v-row justify="center" align="center">
                         <v-switch v-model="data.visible_public"

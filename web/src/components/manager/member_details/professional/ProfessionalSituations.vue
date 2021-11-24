@@ -231,7 +231,7 @@
                                 </v-row>
                             </div>
                         </div>
-                        <v-row v-if="v.$model.showDetails">
+                        <v-row v-if="v.$model.showDetails" class="mb-1">
                             <v-btn small outlined class="ml-12"
                                 @click="addItem(v.$model.fellowships, 'fellowships')">
                                     Add fellowship data

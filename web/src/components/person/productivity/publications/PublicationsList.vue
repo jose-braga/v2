@@ -57,7 +57,10 @@
                 v-resize="onResize"
             >
                 <template v-slot:top>
-                    <v-dialog v-model="dialog" max-width="1600px">
+                    <v-dialog v-model="dialog"
+                        max-width="1600px"
+                        width="100%"
+                    >
                         <PublicationDetails
                             :person-publication-id="editedItem.id"
                             :publication-updated="editedItem.updated"

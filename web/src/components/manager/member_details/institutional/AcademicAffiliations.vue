@@ -68,7 +68,7 @@
                     Add an affiliation
                 </v-btn>
             </v-row>
-            <v-row align-content="center" justify="end">
+            <v-row align-content="center" justify="end" class="mb-1">
                 <v-col cols="3" v-if="formError">
                     <v-row justify="end">
                         <p class="caption red--text">Unable to submit form.</p>
@@ -87,6 +87,45 @@
                             color="primary"></v-progress-circular>
                     <v-icon v-show="success" color="green">mdi-check</v-icon>
                     <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
+                </v-col>
+            </v-row>
+        </v-form>
+    </v-card-text>
+    <v-card-title primary-title>
+        <div>
+            <h3 class="headline">Workplace location</h3>
+        </div>
+    </v-card-title>
+    <v-card-text class="px-4">
+        <p>
+            Fill in if in "Affiliations to Academic Institutions" you do not find your
+            institution (or other situations).
+        </p>
+        <v-form ref="formWorkplace"
+            @submit.prevent="submitWorkplace"
+        >
+            <v-row align="center">
+                <v-col cols="12">
+                    <v-text-field
+                        v-model="data.workplace.workplace"
+                        label="Workplace (Organization and/or address)">
+                    </v-text-field>
+                </v-col>
+            </v-row>
+            <v-row align-content="center" justify="end" class="mb-1">
+                <v-col cols="2" align-self="end">
+                    <v-row justify="end">
+                        <v-btn type="submit"
+                        outlined color="blue">Update</v-btn>
+                    </v-row>
+                </v-col>
+                <v-col cols="1">
+                    <v-progress-circular indeterminate
+                            v-show="progressWork"
+                            :size="20" :width="2"
+                            color="primary"></v-progress-circular>
+                    <v-icon v-show="successWork" color="green">mdi-check</v-icon>
+                    <v-icon v-show="errorWork" color="red">mdi-alert-circle-outline</v-icon>
                 </v-col>
             </v-row>
         </v-form>
@@ -111,9 +150,13 @@ export default {
             success: false,
             error: false,
             formError: false,
+            progressWork: false,
+            successWork: false,
+            errorWork: false,
             departments: [],
             data: {
                 academicAffiliations: [],
+                workplace: {}
             },
             toDelete: [],
         }
@@ -147,6 +190,13 @@ export default {
                             this.$set(this.data.academicAffiliations[ind], key, value);
                         });
                     }
+                })
+                subUtil.getInfoPopulate(this, 'api/people/' + personID + '/workplaces', false)
+                .then( (result) => {
+                    if (result !== undefined) {
+                        this.data.workplace = result;
+                    }
+
                 })
             } else {
                 this.$refs.form.reset();
@@ -223,6 +273,61 @@ export default {
                     this.toDelete = [];
                     this.initialize();
                     setTimeout(() => {this.error = false;}, 6000)
+                    // eslint-disable-next-line
+                    console.log(error)
+                })
+            }
+        },
+        submitWorkplace () {
+            if (this.$store.state.session.loggedIn) {
+                this.progressWork = true;
+                let urlCreate = [];
+                let urlUpdate = [];
+                let personID = this.personId;
+                if (this.data.workplace.id === undefined) {
+                    urlCreate.push({
+                        url:  'api' + this.endpoint
+                                    + '/members'
+                                    + '/' + personID + '/workplaces',
+                        body: this.data.workplace,
+                    });
+                } else {
+                    urlUpdate.push({
+                        url:  'api' + this.endpoint
+                                    + '/members'
+                                    + '/' + personID + '/workplaces/'
+                            + this.data.workplace.id,
+                        body: this.data.workplace,
+                    });
+                }
+                Promise.all(
+                    urlUpdate.map(el =>
+                        this.$http.put(el.url,
+                            { data: el.body, },
+                            { headers:
+                                {'Authorization': 'Bearer ' + localStorage['v2-token']
+                            },
+                        }))
+                    .concat(
+                        urlCreate.map(el =>
+                            this.$http.post(el.url,
+                                { data: el.body, },
+                                { headers:
+                                    {'Authorization': 'Bearer ' + localStorage['v2-token']
+                                },
+                            })))
+                )
+                .then( () => {
+                    this.progressWork = false;
+                    this.successWork = true;
+                    setTimeout(() => {this.successWork = false;}, 1500)
+                    this.initialize();
+                })
+                .catch((error) => {
+                    this.progressWork = false;
+                    this.errorWork = true;
+                    this.initialize();
+                    setTimeout(() => {this.errorWork = false;}, 6000)
                     // eslint-disable-next-line
                     console.log(error)
                 })

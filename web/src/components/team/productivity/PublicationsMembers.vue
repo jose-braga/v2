@@ -50,7 +50,7 @@
                 @input="getSelected"
             >
             </v-data-table>
-            <v-row align-content="center" justify="end" class="mt-4">
+            <v-row align-content="center" justify="end" class="mt-4 mb-2">
                 <v-col cols="2" align-self="end">
                     <v-row justify="end">
                         <v-btn type="submit"

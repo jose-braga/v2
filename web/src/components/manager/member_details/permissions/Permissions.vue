@@ -520,7 +520,7 @@
                             </v-btn>
                         </v-col>
                     </v-row>
-                    <v-row justify="end">
+                    <v-row justify="end" class="mb-1">
                         <v-col cols="2" align-self="end">
                             <v-row justify="end">
                                 <v-btn @click="deletePermission(i)"

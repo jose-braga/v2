@@ -77,7 +77,7 @@
                 </v-card>
             </v-col>
             <v-col cols="12">
-                <v-card color="blue lighten-5">
+                <v-card color="blue lighten-5" class="pb-2">
                     <v-card-title primary-title>
                         <div>
                             <h3 class="headline">Shopping cart</h3>
@@ -124,7 +124,7 @@
                             </v-row>
                         </v-col>
                     </v-row>
-                    <v-row align-content="center" justify="end">
+                    <v-row align-content="center" justify="end"  class="mb-1">
                         <v-col cols="3" v-if="formError">
                             <v-row justify="end">
                                 <p class="caption red--text">Check errors in amounts requested!</p>
@@ -153,7 +153,6 @@
                             <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
                         </v-col>
                     </v-row>
-
                 </v-card>
             </v-col>
             <v-col cols="12" v-if="data.currentFinances"
@@ -206,6 +205,20 @@
                             </v-data-table>
                         </v-col>
                     </v-row>
+                </v-card>
+            </v-col>
+            <v-col cols="12" v-else
+            >
+                <v-card>
+                    <v-card-title primary-title>
+                        <div>
+                            <h3 class="headline">Orders and Financial Information</h3>
+                        </div>
+                    </v-card-title>
+                    <v-card-text class="px-4">
+                        No financial information for the current year was found!<br>
+                        Please contact warehouse manager.
+                    </v-card-text>
                 </v-card>
             </v-col>
         </v-row>
@@ -484,7 +497,7 @@ export default {
                                     }
                                 }
                             }
-                            this.errorMessage = 'Stock levels are now updated to latest values.';
+                            //this.errorMessage = 'Stock levels are now updated to latest values.';
                             setTimeout(() => {
                                 this.error = false;
                                 this.errorMessage = '';

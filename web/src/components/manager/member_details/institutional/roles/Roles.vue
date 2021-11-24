@@ -81,7 +81,7 @@
                 </v-row>
             </v-col>
             <v-col cols="2" align-self="end">
-                <v-row justify="end">
+                <v-row justify="end" class="mb-1">
                     <v-btn type="submit"
                     outlined color="blue">Update Poles/Roles</v-btn>
                 </v-row>

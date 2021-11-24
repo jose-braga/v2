@@ -14,8 +14,8 @@
                     </v-expansion-panel-header>
                     <v-expansion-panel-content>
                         <h3>Affiliations to Research Labs/Groups</h3>
-                        <v-row align-content="center" justify="start">
-                            <v-col cols="4">
+                        <v-row align-content="center" justify="start" class="mt-1">
+                            <v-col cols="12" md="4">
                                 <v-row justify="center">
                                     <v-btn
                                         @click.stop="addItem(studentDetails.lab_data,'lab')"
@@ -101,10 +101,10 @@
                                 </v-btn>
                             </v-col>
                         </v-row>
-                        <h3 class="mt-4">Affiliations to Facilities</h3>
+                        <h3 class="mt-6">Affiliations to Facilities</h3>
                         <v-row align-content="center" justify="start">
-                            <v-col cols="4">
-                                <v-row justify="center">
+                            <v-col cols="12" md="4">
+                                <v-row justify="center" class="mt-1">
                                     <v-btn
                                         @click.stop="addItem(studentDetails.technician_data,'facility')"
                                         outlined color="black"
@@ -186,9 +186,9 @@
                                 </v-btn>
                             </v-col>
                         </v-row>
-                        <h3 class="mt-4">Affiliations to Science Management Offices</h3>
-                        <v-row align-content="center" justify="start">
-                            <v-col cols="4">
+                        <h3 class="mt-6">Affiliations to Science Management Offices</h3>
+                        <v-row align-content="center" justify="start" class="mt-1">
+                            <v-col cols="12" md="4">
                                 <v-row justify="center">
                                     <v-btn
                                         @click.stop="addItem(studentDetails.science_manager_data,'science-management')"
@@ -271,10 +271,10 @@
                                 </v-btn>
                             </v-col>
                         </v-row>
-                        <h3 class="mt-4">Affiliations to Administrative Offices </h3>
+                        <h3 class="mt-6">Affiliations to Administrative Offices </h3>
                         <v-row align-content="center" justify="start">
-                            <v-col cols="4">
-                                <v-row justify="center">
+                            <v-col cols="12" md="4">
+                                <v-row justify="center" class="mt-1">
                                     <v-btn
                                         @click.stop="addItem(studentDetails.administrative_data,'administrative')"
                                         outlined color="black"
@@ -427,7 +427,7 @@
                     </v-expansion-panel-content>
                 </v-expansion-panel>
             </v-expansion-panels>
-            <v-row align-content="center" justify="end">
+            <v-row align-content="center" justify="end" class="mt-3 mb-1">
                 <v-col cols="2" align-self="end">
                     <v-row justify="end">
                         <v-btn type="submit"

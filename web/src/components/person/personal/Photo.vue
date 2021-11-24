@@ -50,7 +50,7 @@
                     </v-col>
 
                 </v-row>
-                <v-row align-content="center" justify="end">
+                <v-row align-content="center" justify="end" class="mb-1">
                     <v-col cols="3" v-if="formError">
                         <v-row justify="end">
                             <p class="caption red--text">Please add an image.</p>

@@ -36,7 +36,7 @@
                     </v-text-field>
                 </v-col>
             </v-row>
-            <v-row>
+            <v-row class="mb-1">
                 <v-btn
                     class="ml-4"
                     type="submit"

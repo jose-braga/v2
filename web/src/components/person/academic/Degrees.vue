@@ -130,7 +130,7 @@
                                             </v-row>
                                             <v-row>
                                                 <v-col>
-                                                    <h5>LAQV/UCIBIO supervisors</h5>
+                                                    <h5 class="mb-4">LAQV/UCIBIO supervisors</h5>
                                                     <v-row>
                                                         <v-expansion-panels>
                                                             <v-expansion-panel v-model="v.$model.supervisors_panel"
@@ -215,7 +215,7 @@
                                                     <v-col>
                                                         <v-divider></v-divider>
                                                     </v-col>
-                                                    <h5>Supervisors, other institutions</h5>
+                                                    <h5 class="mb-4">Supervisors, other institutions</h5>
                                                     <v-row>
                                                         <v-expansion-panels>
                                                             <v-expansion-panel
@@ -318,7 +318,7 @@
                                 Add a degree
                             </v-btn>
                         </v-col>
-                        <v-row align-content="center" justify="end">
+                        <v-row align-content="center" justify="end" class="mb-1">
                             <v-col cols="3" v-if="formError">
                                 <v-row justify="end">
                                     <p class="caption red--text">Unable to submit form.</p>
@@ -490,7 +490,7 @@
                                             </v-row>
                                             <v-row>
                                                 <v-col>
-                                                    <h5>LAQV/UCIBIO supervisors</h5>
+                                                    <h5 class="mb-4">LAQV/UCIBIO supervisors</h5>
                                                     <v-row>
                                                         <v-expansion-panels>
                                                             <v-expansion-panel v-model="v.$model.supervisors_panel"
@@ -575,7 +575,7 @@
                                                     <v-col>
                                                         <v-divider></v-divider>
                                                     </v-col>
-                                                    <h5>Supervisors, other institutions</h5>
+                                                    <h5 class="mb-4">Supervisors, other institutions</h5>
                                                     <v-row>
                                                         <v-expansion-panels>
                                                             <v-expansion-panel v-model="v.$model.ext_supervisors_panel"
@@ -672,7 +672,7 @@
                         <v-col>
                             <v-btn class="mt-4" outlined @click="addItem(data.ongoing, 'degree', 'ongoingDegreesPanel')">Add a degree</v-btn>
                         </v-col>
-                        <v-row align-content="center" justify="end">
+                        <v-row align-content="center" justify="end" class="mb-1">
                             <v-col cols="3" v-if="ongoingFormError">
                                 <v-row justify="end">
                                     <p class="caption red--text">Unable to submit form.</p>

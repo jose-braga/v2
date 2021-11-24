@@ -31,7 +31,10 @@
         class="elevation-1"
     >
         <template v-slot:top>
-            <v-dialog v-model="dialog" max-width="1600px">
+            <v-dialog v-model="dialog"
+                max-width="1600px"
+                width="100%"
+            >
                 <SpaceDetails
                     :space-id="editedItem.id"
                     :space-data="editedItem"

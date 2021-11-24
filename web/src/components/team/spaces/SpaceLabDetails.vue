@@ -70,7 +70,7 @@
                 </v-col>
 
             </v-row>
-            <v-row align-content="center" justify="end">
+            <v-row align-content="center" justify="end" class="mb-1">
                 <v-col cols="2" align-self="end">
                     <v-row justify="end">
                         <v-btn type="submit"

@@ -121,6 +121,7 @@
                 </v-col>
                 <v-dialog v-model="dialogMaps"
                     max-width="1600px"
+                    width="100%"
                 >
                     <v-card>
                         <v-card-text>
@@ -150,7 +151,10 @@
             :sort-desc="[false]"
         >
             <template v-slot:top>
-                <v-dialog v-model="dialog" max-width="1600px">
+                <v-dialog v-model="dialog"
+                    max-width="1600px"
+                    width="100%"
+                >
                     <SpaceDetails
                         :item-id="editedItem.id"
                         :space-id="editedItem.space_id"
@@ -169,7 +173,7 @@
                     color="red">mdi-delete</v-icon>
             </template>
         </v-data-table>
-        <v-row justify="center" align="center" class="mt-4">
+        <v-row justify="center" align="center" class="mt-4 mb-1">
             <v-col cols="12" align="center">
                 <v-row justify="center" align="center">
                     <span class="mr-4">Export to spreadsheet</span>

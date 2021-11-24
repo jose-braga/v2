@@ -43,19 +43,21 @@
                     Date solved: {{ itemDetails.date_solved }}
                 </v-col>
             </v-row>
-            <v-row align-content="center" justify="start" class="pt-6">
-                <div>
-                    <v-btn type="submit"
-                        outlined color="blue">Save</v-btn>
-                </div>
-                <div class="request-status-container ml-2">
-                    <v-progress-circular indeterminate
-                            v-show="progress"
-                            :size="20" :width="2"
-                            color="primary"></v-progress-circular>
-                    <v-icon v-show="success" color="green">mdi-check</v-icon>
-                    <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
-                </div>
+            <v-row align-content="center" justify="start" class="mb-1">
+                <v-col cols="2">
+                    <div>
+                        <v-btn type="submit"
+                            outlined color="blue">Save</v-btn>
+                    </div>
+                    <div class="request-status-container ml-2">
+                        <v-progress-circular indeterminate
+                                v-show="progress"
+                                :size="20" :width="2"
+                                color="primary"></v-progress-circular>
+                        <v-icon v-show="success" color="green">mdi-check</v-icon>
+                        <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
+                    </div>
+                </v-col>
             </v-row>
         </v-container>
     </v-form>

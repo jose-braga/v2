@@ -113,7 +113,10 @@
             </ul>
         </v-form>
     </v-container>
-    <v-dialog v-model="dialog" max-width="1600px">
+    <v-dialog v-model="dialog"
+        max-width="1600px"
+        width="100%"
+    >
         <SpaceDetails
             :item-id="editedItem.space_id"
             :person-id="editedItem.person_id"

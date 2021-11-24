@@ -9,7 +9,7 @@
         <v-container>
             <h2>Edit your roles in this space</h2>
             <v-row align-content="center" justify="start">
-                <v-col cols="4">
+                <v-col cols="7" md="4" class="mt-4">
                     <v-row justify="center">
                         <v-btn
                             @click.stop="addItem(spaceDetails.roles)"
@@ -74,7 +74,7 @@
                     </v-btn>
                 </v-col>
             </v-row>
-            <v-row align-content="center" justify="start">
+            <v-row align-content="center" justify="start" class="mb-1">
                 <v-col cols="2" align-self="end">
                     <v-row justify="end">
                         <v-btn type="submit"

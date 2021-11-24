@@ -1,100 +1,101 @@
 <template>
+<v-card>
 <v-form ref="form"
-        @submit.prevent="submitForm">
-
-<v-card class="px-3">
+    @submit.prevent="submitForm">
     <v-card-title>
         Details of order: {{data.thisOrder.order_id}}
     </v-card-title>
     <v-card-text>
     </v-card-text>
-    <v-data-table class="ma-2"
-        item-key="id"
-        :headers="headers"
-        :footer-props="footerProps"
-        :items="data.thisOrder.items"
-        :sort-by="['name_en']"
-        :sort-desc="[false]"
-        multi-sort
-        dense
-    >
-        <template v-slot:item.ordered_amount_show="{ item }">
-            <div v-if="data.thisOrder.orderPending">
-                <v-text-field v-if="item.decimal === 0"
-                    :error="item.errorStock"
-                    @input="computeCostOrder(item)"
-                    v-model="item.quantity"
-                    label="Change quant.">
-                </v-text-field>
-                <v-text-field v-else
-                    :error="item.errorStock"
-                    @input="computeCostOrder(item)"
-                    v-model="item.quantity_decimal"
-                    label="Change quant.">
-                </v-text-field>
-            </div>
-            <div v-else>
-                {{ item.ordered_amount_show }}
-            </div>
-        </template>
-        <template v-slot:item.change_reason="{ item }">
-            <div v-if="data.thisOrder.orderPending">
-                <v-text-field
-                    v-model="item.change_reason"
-                    label="Reason">
-                </v-text-field>
-            </div>
-            <div v-else>
-                {{ item.change_reason }}
-            </div>
-        </template>
-        <template v-slot:item.this_delivery_show="{ item }">
-            <div v-if="!data.thisOrder.orderPending">
-                <div v-if="item.delivered === 0">
+    <v-container>
+        <v-data-table class="ma-2"
+            item-key="id"
+            :headers="headers"
+            :footer-props="footerProps"
+            :items="data.thisOrder.items"
+            :sort-by="['name_en']"
+            :sort-desc="[false]"
+            multi-sort
+            dense
+        >
+            <template v-slot:item.ordered_amount_show="{ item }">
+                <div v-if="data.thisOrder.orderPending">
                     <v-text-field v-if="item.decimal === 0"
-                        :error="item.errorPartialAmount"
-                        @input="checkPartialAmounts(item)"
-                        v-model="item.this_delivery"
-                        label="Partial amount">
+                        :error="item.errorStock"
+                        @input="computeCostOrder(item)"
+                        v-model="item.quantity"
+                        label="Change quant.">
                     </v-text-field>
                     <v-text-field v-else
-                        :error="item.errorPartialAmount"
-                        @input="checkPartialAmounts(item)"
-                        v-model="item.this_delivery_decimal"
-                        label="Partial amount">
+                        :error="item.errorStock"
+                        @input="computeCostOrder(item)"
+                        v-model="item.quantity_decimal"
+                        label="Change quant.">
                     </v-text-field>
                 </div>
                 <div v-else>
-                    <v-icon color="green">mdi-check</v-icon>
+                    {{ item.ordered_amount_show }}
                 </div>
-            </div>
-        </template>
-    </v-data-table>
-    <v-row justify="end" align="center">
-        <v-col cols="6" sm="3" xl="2" class="price-highlight mt-2 mr-10 mb-4">
-            <v-row justify="center">
-                <span class="total-text">Total:</span> {{data.thisOrder.total_cost_tax_show}} €
-            </v-row>
-        </v-col>
-    </v-row>
-    <v-row justify="end">
-        <v-col cols="2" align-self="end">
-            <v-row justify="end">
-                <v-btn type="submit"
-                outlined color="blue">Save</v-btn>
-            </v-row>
-        </v-col>
-        <v-col cols="1">
-            <v-progress-circular indeterminate
-                    v-show="progress"
-                    :size="20" :width="2"
-                    color="primary"></v-progress-circular>
-            <v-icon v-show="success" color="green">mdi-check</v-icon>
-            <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
-        </v-col>
-    </v-row>
-</v-card>
+            </template>
+            <template v-slot:item.change_reason="{ item }">
+                <div v-if="data.thisOrder.orderPending">
+                    <v-text-field
+                        v-model="item.change_reason"
+                        label="Reason">
+                    </v-text-field>
+                </div>
+                <div v-else>
+                    {{ item.change_reason }}
+                </div>
+            </template>
+            <template v-slot:item.this_delivery_show="{ item }">
+                <div v-if="!data.thisOrder.orderPending">
+                    <div v-if="item.delivered === 0">
+                        <v-text-field v-if="item.decimal === 0"
+                            :error="item.errorPartialAmount"
+                            @input="checkPartialAmounts(item)"
+                            v-model="item.this_delivery"
+                            label="Partial amount">
+                        </v-text-field>
+                        <v-text-field v-else
+                            :error="item.errorPartialAmount"
+                            @input="checkPartialAmounts(item)"
+                            v-model="item.this_delivery_decimal"
+                            label="Partial amount">
+                        </v-text-field>
+                    </div>
+                    <div v-else>
+                        <v-icon color="green">mdi-check</v-icon>
+                    </div>
+                </div>
+            </template>
+        </v-data-table>
+        <v-row justify="end" align="center">
+            <v-col cols="6" sm="3" xl="2" class="price-highlight mt-2 mr-10 mb-4">
+                <v-row justify="center">
+                    <span class="total-text">Total:</span> {{data.thisOrder.total_cost_tax_show}} €
+                </v-row>
+            </v-col>
+        </v-row>
+        <v-row justify="end" class="mb-1">
+            <v-col cols="2" align-self="end">
+                <v-row justify="end">
+                    <v-btn type="submit"
+                    outlined color="blue">Save</v-btn>
+                </v-row>
+            </v-col>
+            <v-col cols="1">
+                <v-progress-circular indeterminate
+                        v-show="progress"
+                        :size="20" :width="2"
+                        color="primary"></v-progress-circular>
+                <v-icon v-show="success" color="green">mdi-check</v-icon>
+                <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
+            </v-col>
+        </v-row>
+    </v-container>
 </v-form>
+</v-card>
 </template>
 
 <script>

@@ -175,7 +175,7 @@
                     ></v-checkbox>
                 </v-col>
             </v-row>
-            <v-row align-content="center" justify="end">
+            <v-row align-content="center" justify="end" class="mb-1">
                 <v-col cols="4" v-if="formError" class="caption red--text">
                     <div>Unable to submit form.</div>
                 </v-col>

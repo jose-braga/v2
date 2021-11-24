@@ -27,7 +27,10 @@
             class='mt-4'
         >
             <template v-slot:top>
-                <v-dialog v-model="dialog" max-width="1600px">
+                <v-dialog v-model="dialog"
+                    max-width="1600px"
+                    width="100%"
+                >
                     <ItemDetails
                         :item-data="editedItem"
                         :item-id="itemID"

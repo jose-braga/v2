@@ -68,7 +68,7 @@
                     Add an affiliation
                 </v-btn>
             </v-row>
-            <v-row align-content="center" justify="end">
+            <v-row align-content="center" justify="end" class="mb-1">
                 <v-col cols="3" v-if="formError">
                     <v-row justify="end">
                         <p class="caption red--text">Unable to submit form.</p>
@@ -112,7 +112,7 @@
                     </v-text-field>
                 </v-col>
             </v-row>
-            <v-row align-content="center" justify="end">
+            <v-row align-content="center" justify="end" class="mb-1">
                 <v-col cols="2" align-self="end">
                     <v-row justify="end">
                         <v-btn type="submit"
@@ -311,8 +311,6 @@ export default {
                 })
             }
         },
-
-
         getDepartments () {
             let vm = this;
             if (this.$store.state.session.loggedIn) {

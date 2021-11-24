@@ -78,7 +78,7 @@
             Add an affiliation
         </v-btn>
     </v-row>
-    <v-row  justify="end">
+    <v-row  justify="end" class="mb-1">
         <v-col cols="2" align-self="end">
             <v-row justify="end">
                 <v-btn type="submit"

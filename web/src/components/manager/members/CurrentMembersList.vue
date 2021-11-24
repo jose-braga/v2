@@ -10,7 +10,8 @@
             <v-dialog
                 v-model="dialogNewMember"
                 scrollable
-                max-width="800px"
+                max-width="1200px"
+                width="100%"
             >
             <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -90,7 +91,10 @@
                 class="elevation-1"
             >
                 <template v-slot:top>
-                    <v-dialog v-model="dialog" max-width="1600px">
+                    <v-dialog v-model="dialog"
+                        max-width="1600px"
+                        width="100%"
+                    >
                         <MemberDetails
                             :person-id="memberID"
                             :person-name="memberName"
