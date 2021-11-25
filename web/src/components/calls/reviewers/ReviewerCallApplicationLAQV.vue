@@ -366,7 +366,9 @@
                 </v-row>
             </v-col>
         </v-row>
-        <v-row align-content="center" justify="center">
+        <v-row align-content="center" justify="center"
+            class="mt-6 mb-2"
+        >
             <v-col cols="2" align-self="end">
                 <v-row justify="end">
                     <v-btn type="submit"
@@ -451,6 +453,7 @@ export default {
                 application: {},
                 scores: {},
                 isLAQV: false,
+                reviewerDeadline: undefined,
             },
             indTotal: undefined,
             applicationCriteria: [],
@@ -567,6 +570,7 @@ export default {
                 this.data.application = result.data.result.application;
                 this.applicationCriteria = result.data.result.applicationCriteria;
                 this.data.isLAQV = result.data.result.call.is_laqv;
+                this.data.reviewerDeadline = result.data.result.call.reviewer_deadline
 
                 for (let ind in this.data.application.reviewerScores) {
                     for (let indAuto in this.data.application.automaticScores) {
@@ -676,7 +680,7 @@ export default {
         },
         getNow () {
             const now = new Date();
-            if (now.toISOString() > '2021-02-11T16:59:59') {
+            if (now.toISOString() > this.data.reviewerDeadline) {
                 this.timeUp = true;
             }
         },

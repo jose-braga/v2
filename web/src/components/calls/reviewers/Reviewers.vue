@@ -3,6 +3,9 @@
     <v-app-bar prominent app>
         <v-row  align="center">
             <v-col cols="1">
+                <img src="/images/logo/laqv-logo.png" width="70">
+            </v-col>
+            <v-col cols="1">
                 <img src="/images/logo/ucibio-logo.png" width="40">
             </v-col>
             <v-col cols="10" class="ml-auto">Calls: Reviewer login</v-col>

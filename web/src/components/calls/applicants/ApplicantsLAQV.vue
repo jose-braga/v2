@@ -106,7 +106,9 @@
                     </v-col>
                 </v-row>
             </v-col>
-            <v-col cols="12" v-if="applicationData.application.submitted">
+            <v-col cols="12" v-if="applicationData.application.submitted"
+                class="mb-2"
+            >
                 <v-row align-content="center" justify="center">
                     <v-col cols="2" align-self="end">
                         <v-row justify="end">

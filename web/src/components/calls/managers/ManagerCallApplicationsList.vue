@@ -15,7 +15,7 @@
         </v-row>
     </v-app-bar>
     <div v-if="loggedIn" class="px-4">
-        <v-row class="mt-1">
+        <v-row class="mt-1 mb-2">
             <v-col cols="10" md="6" align="end">
                 <v-row justify="end" align="center">
                     <span class="mr-4">Export grades to spreadsheet</span>
@@ -25,7 +25,7 @@
                 </v-row>
             </v-col>
         </v-row>
-        <v-row class="mt-1">
+        <v-row class="mt-1 mb-2">
             <v-col cols="10" md="6" align="end">
                 <v-row justify="end" align="center">
                     <span class="mr-4">Make candidates' classification file</span>

@@ -22,7 +22,7 @@
             <v-container>
                 <v-row align="center" v-if="isLAQV">
                     <v-col cols="12">
-                        Review of applications must be completed <b>before 2021-02-11 17:00:00</b>.
+                        Review of applications must be completed <b>before {{data.reviewerDeadline}}</b>.
                     </v-col>
                     <v-col cols="12" v-if="timeUp">
                         <b class="red--text">Your reviewing time is up! You might ask josebraga@fct.unl.pt for an extension.</b>
@@ -70,6 +70,7 @@ export default {
             isLAQV: false,
             timeUp: false,
             data: {
+                reviewerDeadline: undefined,
             }
         }
     },
@@ -107,7 +108,9 @@ export default {
                 }
             )
             .then((result) => {
+                console.log(result)
                 this.callName = result.data.result.call.call_name
+                this.data.reviewerDeadline = result.data.result.call.reviewer_deadline
                 if (result.data.result.call.is_laqv === 1) {
                     this.isLAQV = true
                 }
@@ -138,7 +141,7 @@ export default {
         },
         getNow () {
             const now = new Date();
-            if (now.toISOString() > '2021-02-11T16:59:59') {
+            if (now.toISOString() > this.data.reviewerDeadline) {
                 this.timeUp = true;
             }
         },

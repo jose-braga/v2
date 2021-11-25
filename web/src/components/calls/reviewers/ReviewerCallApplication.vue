@@ -2,7 +2,10 @@
 <div>
     <v-app-bar prominent app>
         <v-row  align="center">
-            <v-col cols="1">
+            <v-col cols="1" v-if="data.isLAQV">
+                <img src="/images/logo/laqv-logo.png" width="70">
+            </v-col>
+            <v-col cols="1" v-else>
                 <img src="/images/logo/ucibio-logo.png" width="40">
             </v-col>
             <v-col cols="10" class="ml-auto call-title">
@@ -837,8 +840,11 @@
                             </v-row>
                         </v-col>
                     </v-row>
-                    <v-row align-content="center" justify="center">
-                        <v-col cols="2" align-self="end">
+                    <v-row align-content="center" justify="center"
+                        class="mt-6 mb-2"
+                    >
+                        <v-col cols="2" align-self="end"
+                        >
                             <v-row justify="end">
                                 <v-btn type="submit"
                                     class="white--text"
@@ -858,7 +864,9 @@
                             <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
                         </v-col>
                     </v-row>
-                    <v-row align-content="center" justify="center">
+                    <v-row align-content="center" justify="center"
+                        class="mt-2 mb-2"
+                    >
                         <v-col cols="2" align-self="end">
                             <v-row justify="end">
                                 <v-btn v-if="data.application.reviewed !== true && data.application.reviewed !== 1"
@@ -927,7 +935,7 @@ export default {
             data: {
                 application: {},
                 scores: {},
-                isLAQV: false,
+                isLAQV: true,
                 isPorto: false,
             },
             indTotal: undefined,
