@@ -183,7 +183,7 @@ var updateOrder = function (options) {
     // account finances history is changed
     // stock is changed
     // stock history is changed
-    // only pending orders are changed!!!!
+    
     querySQL = querySQL
         + 'UPDATE orders'
         + ' SET total_cost = ?,'

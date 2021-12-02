@@ -19,7 +19,8 @@
             dense
         >
             <template v-slot:item.ordered_amount_show="{ item }">
-                <div v-if="data.thisOrder.orderPending">
+
+                <div v-if="data.thisOrder.orderNotClosed">
                     <v-text-field v-if="item.decimal === 0"
                         :error="item.errorStock"
                         @input="computeCostOrder(item)"
@@ -36,9 +37,23 @@
                 <div v-else>
                     {{ item.ordered_amount_show }}
                 </div>
+                <!--
+                <v-text-field v-if="item.decimal === 0"
+                    :error="item.errorStock"
+                    @input="computeCostOrder(item)"
+                    v-model="item.quantity"
+                    label="Change quant.">
+                </v-text-field>
+                <v-text-field v-else
+                    :error="item.errorStock"
+                    @input="computeCostOrder(item)"
+                    v-model="item.quantity_decimal"
+                    label="Change quant.">
+                </v-text-field>
+                -->
             </template>
             <template v-slot:item.change_reason="{ item }">
-                <div v-if="data.thisOrder.orderPending">
+                <div v-if="data.thisOrder.orderNotClosed">
                     <v-text-field
                         v-model="item.change_reason"
                         label="Reason">
@@ -47,6 +62,12 @@
                 <div v-else>
                     {{ item.change_reason }}
                 </div>
+                <!--
+                <v-text-field
+                    v-model="item.change_reason"
+                    label="Reason">
+                </v-text-field>
+                -->
             </template>
             <template v-slot:item.this_delivery_show="{ item }">
                 <div v-if="!data.thisOrder.orderPending">
@@ -77,7 +98,7 @@
                 </v-row>
             </v-col>
         </v-row>
-        <v-row justify="end" class="mb-1">
+        <v-row justify="end" class="mb-1" v-if="data.thisOrder.orderNotClosed">
             <v-col cols="2" align-self="end">
                 <v-row justify="end">
                     <v-btn type="submit"
@@ -200,7 +221,9 @@ export default {
             this.progress = true;
             let personID = this.$store.state.session.personID;
             let urlUpdate = [];
-            if (this.data.thisOrder.orderPending) {
+            if (this.data.thisOrder.orderPending
+                || this.data.thisOrder.changedOrderedQuantity
+            ) {
                 this.data.thisOrder.updateOrder = true;
             } else {
                 this.data.thisOrder.partialDelivery = true;
@@ -240,6 +263,7 @@ export default {
             });
         },
         computeCostOrder (item) {
+            this.$set(this.data.thisOrder, 'changedOrderedQuantity', true)
             if (item !== undefined
                 &&
                 ((item.decimal === 0
