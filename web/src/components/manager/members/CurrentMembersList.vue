@@ -411,8 +411,29 @@ export default {
         currentUnitCity () {
             return this.segmentType + '-' + this.unitId + '-' + this.cityId;
         },
+        searchName () {
+            return this.$store.state.manager.searchName;
+        },
+        searchLabStore () {
+            return this.$store.state.manager.searchLab;
+        },
+        searchGroupStore () {
+            return this.$store.state.manager.searchGroup;
+        },
     },
     watch: {
+        searchName () {
+            this.search = this.searchName;
+            this.filterData();
+        },
+        searchLabStore () {
+            this.searchLab = this.searchLabStore;
+            this.filterData();
+        },
+        searchGroupStore () {
+            this.searchGroup = this.searchGroupStore;
+            this.filterData();
+        },
         currentUnitCity () {
             this.search = '';
             this.searchLab = '';
@@ -553,6 +574,11 @@ export default {
         },
         filterData: debounce(function () {
             this.initialize(1, this.search, this.searchLab, this.searchGroup);
+            this.$store.commit('setSearch', {
+                searchName: this.search,
+                searchLabStore: this.searchLab,
+                searchGroupStore: this.searchGroup,
+            });
         }, 200),
         editItem (item) {
             this.dialog = true;
