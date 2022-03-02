@@ -34,7 +34,7 @@
                             data;
                         </li>
                         <li>By saying YES, I consent the use of my personal data
-                            for the above-mentioned purposes</li>
+                            for the above-mentioned purposes.</li>
                     </ul>
                 </v-col>
                 <v-col cols="12" md="4">

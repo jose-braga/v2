@@ -1176,6 +1176,9 @@ export default {
                         bachelor = {grade: 13}
                         integratedMaster = true;
                     }
+                    if (bachelor === undefined) {
+                        bachelor = {grade: 0}
+                    }
                     academicGrade = 0.6 * parseFloat(bachelor.grade)
                             + 0.4 * parseFloat(master.grade);
                 }

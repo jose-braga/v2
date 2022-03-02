@@ -6,7 +6,7 @@ var notifyWebsiteAPI = function (options) {
         if (process.env.NODE_ENV === 'production') {
             baseURL = 'https://ucibio.pt/api'
         } else {
-            baseURL = 'http://host.docker.internal/ucibio/api'
+            baseURL = 'http://ucibio_website_legacy_web_1/api'
         }
     }
     if (operation === undefined) {
