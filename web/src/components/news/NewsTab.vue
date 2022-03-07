@@ -7,6 +7,9 @@
         </div>
     </v-card-title>
     <v-card-text>
+        <p class="news-title mt-4" v-if="news.length === 0">
+            No news yet.
+        </p>
         <ul>
             <li class="mb-4"
                 v-for="(thisNew,i) in news"
@@ -44,10 +47,8 @@ export default {
     },
     methods: {
         initialize () {
-            if (this.$store.state.session.loggedIn) {
-                const urlSubmit = 'api/v2/' + 'news';
-                subUtil.getPublicInfo(this, urlSubmit, 'news');
-            }
+            const urlSubmit = 'api/v2/' + 'news';
+            subUtil.getPublicInfo(this, urlSubmit, 'news');
         },
     },
 

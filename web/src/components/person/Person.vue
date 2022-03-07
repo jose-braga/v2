@@ -37,12 +37,42 @@
             </v-dialog>
         </v-tabs-items>
     </v-tabs>
-    <v-row v-if="!loggedIn" class="pa-4">
-        <div>Please login first (
-            the symbol <v-icon color="green darken">mdi-login</v-icon>
-            in the toolbar above).
-        </div>
-    </v-row>
+    <v-container>
+        <v-row cols="12" v-if="!loggedIn" class="pa-4">
+            <v-col>Please login first (
+                the symbol <v-icon color="green darken">mdi-login</v-icon>
+                in the toolbar above).
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col cols="12">
+                <v-card flat>
+                    <v-card-title primary-title>
+                        <div>
+                            <h3 class="headline">Platform News</h3>
+                        </div>
+                    </v-card-title>
+                    <v-card-text>
+                        <p class="news-title mt-4" v-if="news.length === 0">
+                            No news yet.
+                        </p>
+                        <ul>
+                            <li class="mb-4"
+                                v-for="(thisNew,i) in news"
+                                    :key="i"
+                            >
+                            <span class="news-title">{{thisNew.title}}</span>
+                            <span class="news-time ml-3"> {{thisNew.published}}</span><br>
+                            <div class="news-body ml-1 mt-1"> {{thisNew.body}}</div>
+
+                            </li>
+                        </ul>
+                    </v-card-text>
+                </v-card>
+            </v-col>
+        </v-row>
+    </v-container>
+
     <!--
     <v-row v-if="!loggedIn" class="pa-4">
         <h3>News:</h3>
@@ -54,14 +84,19 @@
 </template>
 
 <script>
+import subUtil from '@/components/common/submit-utils'
 
 export default {
     components: {
     },
     data () {
         return {
+            news: [],
             activeTab: 0,
         }
+    },
+    created () {
+        this.initialize()
     },
     mounted: function () {
         this.$store.commit('setActiveTile', {
@@ -103,9 +138,13 @@ export default {
         },
     },
     methods: {
+        initialize () {
+            const urlSubmit = 'api/v2/' + 'news';
+            subUtil.getPublicInfo(this, urlSubmit, 'news');
+        },
         tabChanged: function(tab) {
             this.activeTab = tab;
-        }
+        },
     }
 }
 
@@ -119,6 +158,20 @@ export default {
 
 .help {
     max-width: 70%;
+}
+
+.news-title {
+    font-size: 1.2em;
+    color:black
+}
+
+.news-body {
+    white-space: pre-line;
+    font-size: 1.1em;
+}
+
+.news-time {
+    font-size: 0.7em;
 }
 </style>
 
