@@ -12,6 +12,7 @@ import unitArea from './sections/unit-area' // area for documents: MyLAQV, MyUCI
 import preRegister from './sections/pre-register'
 import calls from './sections/calls'
 import polls from './sections/polls'
+import news from './sections/news'
 
 
 let routes1 = [
@@ -29,6 +30,7 @@ let routes1 = [
     admin,
     unitArea,
     preRegister,
+    news,
      // this redirect should be in the end always
 ]
 

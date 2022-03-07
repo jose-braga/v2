@@ -162,6 +162,13 @@ export default {
                 link: '/unit-area/LAQV',
                 isActive: false,
             },
+            {
+                text: 'Platform News',
+                icon: 'mdi-newspaper-variant-outline',
+                image: false,
+                link: '/platform-news',
+                isActive: false,
+            },
             //{
             //    text: 'Polls',
             //    icon: 'mdi-poll',

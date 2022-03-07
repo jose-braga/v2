@@ -7,6 +7,7 @@
             </span>
         </v-card-title>
         <v-container>
+            {{spaceDetails}}
             <v-row>
                 <v-col cols="12" sm="6">
                     <v-text-field v-model="spaceDetails.name_pt"
@@ -265,6 +266,7 @@ export default {
             spaceDetails: {
                 name: '',
                 teams:[],
+                people:[],
             },
             toDeleteTeams: [],
             toDeletePeople: [],
@@ -275,7 +277,7 @@ export default {
         }
     },
     watch: {
-        spaceId () {
+        spaceData () {
             this.initialize();
         },
     },
@@ -289,6 +291,8 @@ export default {
     },
     methods: {
         initialize () {
+            this.spaceDetails.teams = [];
+            this.spaceDetails.people = [];
             this.$set(this, 'spaceDetails', this.spaceData);
         },
         submitForm () {
@@ -428,8 +432,8 @@ export default {
                     setTimeout(() => {this.success = false;}, 1500)
                     this.toDeleteTeams = [];
                     this.toDeletePeople = [];
-                    this.$root.$emit('updateManagerSpace')
-                    //this.initialize();
+                    this.$root.$emit('updateManagerSpace', this.spaceDetails.id)
+                    this.initialize();
                 })
                 .catch((error) => {
                     this.progress = false;

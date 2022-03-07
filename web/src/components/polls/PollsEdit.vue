@@ -708,7 +708,7 @@ export default {
                 })
             }
         },
-        savePeopleSelected (list) {
+        async savePeopleSelected (list) {
             if (this.$store.state.session.loggedIn) {
                 this.progressPeople = true;
                 let pollID = this.$route.params.pollId;
@@ -728,29 +728,30 @@ export default {
                         usedPersonID.push(list[ind].person_id)
                     }
                 }
-                Promise.all(
-                    urlAddPeople.map(el =>
-                        this.$http.post(el.url,
+
+                try {
+                    for (const el of urlAddPeople) {
+                        await this.$http.post(el.url,
                             { data: el.body, },
                             { headers:
                                 {'Authorization': 'Bearer ' + localStorage['v2-token']
                             },
-                        }))
-                )
-                .then( () => {
-                        this.progressPeople = false;
-                        this.successPeople = true;
-                        setTimeout(() => {this.successPeople = false;}, 1500)
-                        this.initialize();
-                })
-                .catch((error) => {
+                        })
+                    }
+
+                } catch (e) {
                     this.progressPeople = false;
                     this.errorPeople = true;
                     this.initialize();
                     setTimeout(() => {this.errorPeople = false;}, 6000)
                     // eslint-disable-next-line
-                    console.log(error)
-                })
+                    console.log(e)
+
+                }
+                this.progressPeople = false;
+                this.successPeople = true;
+                setTimeout(() => {this.successPeople = false;}, 1500)
+                this.initialize();
             }
         },
         deletePeopleSelected (list) {

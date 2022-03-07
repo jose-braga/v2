@@ -1,70 +1,72 @@
 <template>
     <v-dialog v-model="dialog"
-            @input="v => v || closeDialog()"
-            class="pa-2"
-            max-width="470px">
-        <v-form ref="form"
-                @submit.prevent="submitForm"
-        >
-            <v-card class="pa-2">
-                <v-card-title>
-                    <span class="headline">Report a bug or leave a suggestion</span>
-                </v-card-title>
-                <v-row class="px-2">
-                    <v-col cols="12">
-                        <v-select v-model="data.contact_type_id"
-                            :items="contactTypes"
-                            item-value="id" item-text="name_en"
-                            @change="changeContactType"
-                            label="Contact type">
-                        </v-select>
-                    </v-col>
-                    <v-col cols="12" v-if="data.contact_type_id !== null">
-                        <v-text-field
-                            v-model.trim="$v.data.subject.$model"
-                            :error="$v.data.subject.$error"
-                            rows="4"
-                            label="Subject">
-                        </v-text-field>
-                        <div v-if="$v.data.subject.$error">
-                            <p v-if="!$v.data.subject.maxLength" class="caption red--text">
-                                Text exceeds maximum size (200 chars).
-                            </p>
-                        </div>
-                    </v-col>
-                    <v-col cols="12" v-if="data.contact_type_id !== null">
-                        <v-textarea
-                            v-model.trim="$v.data.email_text.$model"
-                            :error="$v.data.email_text.$error"
-                            rows="4"
-                            :label="emailLabel">
-                        </v-textarea>
-                        <div v-if="$v.data.email_text.$error">
-                            <p v-if="!$v.data.email_text.maxLength" class="caption red--text">
-                                Text exceeds maximum size (2000 chars).
-                            </p>
-                        </div>
-                    </v-col>
-                </v-row>
-                <v-row class="pa-2" v-if="data.contact_type_id !== null">
-                    <v-col cols="4">
-                        <v-btn type="submit"
-                            color="red darken-1"
-                            outlined
-                        >Send
-                        </v-btn>
-                    </v-col>
-                    <v-col cols="2">
-                        <v-progress-circular indeterminate
-                                v-show="progress"
-                                :size="20" :width="2"
-                                color="primary"></v-progress-circular>
-                        <v-icon v-show="success" color="green">mdi-check</v-icon>
-                        <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
-                    </v-col>
-                </v-row>
-            </v-card>
-        </v-form>
+        @input="v => v || closeDialog()"
+        max-width="1000px"
+    >
+        <v-card class="pa-2">
+            <v-card-title>
+                <span class="headline">Report a bug or leave a suggestion</span>
+            </v-card-title>
+            <v-form ref="form"
+                    @submit.prevent="submitForm"
+            >
+                <v-container>
+                    <v-row class="px-2">
+                        <v-col cols="12">
+                            <v-select v-model="data.contact_type_id"
+                                :items="contactTypes"
+                                item-value="id" item-text="name_en"
+                                @change="changeContactType"
+                                label="Contact type">
+                            </v-select>
+                        </v-col>
+                        <v-col cols="12" v-if="data.contact_type_id !== null">
+                            <v-text-field
+                                v-model.trim="$v.data.subject.$model"
+                                :error="$v.data.subject.$error"
+                                rows="4"
+                                label="Subject">
+                            </v-text-field>
+                            <div v-if="$v.data.subject.$error">
+                                <p v-if="!$v.data.subject.maxLength" class="caption red--text">
+                                    Text exceeds maximum size (200 chars).
+                                </p>
+                            </div>
+                        </v-col>
+                        <v-col cols="12" v-if="data.contact_type_id !== null">
+                            <v-textarea
+                                v-model.trim="$v.data.email_text.$model"
+                                :error="$v.data.email_text.$error"
+                                rows="4"
+                                :label="emailLabel">
+                            </v-textarea>
+                            <div v-if="$v.data.email_text.$error">
+                                <p v-if="!$v.data.email_text.maxLength" class="caption red--text">
+                                    Text exceeds maximum size (2000 chars).
+                                </p>
+                            </div>
+                        </v-col>
+                    </v-row>
+                    <v-row class="pa-2" v-if="data.contact_type_id !== null">
+                        <v-col cols="4">
+                            <v-btn type="submit"
+                                color="red darken-1"
+                                outlined
+                            >Send
+                            </v-btn>
+                        </v-col>
+                        <v-col cols="2">
+                            <v-progress-circular indeterminate
+                                    v-show="progress"
+                                    :size="20" :width="2"
+                                    color="primary"></v-progress-circular>
+                            <v-icon v-show="success" color="green">mdi-check</v-icon>
+                            <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
+                        </v-col>
+                    </v-row>
+                </v-container>
+            </v-form>
+        </v-card>
     </v-dialog>
 </template>
 

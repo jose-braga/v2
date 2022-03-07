@@ -20,6 +20,7 @@ router.options('*', cors())
 const messaging = require('../controllers/admin/messaging');
 const contacts = require('../controllers/admin/contacts');
 const emailDefinitions = require('../controllers/admin/email_definitions');
+const news = require('../controllers/admin/news');
 
 router.post('/messages', cors(corsOptions), messaging.adminSendMessageAll);
 // get all messages currently in server
@@ -37,6 +38,10 @@ router.post('/:personID/recipient-groups', cors(corsOptions), emailDefinitions.c
 router.put('/:personID/recipient-groups/:recipientGroupID', cors(corsOptions), emailDefinitions.updateRecipientGroup);
 router.delete('/:personID/recipient-groups/:recipientGroupID', cors(corsOptions), emailDefinitions.deleteRecipientGroup);
 
+router.get('/:personID/news', cors(corsOptions), news.getNews);
+router.post('/:personID/news', cors(corsOptions), news.createNews);
+router.put('/:personID/news/:newsID', cors(corsOptions), news.updateNews);
+router.delete('/:personID/news/:newsID', cors(corsOptions), news.deleteNews);
 
 
 //router.put('/:personID/recipient-groups/:recipientGroupID/recipients/:recipientID', cors(corsOptions), emailDefinitions.getRecipientGroups);

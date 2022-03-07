@@ -5,6 +5,8 @@ const AdminUserContactsTab = () => import(/* webpackChunkName: "admin-user-conta
 const AdminUserContactsTabHelp = () => import(/* webpackChunkName: "admin-user-contacts-tab-help" */ '@/components/admin/user_contacts/UserContactsTabHelp.vue')
 const AdminEmailTab = () => import(/* webpackChunkName: "admin-email-tab" */ '@/components/admin/email_definitions/EmailTab.vue')
 const AdminEmailTabHelp = () => import(/* webpackChunkName: "admin-email-tab-help" */ '@/components/admin/email_definitions/EmailTabHelp.vue')
+const AdminNewsTab = () => import(/* webpackChunkName: "admin-news-tab" */ '@/components/admin/news/NewsTab.vue')
+const AdminNewsTabHelp = () => import(/* webpackChunkName: "admin-news-tab-help" */ '@/components/admin/news/NewsTabHelp.vue')
 
 const routes = {
     path: '/admin',
@@ -29,6 +31,13 @@ const routes = {
             components: {
                 default: AdminEmailTab,
                 help: AdminEmailTabHelp
+            }
+        },
+        {
+            path: 'news',
+            components: {
+                default: AdminNewsTab,
+                help: AdminNewsTabHelp
             }
         },
         { path: '', redirect: 'messages' }

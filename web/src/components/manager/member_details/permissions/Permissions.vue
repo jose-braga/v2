@@ -869,7 +869,7 @@ export default {
                 });
             }
         },
-        submitNewPermission (i) {
+        async submitNewPermission (i) {
             if (this.$store.state.session.loggedIn) {
                 this.progress = true;
                 let urlCreate = [];
@@ -889,32 +889,31 @@ export default {
                         body: {permission: permission, method_index: ind}
                     });
                 }
-                Promise.all(
-                    urlCreate.map(el =>
-                        this.$http.post(el.url,
+
+                try {
+                    for (const el of urlCreate) {
+                        await this.$http.post(el.url,
                             { data: el.body, },
                             { headers:
                                 {'Authorization': 'Bearer ' + localStorage['v2-token']
                             },
-                        }))
-                )
-                .then( () => {
-                    this.progress = false;
-                    this.success = true;
-                    setTimeout(() => {
-                        this.success = false;
-                        this.openPanel = undefined;
-                    }, 1500)
-                    this.initialize();
-                })
-                .catch((error) => {
+                        })
+                    }
+                } catch (e) {
                     this.progress = false;
                     this.error = true;
                     this.initialize();
                     setTimeout(() => {this.error = false;}, 6000)
                     // eslint-disable-next-line
-                    console.log(error)
-                });
+                    console.log(e)
+                }
+                this.progress = false;
+                this.success = true;
+                setTimeout(() => {
+                    this.success = false;
+                    this.openPanel = undefined;
+                }, 1500)
+                this.initialize();
             }
         },
         deletePermission (i) {

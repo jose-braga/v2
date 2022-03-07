@@ -827,6 +827,21 @@ var getEmailTypes = function (req, res, next) {
     return;
 };
 
+var getNews = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'SELECT * FROM news'
+        + ' WHERE visible = 1'
+        + ' AND (valid_from IS NULL OR valid_from <= NOW())'
+        + ' AND (valid_until IS NULL OR valid_until >= NOW())'
+        + ' ORDER BY published DESC;'
+        ;
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+
 module.exports.listItems = function (req, res, next) {
     let category = req.params.listCategory;
     if (category === 'countries') {
@@ -1017,6 +1032,9 @@ module.exports.listItems = function (req, res, next) {
     }
     if (category === 'email-types') {
         getEmailTypes(req, res, next);
+    }
+    if (category === 'news') {
+        getNews(req, res, next);
     }
 };
 

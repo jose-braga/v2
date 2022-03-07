@@ -43,6 +43,12 @@
             in the toolbar above).
         </div>
     </v-row>
+    <!--
+    <v-row v-if="!loggedIn" class="pa-4">
+        <h3>News:</h3>
+    </v-row>
+    -->
+
 </div>
 
 </template>

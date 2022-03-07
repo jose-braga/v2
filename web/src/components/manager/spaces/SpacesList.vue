@@ -103,13 +103,13 @@ export default {
     mounted() {
         this.initialize();
         this.$root.$on('updateManagerSpace',
-            () => {
-                this.initialize();
+            (spaceID) => {
+                this.initialize(spaceID);
             }
         );
     },
     methods: {
-        initialize() {
+        initialize(id) {
             this.loading = true;
             let this_session = this.$store.state.session;
             this.managerID = this_session.userID;
@@ -146,6 +146,13 @@ export default {
                     }
                 }
                 this.data.spaces = result;
+                if (id !== undefined) {
+                    for (let ind in this.data.spaces) {
+                        if (this.data.spaces[ind].id === id) {
+                            this.editItem(this.data.spaces[ind]);
+                        }
+                    }
+                }
                 this.loading = false;
             })
 
