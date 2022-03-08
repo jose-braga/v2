@@ -44,9 +44,9 @@
                 in the toolbar above).
             </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="!loggedIn">
             <v-col cols="12">
-                <v-card flat>
+                <v-card>
                     <v-card-title primary-title>
                         <div>
                             <h3 class="headline">Platform News</h3>
