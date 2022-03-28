@@ -1,6 +1,6 @@
 <template>
 <div>
-<v-card>
+<v-card class="ma-2">
     <v-card-title primary-title>
         <div>
             <h3 class="headline">Users</h3>

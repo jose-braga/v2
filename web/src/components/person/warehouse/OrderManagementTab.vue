@@ -1,74 +1,117 @@
 <template>
 <div>
-<v-container>
-    <v-row>
-        <v-col cols="12"
-        >
-            <v-card>
-                <v-card-title primary-title>
-                    <div>
-                        <h3 class="headline">Orders</h3>
-                    </div>
-                </v-card-title>
-                <v-card-text class="px-4">
-                </v-card-text>
-                <v-data-table
-                    item-key="id"
-                    :headers="headers"
-                    :footer-props="footerProps"
-                    :items="data.orders"
-                    :items-per-page="10"
-
-                    :sort-by="['datetime']"
-                    :sort-desc="[true]"
-                    multi-sort
-                    dense
+<v-card class="ma-2">
+    <v-card-title primary-title>
+        <div>
+            <h3 class="headline">Orders</h3>
+        </div>
+    </v-card-title>
+    <v-card-text class="px-4">
+        By default, only orders from the last 3 months are shown.
+        To select a different time range define dates below.
+    </v-card-text>
+    <v-container>
+        <v-row>
+            <v-col cols="12" sm="3" lg="2"
+            >
+                <v-menu ref="from_menu"
+                    v-model="show_from"
+                    :close-on-content-click="false"
+                    :nudge-right="10"
+                    transition="scale-transition"
+                    offset-y min-width="290px"
                 >
-                    <template v-slot:top>
-                        <v-dialog v-model="dialog" max-width="1600px">
-                            <OrderDetails
-                                :order-id="editedItem.id"
-                                :order-data="editedItem"
-                            >
-                            </OrderDetails>
-                        </v-dialog>
-                    </template>
-                    <template v-slot:item.details="{ item }">
-                        <v-icon
-                            @click="orderDetails(item)"
-                        >mdi-format-list-bulleted</v-icon>
-                    </template>
-                    <template v-slot:item.action="{ item }">
-                        <v-icon v-if="item.orderPending"
-                            class="mr-3 mb-2" color="green"
-                            @click="approveOrder(item)"
-                        >mdi-thumb-up</v-icon>
-                        <v-icon v-if="item.orderPending"
-                            class="mb-2" color="red"
-                            @click="rejectOrder(item)"
-                        >mdi-thumb-down</v-icon>
-                        <v-progress-circular indeterminate
-                                v-show="item.progress"
-                                :size="20" :width="2"
-                                color="primary"></v-progress-circular>
-                        <v-icon v-show="item.success" color="green">mdi-check</v-icon>
-                        <v-icon v-show="item.error" color="red">mdi-alert-circle-outline</v-icon>
-                    </template>
-                    <template v-slot:item.close="{ item }">
-                        <v-btn v-if="!item.orderPending && item.orderNotClosed"
-                            small
-                            outlined
-                            @click="finishOrder(item)"
+                    <template v-slot:activator="{ on }">
+                        <v-text-field v-model="from_date"
+                            label="From date" v-on="on"
+                            @input="initialize(from_date,to_date)"
                         >
-                            Done
-                        </v-btn>
+                        </v-text-field>
                     </template>
-                </v-data-table>
-            </v-card>
-        </v-col>
-    </v-row>
+                    <v-date-picker v-model="from_date"
+                        @input="show_from = false; initialize(from_date,to_date)"
+                        no-title
+                    ></v-date-picker>
+                </v-menu>
+            </v-col>
+            <v-col cols="12" sm="3" lg="2"
+            >
+                <v-menu ref="to_menu"
+                    v-model="show_to"
+                    :close-on-content-click="false"
+                    :nudge-right="10"
+                    transition="scale-transition"
+                    offset-y min-width="290px"
+                >
+                    <template v-slot:activator="{ on }">
+                        <v-text-field v-model="to_date"
+                            label="To date" v-on="on"
+                            @input="initialize(from_date,to_date)"
+                        >
+                        </v-text-field>
+                    </template>
+                    <v-date-picker v-model="to_date"
+                        @input="show_to = false; initialize(from_date,to_date)"
+                        no-title
+                    ></v-date-picker>
+                </v-menu>
+            </v-col>
+        </v-row>
+        <v-data-table
+            item-key="id"
+            :headers="headers"
+            :footer-props="footerProps"
+            :items="data.orders"
+            :items-per-page="10"
 
-</v-container>
+            :sort-by="['datetime']"
+            :sort-desc="[true]"
+            multi-sort
+            dense
+        >
+            <template v-slot:top>
+                <v-dialog v-model="dialog" max-width="1600px">
+                    <OrderDetails
+                        :order-id="editedItem.id"
+                        :order-data="editedItem"
+                    >
+                    </OrderDetails>
+                </v-dialog>
+            </template>
+            <template v-slot:item.details="{ item }">
+                <v-icon
+                    @click="orderDetails(item)"
+                >mdi-format-list-bulleted</v-icon>
+            </template>
+            <template v-slot:item.action="{ item }">
+                <v-icon v-if="item.orderPending"
+                    class="mr-3 mb-2" color="green"
+                    @click="approveOrder(item)"
+                >mdi-thumb-up</v-icon>
+                <v-icon v-if="item.orderPending"
+                    class="mb-2" color="red"
+                    @click="rejectOrder(item)"
+                >mdi-thumb-down</v-icon>
+                <v-progress-circular indeterminate
+                        v-show="item.progress"
+                        :size="20" :width="2"
+                        color="primary"></v-progress-circular>
+                <v-icon v-show="item.success" color="green">mdi-check</v-icon>
+                <v-icon v-show="item.error" color="red">mdi-alert-circle-outline</v-icon>
+            </template>
+            <template v-slot:item.close="{ item }">
+                <v-btn v-if="!item.orderPending && item.orderNotClosed"
+                    small
+                    outlined
+                    @click="finishOrder(item)"
+                >
+                    Done
+                </v-btn>
+            </template>
+        </v-data-table>
+    </v-container>
+</v-card>
+
 </div>
 </template>
 
@@ -90,6 +133,10 @@ export default {
             dialog: false,
             editedIndex: undefined,
             editedItem: {},
+            from_date: null,
+            to_date: null,
+            show_from: null,
+            show_to: null,
             data: {
                 orders: [],
             },
@@ -126,10 +173,27 @@ export default {
         },
     },
     methods: {
-        initialize () {
+        initialize (from, to) {
             let personID = this.$store.state.session.personID;
-            subUtil.getInfoPopulate(this, 'api/people/' + personID
-                + '/order-management/orders',
+            let url = 'api/people/' + personID
+                + '/order-management/orders';
+            let add_to_url = '';
+            if (from !== undefined && from !== null && from !== '') {
+                if (add_to_url === '') {
+                    add_to_url = add_to_url + '?from=' + from;
+                } else {
+                    add_to_url = add_to_url + '&from=' + from;
+                }
+            }
+            if (to !== undefined && to !== null && to !== '') {
+                if (add_to_url === '') {
+                    add_to_url = add_to_url + '?to=' + to;
+                } else {
+                    add_to_url = add_to_url + '&to=' + to;
+                }
+            }
+            url = url + add_to_url;
+            subUtil.getInfoPopulate(this, url,
                 true)
             .then( (result) => {
                 this.data.orders = result;

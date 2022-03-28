@@ -6,9 +6,27 @@ let transporter = nodemailer.transporter;
 
 var actionGetOrdersList = function (options) {
     let { req, res, next } = options;
-
     var querySQL = '';
     var places = [];
+    let date_query = '';
+    if (req.query.from !== null && req.query.from !== undefined && req.query.from !== '') {
+        if (date_query === '') {
+            date_query = date_query + ' WHERE orders.datetime >= ?';
+            places.push(req.query.from)
+        } else {
+            date_query = date_query + ' AND orders.datetime >= ?';
+            places.push(req.query.from)
+        }
+    }
+    if (req.query.to !== null && req.query.to !== undefined && req.query.to !== '') {
+        if (date_query === '') {
+            date_query = date_query + ' WHERE orders.datetime <= ?';
+            places.push(req.query.to)
+        } else {
+            date_query = date_query + ' AND orders.datetime <= ?';
+            places.push(req.query.to)
+        }
+    }
     querySQL = querySQL
         + 'SELECT orders.*,'
         + ' people.id AS person_id, people.colloquial_name, emails.email,'
@@ -20,9 +38,11 @@ var actionGetOrdersList = function (options) {
         + ' LEFT JOIN users ON users.id = orders.user_ordered_id'
         + ' LEFT JOIN people ON people.user_id = users.id'
         + ' LEFT JOIN emails ON emails.person_id = people.id'
-    if (req.query.all !== '1') {
+    if (req.query.all !== '1' && date_query === '') {
         querySQL = querySQL
         + ' WHERE DATE_SUB(CURDATE(),INTERVAL 90 DAY) <= DATE(orders.datetime);';
+    } else {
+        querySQL = querySQL + date_query;
     }
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
@@ -183,7 +203,7 @@ var updateOrder = function (options) {
     // account finances history is changed
     // stock is changed
     // stock history is changed
-    
+
     querySQL = querySQL
         + 'UPDATE orders'
         + ' SET total_cost = ?,'
