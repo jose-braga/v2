@@ -445,6 +445,8 @@ function processForSpreadsheet(members) {
                                                                     .format('YYYY-MM-DD')
                 }
                 thisMember['Lab History'] = thisMember['Lab History']
+                            + members[ind].history[indHistory].lab_position_name_en
+                            + ', ' + members[ind].history[indHistory].dedication + '%, '
                             + members[ind].history[indHistory].lab_name
                             + ' (' + members[ind].history[indHistory].valid_from
                             + ', ' + members[ind].history[indHistory].valid_until

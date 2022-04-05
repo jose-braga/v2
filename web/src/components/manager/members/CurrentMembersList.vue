@@ -5,7 +5,11 @@
                 <h3 class="headline">Current members and positions</h3>
             </div>
         </v-card-title>
-        <v-card-text></v-card-text>
+        <v-card-text class="mb-4">
+            Note: if a member has 2 (or more) simultaneous affiliations
+            only one is shown in the table. See each member details to see all
+            affiliations.
+        </v-card-text>
         <v-row justify="center" v-if="unitId || cityId">
             <v-dialog
                 v-model="dialogNewMember"
@@ -79,6 +83,11 @@
             </v-col>
         </v-row>
         <v-container>
+            <!--
+                :sort-by="['name']"
+                :sort-desc="[false]"
+                :server-items-length="totalMembers"
+                -->
             <v-data-table
                 item-key="person_id"
                 :headers="headers"
@@ -86,8 +95,8 @@
                 :footer-props="footerProps"
                 :items="data.members"
                 :items-per-page="itemsPerPage"
-                :server-items-length="totalMembers"
                 :loading="loading"
+                :custom-sort="customSort"
                 class="elevation-1"
             >
                 <template v-slot:top>
@@ -139,10 +148,11 @@ import AddMember from './AddMember'
 import {debounce} from 'lodash'
 import XLSX from 'xlsx'
 
-function processResults(vm, result) {
+function processResults(vm, result, unitID) {
     let currentMembers = [];
     let today = time.moment();
     for (let ind in result) {
+        let added = false;
         if (result[ind].history.length > 0) {
             for (let indHistory in result[ind].history) {
                 let validFrom = result[ind].history[indHistory].valid_from;
@@ -150,24 +160,77 @@ function processResults(vm, result) {
                 if ((validFrom === null || time.moment(validFrom).isBefore(today))
                     && (validUntil === null || time.moment(validUntil).isAfter(today))
                     ) {
-                    //result[ind].progress = false;
-                    //result[ind].success = undefined;
-                    //result[ind].error = undefined;
+                    let thisUnit;
+                    if (result[ind].history[indHistory].groups.length > 0) {
+                        thisUnit = result[ind].history[indHistory].groups[0].units[0].id;
+                    }
                     result[ind].history[indHistory].valid_from = time.momentToDate(result[ind].history[indHistory].valid_from);
                     result[ind].history[indHistory].valid_until = time.momentToDate(result[ind].history[indHistory].valid_until);
-                    //result[ind].history[indHistory].show_valid_from = false;
-                    //result[ind].history[indHistory].show_valid_until = false;
-                    //result[ind].history[indHistory].show_add_more_recent = true;
-                    //result[ind].history[indHistory].to_delete = false;
-                    result[ind].most_recent_data = result[ind].history[indHistory];
-                    //result[ind].newer_data = {}
+                    if (thisUnit === unitID || unitID === false) {
+                        added = true;
+                        result[ind].most_recent_data = result[ind].history[indHistory];
+                        currentMembers.push(result[ind]);
+                        break;
+                    }
+                }
+            }
+        }
+        if (result[ind].history.length === 0 || !added) {
+            // now we add technicians, science managers and adminstrative
+            for (let indData in result[ind].technician_data) {
+                let validFrom = result[ind].technician_data[indData].valid_from;
+                let validUntil = result[ind].technician_data[indData].valid_until;
+                if ((validFrom === null || time.moment(validFrom).isBefore(today))
+                    && (validUntil === null || time.moment(validUntil).isAfter(today))
+                    ) {
+                    result[ind].most_recent_data = {};
+                    result[ind].most_recent_data.lab_name = result[ind].technician_data[indData].technician_office_name_en;
+                    result[ind].most_recent_data.lab_position_name_en = result[ind].technician_data[indData].technician_position_name_en;
+                    result[ind].most_recent_data.sort_order = result[ind].technician_data[indData].sort_order;
+                    result[ind].most_recent_data.valid_from = time.momentToDate(result[ind].technician_data[indData].valid_from);
+                    result[ind].most_recent_data.valid_until = time.momentToDate(result[ind].technician_data[indData].valid_until);
+                    result[ind].most_recent_data.dedication = result[ind].technician_data[indData].dedication;
                     currentMembers.push(result[ind]);
                     break;
                 }
             }
-        } else {
-            result[ind].most_recent_data = {};
-            currentMembers.push(result[ind]);
+            for (let indData in result[ind].science_manager_data) {
+                let validFrom = result[ind].science_manager_data[indData].valid_from;
+                let validUntil = result[ind].science_manager_data[indData].valid_until;
+                if ((validFrom === null || time.moment(validFrom).isBefore(today))
+                    && (validUntil === null || time.moment(validUntil).isAfter(today))
+                    ) {
+                    result[ind].most_recent_data = {};
+                    result[ind].most_recent_data.lab_name = result[ind].science_manager_data[indData].science_manager_office_name_en;
+                    result[ind].most_recent_data.lab_position_name_en = result[ind].science_manager_data[indData].science_manager_position_name_en;
+                    result[ind].most_recent_data.sort_order = result[ind].science_manager_data[indData].sort_order;
+                    result[ind].most_recent_data.valid_from = time.momentToDate(result[ind].science_manager_data[indData].valid_from);
+                    result[ind].most_recent_data.valid_until = time.momentToDate(result[ind].science_manager_data[indData].valid_until);
+                    result[ind].most_recent_data.dedication = result[ind].science_manager_data[indData].dedication;
+                    currentMembers.push(result[ind]);
+                    break;
+                }
+            }
+            for (let indData in result[ind].administrative_data) {
+                let validFrom = result[ind].administrative_data[indData].valid_from;
+                let validUntil = result[ind].administrative_data[indData].valid_until;
+                if ((validFrom === null || time.moment(validFrom).isBefore(today))
+                    && (validUntil === null || time.moment(validUntil).isAfter(today))
+                    ) {
+                    result[ind].most_recent_data = {};
+                    result[ind].most_recent_data.lab_name = result[ind].administrative_data[indData].administrative_office_name_en;
+                    result[ind].most_recent_data.lab_position_name_en = result[ind].administrative_data[indData].administrative_position_name_en;
+                    result[ind].most_recent_data.sort_order = result[ind].administrative_data[indData].sort_order;
+                    result[ind].most_recent_data.valid_from = time.momentToDate(result[ind].administrative_data[indData].valid_from);
+                    result[ind].most_recent_data.valid_until = time.momentToDate(result[ind].administrative_data[indData].valid_until);
+                    result[ind].most_recent_data.dedication = result[ind].administrative_data[indData].dedication;
+                    currentMembers.push(result[ind]);
+                    break;
+                }
+            }
+
+            //result[ind].most_recent_data = {};
+
         }
 
     }
@@ -373,7 +436,7 @@ export default {
             dialog: false,
             dialogNewMember: false,
             currentPage: 1,
-            options: {},
+            options: {multiSort: true},
             loading: true,
             totalMembers: 0,
             itemsPerPage: 10,
@@ -390,13 +453,13 @@ export default {
             },
             headers: [
                 { text: 'ID', value: 'person_id', sortable: false},
-                { text: 'Name', value: 'name', sortable: false},
-                { text: 'Position', value:'most_recent_data.lab_position_name_en', sortable: false },
-                { text: 'Started', value:'most_recent_data.valid_from', sortable: false },
-                { text: 'Finished', value:'most_recent_data.valid_until', sortable: false },
+                { text: 'Name', value: 'name', sortable: true},
+                { text: 'Position', value:'most_recent_data.lab_position_name_en', sortable: true },
+                { text: 'Lab/Group', value:'most_recent_data.lab_name', sortable: true },
+                { text: 'Started', value:'most_recent_data.valid_from', sortable: true },
+                { text: 'Finished', value:'most_recent_data.valid_until', sortable: true },
                 { text: 'Dedication', value:'most_recent_data.dedication', sortable: false },
                 { text: 'Ciência ID', value:'researcher_details[0].ciencia_id', sortable: false },
-                { text: 'ORCID', value:'researcher_details[0].ORCID', sortable: false },
                 { text: 'Details', value: 'action', sortable: false },
             ],
             footerProps: {
@@ -440,16 +503,6 @@ export default {
             this.searchGroup = '';
             this.initialize(1, '', '', '');
         },
-        options () {
-            if (this.itemsPerPage !== this.options.itemsPerPage) {
-                this.itemsPerPage = this.options.itemsPerPage;
-                this.options.page = 1;
-            }
-            if (this.userAction) {
-                this.initialize(this.options.page, this.search, this.searchLab, this.searchGroup);
-            }
-            this.userAction = true;
-        }
     },
     methods: {
         initialize (page, search, searchLab, searchGroup) {
@@ -492,7 +545,8 @@ export default {
                         subUtil.getInfoPopulate(this, urlSubmit, true, true)
                         .then( (result) => {
                             this.totalMembers = result.count;
-                            this.data.members = processResults(this, result.result);
+                            this.data.members = processResults(this, result.result, this.unitId);
+                            this.data.members.sort((el1, el2) => el1.name.localeCompare(el2.name))
                             this.loading = false;
                         });
                     } else if ( this.segmentType === 'unit-city'
@@ -528,7 +582,8 @@ export default {
                         subUtil.getInfoPopulate(this, urlSubmit, true, true)
                         .then( (result) => {
                             this.totalMembers = result.count;
-                            this.data.members = processResults(this, result.result);
+                            this.data.members = processResults(this, result.result, this.unitId);
+                            this.data.members.sort((el1, el2) => el1.name.localeCompare(el2.name))
                             this.loading = false;
                         });
                     } else if ( this.segmentType === 'city'
@@ -562,7 +617,8 @@ export default {
                         subUtil.getInfoPopulate(this, urlSubmit, true, true)
                         .then( (result) => {
                             this.totalMembers = result.count;
-                            this.data.members = processResults(this, result.result);
+                            this.data.members = processResults(this, result.result, false);
+                            this.data.members.sort((el1, el2) => el1.name.localeCompare(el2.name))
                             this.loading = false;
                         });
                     }
@@ -573,7 +629,7 @@ export default {
             }
         },
         filterData: debounce(function () {
-            this.initialize(1, this.search, this.searchLab, this.searchGroup);
+            this.initialize(1, this.search, this.searchLab, this.searchGroup, this.options.sortBy,this.options.sortDesc);
             this.$store.commit('setSearch', {
                 searchName: this.search,
                 searchLabStore: this.searchLab,
@@ -612,7 +668,11 @@ export default {
                 this.progress = false;
                 this.success = true;
                 let items = result.data.result;
-                items = processResults (this, items);
+                if (this.segmentType === 'unit' || this.segmentType === 'unit-city') {
+                    items = processResults (this, items, this.unitId);
+                } else {
+                    items = processResults (this, items, false);
+                }
                 let itemsCurated = processForSpreadsheet(items);
                 let wb = XLSX.utils.book_new();
                 let ws  = XLSX.utils.json_to_sheet(itemsCurated);
@@ -636,6 +696,68 @@ export default {
                 console.log(error)
             })
 
+        },
+        customSort (items, sortBy, sortDesc) {
+            let sortDesc2 = sortDesc.map(x => {
+                if (x) { return 1; } else { return 2; }
+            })
+            items.sort(
+                (el1,el2) => {
+                    let comparison = 0;
+                    for (let ind in sortBy) {
+                        if (sortBy[ind] === 'name') {
+                            comparison = el1.name.localeCompare(el2.name) * (-1) ** sortDesc2[ind];
+                        } else if (sortBy[ind] === 'most_recent_data.lab_name') {
+                            if ((el1.most_recent_data.lab_name === null || el1.most_recent_data.lab_name === undefined)
+                                && (el2.most_recent_data.lab_name === null || el2.most_recent_data.lab_name === undefined)) {
+                                comparison = 0;
+                            } else if (el1.most_recent_data.lab_name === null || el1.most_recent_data.lab_name === undefined) {
+                                comparison = 1 * (-1) ** sortDesc2[ind];
+                            } else if (el2.most_recent_data.lab_name === null || el2.most_recent_data.lab_name === undefined) {
+                                comparison = -1 * (-1) ** sortDesc2[ind];
+                            } else {
+                                comparison = el1.most_recent_data.lab_name.localeCompare(el2.most_recent_data.lab_name) * (-1) ** sortDesc2[ind];
+                            }
+                        } else if (sortBy[ind] === 'most_recent_data.lab_position_name_en') {
+                            if ((el1.most_recent_data.lab_position_name_en === null || el1.most_recent_data.lab_position_name_en === undefined)
+                                && (el2.most_recent_data.lab_position_name_en === null || el2.most_recent_data.lab_position_name_en === undefined)) {
+                                comparison = 0;
+                            } else if (el1.most_recent_data.lab_position_name_en === null || el1.most_recent_data.lab_position_name_en === undefined) {
+                                comparison = 1 * (-1) ** sortDesc2[ind];
+                            } else if (el2.most_recent_data.lab_position_name_en === null  || el2.most_recent_data.lab_position_name_en === undefined) {
+                                comparison = -1 * (-1) ** sortDesc2[ind];
+                            } else {
+                                comparison = (el1.most_recent_data.sort_order - el2.most_recent_data.sort_order) * (-1) ** sortDesc2[ind];
+                            }
+                        } else if (sortBy[ind] === 'most_recent_data.valid_from') {
+                            if ((el1.most_recent_data.valid_from === null || el1.most_recent_data.valid_from === undefined)
+                                 && (el2.most_recent_data.valid_from === null || el2.most_recent_data.valid_from === undefined)) {
+                                comparison = 0;
+                            } else if (el1.most_recent_data.valid_from === null || el1.most_recent_data.valid_from === undefined) {
+                                comparison = -1 * (-1) ** sortDesc2[ind];
+                            } else if (el2.most_recent_data.valid_from === null || el2.most_recent_data.valid_from === undefined) {
+                                comparison = 1 * (-1) ** sortDesc2[ind];
+                            } else {
+                                comparison = el1.most_recent_data.valid_from.localeCompare(el2.most_recent_data.valid_from) * (-1) ** sortDesc2[ind];
+                            }
+                        } else if (sortBy[ind] === 'most_recent_data.valid_until') {
+                            if ((el1.most_recent_data.valid_until === null || el1.most_recent_data.valid_until === undefined)
+                                 && (el2.most_recent_data.valid_until === null || el2.most_recent_data.valid_until === undefined)) {
+                                comparison = 0;
+                            } else if (el1.most_recent_data.valid_until === null || el1.most_recent_data.valid_until === undefined) {
+                                comparison = 1 * (-1) ** sortDesc2[ind];
+                            } else if (el2.most_recent_data.valid_until === null || el2.most_recent_data.valid_until === undefined) {
+                                comparison = -1 * (-1) ** sortDesc2[ind];
+                            } else {
+                                comparison = el1.most_recent_data.valid_until.localeCompare(el2.most_recent_data.valid_until) * (-1) ** sortDesc2[ind];
+                            }
+                        }
+                        if (comparison !== 0) break;
+                    }
+                    return comparison;
+                }
+            )
+            return items;
         },
     },
 

@@ -35,20 +35,6 @@ var actionGetCurrentMembersList = function (options) {
         let groupraw = req.query.group;
         group = '%' + groupraw.replace(/\s/gi,'%') + '%'
     }
-    if (req.query.limit !== undefined) {
-        limit = parseInt(req.query.limit, 10);
-    }
-    options.pageSize = limit;
-    if (req.query.offset !== undefined) {
-        offset = parseInt(req.query.offset, 10);
-    }
-    options.offset = offset;
-    if (req.query.sortOrder !== undefined) {
-        sortOrder = req.query.sortOrder;
-        if (sortOrder !== 'ASC' && sortOrder !== 'DESC') {
-            sortOrder = 'ASC';
-        }
-    }
     options.moreDetails = false;
     if (req.query.details !== undefined) {
         if (req.query.details === '1') {
@@ -111,18 +97,16 @@ var actionGetCurrentMembersList = function (options) {
         + ' AND ((people_administrative_offices.valid_from IS NULL AND people_administrative_offices.valid_until IS NULL)'
         + '    OR (people_administrative_offices.valid_from <= ? AND people_administrative_offices.valid_until IS NULL)'
         + '    OR (people_administrative_offices.valid_from IS NULL AND people_administrative_offices.valid_until >= ?)'
-        + '    OR (people_administrative_offices.valid_from <= ? AND people_administrative_offices.valid_until >= ?))'
-
-        + ' ORDER BY `name` ' + sortOrder;
+        + '    OR (people_administrative_offices.valid_from <= ? AND people_administrative_offices.valid_until >= ?))';
     places = [unitID].concat(qArray).concat([lab, lab, group, group, today, today, today, today])
         .concat([unitID]).concat(qArray).concat([lab, lab, today, today, today, today])
         .concat([unitID]).concat(qArray).concat([lab, lab, today, today, today, today])
         .concat([unitID]).concat(qArray).concat([lab, lab, today, today, today, today])
         ;
-    if (!options.moreDetails) {
-        querySQL = querySQL + ' LIMIT ?, ?';
-        places.push(offset, limit);
-    }
+    //if (!options.moreDetails) {
+    //    querySQL = querySQL + ' LIMIT ?, ?';
+    //    places.push(offset, limit);
+    //}
     options.today = today;
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
@@ -149,114 +133,12 @@ var actionGetCurrentMembersList = function (options) {
             }
         },
         options);
-};
-var actionCountTotal = function (people, options) {
-    let { req, res, next, today } = options;
-    let unitID = req.params.unitID;
-    let qArray = [];
-    let lab = '%'
-    let group = '%'
-    let likeNameExpression = '';
-    if (req.query.q !== undefined) {
-        let qraw = req.query.q;
-        let qSplit = qraw.split(' ');
-        for (let ind in qSplit) {
-            qArray.push('%' + qSplit[ind] + '%');
-            if (likeNameExpression === '') {
-                likeNameExpression = likeNameExpression + ' AND (people.name LIKE ?';
-            } else {
-                likeNameExpression = likeNameExpression + ' AND people.name LIKE ?';
-            }
-        }
-        likeNameExpression = likeNameExpression + ')';
-    }
-    if (req.query.lab !== undefined) {
-        let labraw = req.query.lab;
-        lab = '%' + labraw.replace(/\s/gi,'%') + '%'
-    }
-    if (req.query.group !== undefined) {
-        let groupraw = req.query.group;
-        group = '%' + groupraw.replace(/\s/gi,'%') + '%'
-    }
-    var querySQL = '';
-    var places = [];
-    querySQL = querySQL
-        + 'SELECT COUNT(*) AS total_number'
-        + ' FROM ('
-        + 'SELECT DISTINCT people.id AS person_id, people.user_id, people.name, people.colloquial_name'
-        + ' FROM people'
-        + ' JOIN people_labs ON people_labs.person_id = people.id'
-        + ' JOIN labs ON labs.id = people_labs.lab_id'
-        + ' JOIN labs_groups ON labs_groups.lab_id = labs.id'
-        + ' JOIN `groups` ON `groups`.id = labs_groups.group_id'
-        + ' JOIN groups_units ON groups_units.group_id = `groups`.id'
-        + ' WHERE people.status = 1 AND groups_units.unit_id = ?'
-        + likeNameExpression
-        + ' AND (labs.name LIKE ? OR labs.short_name = ?)'
-        + ' AND (groups.name LIKE ? OR groups.short_name = ?)'
-        + ' AND ((people_labs.valid_from IS NULL AND people_labs.valid_until IS NULL)'
-        + '     OR (people_labs.valid_from <= ? AND people_labs.valid_until IS NULL)'
-        + '     OR (people_labs.valid_from IS NULL AND people_labs.valid_until >= ?)'
-        + '     OR (people_labs.valid_from <= ? AND people_labs.valid_until >= ?))'
-        + ' UNION'
-        + ' SELECT DISTINCT people.id AS person_id, people.user_id, people.name, people.colloquial_name'
-        + ' FROM people'
-        + ' JOIN technicians ON technicians.person_id = people.id'
-        + ' JOIN technician_offices ON technician_offices.id = technicians.technician_office_id'
-        + ' JOIN technicians_units ON technicians_units.technician_id = technicians.id'
-        + ' WHERE people.status = 1 AND technicians_units.unit_id = ?'
-        + likeNameExpression
-        + ' AND (technician_offices.name_en LIKE ? OR technician_offices.name_pt LIKE ?)'
-        + ' AND ((technicians.valid_from IS NULL AND technicians.valid_until IS NULL)'
-        + '    OR (technicians.valid_from <= ? AND technicians.valid_until IS NULL)'
-        + '    OR (technicians.valid_from IS NULL AND technicians.valid_until >= ?)'
-        + '    OR (technicians.valid_from <= ? AND technicians.valid_until >= ?))'
-        + ' UNION'
-        + ' SELECT DISTINCT people.id AS person_id, people.user_id, people.name, people.colloquial_name'
-        + ' FROM people'
-        + ' JOIN science_managers ON science_managers.person_id = people.id'
-        + ' JOIN science_manager_offices ON science_manager_offices.id = science_managers.science_manager_office_id'
-        + ' JOIN science_managers_units ON science_managers_units.science_manager_id = science_managers.id'
-        + ' WHERE people.status = 1 AND science_managers_units.unit_id = ?'
-        + likeNameExpression
-        + ' AND (science_manager_offices.name_en LIKE ? OR science_manager_offices.name_pt LIKE ?)'
-        + ' AND ((science_managers.valid_from IS NULL AND science_managers.valid_until IS NULL)'
-        + '    OR (science_managers.valid_from <= ? AND science_managers.valid_until IS NULL)'
-        + '    OR (science_managers.valid_from IS NULL AND science_managers.valid_until >= ?)'
-        + '    OR (science_managers.valid_from <= ? AND science_managers.valid_until >= ?))'
-        + ' UNION'
-        + ' SELECT DISTINCT people.id AS person_id, people.user_id, people.name, people.colloquial_name'
-        + ' FROM people'
-        + ' JOIN people_administrative_offices ON people_administrative_offices.person_id = people.id'
-        + ' JOIN administrative_offices ON administrative_offices.id = people_administrative_offices.administrative_office_id'
-        + ' JOIN people_administrative_units ON people_administrative_units.administrative_id = people_administrative_offices.id'
-        + ' WHERE people.status = 1 AND people_administrative_units.unit_id = ?'
-        + likeNameExpression
-        + ' AND (administrative_offices.name_en LIKE ? OR administrative_offices.name_pt LIKE ?)'
-        + ' AND ((people_administrative_offices.valid_from IS NULL AND people_administrative_offices.valid_until IS NULL)'
-        + '    OR (people_administrative_offices.valid_from <= ? AND people_administrative_offices.valid_until IS NULL)'
-        + '    OR (people_administrative_offices.valid_from IS NULL AND people_administrative_offices.valid_until >= ?)'
-        + '    OR (people_administrative_offices.valid_from <= ? AND people_administrative_offices.valid_until >= ?))'
-
-
-        + ') AS unit_people'
-        ;
-    places = [unitID].concat(qArray).concat([lab, lab, group, group, today, today, today, today])
-        .concat([unitID]).concat(qArray).concat([lab, lab, today, today, today, today])
-        .concat([unitID]).concat(qArray).concat([lab, lab, today, today, today, today])
-        .concat([unitID]).concat(qArray).concat([lab, lab, today, today, today, today])
-        ;
-    return sql.getSQLOperationResult(req, res, querySQL, places,
-        (resQuery, options) => {
-            if (resQuery.length === 1) {
-                options.totalSearch = resQuery[0].total_number;
-            } else {
-                options.totalSearch = -1; // for errors
-            }
-            actionGetResearcherDetails(people, options, 0)
-        },
-        options);
 }
+var actionCountTotal = function (people, options) {
+    options.totalSearch = people.length;
+    actionGetResearcherDetails(people, options, 0)
+}
+
 var actionGetPastMembersList = function (options) {
     let { req, res, next } = options;
     let today = time.moment().format('YYYY-MM-DD');
@@ -288,20 +170,6 @@ var actionGetPastMembersList = function (options) {
     if (req.query.group !== undefined) {
         let groupraw = req.query.group;
         group = '%' + groupraw.replace(/\s/gi,'%') + '%'
-    }
-    if (req.query.limit !== undefined) {
-        limit = parseInt(req.query.limit, 10);
-    }
-    options.pageSize = limit;
-    if (req.query.offset !== undefined) {
-        offset = parseInt(req.query.offset, 10);
-    }
-    options.offset = offset;
-    if (req.query.sortOrder !== undefined) {
-        sortOrder = req.query.sortOrder;
-        if (sortOrder !== 'ASC' && sortOrder !== 'DESC') {
-            sortOrder = 'ASC';
-        }
     }
     options.moreDetails = false;
     if (req.query.details !== undefined) {
@@ -361,17 +229,16 @@ var actionGetPastMembersList = function (options) {
         + ' AND (administrative_offices.name_en LIKE ? OR administrative_offices.name_pt LIKE ?)'
         + ' AND (( people_administrative_offices.valid_from < ? OR people_administrative_offices.valid_from IS NULL)'
         + '    AND (people_administrative_offices.valid_until IS NOT NULL AND people_administrative_offices.valid_until < ?)'
-        + ')'
-        + ' ORDER BY `name` ' + sortOrder;
+        + ')';
     places = [unitID].concat(qArray).concat([lab, lab, group, group, today, today])
         .concat([unitID]).concat(qArray).concat([lab, lab, today, today])
         .concat([unitID]).concat(qArray).concat([lab, lab, today, today])
         .concat([unitID]).concat(qArray).concat([lab, lab, today, today])
         ;
-    if (!options.moreDetails) {
-        querySQL = querySQL + ' LIMIT ?, ?';
-        places.push(offset, limit);
-    }
+    //if (!options.moreDetails) {
+    //    querySQL = querySQL + ' LIMIT ?, ?';
+    //    places.push(offset, limit);
+    //}
     options.today = today;
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
@@ -400,105 +267,8 @@ var actionGetPastMembersList = function (options) {
         options);
 };
 var actionCountPastTotal = function (people, options) {
-    let { req, res, next, today } = options;
-    let unitID = req.params.unitID;
-    let qArray = [];
-    let lab = '%'
-    let group = '%'
-    let likeNameExpression = '';
-    if (req.query.q !== undefined) {
-        let qraw = req.query.q;
-        let qSplit = qraw.split(' ');
-        for (let ind in qSplit) {
-            qArray.push('%' + qSplit[ind] + '%');
-            if (likeNameExpression === '') {
-                likeNameExpression = likeNameExpression + ' AND (people.name LIKE ?';
-            } else {
-                likeNameExpression = likeNameExpression + ' AND people.name LIKE ?';
-            }
-        }
-        likeNameExpression = likeNameExpression + ')';
-    }
-    if (req.query.lab !== undefined) {
-        let labraw = req.query.lab;
-        lab = '%' + labraw.replace(/\s/gi,'%') + '%'
-    }
-    if (req.query.group !== undefined) {
-        let groupraw = req.query.group;
-        group = '%' + groupraw.replace(/\s/gi,'%') + '%'
-    }
-    var querySQL = '';
-    var places = [];
-    querySQL = querySQL
-        + 'SELECT COUNT(*) AS total_number'
-        + ' FROM ('
-            + 'SELECT DISTINCT people.id AS person_id, people.user_id, people.name, people.colloquial_name'
-            + ' FROM people'
-            + ' JOIN people_labs ON people_labs.person_id = people.id'
-            + ' JOIN labs ON labs.id = people_labs.lab_id'
-            + ' JOIN labs_groups ON labs_groups.lab_id = labs.id'
-            + ' JOIN `groups` ON `groups`.id = labs_groups.group_id'
-            + ' JOIN groups_units ON groups_units.group_id = `groups`.id'
-            + ' WHERE people.status = 1 AND groups_units.unit_id = ?'
-            + likeNameExpression
-            + ' AND (labs.name LIKE ? OR labs.short_name = ?)'
-            + ' AND (groups.name LIKE ? OR groups.short_name = ?)'
-            + ' AND ((people_labs.valid_from < ? OR people_labs.valid_from IS NULL)'
-            + '     AND (people_labs.valid_until IS NOT NULL AND people_labs.valid_until < ?)'
-            + ' )'
-            + ' UNION'
-            + ' SELECT DISTINCT people.id AS person_id, people.user_id, people.name, people.colloquial_name'
-            + ' FROM people'
-            + ' JOIN technicians ON technicians.person_id = people.id'
-            + ' JOIN technician_offices ON technician_offices.id = technicians.technician_office_id'
-            + ' JOIN technicians_units ON technicians_units.technician_id = technicians.id'
-            + ' WHERE people.status = 1 AND technicians_units.unit_id = ?'
-            + likeNameExpression
-            + ' AND (technician_offices.name_en LIKE ? OR technician_offices.name_pt LIKE ?)'
-            + ' AND ((technicians.valid_from < ? OR technicians.valid_from)'
-            + '    AND (technicians.valid_until IS NOT NULL AND technicians.valid_until < ?)'
-            + ' )'
-            + ' UNION'
-            + ' SELECT DISTINCT people.id AS person_id, people.user_id, people.name, people.colloquial_name'
-            + ' FROM people'
-            + ' JOIN science_managers ON science_managers.person_id = people.id'
-            + ' JOIN science_manager_offices ON science_manager_offices.id = science_managers.science_manager_office_id'
-            + ' JOIN science_managers_units ON science_managers_units.science_manager_id = science_managers.id'
-            + ' WHERE people.status = 1 AND science_managers_units.unit_id = ?'
-            + likeNameExpression
-            + ' AND (science_manager_offices.name_en LIKE ? OR science_manager_offices.name_pt LIKE ?)'
-            + ' AND ((science_managers.valid_from < ? OR science_managers.valid_from IS NULL)'
-            + '    AND (science_managers.valid_until IS NOT NULL AND science_managers.valid_until < ?)'
-            + ' )'
-            + ' UNION'
-            + ' SELECT DISTINCT people.id AS person_id, people.user_id, people.name, people.colloquial_name'
-            + ' FROM people'
-            + ' JOIN people_administrative_offices ON people_administrative_offices.person_id = people.id'
-            + ' JOIN administrative_offices ON administrative_offices.id = people_administrative_offices.administrative_office_id'
-            + ' JOIN people_administrative_units ON people_administrative_units.administrative_id = people_administrative_offices.id'
-            + ' WHERE people.status = 1 AND people_administrative_units.unit_id = ?'
-            + likeNameExpression
-            + ' AND (administrative_offices.name_en LIKE ? OR administrative_offices.name_pt LIKE ?)'
-            + ' AND (( people_administrative_offices.valid_from < ? OR people_administrative_offices.valid_from IS NULL)'
-            + '    AND (people_administrative_offices.valid_until IS NOT NULL AND people_administrative_offices.valid_until < ?)'
-            + ' )'
-        + ') AS unit_people'
-    places = [unitID].concat(qArray).concat([lab, lab, group, group, today, today])
-        .concat([unitID]).concat(qArray).concat([lab, lab, today, today])
-        .concat([unitID]).concat(qArray).concat([lab, lab, today, today])
-        .concat([unitID]).concat(qArray).concat([lab, lab, today, today])
-        ;
-    return sql.getSQLOperationResult(req, res, querySQL, places,
-        (resQuery, options) => {
-            if (resQuery.length === 1) {
-                options.totalSearch = resQuery[0].total_number;
-            } else {
-                options.totalSearch = -1; // for errors
-            }
-            actionGetResearcherDetails(people, options, 0)
-        },
-        options);
-
+    options.totalSearch = people.length;
+    actionGetResearcherDetails(people, options, 0)
 }
 
 var actionGetResearcherDetails = function (people, options, i) {
@@ -526,7 +296,8 @@ var actionGetMemberLabs = function (people, options, i) {
         + 'SELECT people_labs.*,'
         + ' labs.name AS lab_name, labs.short_name AS lab_short_name,'
         + ' labs.started AS lab_started, labs.finished AS lab_finished,'
-        + ' lab_positions.name_en AS lab_position_name_en, lab_positions.name_pt AS lab_position_name_pt'
+        + ' lab_positions.name_en AS lab_position_name_en, lab_positions.name_pt AS lab_position_name_pt,'
+        + ' lab_positions.sort_order'
         + ' FROM people_labs'
         + ' JOIN labs ON labs.id = people_labs.lab_id'
         + ' LEFT JOIN lab_positions ON lab_positions.id = people_labs.lab_position_id'
@@ -639,7 +410,8 @@ var actionGetMemberFacilities = function (people, options, i) {
         + 'SELECT technicians.*,'
         + ' technician_offices.name_en AS technician_office_name_en,'
         + ' technician_offices.started AS technician_office_started, technician_offices.finished AS technician_office_finished,'
-        + ' technician_positions.name_en AS technician_position_name_en, technician_positions.name_pt AS technician_position_name_pt'
+        + ' technician_positions.name_en AS technician_position_name_en, technician_positions.name_pt AS technician_position_name_pt,'
+        + ' technician_positions.sort_order'
         + ' FROM technicians'
         + ' JOIN technician_offices ON technician_offices.id = technicians.technician_office_id'
         + ' LEFT JOIN technician_positions ON technician_positions.id = technicians.technician_position_id'
@@ -661,7 +433,8 @@ var actionGetMemberScienceManager = function (people, options, i) {
         + 'SELECT science_managers.*,'
         + ' science_manager_offices.name_en AS science_manager_office_name_en,'
         + ' science_manager_offices.started AS science_manager_office_started, science_manager_offices.finished AS science_manager_office_finished,'
-        + ' science_manager_positions.name_en AS science_manager_position_name_en, science_manager_positions.name_pt AS science_manager_position_name_pt'
+        + ' science_manager_positions.name_en AS science_manager_position_name_en, science_manager_positions.name_pt AS science_manager_position_name_pt,'
+        + ' science_manager_positions.sort_order'
         + ' FROM science_managers'
         + ' JOIN science_manager_offices ON science_manager_offices.id = science_managers.science_manager_office_id'
         + ' LEFT JOIN science_manager_positions ON science_manager_positions.id = science_managers.science_manager_position_id'
@@ -683,7 +456,8 @@ var actionGetMemberAdministative = function (people, options, i) {
         + 'SELECT people_administrative_offices.*,'
         + ' administrative_offices.name_en AS administrative_office_name_en,'
         + ' administrative_offices.started AS administrative_office_started, administrative_offices.finished AS administrative_office_finished,'
-        + ' administrative_positions.name_en AS administrative_position_name_en, administrative_positions.name_pt AS administrative_position_name_pt'
+        + ' administrative_positions.name_en AS administrative_position_name_en, administrative_positions.name_pt AS administrative_position_name_pt,'
+        + ' administrative_positions.sort_order'
         + ' FROM people_administrative_offices'
         + ' JOIN administrative_offices ON administrative_offices.id = people_administrative_offices.administrative_office_id'
         + ' LEFT JOIN administrative_positions ON administrative_positions.id = people_administrative_offices.administrative_position_id'

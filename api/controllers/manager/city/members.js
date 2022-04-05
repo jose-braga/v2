@@ -43,6 +43,39 @@ var actionGetCurrentMembersList = function (options) {
         offset = parseInt(req.query.offset, 10);
     }
     options.offset = offset;
+    let stringOrder = ''
+    if (req.query.sort !== undefined) {
+        if (Array.isArray(req.query.sort)) {
+            stringOrder = stringOrder + ' ORDER BY ';
+            for (let indSort in req.query.sort) {
+                if (req.query.sort[indSort] === 'name') {
+                    stringOrder = stringOrder + ' `name` '
+                } else if (req.query.sort[indSort] === 'most_recent_data.lab_position_name_en') {
+                    stringOrder = stringOrder + ' `sort_order` '
+                }
+                if (req.query.desc[indSort] === 'true') {
+                    stringOrder = stringOrder + ' DESC,'
+                } else {
+                    stringOrder = stringOrder + ' ASC,'
+                }
+            }
+        } else {
+            stringOrder = stringOrder + ' ORDER BY ';
+            // when sort has only a single element is a string
+            if (req.query.sort === 'name') {
+                stringOrder = stringOrder + ' `name` '
+            } else if (req.query.sort === 'most_recent_data.lab_position_name_en') {
+                stringOrder = stringOrder + ' `sort_order` '
+            }
+            if (req.query.desc === 'true') {
+                stringOrder = stringOrder + ' DESC,'
+            } else {
+                stringOrder = stringOrder + ' ASC,'
+            }
+        }
+    }
+    stringOrder = stringOrder.slice(0, -1);
+    /* Use the following block only if  sort array has no elements */
     if (req.query.sortOrder !== undefined) {
         sortOrder = req.query.sortOrder;
         if (sortOrder !== 'ASC' && sortOrder !== 'DESC') {
@@ -58,10 +91,11 @@ var actionGetCurrentMembersList = function (options) {
     var querySQL = '';
     var places = [];
     querySQL = querySQL
-        + 'SELECT DISTINCT people.id AS person_id, people.user_id, people.name, people.colloquial_name'
+        + 'SELECT DISTINCT people.id AS person_id, people.user_id, people.name, people.colloquial_name, people_labs.lab_position_id, "researcher" AS `type`, lab_positions.sort_order'
         + ' FROM people'
         + ' JOIN people_institution_city ON people_institution_city.person_id = people.id'
         + ' JOIN people_labs ON people_labs.person_id = people.id'
+        + ' LEFT JOIN lab_positions ON lab_positions.id =  people_labs.lab_position_id'
         + ' JOIN labs ON labs.id = people_labs.lab_id'
         + ' JOIN labs_groups ON labs_groups.lab_id = labs.id'
         + ' JOIN `groups` ON `groups`.id = labs_groups.group_id'
@@ -78,10 +112,11 @@ var actionGetCurrentMembersList = function (options) {
         + ' AND ((people_institution_city.valid_from IS NULL OR people_institution_city.valid_from <= ?)'
         + '    AND (people_institution_city.valid_until IS NULL OR people_institution_city.valid_until >= ?))'
         + ' UNION'
-        + ' SELECT DISTINCT people.id AS person_id, people.user_id, people.name, people.colloquial_name'
+        + ' SELECT DISTINCT people.id AS person_id, people.user_id, people.name, people.colloquial_name, technicians.technician_position_id AS lab_position_id, "technician" AS `type`, technician_positions.sort_order'
         + ' FROM people'
         + ' JOIN people_institution_city ON people_institution_city.person_id = people.id'
         + ' JOIN technicians ON technicians.person_id = people.id'
+        + ' LEFT JOIN technician_positions ON technician_positions.id =  technicians.technician_position_id'
         + ' JOIN technician_offices ON technician_offices.id = technicians.technician_office_id'
         + ' JOIN technicians_units ON technicians_units.technician_id = technicians.id'
         + ' WHERE people.status = 1'
@@ -95,10 +130,11 @@ var actionGetCurrentMembersList = function (options) {
         + ' AND ((people_institution_city.valid_from IS NULL OR people_institution_city.valid_from <= ?)'
         + '    AND (people_institution_city.valid_until IS NULL OR people_institution_city.valid_until >= ?))'
         + ' UNION'
-        + ' SELECT DISTINCT people.id AS person_id, people.user_id, people.name, people.colloquial_name'
+        + ' SELECT DISTINCT people.id AS person_id, people.user_id, people.name, people.colloquial_name, science_managers.science_manager_position_id AS lab_position_id, "science_manager" AS `type`, science_manager_positions.sort_order'
         + ' FROM people'
         + ' JOIN people_institution_city ON people_institution_city.person_id = people.id'
         + ' JOIN science_managers ON science_managers.person_id = people.id'
+        + ' LEFT JOIN science_manager_positions ON science_manager_positions.id =  science_managers.science_manager_position_id'
         + ' JOIN science_manager_offices ON science_manager_offices.id = science_managers.science_manager_office_id'
         + ' JOIN science_managers_units ON science_managers_units.science_manager_id = science_managers.id'
         + ' WHERE people.status = 1'
@@ -112,10 +148,11 @@ var actionGetCurrentMembersList = function (options) {
         + ' AND ((people_institution_city.valid_from IS NULL OR people_institution_city.valid_from <= ?)'
         + '    AND (people_institution_city.valid_until IS NULL OR people_institution_city.valid_until >= ?))'
         + ' UNION'
-        + ' SELECT DISTINCT people.id AS person_id, people.user_id, people.name, people.colloquial_name'
+        + ' SELECT DISTINCT people.id AS person_id, people.user_id, people.name, people.colloquial_name, people_administrative_offices.administrative_position_id AS lab_position_id, "administrative" AS `type`, administrative_positions.sort_order'
         + ' FROM people'
         + ' JOIN people_institution_city ON people_institution_city.person_id = people.id'
         + ' JOIN people_administrative_offices ON people_administrative_offices.person_id = people.id'
+        + ' LEFT JOIN administrative_positions ON administrative_positions.id =  people_administrative_offices.administrative_position_id'
         + ' JOIN administrative_offices ON administrative_offices.id = people_administrative_offices.administrative_office_id'
         + ' JOIN people_administrative_units ON people_administrative_units.administrative_id = people_administrative_offices.id'
         + ' WHERE people.status = 1'
@@ -127,8 +164,12 @@ var actionGetCurrentMembersList = function (options) {
         + '    OR (people_administrative_offices.valid_from IS NULL AND people_administrative_offices.valid_until >= ?)'
         + '    OR (people_administrative_offices.valid_from <= ? AND people_administrative_offices.valid_until >= ?))'
         + ' AND ((people_institution_city.valid_from IS NULL OR people_institution_city.valid_from <= ?)'
-        + '    AND (people_institution_city.valid_until IS NULL OR people_institution_city.valid_until >= ?))'
-        + ' ORDER BY `name` ' + sortOrder;
+        + '    AND (people_institution_city.valid_until IS NULL OR people_institution_city.valid_until >= ?))';
+        if (stringOrder === '') {
+            querySQL = querySQL + ' ORDER BY `name` ' + sortOrder;
+        } else {
+            querySQL = querySQL + stringOrder;
+        }
     places = [cityID].concat(qArray).concat([lab, lab, group, group, today, today, today, today, today, today])
         .concat([cityID]).concat(qArray).concat([lab, lab, today, today, today, today, today, today])
         .concat([cityID]).concat(qArray).concat([lab, lab, today, today, today, today, today, today])
