@@ -36,7 +36,7 @@ module.exports.login = function (req, res, next) {
                 );
             }
             if (!jwtUtils.checkPassword(password, resQuery[0].password)) {
-                return sendJSONResponse(res, 400,
+                return responses.sendJSONResponse(res, 400,
                     { statusCode: 400, message: 'Incorrect credentials.' }
                 );
             }

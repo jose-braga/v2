@@ -36,8 +36,8 @@
                     <b>Additional requests or questions</b>
                 </v-col>
                 <v-col cols="12" md="9">
-                    Use this to communicate with a data manager. Upon submitting
-                    your registration, the data manager will be able to read your
+                    Use this to communicate with a Research Unit manager. Upon submitting
+                    your registration, a manager will be able to read your
                     questions/requests.
                 </v-col>
             </v-row>
