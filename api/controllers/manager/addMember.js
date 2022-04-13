@@ -84,21 +84,26 @@ var addPersonCountry = function (options) {
     let { req, res, next, personID, i } = options;
     let data = req.body.data;
     let places = [];
-    querySQL = 'INSERT INTO people_countries'
-            + ' (person_id, country_id)'
-            + ' VALUES (?,?);';
-    places.push(personID,
-        data.countries[i].id);
-    sql.makeSQLOperation(req, res, querySQL, places,
-        (options) => {
-            if (i + 1 < data.countries.length) {
-                options.i = i + 1;
-                return addPersonCountry(options);
-            } else {
-                return addPersonalEmail(options);
-            }
-        },
-        options);
+    if (data.countries !== undefined && data.countries !== null && data.countries.length > 0) {
+        querySQL = 'INSERT INTO people_countries'
+                + ' (person_id, country_id)'
+                + ' VALUES (?,?);';
+        places.push(personID,
+            data.countries[i].id);
+        sql.makeSQLOperation(req, res, querySQL, places,
+            (options) => {
+                if (i + 1 < data.countries.length) {
+                    options.i = i + 1;
+                    return addPersonCountry(options);
+                } else {
+                    return addPersonalEmail(options);
+                }
+            },
+            options);
+    } else {
+        return addPersonalEmail(options);
+    }
+
 };
 var addPersonalEmail = function (options) {
     let { req, res, next, personID } = options;

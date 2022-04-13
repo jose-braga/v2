@@ -333,6 +333,7 @@ export default {
     },
     data() {
         return {
+            mostRecentRequest: null,
             progress: false,
             success: false,
             error: false,
@@ -370,7 +371,8 @@ export default {
         }
     },
     mounted () {
-        this.initialize(1, '', '', '');
+        this.mostRecentRequest = time.moment();
+        this.initialize(1, '', '', '',this.mostRecentRequest);
     },
     computed: {
         currentUnitCity () {
@@ -408,12 +410,13 @@ export default {
                 searchLabStore: this.searchLab,
                 searchGroupStore: this.searchGroup,
             });
-            this.initialize(1, '', '', '');
+            this.mostRecentRequest = time.moment();
+            this.initialize(1, '', '', '', this.mostRecentRequest);
         },
 
     },
     methods: {
-        initialize (page, search, searchLab, searchGroup) {
+        initialize (page, search, searchLab, searchGroup, reqTime) {
             this.options.page = page;
             this.loading = true;
             let this_session = this.$store.state.session;
@@ -450,12 +453,21 @@ export default {
                                 + '?limit=' + this.itemsPerPage
                                 + '&offset=' + (page - 1) * this.itemsPerPage;
                         }
+                        //console.log('before:', urlSubmit)
+                        //console.log('before (reqTime):', reqTime.format())
+                        //console.log('before (mostRecentRequest):', this.mostRecentRequest.format())
                         subUtil.getInfoPopulate(this, urlSubmit, true, true)
                         .then( (result) => {
-                            this.totalMembers = result.count;
-                            this.data.members = processResults(this, result.result);
-                            this.data.members.sort((el1, el2) => el1.name.localeCompare(el2.name))
-                            this.loading = false;
+                            //console.log('after:', urlSubmit)
+                            //console.log('after (reqTime):', reqTime.format())
+                            //console.log('after (mostRecentRequest):', this.mostRecentRequest.format())
+                            if (reqTime.format() === this.mostRecentRequest.format()) {
+                                this.totalMembers = result.count;
+                                this.data.members = processResults(this, result.result);
+                                this.data.members.sort((el1, el2) => el1.name.localeCompare(el2.name))
+                                this.loading = false;
+                            }
+                            
                         });
                     } else if ( this.segmentType === 'unit-city'
                         && decomposedPath.length === 6
@@ -489,10 +501,12 @@ export default {
                         }
                         subUtil.getInfoPopulate(this, urlSubmit, true, true)
                         .then( (result) => {
-                            this.totalMembers = result.count;
-                            this.data.members = processResults(this, result.result);
-                            this.data.members.sort((el1, el2) => el1.name.localeCompare(el2.name))
-                            this.loading = false;
+                            if (reqTime.format() === this.mostRecentRequest.format()) {
+                                this.totalMembers = result.count;
+                                this.data.members = processResults(this, result.result);
+                                this.data.members.sort((el1, el2) => el1.name.localeCompare(el2.name))
+                                this.loading = false;
+                            }
                         });
                     } else if ( this.segmentType === 'city'
                             && decomposedPath.length === 4
@@ -524,26 +538,30 @@ export default {
                         }
                         subUtil.getInfoPopulate(this, urlSubmit, true, true)
                         .then( (result) => {
-                            this.totalMembers = result.count;
-                            this.data.members = processResults(this, result.result);
-                            this.data.members.sort((el1, el2) => el1.name.localeCompare(el2.name))
-                            this.loading = false;
+                            if (reqTime.format() === this.mostRecentRequest.format()) {
+                                this.totalMembers = result.count;
+                                this.data.members = processResults(this, result.result);
+                                this.data.members.sort((el1, el2) => el1.name.localeCompare(el2.name))
+                                this.loading = false;
+                            }
                         });
                     }
                 }
                 if (!foundEndpoint) {
+                    this.loading = false;
                     this.data.members = [];
                 }
             }
         },
         filterData: debounce(function () {
-            this.initialize(1, this.search, this.searchLab, this.searchGroup);
+            this.mostRecentRequest = time.moment();
+            this.initialize(1, this.search, this.searchLab, this.searchGroup, this.mostRecentRequest);
             this.$store.commit('setSearch', {
                 searchName: this.search,
                 searchLabStore: this.searchLab,
                 searchGroupStore: this.searchGroup,
             });
-        }, 200),
+        }, 600),
         editItem (item) {
             this.dialog = true;
             this.memberID = item.person_id;
