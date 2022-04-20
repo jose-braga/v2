@@ -154,10 +154,8 @@ export default {
         },
         getContactTypes () {
             var vm = this;
-            if (this.$store.state.session.loggedIn) {
-                const urlSubmit = 'api/v2/' + 'contact-types';
-                return subUtil.getPublicInfo(vm, urlSubmit, 'contactTypes');
-            }
+            const urlSubmit = 'api/v2/' + 'contact-types';
+            return subUtil.getPublicInfo(vm, urlSubmit, 'contactTypes');
         },
     },
     validations: {
