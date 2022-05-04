@@ -49,5 +49,9 @@ module.exports.hashPassword = function (password) {
 };
 
 module.exports.checkPassword = function (password, hash) {
-    return bcrypt.compareSync(password, hash);
+    if (hash !== null) {
+        return bcrypt.compareSync(password, hash);
+    } else {
+        return false;
+    }
 };

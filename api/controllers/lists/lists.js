@@ -1009,9 +1009,6 @@ module.exports.listItems = function (req, res, next) {
     if (category === 'meeting-types') { // by mistake I created 2 tables with the same data
         getMeetingTypes(req, res, next);
     }
-    if (category === 'communication-types') {
-        getCommunicationTypes(req, res, next);
-    }
     if (category === 'patent-types') {
         getPatentTypes(req, res, next);
     }

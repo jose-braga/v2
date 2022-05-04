@@ -24,7 +24,7 @@ const externalAPI = require('../controllers/people/external_api'); //authorizati
 const informationEditors = require('../controllers/people/information_editors');
 const academicAffiliations = require('../controllers/people/academic_affiliations');
 const addPublications = require('../controllers/people/add_publications');
-//const addPubORCID = require('../controllers/people/add_pub_ORCID');
+const addPubORCID = require('../controllers/people/add_pub_ORCID');
 const addPubRepository = require('../controllers/people/add_pub_repository');
 const authorNames = require('../controllers/people/author_names');
 const cars = require('../controllers/people/cars');
@@ -214,6 +214,9 @@ router.post('/:personID/people-publications/:publicationID', cors(corsOptions), 
 router.put('/:personID/people-publications/:publicationID', cors(corsOptions), publicationsList.updatePersonPublicationAssociation);
 router.delete('/:personID/people-publications/:publicationID', cors(corsOptions), publicationsList.deletePersonPublicationAssociation);
 router.put('/:personID/publications/:publicationID', cors(corsOptions), publicationsList.updatePublication);
+router.post('/:personID/journals', cors(corsOptions), addPubORCID.createJournal);
+router.post('/:personID/journals/:journalID/publications', cors(corsOptions), addPubORCID.createPublication);
+
 
 router.get('/:personID/author-names', cors(corsOptions), authorNames.getAuthorNames);
 router.post('/:personID/author-names', cors(corsOptions), authorNames.createAuthorName);

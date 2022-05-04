@@ -755,7 +755,12 @@ module.exports.searchPeople = function (req, res, next) {
              + ' LEFT JOIN units AS science_manager_units_units ON science_manager_units_units.id = science_managers_units.unit_id'
              + ' LEFT JOIN people_administrative_offices ON people_administrative_offices.person_id = people.id'
              + ' LEFT JOIN people_administrative_units ON people_administrative_units.administrative_id = people_administrative_offices.id'
-             + ' LEFT JOIN units AS administrative_units ON administrative_units.id = people_administrative_units.unit_id'
+             + ' LEFT JOIN units AS administrative_units ON administrative_units.id = people_administrative_units.unit_id';
+    if (email !== null) {
+        querySQL = querySQL
+             + ' LEFT JOIN emails ON emails.person_id = people.id'
+    }
+    querySQL = querySQL +
              + ' WHERE people.status = ? AND people.visible_public = 1'
              + ' AND ( (people.active_from <= CURDATE() AND people.active_until >= CURDATE()) '
                 + ' OR (people.active_from <= CURDATE() AND people.active_until IS NULL)'

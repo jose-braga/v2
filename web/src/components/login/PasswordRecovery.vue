@@ -51,7 +51,9 @@
                     </v-col>
                     <v-col v-if="success" cols="12">
                         <div>
-                            <p class="caption blue--text">Password change successfull</p>
+                            <p class="caption blue--text">Password change successfull
+                                <br> Redirecting you to the initial page.
+                            </p>
                         </div>
                     </v-col>
                     <v-col cols="12">
@@ -133,6 +135,10 @@ export default {
                     })
                 .then(() => {
                     this.success = true;
+                    setTimeout(() => {
+                        this.$router.push({ path: '/person/personal' });
+                    }, 1500)
+
                 })
                 .catch((error) => {
                     this.error = true;
