@@ -22,6 +22,11 @@ var makeSQLOperation = function (req, res, sql, places, callback, callbackOption
                 // And done with the connection.
                 connection.release();
                 if (err) {
+                    console.log('Error in makeSQLOperation');
+                    console.log('--------- SQL --------- ');
+                    console.log(sql);
+                    console.log('-------- Values ------- ');
+                    console.log(places);
                     responses.sendJSONResponse(res, 400, { "status": "error", "statusCode": 400, "error": err.stack });
                     return;
                 }
@@ -61,6 +66,11 @@ var getSQLOperationResult = function (req, res, sql, places, callback, callbackO
                 // And done with the connection.
                 connection.release();
                 if (err) {
+                    console.log('--------- SQL --------- ');
+                    console.log(sql);
+                    console.log('-------- Values ------- ');
+                    console.log(places);
+                    console.log('------ Err. Stack -----');
                     console.log(err.stack);
                     return;
                 }

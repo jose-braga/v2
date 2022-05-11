@@ -30,6 +30,9 @@
                             :person-publication-id="editedItem.id"
                             :publication-updated="editedItem.updated"
                             :publication-data="editedItem"
+                            :endpoint="endpoint"
+                            :person-id="personId"
+                            :manager-id="managerId"
                         >
                         </PublicationDetails>
                     </v-dialog>
@@ -194,6 +197,7 @@ export default {
     computed: {},
     watch: {
         personId () {
+            this.data.publications = [];
             this.initialize();
         },
     },

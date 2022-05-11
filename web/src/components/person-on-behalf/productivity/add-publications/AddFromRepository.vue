@@ -204,7 +204,11 @@ function determineJournal(pub, journals) {
             } else {
                 bestInd = bestIndShort;
             }
-            mostSimilarJournalID = journals[bestInd].id;
+            let min_short_full = Math.min(minSimilarityFull, minSimilarityShort);
+            let dissimilarityMetric = (min_short_full * 1.0)/(pub.journal_name.length * 1.0);
+            if (dissimilarityMetric < 0.1) {
+                mostSimilarJournalID = journals[bestInd].id;
+            }
         }
         pub.journal_id = mostSimilarJournalID;
     }
@@ -374,11 +378,11 @@ export default {
                                     + '/people-publications/' + publicationID,
                             body: urlCreatePublications[ind].body,
                         });
-                        urlUpdatePublications.push({
-                            url: 'api/people/' + personID
-                                    + '/publications/' + publicationID,
-                            body: urlCreatePublications[ind].body,
-                        });
+                        //urlUpdatePublications.push({
+                        //    url: 'api/people/' + personID
+                        //            + '/publications/' + publicationID,
+                        //    body: urlCreatePublications[ind].body,
+                        //});
                     }
                     return Promise.all(
                         urlCreatePersonPublications.map(el =>
@@ -474,7 +478,8 @@ export default {
                             publicationsPURE[ind] = determineJournal(publicationsPURE[ind], this.journals);
                             if (publicationsPURE[ind].title === null
                                     || publicationsPURE[ind].authors_raw === null
-                                    || publicationsPURE[ind].journal_name === null) {
+                                    || publicationsPURE[ind].journal_name === null
+                                    || (publicationsPURE[ind].journal_name !== null && publicationsPURE[ind].journal_id === null)) {
                                 this.$set(publicationsPURE[ind], 'incomplete', true);
                             }
                         }

@@ -720,6 +720,7 @@ module.exports.searchPeople = function (req, res, next) {
     var lab = null;
     let email = null;
     let rgID = null;
+    let researchGroup = null;
     var unitID = null;
     if (req.query.hasOwnProperty('name')) {
         names = req.query.name.split(' ');
@@ -733,6 +734,9 @@ module.exports.searchPeople = function (req, res, next) {
     if (req.query.hasOwnProperty('rg')) {
         rgID = req.query.rg;
     }
+    if (req.query.hasOwnProperty('rgroup')) {
+        researchGroup = req.query.rgroup.replace(/\s/gi,'%');
+    }
     if (req.query.hasOwnProperty('unit')) {
         unitID = req.query.unit;
     }
@@ -745,7 +749,7 @@ module.exports.searchPeople = function (req, res, next) {
              + ' LEFT JOIN labs ON labs.id = people_labs.lab_id'
              + ' LEFT JOIN labs_groups ON labs_groups.lab_id = labs.id'
              + ' LEFT JOIN `groups` ON labs_groups.group_id = `groups`.id'
-             + ' LEFT JOIN groups_units ON groups_units.group_id = groups.id'
+             + ' LEFT JOIN groups_units ON groups_units.group_id = `groups`.id'
              + ' LEFT JOIN units ON groups_units.unit_id = units.id'
              + ' LEFT JOIN technicians ON technicians.person_id = people.id'
              + ' LEFT JOIN technicians_units ON technicians_units.technician_id = technicians.id'
@@ -760,17 +764,17 @@ module.exports.searchPeople = function (req, res, next) {
         querySQL = querySQL
              + ' LEFT JOIN emails ON emails.person_id = people.id'
     }
-    querySQL = querySQL +
+    querySQL = querySQL
              + ' WHERE people.status = ? AND people.visible_public = 1'
              + ' AND ( (people.active_from <= CURDATE() AND people.active_until >= CURDATE()) '
-                + ' OR (people.active_from <= CURDATE() AND people.active_until IS NULL)'
-                + ' OR (people.active_from IS NULL AND people.active_until >= CURDATE())'
-                + ' OR (people.active_from IS NULL AND people.active_until IS NULL) )'
+             + ' OR (people.active_from <= CURDATE() AND people.active_until IS NULL)'
+             + ' OR (people.active_from IS NULL AND people.active_until >= CURDATE())'
+             + ' OR (people.active_from IS NULL AND people.active_until IS NULL) )'
     places.push(1);
     if (names.length > 0) {
         for (let name of names) {
             let searchStr = '%' + name + '%'
-            querySQL = querySQL + 'AND people.name LIKE ?';
+            querySQL = querySQL + ' AND people.name LIKE ?';
             places.push(searchStr);
         }
     }
@@ -778,6 +782,11 @@ module.exports.searchPeople = function (req, res, next) {
         lab = '%' + lab + '%';
         querySQL = querySQL + ' AND labs.name LIKE ?'
         places.push(lab);
+    }
+    if (researchGroup !== null) {
+        researchGroup = '%' + researchGroup + '%';
+        querySQL = querySQL + ' AND `groups`.name LIKE ?'
+        places.push(researchGroup);
     }
     if (email !== null) {
         email = '%' + email + '%';

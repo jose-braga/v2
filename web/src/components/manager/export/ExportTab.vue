@@ -39,6 +39,13 @@
 
         </v-row>
         <v-row align="center">
+            <v-col cols="10" md="3">
+                <v-select v-model="filterLabID"
+                    :items="labs"
+                    item-value="id" item-text="name"
+                    label="Lab">
+                </v-select>
+            </v-col>
             <v-col cols="5" sm="3">
                 <v-menu ref="showDateFrom"
                     v-model="showDateFrom"
@@ -1258,6 +1265,7 @@ export default {
             filterUnitID: null,
             filterPoleID: null,
             filterDepartmentID: null,
+            filterLabID: null,
             filterDepartmentTeamID: null,
             filterDateFrom: null,
             showDateFrom: false,
@@ -1266,6 +1274,7 @@ export default {
             units: [],
             poles: [],
             departments: [],
+            labs: [],
             departmentTeams: [],
         }
     },
@@ -1275,6 +1284,7 @@ export default {
         this.getUnits();
         this.getPoles();
         this.getDepartments();
+        this.getLabs();
         this.getDepartmentTeams();
     },
     computed: {
@@ -1303,6 +1313,14 @@ export default {
                     query = query + '?department=' + this.filterDepartmentID;
                 } else {
                     query = query + '&department=' + this.filterDepartmentID;
+                }
+            }
+            if (this.filterLabID) {
+                if (firstOnQuery) {
+                    firstOnQuery = false;
+                    query = query + '?lab=' + this.filterLabID;
+                } else {
+                    query = query + '&lab=' + this.filterLabID;
                 }
             }
             if (this.filterDepartmentTeamID) {
@@ -1356,6 +1374,13 @@ export default {
                 return subUtil.getPublicInfo(vm, urlSubmit, 'departmentTeams');
             }
         },
+        getLabs() {
+            var vm = this;
+            if (this.$store.state.session.loggedIn) {
+                const urlSubmit = 'api/v2/' + 'labs';
+                return subUtil.getPublicInfo(vm, urlSubmit, 'labs');
+            }
+        },
         getSpreadsheetData () {
             this.progress = true;
             let this_session = this.$store.state.session;
@@ -1399,6 +1424,9 @@ export default {
             }
             if (this.filterDepartmentID !== null && this.filterDepartmentID !== undefined) {
                 filename = filename + '_department_' + this.filterDepartmentID;
+            }
+            if (this.filterLabID !== null && this.filterLabID !== undefined) {
+                filename = filename + '_lab_' + this.filterLabID;
             }
             if (this.filterDepartmentTeamID !== null && this.filterDepartmentTeamID !== undefined) {
                 filename = filename + '_depTeam_' + this.filterDepartmentTeamID;

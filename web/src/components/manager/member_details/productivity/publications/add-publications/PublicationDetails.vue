@@ -88,7 +88,7 @@
                             cache-items
                             flat
                             hide-no-data
-                            hide-details
+
                             label="Journal">
                         </v-autocomplete>
                         <v-checkbox v-if="publicationDetails.isORCID || publicationDetails.isPURE"

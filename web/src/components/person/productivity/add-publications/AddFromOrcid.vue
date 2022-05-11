@@ -153,7 +153,9 @@ function filterORCIDData(works) {
                     }
                     if (Object.prototype.hasOwnProperty.call(publication['work-summary'][indSum],'put-code')) {
                         if (Object.prototype.hasOwnProperty.call(publication['work-summary'][indSum],'source')) {
-                            if (Object.prototype.hasOwnProperty.call(publication['work-summary'][indSum].source,'source-name')) {
+                            if (Object.prototype.hasOwnProperty.call(publication['work-summary'][indSum].source,'source-name')
+                                && publication['work-summary'][indSum].source['source-name'] !== null
+                            ) {
                                 if (publication['work-summary'][indSum].source['source-name'].value === 'CIÊNCIAVITAE') {
                                     thisClassification = 1;
                                 } else if (publication['work-summary'][indSum].source['source-name'].value === 'Crossref Metadata Search'
@@ -406,7 +408,11 @@ function determineJournal(pub, journals) {
             } else {
                 bestInd = bestIndShort;
             }
-            mostSimilarJournalID = journals[bestInd].id;
+            let min_short_full = Math.min(minSimilarityFull, minSimilarityShort);
+            let dissimilarityMetric = (min_short_full * 1.0)/(pub.journal_name.length * 1.0);
+            if (dissimilarityMetric < 0.1) {
+                mostSimilarJournalID = journals[bestInd].id;
+            }
         }
         pub.journal_id = mostSimilarJournalID;
     }
@@ -572,11 +578,11 @@ export default {
                                     + '/people-publications/' + publicationID,
                             body: urlCreatePublications[ind].body,
                         });
-                        urlUpdatePublications.push({
-                            url: 'api/people/' + personID
-                                    + '/publications/' + publicationID,
-                            body: urlCreatePublications[ind].body,
-                        });
+                        //urlUpdatePublications.push({
+                        //    url: 'api/people/' + personID
+                        //            + '/publications/' + publicationID,
+                        //    body: urlCreatePublications[ind].body,
+                        //});
                     }
                     return Promise.all(
                         urlCreatePersonPublications.map(el =>
@@ -689,7 +695,8 @@ export default {
                         this.data.publications[ind] = determineJournal(this.data.publications[ind], this.journals);
                         if (this.data.publications[ind].title === null
                             || this.data.publications[ind].authors_raw === null
-                            || this.data.publications[ind].journal_name === null) {
+                            || this.data.publications[ind].journal_name === null
+                            || (this.data.publications[ind].journal_name !== null && this.data.publications[ind].journal_id === null)) {
                             this.$set(this.data.publications[ind], 'incomplete', true);
                         }
                     }

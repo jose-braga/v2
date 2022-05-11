@@ -65,6 +65,7 @@
                             :person-publication-id="editedItem.id"
                             :publication-updated="editedItem.updated"
                             :publication-data="editedItem"
+                            :other-person-id="otherPersonId"
                         >
                         </PublicationDetails>
                     </v-dialog>

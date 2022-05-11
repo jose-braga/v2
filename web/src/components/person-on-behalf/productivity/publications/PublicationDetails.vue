@@ -81,6 +81,7 @@
                 <v-row>
                     <v-col cols="12" md="6">
                         <v-autocomplete
+                            v-if="!publicationDetails.new_journal"
                             v-model="publicationDetails.journal_id"
                             @change="journalChange()"
                             :items="journals" item-value="id" item-text="name_show"
@@ -90,6 +91,15 @@
                             hide-details
                             label="Journal">
                         </v-autocomplete>
+                        <v-checkbox
+                            v-model="publicationDetails.new_journal"
+                            label="Journal not in list, create new journal"
+                        ></v-checkbox>
+                        <v-text-field v-if="publicationDetails.new_journal"
+                            v-model="publicationDetails.journal_name"
+                            @input="journalNameAdded()"
+                            label="Journal name"
+                        ></v-text-field>
                     </v-col>
                     <v-col cols="12" md="4">
                         <v-text-field
@@ -180,6 +190,7 @@ export default {
         personPublicationId: Number,
         publicationUpdated: String,
         publicationData: Object,
+        otherPersonId: Number,
     },
     data() {
         return {
@@ -270,7 +281,8 @@ export default {
         },
         submitForm() {
             if (this.$store.state.session.loggedIn) {
-                let personID = this.$store.state.session.personID;
+                let personID = this.otherPersonId;
+                let urlCreateJournal = [];
                 let urlUpdate = [];
                 this.progress = true;
                 urlUpdate.push({
@@ -278,7 +290,27 @@ export default {
                             + '/publications/' + this.publicationDetails.publication_id,
                     body: this.publicationDetails,
                 });
+                if (this.publicationDetails.new_journal === true) {
+                    urlCreateJournal.push({
+                        url: 'api/people/' + personID
+                            + '/journals',
+                        body: this.publicationDetails,
+                    });
+                }
                 Promise.all(
+                    urlCreateJournal.map(el =>
+                        this.$http.post(el.url,
+                            { data: el.body, },
+                            { headers:
+                                {'Authorization': 'Bearer ' + localStorage['v2-token']
+                            },
+                        }))
+                )
+                .then( (createdJournals) => {
+                    if (this.publicationDetails.new_journal === true) {
+                        urlUpdate[0].body.journal_id = createdJournals[0].data.result.journalID;
+                    }
+                    return Promise.all(
                         urlUpdate.map(el =>
                             this.$http.put(el.url,
                                 { data: el.body, },
@@ -287,21 +319,33 @@ export default {
                                 },
                             }))
                     )
-                    .then( () => {
-                        this.progress = false;
-                        this.success = true;
-                        this.$root.$emit('updateSinglePublication', this.personPublicationId);
-                        setTimeout(() => {this.success = false;}, 1500)
-                        this.initialize();
-                    })
-                    .catch((error) => {
-                        this.progress = false;
-                        this.error = true;
-                        this.$root.$emit('updateSinglePublication', this.personPublicationId);
-                        setTimeout(() => {this.error = false;}, 6000)
-                        // eslint-disable-next-line
-                        console.log(error)
-                    })
+                })
+                .then( () => {
+                    this.journals = []
+                    return this.getJournals();
+                })
+                .then( () => {
+                    for (let ind in this.journals) {
+                        this.$set(this.journals[ind], 'name_show',
+                            this.journals[ind].short_name
+                            + ' - ' + this.journals[ind].name);
+                    }
+                    this.loadingJournals = false;
+                    this.journalChange();
+                    this.progress = false;
+                    this.success = true;
+                    this.$root.$emit('updateSinglePublication', this.personPublicationId);
+                    setTimeout(() => {this.success = false;}, 1500)
+                    this.initialize();
+                })
+                .catch((error) => {
+                    this.progress = false;
+                    this.error = true;
+                    this.$root.$emit('updateSinglePublication', this.personPublicationId);
+                    setTimeout(() => {this.error = false;}, 6000)
+                    // eslint-disable-next-line
+                    console.log(error)
+                })
             }
         },
         getJournals () {
@@ -343,6 +387,17 @@ export default {
                         + ' / ' + this.journals[ind].eissn);
                     break;
                 }
+            }
+        },
+        journalNameAdded() {
+            if (this.publicationDetails.journal_name !== null
+                && this.publicationDetails.journal_name !== undefined
+                && this.publicationDetails.journal_name !== '') {
+                this.publicationDetails.incomplete = false;
+                this.$set(this.publicationDetails, 'publisher_show',null)
+                this.$set(this.publicationDetails, 'issn_show',null)
+            } else {
+                this.publicationDetails.incomplete = true;
             }
         },
     },

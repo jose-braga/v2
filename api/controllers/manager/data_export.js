@@ -7,6 +7,7 @@ var filterPeople = function (options) {
     let { req, res, next } = options;
     let unitID = null;
     let poleID = null;
+    let labID = null;
     let departmentID = null;
     let depTeamID = null;
     let dateFrom = null;
@@ -84,6 +85,25 @@ var filterPeople = function (options) {
                 + ' AND ('
                 + ' (people_departments.valid_from IS NULL OR people_departments.valid_from <= ?)'
                 + ' AND (people_departments.valid_until IS NULL OR people_departments.valid_until >= ?)'
+                + ')'
+                ;
+            places.push(dateFrom, dateUntil);
+        }
+    }
+    if (req.query.lab !== undefined) {
+        labID = parseInt(req.query.lab, 10);
+        joinStatements = joinStatements
+            + ' JOIN people_labs ON people_labs.person_id = people.id'
+            ;
+        whereStatements = whereStatements
+            + ' AND people_labs.lab_id = ?'
+            ;
+        places.push(labID);
+        if (hasDateFilter) {
+            whereStatements = whereStatements
+                + ' AND ('
+                + ' (people_labs.valid_from IS NULL OR people_labs.valid_from <= ?)'
+                + ' AND (people_labs.valid_until IS NULL OR people_labs.valid_until >= ?)'
                 + ')'
                 ;
             places.push(dateFrom, dateUntil);
