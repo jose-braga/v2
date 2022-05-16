@@ -68,6 +68,13 @@
                         ></v-date-picker>
                     </v-menu>
                 </v-col>
+                <v-col cols="12" sm="3">
+                    <v-textarea
+                        v-model="role.comments"
+                        label="Comments"
+                        rows="1"
+                    ></v-textarea>
+                </v-col>
                 <v-col cols="12" sm="1">
                     <v-btn icon @click.stop="removeItem(spaceDetails.roles, i)" class="mt-3">
                         <v-icon color="red darken">mdi-delete</v-icon>
@@ -144,7 +151,7 @@ export default {
                 let urlCreateRole = [];
                 let urlDeleteRole = [];
                 let urlUpdateRole = [];
-                let personID = this.$store.state.session.personID;
+                let personID = this.personId;
                 for (let ind in this.spaceDetails.roles) {
                     let datum = this.spaceDetails.roles[ind]
                     if (datum.id === 'new') {

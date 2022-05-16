@@ -7,7 +7,6 @@
             </span>
         </v-card-title>
         <v-container>
-            {{spaceDetails}}
             <v-row>
                 <v-col cols="12" sm="6">
                     <v-text-field v-model="spaceDetails.name_pt"

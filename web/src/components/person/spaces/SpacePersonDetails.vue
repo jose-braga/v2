@@ -68,6 +68,13 @@
                         ></v-date-picker>
                     </v-menu>
                 </v-col>
+                <v-col cols="12" sm="3">
+                    <v-textarea
+                        v-model="role.comments"
+                        label="Comments"
+                        rows="1"
+                    ></v-textarea>
+                </v-col>
                 <v-col cols="12" sm="1">
                     <v-btn icon @click.stop="removeItem(spaceDetails.roles, i)" class="mt-3">
                         <v-icon color="red darken">mdi-delete</v-icon>
@@ -156,7 +163,7 @@ export default {
                     } else {
                         urlUpdateRole.push({
                             url: 'api/people/' + personID
-                                + '/spaces/' + this.space_id
+                                + '/spaces/' + this.itemId
                                 + '/roles/' + datum.id,
                             body: datum,
                         });
@@ -165,9 +172,10 @@ export default {
                 for (let ind in this.toDeleteRoles) {
                     let datum = this.toDeleteRoles[ind]
                     urlDeleteRole.push('api/people/' + personID
-                                + '/spaces/' + this.space_id
+                                + '/spaces/' + this.itemId
                                 + '/roles/' + datum.id)
                 }
+                console.log(urlUpdateRole)
                 Promise.all(
                     urlDeleteRole.map(el =>
                         this.$http.delete(el,

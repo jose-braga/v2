@@ -239,15 +239,16 @@ var actionCreateSpacePerson = function (options) {
     // don't forget to add fractions if that is important
     querySQL = querySQL
             + 'INSERT INTO users_spaces'
-            + ' (space_id, person_id, role_id, valid_from, valid_until)'
-            + ' VALUES (?, ?, ?, ?, ?)'
+            + ' (space_id, person_id, role_id, valid_from, valid_until, comments)'
+            + ' VALUES (?,?,?,?,?,?)'
 
     places.push(
         spaceID,
         data.person_id,
         data.role_id,
         data.valid_from,
-        data.valid_until
+        data.valid_until,
+        data.comments
     );
     return sql.makeSQLOperation(req, res, querySQL, places);
 };
@@ -269,13 +270,15 @@ var actionUpdateSpacePerson = function (options) {
             + ' SET person_id = ?,'
             + ' role_id = ?,'
             + ' valid_from = ?,'
-            + ' valid_until = ?'
+            + ' valid_until = ?,'
+            + ' comments = ?'
             + ' WHERE id = ?;';
     places.push(
         data.person_id,
         data.role_id,
         data.valid_from,
         data.valid_until,
+        data.comments,
         spacePersonID
     );
     return sql.makeSQLOperation(req, res, querySQL, places);

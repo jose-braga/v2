@@ -1261,7 +1261,7 @@ var getSpacesPerson = function (options) {
         + 'SELECT spaces.*,'
         + ' space_types.name_en AS space_type_name,'
         + ' users_spaces.role_id, space_roles.name_en AS role_name,'
-        + ' users_spaces.valid_from, users_spaces.valid_until'
+        + ' users_spaces.valid_from, users_spaces.valid_until, users_spaces.comments'
         + ' FROM users_spaces'
         + ' JOIN spaces ON spaces.id = users_spaces.space_id'
         + ' LEFT JOIN space_types ON space_types.id = spaces.space_type_id'

@@ -68,6 +68,13 @@
                         ></v-date-picker>
                     </v-menu>
                 </v-col>
+                <v-col cols="12" sm="3">
+                    <v-textarea
+                        v-model="role.comments"
+                        label="Comments"
+                        rows="1"
+                    ></v-textarea>
+                </v-col>
                 <v-col cols="12" sm="1">
                     <v-btn icon @click.stop="removeItem(spaceDetails.roles, i)" class="mt-3">
                         <v-icon color="red darken">mdi-delete</v-icon>
@@ -104,6 +111,7 @@ export default {
         itemId: Number,
         personId: Number,
         spaceData: Object,
+        otherPersonId: Number,
     },
     data() {
         return {
@@ -143,7 +151,7 @@ export default {
                 let urlCreateRole = [];
                 let urlDeleteRole = [];
                 let urlUpdateRole = [];
-                let personID = this.$store.state.session.personID;
+                let personID = this.otherPersonId;
                 for (let ind in this.spaceDetails.roles) {
                     let datum = this.spaceDetails.roles[ind]
                     if (datum.id === 'new') {
@@ -156,7 +164,7 @@ export default {
                     } else {
                         urlUpdateRole.push({
                             url: 'api/people/' + personID
-                                + '/spaces/' + this.space_id
+                                + '/spaces/' + this.itemId
                                 + '/roles/' + datum.id,
                             body: datum,
                         });
@@ -165,7 +173,7 @@ export default {
                 for (let ind in this.toDeleteRoles) {
                     let datum = this.toDeleteRoles[ind]
                     urlDeleteRole.push('api/people/' + personID
-                                + '/spaces/' + this.space_id
+                                + '/spaces/' + this.itemId
                                 + '/roles/' + datum.id)
                 }
                 Promise.all(

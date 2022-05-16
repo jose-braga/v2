@@ -22,7 +22,7 @@
                 </v-col>
             </v-row>
             <v-row v-if="addingNewSpace" align-content="center">
-                <v-col cols="12" sm="3">
+                <v-col cols="12" sm="2">
                     <v-autocomplete
                         v-model="data.newSpaces.space_id"
                         :items="spaces" item-value="id" item-text="space_text"
@@ -80,7 +80,14 @@
                         ></v-date-picker>
                     </v-menu>
                 </v-col>
-                <v-col cols="2" align-self="center">
+                <v-col cols="12" sm="2">
+                    <v-textarea
+                        v-model="data.newSpaces.comments"
+                        label="Comments"
+                        rows="1"
+                    ></v-textarea>
+                </v-col>
+                <v-col cols="1" align-self="center">
                     <v-row justify="end">
                         <v-btn type="submit"
                         outlined color="red">Add</v-btn>
@@ -121,6 +128,7 @@
             :item-id="editedItem.space_id"
             :person-id="editedItem.person_id"
             :space-data="editedItem"
+            :other-person-id="otherPersonId"
         >
         </SpaceDetails>
     </v-dialog>

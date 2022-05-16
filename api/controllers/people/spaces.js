@@ -238,14 +238,15 @@ var actionAddPersonSpaces = function (options) {
     var querySQL = '';
     var places = [];
     querySQL = querySQL
-        + 'INSERT INTO users_spaces (person_id, space_id, role_id, valid_from, valid_until)'
-        + ' VALUES (?,?,?,?,?);'
+        + 'INSERT INTO users_spaces (person_id, space_id, role_id, valid_from, valid_until, comments)'
+        + ' VALUES (?,?,?,?,?,?);'
         ;
     places.push(personID,
         data.space_id,
         data.role_id,
         data.valid_from,
-        data.valid_until
+        data.valid_until,
+        data.comments
     )
     return sql.makeSQLOperation(req, res, querySQL, places)
 };
@@ -269,14 +270,15 @@ var actionAddPersonRoles = function (options) {
     var querySQL = '';
     var places = [];
     querySQL = querySQL
-        + 'INSERT INTO users_spaces (person_id, space_id, role_id, valid_from, valid_until)'
-        + ' VALUES (?,?,?,?,?);'
+        + 'INSERT INTO users_spaces (person_id, space_id, role_id, valid_from, valid_until, comments)'
+        + ' VALUES (?,?,?,?,?,?);'
         ;
     places.push(personID,
         spaceID,
         data.role_id,
         data.valid_from,
-        data.valid_until
+        data.valid_until,
+        data.comments
     )
     return sql.makeSQLOperation(req, res, querySQL, places)
 };
@@ -302,13 +304,15 @@ var actionUpdatePersonRoles = function (options) {
         + 'UPDATE users_spaces'
         + ' SET role_id = ?,'
         + ' valid_from = ?,'
-        + ' valid_until = ?'
+        + ' valid_until = ?,'
+        + ' comments = ?'
         + ' WHERE id = ?;'
         ;
     places.push(
         data.role_id,
         data.valid_from,
         data.valid_until,
+        data.comments,
         userRoleID
     );
     return sql.makeSQLOperation(req, res, querySQL, places)
