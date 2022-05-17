@@ -1201,6 +1201,7 @@ function processResultsSpaces(vm, dataSpaces) {
             data['Space Type'] = space.space_type_name;
             data['Space Ref.'] = space.reference;
             data['Space Name'] = space.name_pt;
+            data['Comments'] = space.comments;
             peopleSpaces.push(data)
 
         }
