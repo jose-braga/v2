@@ -175,7 +175,6 @@ export default {
                                 + '/spaces/' + this.itemId
                                 + '/roles/' + datum.id)
                 }
-                console.log(urlUpdateRole)
                 Promise.all(
                     urlDeleteRole.map(el =>
                         this.$http.delete(el,

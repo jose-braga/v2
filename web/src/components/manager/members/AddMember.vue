@@ -1112,7 +1112,6 @@ export default {
                         url: url,
                         body: this.data,
                     });
-                    console.log(urlCreate)
 
                     Promise.all(
                         urlCreate.map(el =>

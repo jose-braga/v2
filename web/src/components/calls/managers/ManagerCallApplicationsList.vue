@@ -1147,12 +1147,10 @@ export default {
                     + '_applicants_' + dateFile + '.xlsx');
         },
         generateCandidateFiles(items) {
-            console.log(items)
             let today = time.moment();
             let dateFile = time.momentToDate(today, 'Europe/Lisbon', 'YYYY-MM-DDTHHmmss')
             for (let ind in items) {
                 let candidateName = items[ind].applicant_name;
-                console.log(candidateName)
                 let degrees = items[ind].academicDegrees;
                 let integratedMaster = false;
                 let bachelor;

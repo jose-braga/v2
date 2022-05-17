@@ -380,7 +380,7 @@ export default {
             }
         },
         generateSpreadsheet(members) {
-            console.log(members)
+            //console.log(members)
             let today = time.moment();
             let dateFile = time.momentToDate(today, 'Europe/Lisbon', 'YYYY-MM-DDTHHmmss');
             let filename = '';

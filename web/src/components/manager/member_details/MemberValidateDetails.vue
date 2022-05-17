@@ -284,7 +284,6 @@ export default {
     },
     watch: {
         personId () {
-            console.log('oi!top!')
             this.initialize();
         },
     },

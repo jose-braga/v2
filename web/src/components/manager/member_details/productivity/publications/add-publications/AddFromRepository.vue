@@ -590,9 +590,9 @@ export default {
                     }
                     // now try checking by title/journal
                     if (checkMore) {
-                        if (purePublications[ind].title === undefined) {
-                            console.log(purePublications[ind])
-                        }
+                        //if (purePublications[ind].title === undefined) {
+                        //    console.log(purePublications[ind])
+                        //}
                         let pureTitle = prepareStringComparison(purePublications[ind].title.value);
                         let indTitle = dbTitles.indexOf(pureTitle);
                         if (indTitle === -1) {

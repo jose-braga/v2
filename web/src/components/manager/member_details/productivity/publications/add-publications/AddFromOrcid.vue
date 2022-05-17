@@ -740,7 +740,7 @@ export default {
             }
         },
         editItem (item) {
-            console.log(item)
+            //console.log(item)
             item.citations_last_year = {};
             item.impact_factor_last_year = {};
             this.dialog = true;

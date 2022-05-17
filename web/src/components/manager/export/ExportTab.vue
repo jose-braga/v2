@@ -1207,9 +1207,7 @@ function processResultsSpaces(vm, dataSpaces) {
     }
     let teamsSpaces = [];
     for (let indTeam in dataSpaces.spacesTeams) {
-        console.log(indTeam)
         let space = dataSpaces.spacesTeams[indTeam];
-        console.log(space)
         let data = {};
         data['Space Ref.'] = space.reference;
         data['Team Name'] = space.team_name;
@@ -1560,7 +1558,6 @@ export default {
                 }
             )
             .then((result) => {
-                console.log(result.data.result)
                 this.saveSpreadsheetSpaces(result.data.result);
             })
             .catch((error) => {
