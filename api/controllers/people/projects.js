@@ -787,7 +787,7 @@ var actionAddProjectLabs = function (options) {
 var actionAddProjectAreas = function (options) {
     let { req, res, next, projectID, i} = options;
     let data = req.body.data;
-    if (data.project_areas.length > 0) {
+    if (data.project_areas!== undefined && data.project_areas.length > 0) {
         let item = data.project_areas[i];
         var querySQL = '';
         var places = [];
