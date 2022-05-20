@@ -179,7 +179,8 @@ var actionCreateItem = function (options) {
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             options.itemID = resQuery.insertId;
-            if (data.person_details.length > 0) {
+            if (data.person_details !== undefined &&
+                data.person_details.length > 0) {
                 options.i = 0;
                 return addPersonItem(options);
             } else if (data.labs_details !== undefined

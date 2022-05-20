@@ -210,7 +210,8 @@ var addPersonItem = function (options) {
 var addLabItem = function (options) {
     let { req, res, next, itemID, i } = options;
     let data = req.body.data;
-    if (data.labs_details.length > 0) {
+    if (data.labs_details !== undefined &&
+        data.labs_details.length > 0) {
         var querySQL = '';
         var places = [];
         querySQL = querySQL
@@ -394,7 +395,8 @@ var updateCreateItemPerson = function (options) {
             } else if (req.body.data.toDeleteLab.length > 0) {
                 options.i = 0;
                 return deleteItemLab(options);
-            } else if (req.body.data.labs_details.length > 0) {
+            } else if (req.body.data.labs_details !== undefined &&
+                req.body.data.labs_details.length > 0) {
                 options.i = 0;
                 return updateCreateItemLab(options);
             } else {
@@ -426,7 +428,8 @@ var deleteItemLab = function (options) {
             if (i + 1 < req.body.data.toDeleteLab.length) {
                 options.i = i + 1;
                 return deleteItemLab(options);
-            } else if (req.body.data.labs_details.length > 0) {
+            } else if (req.body.data.labs_details !== undefined &&
+                req.body.data.labs_details.length > 0) {
                 options.i = 0;
                 return updateCreateItemLab(options);
             } else {

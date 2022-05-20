@@ -444,7 +444,7 @@ var getJobsFellowships = function (people, options, i, j) {
     let { req, res, next } = options;
     let person = people[i];
     let jobs = person.jobs;
-    if (jobs.length > 0) {
+    if (jobs !== undefined && jobs.length > 0) {
         var querySQL = '';
         var places = [];
         querySQL = querySQL + 'SELECT jobs_fellowships.fellowship_id,'
@@ -482,7 +482,7 @@ var getJobsContracts = function (people, options, i, j) {
     let { req, res, next } = options;
     let person = people[i];
     let jobs = person.jobs;
-    if (jobs.length > 0) {
+    if (jobs !== undefined && jobs.length > 0) {
         var querySQL = '';
         var places = [];
         querySQL = querySQL + 'SELECT jobs_contracts.contract_id,'

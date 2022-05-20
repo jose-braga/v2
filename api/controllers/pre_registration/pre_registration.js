@@ -480,7 +480,7 @@ var getJobCategorySituationID = function (options) {
                 }
             },
             options);
-    } else if (person.cars.length > 0) {
+    } else if (person.cars!== undefined && person.cars.length > 0) {
         options.i = 0;
         return actionCreateCar(options);
     } else {
@@ -520,7 +520,7 @@ var actionCreateJob = function (options) {
             } else if (i + 1 < person.situations.length) {
                 options.i = i + 1;
                 return getJobCategorySituationID(options);
-            } else if (person.cars.length > 0) {
+            } else if (person.cars !== undefined && person.cars.length > 0) {
                 options.i = 0;
                 return actionCreateCar(options);
             } else {
@@ -639,7 +639,7 @@ var actionCreateJobFellowshipRelationship = function (options) {
             } else if (i + 1 < person.situations.length) {
                 options.i = i + 1;
                 return getJobCategorySituationID(options);
-            } else if (person.cars.length > 0) {
+            } else if (person.cars !== undefined && person.cars.length > 0) {
                 options.i = 0;
                 return actionCreateCar(options);
             } else {
@@ -752,7 +752,7 @@ var actionCreateJobContractRelationship = function (options) {
             } else if (i + 1 < person.situations.length) {
                 options.i = i + 1;
                 return getJobCategorySituationID(options);
-            } else if (person.cars.length > 0) {
+            } else if (person.cars !== undefined && person.cars.length > 0) {
                 options.i = 0;
                 return actionCreateCar(options);
             } else {

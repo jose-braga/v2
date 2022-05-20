@@ -71,7 +71,7 @@ var addPersonHistory = function (options) {
     );
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
-            if (data.roles.length > 0) {
+            if (data.countries !== undefined && data.countries.length > 0) {
                 options.i = 0
                 return addPersonCountry(options);
             } else {
