@@ -45,9 +45,13 @@
                         <template v-slot:activator="{ on: date_menu }">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on: tooltip }">
-                                    <v-text-field v-model="data.birth_date"
+                                    <v-text-field v-model="$v.data.birth_date.$model"
+                                        :error="$v.data.birth_date.$error"
                                         label="Birth date" v-on="{...tooltip,...date_menu}">
                                     </v-text-field>
+                                    <div v-if="$v.data.birth_date.$error">
+                                        <p v-if="!$v.data.birth_date.isValid" class="caption red--text">Date format should be 'YYYY-MM-DD' (or empty)</p>
+                                    </div>
                                 </template>
                                 <span>
                                     Click to navigate dates.<br>
@@ -258,6 +262,7 @@ export default {
         data: {
             name: { maxLength: maxLength(100), required },
             colloquial_name: { maxLength: maxLength(100), required },
+            birth_date: { isValid: time.validate },
         }
     }
 }
