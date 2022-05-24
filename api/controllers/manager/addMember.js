@@ -389,6 +389,15 @@ var addLab = function (options) {
     let data = req.body.data;
     let position = data.current_positions[i];
     let places = [];
+    if (position.valid_from === '') {
+        position.valid_from = null;
+    }
+    if (position.valid_until === '') {
+        position.valid_until = null;
+    }
+    if (position.dedication === '') {
+        position.dedication = null;
+    }
     querySQL = 'INSERT INTO people_labs'
         + ' (person_id, lab_id, lab_position_id, dedication, valid_from, valid_until, pluriannual, integrated, nuclearCV)'
         + ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);';
@@ -430,6 +439,15 @@ var addFacility = function (options) {
     let data = req.body.data;
     let position = data.tech_current_positions[i];
     let places = [];
+    if (position.valid_from === '') {
+        position.valid_from = null;
+    }
+    if (position.valid_until === '') {
+        position.valid_until = null;
+    }
+    if (position.dedication === '') {
+        position.dedication = null;
+    }
     querySQL = 'INSERT INTO technicians'
         + ' (person_id, technician_office_id, technician_position_id, dedication, valid_from, valid_until)'
         + ' VALUES (?, ?, ?, ?, ?, ?);';
@@ -484,6 +502,15 @@ var addScienceManagement = function (options) {
     let data = req.body.data;
     let position = data.scm_current_positions[i];
     let places = [];
+    if (position.valid_from === '') {
+        position.valid_from = null;
+    }
+    if (position.valid_until === '') {
+        position.valid_until = null;
+    }
+    if (position.dedication === '') {
+        position.dedication = null;
+    }
     querySQL = 'INSERT INTO science_managers'
         + ' (person_id, science_manager_office_id, science_manager_position_id, dedication, valid_from, valid_until)'
         + ' VALUES (?, ?, ?, ?, ?, ?);';
@@ -535,6 +562,15 @@ var addAdministrative = function (options) {
     let data = req.body.data;
     let position = data.adm_current_positions[i];
     let places = [];
+    if (position.valid_from === '') {
+        position.valid_from = null;
+    }
+    if (position.valid_until === '') {
+        position.valid_until = null;
+    }
+    if (position.dedication === '') {
+        position.dedication = null;
+    }
     querySQL = 'INSERT INTO people_administrative_offices'
         + ' (person_id, administrative_office_id, administrative_position_id, dedication, valid_from, valid_until)'
         + ' VALUES (?, ?, ?, ?, ?, ?);';
@@ -582,6 +618,15 @@ var addJob = function (options) {
     let profSituation = data.professional_situation;
     let places = [];
     let querySQL = '';
+    if (profSituation.valid_from === '') {
+        profSituation.valid_from = null;
+    }
+    if (profSituation.valid_until === '') {
+        profSituation.valid_until = null;
+    }
+    if (profSituation.dedication === '') {
+        profSituation.dedication = null;
+    }
     if (profSituation.situation_id !== null && profSituation.situation_id !== undefined
         && profSituation.category_id !== null && profSituation.category_id !== undefined
     ) {

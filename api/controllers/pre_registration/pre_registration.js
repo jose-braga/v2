@@ -493,6 +493,7 @@ var actionCreateJob = function (options) {
     let person = req.body.data;
     if (person.situations[i].valid_from === '') person.situations[i].valid_from = null;
     if (person.situations[i].valid_until === '') person.situations[i].valid_until = null;
+    if (person.situations[i].dedication === '') person.situations[i].dedication = null;
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'INSERT INTO jobs'

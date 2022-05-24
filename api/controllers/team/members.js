@@ -237,6 +237,9 @@ var actionUpdateLabMemberPosition = function (options) {
     if (positionData.valid_until === '') {
         positionData.valid_until = null;
     }
+    if (positionData.dedication === '') {
+        positionData.dedication = null;
+    }
     var places = [];
     querySQL = 'UPDATE people_labs'
             + ' SET lab_position_id = ?,'
@@ -279,6 +282,9 @@ var actionAddLabMemberPositionHistory = function (resQuery, options) {
     }
     if (positionData.valid_until === '') {
         positionData.valid_until = null;
+    }
+    if (positionData.dedication === '') {
+        positionData.dedication = null;
     }
     querySQL = 'INSERT INTO people_labs_history'
         + ' (people_labs_id, person_id, lab_id, lab_position_id, dedication, valid_from, valid_until, created, updated, operation, changed_by)'
@@ -329,6 +335,9 @@ var actionCreateLabMemberPosition = function (options) {
     }
     if (positionData.valid_until === '') {
         positionData.valid_until = null;
+    }
+    if (positionData.dedication === '') {
+        positionData.dedication = null;
     }
     var places = [];
     querySQL = 'INSERT INTO people_labs'
@@ -559,6 +568,9 @@ var actionAddPersonLab = function (options) {
     if (person.valid_until === '') {
         person.valid_until = null;
     }
+    if (person.dedication === '') {
+        person.dedication = null;
+    }
     let places = [];
     querySQL = 'INSERT INTO people_labs'
         + ' (person_id, lab_id, lab_position_id, dedication, valid_from, valid_until)'
@@ -587,6 +599,9 @@ var actionAddPersonLabHistory = function (options) {
     }
     if (person.valid_until === '') {
         person.valid_until = null;
+    }
+    if (person.dedication === '') {
+        person.dedication = null;
     }
     let places = [];
     querySQL = 'INSERT INTO people_labs_history'

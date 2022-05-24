@@ -389,6 +389,9 @@ var actionAddStudentLabPosition = function (options) {
     if (data.valid_until === '') {
         data.valid_until = null;
     }
+    if (data.dedication === '') {
+        data.dedication = null;
+    }
     var querySQL = '';
     var places = [];
     querySQL = querySQL
@@ -420,6 +423,9 @@ var actionAddStudentFacilityPosition = function (options) {
     }
     if (data.valid_until === '') {
         data.valid_until = null;
+    }
+    if (data.dedication === '') {
+        data.dedication = null;
     }
     var querySQL = '';
     var places = [];
@@ -476,6 +482,9 @@ var actionAddStudentScienceManagementPosition = function (options) {
     if (data.valid_until === '') {
         data.valid_until = null;
     }
+    if (data.dedication === '') {
+        data.dedication = null;
+    }
     var querySQL = '';
     var places = [];
     querySQL = querySQL
@@ -531,6 +540,9 @@ var actionAddStudentAdministrativePosition = function (options) {
     if (data.valid_until === '') {
         data.valid_until = null;
     }
+    if (data.dedication === '') {
+        data.dedication = null;
+    }
     var querySQL = '';
     var places = [];
     querySQL = querySQL
@@ -585,6 +597,9 @@ var actionUpdateStudentLabPosition = function (options) {
     if (data.valid_until === '') {
         data.valid_until = null;
     }
+    if (data.dedication === '') {
+        data.dedication = null;
+    }
     var querySQL = '';
     var places = [];
     querySQL = querySQL
@@ -622,6 +637,9 @@ var actionUpdateStudentFacilityPosition = function (options) {
     }
     if (data.valid_until === '') {
         data.valid_until = null;
+    }
+    if (data.dedication === '') {
+        data.dedication = null;
     }
     var querySQL = '';
     var places = [];
@@ -678,6 +696,9 @@ var actionUpdateStudentScienceManagementPosition = function (options) {
     if (data.valid_until === '') {
         data.valid_until = null;
     }
+    if (data.dedication === '') {
+        data.dedication = null;
+    }
     var querySQL = '';
     var places = [];
     querySQL = querySQL
@@ -732,6 +753,9 @@ var actionUpdateStudentAdministrativePosition = function (options) {
     }
     if (data.valid_until === '') {
         data.valid_until = null;
+    }
+    if (data.dedication === '') {
+        data.dedication = null;
     }
     var querySQL = '';
     var places = [];

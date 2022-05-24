@@ -331,6 +331,15 @@ var actionCreateLabAffiliation = function (options) {
     let data = req.body.data;
     var querySQL = '';
     var places = [];
+    if (data.valid_from === '') {
+        data.valid_from = null;
+    }
+    if (data.valid_until === '') {
+        data.valid_until = null;
+    }
+    if (data.dedication === '') {
+        data.dedication = null;
+    }
     querySQL = querySQL + 'INSERT INTO people_labs'
         + ' (person_id, lab_id, lab_position_id, dedication,'
         + ' pluriannual, integrated, nuclearCV, valid_from, valid_until)'
@@ -369,6 +378,9 @@ var actionUpdateLabAffiliation = function (options) {
     }
     if (data.valid_until === '') {
         data.valid_until = null;
+    }
+    if (data.dedication === '') {
+        data.dedication = null;
     }
     var querySQL = '';
     var places = [];
@@ -474,6 +486,9 @@ var actionCreateTechnicalAffiliation = function (options) {
     if (data.valid_until === '') {
         data.valid_until = null;
     }
+    if (data.dedication === '') {
+        data.dedication = null;
+    }
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'INSERT INTO technicians'
@@ -534,6 +549,9 @@ var actionUpdateTechnicalAffiliation = function (options) {
     }
     if (data.valid_until === '') {
         data.valid_until = null;
+    }
+    if (data.dedication === '') {
+        data.dedication = null;
     }
     var querySQL = '';
     var places = [];
@@ -668,6 +686,9 @@ var actionCreateScienceManagementAffiliation = function (options) {
     if (data.valid_until === '') {
         data.valid_until = null;
     }
+    if (data.dedication === '') {
+        data.dedication = null;
+    }
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'INSERT INTO science_managers'
@@ -728,6 +749,9 @@ var actionUpdateScienceManagementAffiliation = function (options) {
     }
     if (data.valid_until === '') {
         data.valid_until = null;
+    }
+    if (data.dedication === '') {
+        data.dedication = null;
     }
     var querySQL = '';
     var places = [];
@@ -863,6 +887,9 @@ var actionCreateAdministrativeAffiliation = function (options) {
     if (data.valid_until === '') {
         data.valid_until = null;
     }
+    if (data.dedication === '') {
+        data.dedication = null;
+    }
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'INSERT INTO people_administrative_offices'
@@ -923,6 +950,9 @@ var actionUpdateAdministrativeAffiliation = function (options) {
     }
     if (data.valid_until === '') {
         data.valid_until = null;
+    }
+    if (data.dedication === '') {
+        data.dedication = null;
     }
     var querySQL = '';
     var places = [];

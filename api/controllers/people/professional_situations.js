@@ -264,6 +264,9 @@ var actionCreateProfessionalSituations = function (options) {
     let data = req.body.data;
     if (data.valid_from === '') data.valid_from = null;
     if (data.valid_until === '') data.valid_until = null;
+    if (data.dedication === '') {
+        data.dedication = null;
+    }
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'INSERT INTO jobs'
@@ -298,6 +301,9 @@ var actionUpdateProfessionalSituations = function (options) {
     let data = req.body.data;
     if (data.valid_from === '') data.valid_from = null;
     if (data.valid_until === '') data.valid_until = null;
+    if (data.dedication === '') {
+        data.dedication = null;
+    }
     var querySQL = '';
     var places = [];
     // category_situation_id will be updated once categories_situations is queried
