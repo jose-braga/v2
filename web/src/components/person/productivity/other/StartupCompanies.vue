@@ -77,11 +77,12 @@
                                         transition="scale-transition"
                                         offset-y min-width="290px">
                                         <template v-slot:activator="{ on }">
-                                            <v-text-field v-model="data.newItem.start"
+                                            <v-text-field v-model="$v.data.newItem.start.$model"
+                                                :error="$v.data.newItem.start.$error"
                                                 label="Started" v-on="on">
                                             </v-text-field>
                                         </template>
-                                        <v-date-picker v-model="data.newItem.start"
+                                        <v-date-picker v-model="$v.data.newItem.start.$model"
                                             @input="data.newItem.show_start_date = false"
                                             no-title
                                         ></v-date-picker>
@@ -95,11 +96,12 @@
                                         transition="scale-transition"
                                         offset-y min-width="290px">
                                         <template v-slot:activator="{ on }">
-                                            <v-text-field v-model="data.newItem.end"
+                                            <v-text-field v-model="$v.data.newItem.end.$model"
+                                                :error="$v.data.newItem.end.$error"
                                                 label="Ended" v-on="on">
                                             </v-text-field>
                                         </template>
-                                        <v-date-picker v-model="data.newItem.end"
+                                        <v-date-picker v-model="$v.data.newItem.end.$model"
                                             @input="data.newItem.show_end_date = false"
                                             no-title
                                         ></v-date-picker>
@@ -197,6 +199,11 @@
                                 </v-col>
                             </v-row>
                             <v-row align-content="center" justify="center" class="pt-6">
+                                <v-col cols="3" v-if="formError">
+                                    <v-row justify="end">
+                                        <p class="caption red--text">Unable to submit form.</p>
+                                    </v-row>
+                                </v-col>
                                 <div>
                                     <v-btn type="submit"
                                         outlined color="blue">Save</v-btn>
@@ -317,6 +324,7 @@ export default {
             progress: false,
             success: false,
             error: false,
+            formError: false,
             search: '',
             searchCountries: '',
             dialog: false,
@@ -349,6 +357,8 @@ export default {
                     short_description: null,
                     person_details: [],
                     labs_details: [],
+                    start: null,
+                    end: null,
                 },
                 items: [],
                 searchItems: [],
@@ -432,46 +442,49 @@ export default {
             }
         },
         submitForm () {
-            if (this.$store.state.session.loggedIn
-                && !this.$v.$invalid
-            ) {
-                this.progress = true;
-                let personID = this.$store.state.session.personID;
+            if (this.$v.$invalid) {
+                this.formError = true;
+                setTimeout(() => {this.formError = false;}, 3000)
+            } else {
+                if (this.$store.state.session.loggedIn) {
+                    this.progress = true;
+                    let personID = this.$store.state.session.personID;
 
-                let urlCreate = [
-                    {
-                        url: 'api/people/' + personID
-                            + '/startups',
-                        body: this.data.newItem,
-                    }
-                ];
-                Promise.all(urlCreate.map(el =>
-                    this.$http.post(el.url,
-                        { data: el.body, },
-                        { headers:
-                            {'Authorization': 'Bearer ' + localStorage['v2-token']
-                        },
-                    }))
-                )
-                .then(() => {
-                    this.progress = false;
-                    this.success = true;
-                    setTimeout(() => {
-                        this.success = false;
-                        this.data.newItem = {
-                            person_details: [],
-                            labs_details: [],
-                        };
-                        this.initialize();
-                    }, 1500);
-                })
-                .catch((error) => {
-                    this.progress = false;
-                    this.error = true;
-                    setTimeout(() => {this.error = false;}, 6000)
-                    // eslint-disable-next-line
-                    console.log(error)
-                })
+                    let urlCreate = [
+                        {
+                            url: 'api/people/' + personID
+                                + '/startups',
+                            body: this.data.newItem,
+                        }
+                    ];
+                    Promise.all(urlCreate.map(el =>
+                        this.$http.post(el.url,
+                            { data: el.body, },
+                            { headers:
+                                {'Authorization': 'Bearer ' + localStorage['v2-token']
+                            },
+                        }))
+                    )
+                    .then(() => {
+                        this.progress = false;
+                        this.success = true;
+                        setTimeout(() => {
+                            this.success = false;
+                            this.data.newItem = {
+                                person_details: [],
+                                labs_details: [],
+                            };
+                            this.initialize();
+                        }, 1500);
+                    })
+                    .catch((error) => {
+                        this.progress = false;
+                        this.error = true;
+                        setTimeout(() => {this.error = false;}, 6000)
+                        // eslint-disable-next-line
+                        console.log(error)
+                    })
+                }
             }
         },
         submitNewAssociations () {
@@ -565,7 +578,9 @@ export default {
     validations: {
         data: {
             newItem: {
-                short_description: { maxLength: maxLength(500) }
+                short_description: { maxLength: maxLength(500) },
+                start: { isValid: time.validate },
+                end: { isValid: time.validate },
             },
         },
     },

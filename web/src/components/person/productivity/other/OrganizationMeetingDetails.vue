@@ -29,7 +29,7 @@
                         label="Meeting Type">
                     </v-select>
                 </v-col>
-                <v-col cols="12" sm="4" md="3" lg="2">
+                <v-col cols="12" sm="4" md="3" lg="3">
                     <v-switch v-model="itemDetails.international"
                         :label="'International:' + itemDetails.international"
                         dense
@@ -62,11 +62,12 @@
                                 transition="scale-transition"
                                 offset-y min-width="290px">
                                 <template v-slot:activator="{ on }">
-                                    <v-text-field v-model="itemDetails.start"
+                                    <v-text-field v-model="$v.itemDetails.start.$model"
+                                        :error="$v.itemDetails.start.$error"
                                         label="Start" v-on="on">
                                     </v-text-field>
                                 </template>
-                                <v-date-picker v-model="itemDetails.start"
+                                <v-date-picker v-model="$v.itemDetails.start.$model"
                                     @input="itemDetails.show_start = false"
                                     no-title
                                 ></v-date-picker>
@@ -82,11 +83,12 @@
                                 transition="scale-transition"
                                 offset-y min-width="290px">
                                 <template v-slot:activator="{ on }">
-                                    <v-text-field v-model="itemDetails.end"
+                                    <v-text-field v-model="$v.itemDetails.end.$model"
+                                        :error="$v.itemDetails.end.$error"
                                         label="End" v-on="on">
                                     </v-text-field>
                                 </template>
-                                <v-date-picker v-model="itemDetails.end"
+                                <v-date-picker v-model="$v.itemDetails.end.$model"
                                     @input="itemDetails.show_end = false"
                                     no-title
                                 ></v-date-picker>
@@ -189,6 +191,11 @@
                 </v-col>
             </v-row>
             <v-row align-content="center" justify="center" class="pt-6">
+                <v-col cols="3" v-if="formError">
+                    <v-row justify="end">
+                        <p class="caption red--text">Unable to submit form.</p>
+                    </v-row>
+                </v-col>
                 <div>
                     <v-btn type="submit"
                         outlined color="blue">Save</v-btn>
@@ -209,6 +216,7 @@
 
 <script>
 import subUtil from '@/components/common/submit-utils'
+import time from '@/components/common/date-utils'
 import { maxLength } from 'vuelidate/lib/validators'
 
 function prepareStringComparison(str) {
@@ -249,6 +257,8 @@ export default {
                 international: false,
                 person_details: [],
                 labs_details: [],
+                start: null,
+                end: null,
             },
             searchPeople: [],
             searchLabs: [],
@@ -277,49 +287,52 @@ export default {
             this.itemDetails = Object.assign({}, this.itemData);
         },
         submitForm () {
-            if (this.$store.state.session.loggedIn
-                && !this.$v.$invalid
-            ) {
-                this.progress = true;
-                let personID = this.$store.state.session.personID;
-                this.itemDetails.toDeletePerson = this.toDeletePerson;
-                this.itemDetails.toDeleteLab = this.toDeleteLab;
-                let urlUpdate = [
-                    {
-                        url: 'api/people/' + personID
-                            + '/organization-meetings/' + this.itemDetails.meeting_id,
-                        body: this.itemDetails,
-                    }
-                ];
-                Promise.all(urlUpdate.map(el =>
-                    this.$http.put(el.url,
-                        { data: el.body, },
-                        { headers:
-                            {'Authorization': 'Bearer ' + localStorage['v2-token']
-                        },
-                    }))
-                )
-                .then(() => {
-                    this.progress = false;
-                    this.success = true;
-                    this.$root.$emit('updatedMeetingOrganization')
-                    setTimeout(() => {
-                        this.success = false;
-                        this.toDeletePerson = [];
-                        this.toDeleteLab = [];
-                        this.itemDetails = {
-                        };
-                        //this.$root.$emit('updatedPatent')
-                        this.initialize();
-                    }, 1500);
-                })
-                .catch((error) => {
-                    this.progress = false;
-                    this.error = true;
-                    setTimeout(() => {this.error = false;}, 6000)
-                    // eslint-disable-next-line
-                    console.log(error)
-                })
+            if (this.$v.$invalid) {
+                this.formError = true;
+                setTimeout(() => {this.formError = false;}, 3000)
+            } else {
+                if (this.$store.state.session.loggedIn) {
+                    this.progress = true;
+                    let personID = this.$store.state.session.personID;
+                    this.itemDetails.toDeletePerson = this.toDeletePerson;
+                    this.itemDetails.toDeleteLab = this.toDeleteLab;
+                    let urlUpdate = [
+                        {
+                            url: 'api/people/' + personID
+                                + '/organization-meetings/' + this.itemDetails.meeting_id,
+                            body: this.itemDetails,
+                        }
+                    ];
+                    Promise.all(urlUpdate.map(el =>
+                        this.$http.put(el.url,
+                            { data: el.body, },
+                            { headers:
+                                {'Authorization': 'Bearer ' + localStorage['v2-token']
+                            },
+                        }))
+                    )
+                    .then(() => {
+                        this.progress = false;
+                        this.success = true;
+                        this.$root.$emit('updatedMeetingOrganization')
+                        setTimeout(() => {
+                            this.success = false;
+                            this.toDeletePerson = [];
+                            this.toDeleteLab = [];
+                            this.itemDetails = {
+                            };
+                            //this.$root.$emit('updatedPatent')
+                            this.initialize();
+                        }, 1500);
+                    })
+                    .catch((error) => {
+                        this.progress = false;
+                        this.error = true;
+                        setTimeout(() => {this.error = false;}, 6000)
+                        // eslint-disable-next-line
+                        console.log(error)
+                    })
+                }
             }
         },
         getPeople () {
@@ -387,6 +400,8 @@ export default {
         itemDetails: {
             meeting_name: { maxLength: maxLength(1000)},
             description: { maxLength: maxLength(2000)},
+            start: { isValid: time.validate },
+            end: { isValid: time.validate },
         }
     },
 

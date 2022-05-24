@@ -180,7 +180,9 @@ function filterORCIDData(works) {
                         }
                     }
                     let title = null;
-                    if (Object.prototype.hasOwnProperty.call(publication['work-summary'][indSum],'title')) {
+                    if (Object.prototype.hasOwnProperty.call(publication['work-summary'][indSum],'title')
+                        && publication['work-summary'][indSum]['title'] !== null
+                    ) {
                         if (Object.prototype.hasOwnProperty.call(publication['work-summary'][indSum].title,'title')) {
                             title = publication['work-summary'][indSum].title.title.value.trim();
                         }

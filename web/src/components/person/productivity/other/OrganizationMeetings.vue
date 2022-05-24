@@ -82,7 +82,7 @@
                                         label="Meeting Type">
                                     </v-select>
                                 </v-col>
-                                <v-col cols="12" sm="4" md="3" lg="2">
+                                <v-col cols="12" sm="4" md="3" lg="3">
                                     <v-switch v-model="data.newItem.international"
                                         :label="'International:' + data.newItem.international"
                                         dense
@@ -115,11 +115,12 @@
                                                 transition="scale-transition"
                                                 offset-y min-width="290px">
                                                 <template v-slot:activator="{ on }">
-                                                    <v-text-field v-model="data.newItem.start"
+                                                    <v-text-field v-model="$v.data.newItem.start.$model"
+                                                        :error="$v.data.newItem.start.$error"
                                                         label="Start" v-on="on">
                                                     </v-text-field>
                                                 </template>
-                                                <v-date-picker v-model="data.newItem.start"
+                                                <v-date-picker v-model="$v.data.newItem.start.$model"
                                                     @input="data.newItem.show_start = false"
                                                     no-title
                                                 ></v-date-picker>
@@ -135,11 +136,12 @@
                                                 transition="scale-transition"
                                                 offset-y min-width="290px">
                                                 <template v-slot:activator="{ on }">
-                                                    <v-text-field v-model="data.newItem.end"
+                                                    <v-text-field v-model="$v.data.newItem.end.$model"
+                                                        :error="$v.data.newItem.end.$error"
                                                         label="End" v-on="on">
                                                     </v-text-field>
                                                 </template>
-                                                <v-date-picker v-model="data.newItem.end"
+                                                <v-date-picker v-model="$v.data.newItem.end.$model"
                                                     @input="data.newItem.show_end = false"
                                                     no-title
                                                 ></v-date-picker>
@@ -242,6 +244,11 @@
                                 </v-col>
                             </v-row>
                             <v-row align-content="center" justify="center" class="pt-6">
+                                <v-col cols="3" v-if="formError">
+                                    <v-row justify="end">
+                                        <p class="caption red--text">Unable to submit form.</p>
+                                    </v-row>
+                                </v-col>
                                 <div>
                                     <v-btn type="submit"
                                         outlined color="blue">Save</v-btn>
@@ -366,6 +373,7 @@ export default {
             progress: false,
             success: false,
             error: false,
+            formError: false,
             search: '',
             searchCountries: '',
             dialog: false,
@@ -401,6 +409,9 @@ export default {
                     meeting_name: undefined,
                     description: undefined,
                     international: false,
+                    country_id: null,
+                    start: null,
+                    end: null,
                     person_details: [{person_id: this.$store.state.session.personID}],
                     labs_details: [],
                 },
@@ -467,90 +478,95 @@ export default {
 
         },
         submitForm () {
-            if (this.$store.state.session.loggedIn
-                && !this.$v.$invalid
-            ) {
-                this.progress = true;
-                let personID = this.$store.state.session.personID;
-                let urlCreate = [];
-                urlCreate.push({
-                    url: 'api/people/' + personID
-                        + '/organization-meetings',
-                    body: this.data.newItem,
-                })
-                Promise.all(urlCreate.map(el =>
-                    this.$http.post(el.url,
-                        { data: el.body, },
-                        { headers:
-                            {'Authorization': 'Bearer ' + localStorage['v2-token']
-                        },
-                    }))
-                )
-                .then(() => {
-                    this.progress = false;
-                    this.success = true;
-                    setTimeout(() => {
-                        this.success = false;
-                        this.data.newItem = {
-                            meeting_name: undefined,
-                            description: undefined,
-                            international: false,
-                            person_details: [{person_id: this.$store.state.session.personID}],
-                            labs_details: [],
-                        }
-                        this.initialize();
-                    }, 1500);
-                })
-                .catch((error) => {
-                    this.progress = false;
-                    this.error = true;
-                    setTimeout(() => {this.error = false;}, 6000)
-                    // eslint-disable-next-line
-                    console.log(error)
-                })
+            if (this.$v.$invalid) {
+                this.formError = true;
+                setTimeout(() => {this.formError = false;}, 3000)
+            } else {
+                if (this.$store.state.session.loggedIn) {
+                    this.progress = true;
+                    let personID = this.$store.state.session.personID;
+                    let urlCreate = [];
+                    urlCreate.push({
+                        url: 'api/people/' + personID
+                            + '/organization-meetings',
+                        body: this.data.newItem,
+                    })
+                    Promise.all(urlCreate.map(el =>
+                        this.$http.post(el.url,
+                            { data: el.body, },
+                            { headers:
+                                {'Authorization': 'Bearer ' + localStorage['v2-token']
+                            },
+                        }))
+                    )
+                    .then(() => {
+                        this.progress = false;
+                        this.success = true;
+                        setTimeout(() => {
+                            this.success = false;
+                            this.data.newItem = {
+                                meeting_name: undefined,
+                                description: undefined,
+                                international: false,
+                                person_details: [{person_id: this.$store.state.session.personID}],
+                                labs_details: [],
+                            }
+                            this.initialize();
+                        }, 1500);
+                    })
+                    .catch((error) => {
+                        this.progress = false;
+                        this.error = true;
+                        setTimeout(() => {this.error = false;}, 6000)
+                        // eslint-disable-next-line
+                        console.log(error)
+                    })
+                }
             }
         },
         submitNewAssociations () {
-            if (this.$store.state.session.loggedIn) {
-                this.progress = true;
-                let personID = this.$store.state.session.personID;
-                let urlCreate = []; //create person-project association
-                let items = this.data.searchItems;
-                for (let ind in items) {
-                    if (items[ind].to_associate) {
-                        urlCreate.push({
-                            url: 'api/people/' + personID
-                                    + '/organization-meetings/' + items[ind].id,
-                            body: items[ind],
-                        });
+            
+                if (this.$store.state.session.loggedIn) {
+                    this.progress = true;
+                    let personID = this.$store.state.session.personID;
+                    let urlCreate = []; //create person-project association
+                    let items = this.data.searchItems;
+                    for (let ind in items) {
+                        if (items[ind].to_associate) {
+                            urlCreate.push({
+                                url: 'api/people/' + personID
+                                        + '/organization-meetings/' + items[ind].id,
+                                body: items[ind],
+                            });
 
+                        }
                     }
+                    Promise.all(urlCreate.map(el =>
+                        this.$http.post(el.url,
+                            { data: el.body, },
+                            { headers:
+                                {'Authorization': 'Bearer ' + localStorage['v2-token']
+                            },
+                        }))
+                    )
+                    .then(() => {
+                        this.progress = false;
+                        this.success = true;
+                        setTimeout(() => {
+                            this.success = false;
+                            this.searchItems (this.search);
+                            this.initialize();
+                        }, 1500);
+                    })
+                    .catch((error) => {
+                        this.progress = false;
+                        this.error = true;
+                        setTimeout(() => {this.error = false;}, 6000)
+                        // eslint-disable-next-line
+                        console.log(error)
+                    })
                 }
-                Promise.all(urlCreate.map(el =>
-                    this.$http.post(el.url,
-                        { data: el.body, },
-                        { headers:
-                            {'Authorization': 'Bearer ' + localStorage['v2-token']
-                        },
-                    }))
-                )
-                .then(() => {
-                    this.progress = false;
-                    this.success = true;
-                    setTimeout(() => {
-                        this.success = false;
-                        this.searchItems (this.search);
-                        this.initialize();
-                    }, 1500);
-                })
-                .catch((error) => {
-                    this.progress = false;
-                    this.error = true;
-                    setTimeout(() => {this.error = false;}, 6000)
-                    // eslint-disable-next-line
-                    console.log(error)
-                })
-            }
+
         },
         removeItemTable (item) {
             let proceed = confirm('Are you sure you want to delete your association this item?')
@@ -666,6 +682,8 @@ export default {
             newItem: {
                 meeting_name: { maxLength: maxLength(1000)},
                 description: { maxLength: maxLength(2000)},
+                start: { isValid: time.validate },
+                end: { isValid: time.validate },
             }
         }
     },

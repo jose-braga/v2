@@ -65,11 +65,12 @@
                         transition="scale-transition"
                         offset-y min-width="290px">
                         <template v-slot:activator="{ on }">
-                            <v-text-field v-model="projectDetails.project_details.start"
+                            <v-text-field v-model="$v.projectDetails.project_details.start.$model"
+                                :error="$v.projectDetails.project_details.start.$error"
                                 label="Start date" v-on="on">
                             </v-text-field>
                         </template>
-                        <v-date-picker v-model="projectDetails.project_details.start"
+                        <v-date-picker v-model="$v.projectDetails.project_details.start.$model"
                             @input="projectDetails.project_details.show_start = false"
                             no-title
                         ></v-date-picker>
@@ -83,11 +84,12 @@
                         transition="scale-transition"
                         offset-y min-width="290px">
                         <template v-slot:activator="{ on }">
-                            <v-text-field v-model="projectDetails.project_details.end"
+                            <v-text-field v-model="$v.projectDetails.project_details.end.$model"
+                                :error="$v.projectDetails.project_details.end.$error"
                                 label="End date" v-on="on">
                             </v-text-field>
                         </template>
-                        <v-date-picker v-model="projectDetails.project_details.end"
+                        <v-date-picker v-model="$v.projectDetails.project_details.end.$model"
                             @input="projectDetails.project_details.show_end = false"
                             no-title
                         ></v-date-picker>
@@ -375,6 +377,11 @@
                 </v-col>
             </v-row>
             <v-row align-content="center" justify="center" class="pt-6">
+                <v-col cols="3" v-if="formError">
+                    <v-row justify="end">
+                        <p class="caption red--text">Unable to submit form.</p>
+                    </v-row>
+                </v-col>
                 <div>
                     <v-btn type="submit"
                         outlined color="blue">Save</v-btn>
@@ -431,6 +438,8 @@ export default {
             projectDetails: {
                 project_details: {
                     title: '',
+                    start: null,
+                    end: null,
                     management_entities: {},
                     funding_agencies: [],
                 },
@@ -506,64 +515,69 @@ export default {
             })
         },
         submitForm () {
-            if (this.$store.state.session.loggedIn) {
-                this.progress = true;
-                let personID = this.$store.state.session.personID;
-                if (this.projectDetails.project_details.funding_agencies.length === 1) {
-                    if (this.projectDetails.project_details.funding_agencies[0].id === 'other') {
-                        this.projectDetails.project_details.funding_agencies = [];
-                        if (this.projectDetails.project_details.other_funding_agencies.name === ''
-                            && this.projectDetails.project_details.other_funding_agencies.name === null
-                            && this.projectDetails.project_details.other_funding_agencies.name === undefined
-                        ) {
-                            this.projectDetails.project_details.other_funding_agencies = {}
+            if (this.$v.$invalid) {
+                this.formError = true;
+                setTimeout(() => {this.formError = false;}, 3000)
+            } else {
+                if (this.$store.state.session.loggedIn) {
+                    this.progress = true;
+                    let personID = this.$store.state.session.personID;
+                    if (this.projectDetails.project_details.funding_agencies.length === 1) {
+                        if (this.projectDetails.project_details.funding_agencies[0].id === 'other') {
+                            this.projectDetails.project_details.funding_agencies = [];
+                            if (this.projectDetails.project_details.other_funding_agencies.name === ''
+                                && this.projectDetails.project_details.other_funding_agencies.name === null
+                                && this.projectDetails.project_details.other_funding_agencies.name === undefined
+                            ) {
+                                this.projectDetails.project_details.other_funding_agencies = {}
+                            }
                         }
-                    }
-                } else if (this.projectDetails.project_details.funding_agencies.length > 1) {
-                    let fund_ag = [];
-                    for (let ind in this.projectDetails.project_details.funding_agencies) {
-                        if (this.projectDetails.project_details.funding_agencies[ind].id !== 'other' ) {
-                            fund_ag.push(this.projectDetails.project_details.funding_agencies[ind])
+                    } else if (this.projectDetails.project_details.funding_agencies.length > 1) {
+                        let fund_ag = [];
+                        for (let ind in this.projectDetails.project_details.funding_agencies) {
+                            if (this.projectDetails.project_details.funding_agencies[ind].id !== 'other' ) {
+                                fund_ag.push(this.projectDetails.project_details.funding_agencies[ind])
 
+                            }
                         }
+                        this.projectDetails.project_details.funding_agencies = fund_ag;
                     }
-                    this.projectDetails.project_details.funding_agencies = fund_ag;
+                    this.projectDetails.toDeletePerson = this.toDeletePerson;
+                    this.projectDetails.toDeleteLab = this.toDeleteLab;
+                    let urlUpdate = [
+                        {
+                            url: 'api/people/' + personID
+                                + '/projects/' + this.projectDetails.project_id,
+                            body: this.projectDetails,
+                        }
+                    ];
+                    Promise.all(urlUpdate.map(el =>
+                        this.$http.put(el.url,
+                            { data: el.body, },
+                            { headers:
+                                {'Authorization': 'Bearer ' + localStorage['v2-token']
+                            },
+                        }))
+                    )
+                    .then(() => {
+                        this.progress = false;
+                        this.success = true;
+                        setTimeout(() => {
+                            this.success = false;
+                            this.toDeletePerson = [];
+                            this.toDeleteLab = [];
+                            this.initialize();
+                            this.$root.$emit('updatedProject')
+                        }, 1500);
+                    })
+                    .catch((error) => {
+                        this.progress = false;
+                        this.error = true;
+                        setTimeout(() => {this.error = false;}, 6000)
+                        // eslint-disable-next-line
+                        console.log(error)
+                    })
                 }
-                this.projectDetails.toDeletePerson = this.toDeletePerson;
-                this.projectDetails.toDeleteLab = this.toDeleteLab;
-                let urlUpdate = [
-                    {
-                        url: 'api/people/' + personID
-                            + '/projects/' + this.projectDetails.project_id,
-                        body: this.projectDetails,
-                    }
-                ];
-                Promise.all(urlUpdate.map(el =>
-                    this.$http.put(el.url,
-                        { data: el.body, },
-                        { headers:
-                            {'Authorization': 'Bearer ' + localStorage['v2-token']
-                        },
-                    }))
-                )
-                .then(() => {
-                    this.progress = false;
-                    this.success = true;
-                    setTimeout(() => {
-                        this.success = false;
-                        this.toDeletePerson = [];
-                        this.toDeleteLab = [];
-                        this.initialize();
-                        this.$root.$emit('updatedProject')
-                    }, 1500);
-                })
-                .catch((error) => {
-                    this.progress = false;
-                    this.error = true;
-                    setTimeout(() => {this.error = false;}, 6000)
-                    // eslint-disable-next-line
-                    console.log(error)
-                })
             }
         },
         getPeople () {
@@ -666,6 +680,14 @@ export default {
                 }
             }
             return true;
+        },
+    },
+    validations: {
+        projectDetails: {
+            project_details: {
+                start: { isValid: time.validate },
+                end: { isValid: time.validate },
+            }
         },
     },
 

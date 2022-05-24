@@ -32,6 +32,13 @@
                     Press <b>"Submit"</b> at the bottom when finished!
                 </span>
             </v-row>
+            <v-row justify="center">
+                <span class="highlight-text-red mt-2">
+                    Use YYYY-MM-DD date format always (registration might fail otherwise).
+                    <br>Recommendation: Use the datepicker that shows up in date fields
+                    <br>(1 click in header navigates by month, 2 clicks in header navigates by year)
+                </span>
+            </v-row>
             <v-row>
                 <v-col cols="12" md="6">
                     <Password ref="password"></Password>
@@ -390,5 +397,9 @@ export default {
 .highlight-text {
     font-size: 1.2em;
     color: green;
+}
+.highlight-text-red {
+    font-size: 1.2em;
+    color: red;
 }
 </style>

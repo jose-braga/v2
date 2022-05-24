@@ -16,7 +16,7 @@
             </v-col>
         </v-row>
         <v-row
-            v-for="(v,i) in data.responsibles"
+            v-for="(v,i) in $v.data.responsibles.$each.$iter"
             :key="i">
             <v-col cols="12" sm="5">
                 <v-autocomplete
@@ -34,36 +34,44 @@
                 </v-autocomplete>
             </v-col>
             <v-col cols="12" sm="3">
-                <v-menu ref="v.show_date_start" v-model="v.show_date_start"
+                <v-menu ref="v.show_date_start" v-model="v.$model.show_date_start"
                     :close-on-content-click="false"
                     :nudge-right="10"
                     transition="scale-transition"
                     offset-y min-width="290px">
                     <template v-slot:activator="{ on }">
-                        <v-text-field v-model="v.valid_from"
-                            @input="addValue"
+                        <v-text-field v-model="v.$model.valid_from"
+                            :error="v.valid_from.$error"
+                            @input="addValue; v.valid_from.$touch()"
                             label="Started" v-on="on">
                         </v-text-field>
+                        <div v-show="v.valid_from.$error">
+                            <p v-show="!v.valid_from.isValid" class="caption red--text">Date format should be 'YYYY-MM-DD' (or empty)</p>
+                        </div>
                     </template>
-                    <v-date-picker v-model="v.valid_from"
-                            @input="v.show_date_start = false; addValue()"
+                    <v-date-picker v-model="v.$model.valid_from"
+                            @input="v.$model.show_date_start = false; addValue()"
                             no-title></v-date-picker>
                 </v-menu>
             </v-col>
             <v-col cols="12" sm="3">
-                <v-menu ref="v.show_date_end" v-model="v.show_date_end"
+                <v-menu ref="v.show_date_end" v-model="v.$model.show_date_end"
                     :close-on-content-click="false"
                     :nudge-right="10"
                     transition="scale-transition"
                     offset-y min-width="290px">
                     <template v-slot:activator="{ on }">
-                        <v-text-field v-model="v.valid_until"
-                            @input="addValue"
+                        <v-text-field v-model="v.$model.valid_until"
+                            :error="v.valid_until.$error"
+                            @input="addValue; v.valid_until.$touch()"
                             label="Ended" v-on="on">
                         </v-text-field>
+                        <div v-show="v.valid_until.$error">
+                            <p v-show="!v.valid_until.isValid" class="caption red--text">Date format should be 'YYYY-MM-DD' (or empty)</p>
+                        </div>
                     </template>
-                    <v-date-picker v-model="v.valid_until"
-                            @input="v.show_date_end = false; addValue()"
+                    <v-date-picker v-model="v.$model.valid_until"
+                            @input="v.$model.show_date_end = false; addValue()"
                             no-title></v-date-picker>
                 </v-menu>
             </v-col>
@@ -79,6 +87,7 @@
 
 <script>
 import subUtil from '@/components/common/submit-utils'
+import time from '@/components/common/date-utils'
 
 function prepareStringComparison(str) {
     if (str === null || str === undefined) {
@@ -149,7 +158,17 @@ export default {
             }
             return true;
         },
-    }
+    },
+    validations: {
+        data: {
+            responsibles: {
+                $each: {
+                    valid_from: { isValid: time.validate },
+                    valid_until: { isValid: time.validate },
+                },
+            },
+        },
+    },
 
 }
 </script>

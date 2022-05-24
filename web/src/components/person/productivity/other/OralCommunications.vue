@@ -180,11 +180,12 @@
                                             transition="scale-transition"
                                             offset-y min-width="290px">
                                             <template v-slot:activator="{ on }">
-                                                <v-text-field v-model="data.newItem.date"
+                                                <v-text-field v-model="$v.data.newItem.date.$model"
+                                                    :error="$v.data.newItem.date.$error"
                                                     label="Date talk/poster" v-on="on">
                                                 </v-text-field>
                                             </template>
-                                            <v-date-picker v-model="data.newItem.date"
+                                            <v-date-picker v-model="$v.data.newItem.date.$model"
                                                 @input="data.newItem.show_start = false"
                                                 no-title
                                             ></v-date-picker>
@@ -232,6 +233,11 @@
                                 </v-col>
                             </v-row>
                             <v-row align-content="center" justify="center" class="pt-6">
+                                <v-col cols="3" v-if="formError">
+                                    <v-row justify="end">
+                                        <p class="caption red--text">Unable to submit form.</p>
+                                    </v-row>
+                                </v-col>
                                 <div>
                                     <v-btn type="submit"
                                         outlined color="blue">Save</v-btn>
@@ -295,6 +301,7 @@ export default {
             progress: false,
             success: false,
             error: false,
+            formError: false,
             search: '',
             searchCountries: '',
             dialog: false,
@@ -317,6 +324,7 @@ export default {
                     //communication_raw: null,
                     international: false,
                     labs_details: [],
+                    date: null,
                 },
                 items: [],
             },
@@ -373,57 +381,62 @@ export default {
 
         },
         submitForm () {
-            if (this.$store.state.session.loggedIn) {
-                this.progress = true;
-                let personID = this.$store.state.session.personID;
-                let urlCreate = [];
-                if (this.isUnstructured) {
-                    let text = this.data.newItem.raw_text;
-                    let communications = text.split(/\n+/g)
-                    for (let ind in communications) {
-                        urlCreate.push({
-                            url: 'api/people/' + personID
-                                + '/communications',
-                            body: {
-                                communication_raw: communications[ind],
-                                labs_details: this.data.newItem.labs_details,
-                            },
-                        })
-                    }
-                } else {
-                    urlCreate.push({
-                            url: 'api/people/' + personID
-                                + '/communications',
-                            body: this.data.newItem,
-                        })
-                }
-                Promise.all(urlCreate.map(el =>
-                    this.$http.post(el.url,
-                        { data: el.body, },
-                        { headers:
-                            {'Authorization': 'Bearer ' + localStorage['v2-token']
-                        },
-                    }))
-                )
-                .then(() => {
-                    this.progress = false;
-                    this.success = true;
-                    setTimeout(() => {
-                        this.success = false;
-                        this.data.newItem = {
-                            international: false,
-                            labs_details: [],
+            if (this.$v.$invalid) {
+                this.formError = true;
+                setTimeout(() => {this.formError = false;}, 3000)
+            } else {
+                if (this.$store.state.session.loggedIn) {
+                    this.progress = true;
+                    let personID = this.$store.state.session.personID;
+                    let urlCreate = [];
+                    if (this.isUnstructured) {
+                        let text = this.data.newItem.raw_text;
+                        let communications = text.split(/\n+/g)
+                        for (let ind in communications) {
+                            urlCreate.push({
+                                url: 'api/people/' + personID
+                                    + '/communications',
+                                body: {
+                                    communication_raw: communications[ind],
+                                    labs_details: this.data.newItem.labs_details,
+                                },
+                            })
                         }
-                        this.initialize();
-                    }, 1500);
-                })
-                .catch((error) => {
-                    this.progress = false;
-                    this.error = true;
-                    setTimeout(() => {this.error = false;}, 6000)
-                    // eslint-disable-next-line
-                    console.log(error)
-                })
+                    } else {
+                        urlCreate.push({
+                                url: 'api/people/' + personID
+                                    + '/communications',
+                                body: this.data.newItem,
+                            })
+                    }
+                    Promise.all(urlCreate.map(el =>
+                        this.$http.post(el.url,
+                            { data: el.body, },
+                            { headers:
+                                {'Authorization': 'Bearer ' + localStorage['v2-token']
+                            },
+                        }))
+                    )
+                    .then(() => {
+                        this.progress = false;
+                        this.success = true;
+                        setTimeout(() => {
+                            this.success = false;
+                            this.data.newItem = {
+                                international: false,
+                                labs_details: [],
+                            }
+                            this.initialize();
+                        }, 1500);
+                    })
+                    .catch((error) => {
+                        this.progress = false;
+                        this.error = true;
+                        setTimeout(() => {this.error = false;}, 6000)
+                        // eslint-disable-next-line
+                        console.log(error)
+                    })
+                }
             }
         },
         removeItemTable (item) {
@@ -518,15 +531,14 @@ export default {
         },
     },
     validations: {
-        /*
         data: {
             newItem: {
-                communication_raw: {
-                    required: requiredIf(function () { return this.isUnstructured}),
-                }
+                date: { isValid: time.validate },
+                //communication_raw: {
+                //    required: requiredIf(function () { return this.isUnstructured}),
+                //}
             }
         },
-        */
     },
 }
 </script>

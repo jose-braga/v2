@@ -78,11 +78,12 @@
                                         transition="scale-transition"
                                         offset-y min-width="290px">
                                         <template v-slot:activator="{ on }">
-                                            <v-text-field v-model="data.newItem.event_date"
-                                                label="Start date" v-on="on">
+                                            <v-text-field v-model="$v.data.newItem.event_date.$model"
+                                                :error="$v.data.newItem.event_date.$error"
+                                                label="Date" v-on="on">
                                             </v-text-field>
                                         </template>
-                                        <v-date-picker v-model="data.newItem.event_date"
+                                        <v-date-picker v-model="$v.data.newItem.event_date.$model"
                                             @input="data.newItem.show_start = false"
                                             no-title
                                         ></v-date-picker>
@@ -188,6 +189,11 @@
                                 </v-col>
                             </v-row>
                             <v-row align-content="center" justify="center" class="pt-6">
+                                <v-col cols="3" v-if="formError">
+                                    <v-row justify="end">
+                                        <p class="caption red--text">Unable to submit form.</p>
+                                    </v-row>
+                                </v-col>
                                 <div>
                                     <v-btn type="submit"
                                         outlined color="blue">Save</v-btn>
@@ -308,6 +314,7 @@ export default {
             progress: false,
             success: false,
             error: false,
+            formError: false,
             search: '',
             searchCountries: '',
             dialog: false,
@@ -338,6 +345,7 @@ export default {
                     name: '',
                     description: '',
                     international: false,
+                    event_date: null,
                     person_details: [],
                     labs_details: [],
                 },
@@ -418,47 +426,50 @@ export default {
             }
         },
         submitForm () {
-            if (this.$store.state.session.loggedIn
-                && !this.$v.$invalid
-            ) {
-                this.progress = true;
-                let personID = this.$store.state.session.personID;
+            if (this.$v.$invalid) {
+                this.formError = true;
+                setTimeout(() => {this.formError = false;}, 3000)
+            } else {
+                if (this.$store.state.session.loggedIn) {
+                    this.progress = true;
+                    let personID = this.$store.state.session.personID;
 
-                let urlCreate = [
-                    {
-                        url: 'api/people/' + personID
-                            + '/outreaches',
-                        body: this.data.newItem,
-                    }
-                ];
-                Promise.all(urlCreate.map(el =>
-                    this.$http.post(el.url,
-                        { data: el.body, },
-                        { headers:
-                            {'Authorization': 'Bearer ' + localStorage['v2-token']
-                        },
-                    }))
-                )
-                .then(() => {
-                    this.progress = false;
-                    this.success = true;
-                    setTimeout(() => {
-                        this.success = false;
-                        this.data.newItem = {
-                            international: false,
-                            person_details: [],
-                            labs_details: [],
-                        };
-                        this.initialize();
-                    }, 1500);
-                })
-                .catch((error) => {
-                    this.progress = false;
-                    this.error = true;
-                    setTimeout(() => {this.error = false;}, 6000)
-                    // eslint-disable-next-line
-                    console.log(error)
-                })
+                    let urlCreate = [
+                        {
+                            url: 'api/people/' + personID
+                                + '/outreaches',
+                            body: this.data.newItem,
+                        }
+                    ];
+                    Promise.all(urlCreate.map(el =>
+                        this.$http.post(el.url,
+                            { data: el.body, },
+                            { headers:
+                                {'Authorization': 'Bearer ' + localStorage['v2-token']
+                            },
+                        }))
+                    )
+                    .then(() => {
+                        this.progress = false;
+                        this.success = true;
+                        setTimeout(() => {
+                            this.success = false;
+                            this.data.newItem = {
+                                international: false,
+                                person_details: [],
+                                labs_details: [],
+                            };
+                            this.initialize();
+                        }, 1500);
+                    })
+                    .catch((error) => {
+                        this.progress = false;
+                        this.error = true;
+                        setTimeout(() => {this.error = false;}, 6000)
+                        // eslint-disable-next-line
+                        console.log(error)
+                    })
+                }
             }
         },
         submitNewAssociations () {
@@ -554,6 +565,7 @@ export default {
             newItem: {
                 name: { maxLength: maxLength(100) },
                 description: { maxLength: maxLength(500) },
+                event_date: { isValid: time.validate },
             },
         },
     },

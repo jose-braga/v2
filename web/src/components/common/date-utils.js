@@ -63,9 +63,22 @@ var sorter = function (data, key, inverse) {
     return data;
 };
 
+var validate = function(value) {
+    if (value === null || value === undefined || value === '') {
+        return true;
+    } else {
+        if (moment(value, 'YYYY-MM-DD', true).isValid()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
 export default {
     momentToDate,
     moment,
     processResultsDate,
     sorter,
+    validate
 }

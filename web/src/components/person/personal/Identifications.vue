@@ -4,35 +4,37 @@
         <p v-if="data.identifications.length === 0">
             No data.
         </p>
-        <div v-for="(identification, i) in data.identifications"
+        <div v-for="(identification, i) in $v.data.identifications.$each.$iter"
             :key="i">
             <v-row align="center">
                 <v-col cols="11" sm="4">
-                    <v-select v-model="identification.card_type_id"
+                    <v-select v-model="identification.$model.card_type_id"
                         :items="cardTypes" item-value="id" item-text="name_en"
                         label="Card Type">
                     </v-select>
                 </v-col>
                 <v-col cols="12" sm="4">
                     <v-text-field
-                        v-model="identification.card_number"
+                        v-model="identification.$model.card_number"
                         label="Card ID number">
                     </v-text-field>
                 </v-col>
                 <v-col cols="12" sm="3">
                     <v-menu ref="identification.show_date_end"
-                        v-model="identification.show_date_end"
+                        v-model="identification.$model.show_date_end"
                         :close-on-content-click="false"
                         :nudge-right="10"
                         transition="scale-transition"
                         offset-y min-width="290px">
                         <template v-slot:activator="{ on }">
-                            <v-text-field v-model="identification.valid_until"
+                            <v-text-field v-model="identification.$model.valid_until"
+                                :error="identification.valid_until.$error"
+                                @input="identification.valid_until.$touch()"
                                 label="Valid until" v-on="on">
                             </v-text-field>
                         </template>
-                        <v-date-picker v-model="identification.valid_until"
-                                @input="identification.show_date_end = false"
+                        <v-date-picker v-model="identification.$model.valid_until"
+                                @input="identification.$model.show_date_end = false"
                                 no-title></v-date-picker>
                     </v-menu>
                 </v-col>
@@ -120,73 +122,78 @@ export default {
             }
         },
         submitForm () {
-            if (this.$store.state.session.loggedIn) {
-                this.progress = true;
-                let urlCreate = [];
-                let urlDelete = [];
-                let urlUpdate = [];
-                let personID = this.$store.state.session.personID;
-                let identifications = this.data.identifications;
-                for (let ind in identifications) {
-                    if (identifications[ind].id === 'new') {
-                        identifications[ind].person_id = personID;
-                        urlCreate.push({
-                                url: 'api/people/' + personID + '/identifications',
-                                body: identifications[ind],
-                            });
+            if (this.$v.$invalid) {
+                this.formError = true;
+                setTimeout(() => {this.formError = false;}, 3000)
+            } else {
+                if (this.$store.state.session.loggedIn) {
+                    this.progress = true;
+                    let urlCreate = [];
+                    let urlDelete = [];
+                    let urlUpdate = [];
+                    let personID = this.$store.state.session.personID;
+                    let identifications = this.data.identifications;
+                    for (let ind in identifications) {
+                        if (identifications[ind].id === 'new') {
+                            identifications[ind].person_id = personID;
+                            urlCreate.push({
+                                    url: 'api/people/' + personID + '/identifications',
+                                    body: identifications[ind],
+                                });
 
-                    } else {
-                        urlUpdate.push({
-                                url: 'api/people/' + personID
-                                        + '/identifications/' + identifications[ind].id,
-                                body: identifications[ind],
-                            });
+                        } else {
+                            urlUpdate.push({
+                                    url: 'api/people/' + personID
+                                            + '/identifications/' + identifications[ind].id,
+                                    body: identifications[ind],
+                                });
+                        }
                     }
-                }
-                for (let ind in this.toDelete) {
-                    urlDelete.push('api/people/' + personID
-                                + '/identifications/' + this.toDelete[ind].id);
-                }
-                Promise.all(
-                    urlUpdate.map(el =>
-                        this.$http.put(el.url,
-                            { data: el.body, },
-                            { headers:
-                                {'Authorization': 'Bearer ' + localStorage['v2-token']
-                            },
-                        }))
-                    .concat(
-                        urlCreate.map(el =>
-                            this.$http.post(el.url,
+                    for (let ind in this.toDelete) {
+                        urlDelete.push('api/people/' + personID
+                                    + '/identifications/' + this.toDelete[ind].id);
+                    }
+                    Promise.all(
+                        urlUpdate.map(el =>
+                            this.$http.put(el.url,
                                 { data: el.body, },
                                 { headers:
                                     {'Authorization': 'Bearer ' + localStorage['v2-token']
                                 },
-                            })))
-                    .concat(
-                        urlDelete.map(el =>
-                            this.$http.delete(el,
-                                { headers:
-                                    {'Authorization': 'Bearer ' + localStorage['v2-token']
-                                },
-                            })))
-                )
-                .then( () => {
-                    this.progress = false;
-                    this.success = true;
-                    setTimeout(() => {this.success = false;}, 1500)
-                    this.toDelete = [];
-                    this.initialize();
-                })
-                .catch((error) => {
-                    this.progress = false;
-                    this.error = true;
-                    this.toDelete = [];
-                    this.initialize();
-                    setTimeout(() => {this.error = false;}, 6000)
-                    // eslint-disable-next-line
-                    console.log(error)
-                })
+                            }))
+                        .concat(
+                            urlCreate.map(el =>
+                                this.$http.post(el.url,
+                                    { data: el.body, },
+                                    { headers:
+                                        {'Authorization': 'Bearer ' + localStorage['v2-token']
+                                    },
+                                })))
+                        .concat(
+                            urlDelete.map(el =>
+                                this.$http.delete(el,
+                                    { headers:
+                                        {'Authorization': 'Bearer ' + localStorage['v2-token']
+                                    },
+                                })))
+                    )
+                    .then( () => {
+                        this.progress = false;
+                        this.success = true;
+                        setTimeout(() => {this.success = false;}, 1500)
+                        this.toDelete = [];
+                        this.initialize();
+                    })
+                    .catch((error) => {
+                        this.progress = false;
+                        this.error = true;
+                        this.toDelete = [];
+                        this.initialize();
+                        setTimeout(() => {this.error = false;}, 6000)
+                        // eslint-disable-next-line
+                        console.log(error)
+                    })
+                }
             }
         },
         getCardTypes () {
@@ -205,6 +212,15 @@ export default {
                 this.toDelete.push(list[ind]);
             }
             list.splice(ind, 1);
+        },
+    },
+    validations: {
+        data: {
+            identifications: {
+                $each: {
+                    valid_until: { isValid: time.validate },
+                },
+            }
         },
     },
 }

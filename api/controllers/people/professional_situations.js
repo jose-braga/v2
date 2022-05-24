@@ -492,9 +492,9 @@ var insertFellowshipJobRelationship = function (options) {
     places.push(jobID, fellowship_id);
     return sql.makeSQLOperation(req, res, querySQL, places,
         (options) => {
-            if (data.funding_agencies.length > 0) {
+            if (data.funding_agencies!== undefined && data.funding_agencies.length > 0) {
                 return insertFellowshipFundingAgencyRelationship(options, 0)
-            } else if (data.management_entities.length > 0) {
+            } else if (data.management_entities !== undefined && data.management_entities.length > 0) {
                 return insertFellowshipManagementEntityRelationship(options, 0)
             } else {
                 let notificationConfig = { entityID: personID };

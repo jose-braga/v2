@@ -102,11 +102,12 @@
                                 transition="scale-transition"
                                 offset-y min-width="290px">
                                 <template v-slot:activator="{ on }">
-                                    <v-text-field v-model="itemDetails.date"
+                                    <v-text-field v-model="$v.itemDetails.date.$model"
+                                        :error="$v.itemDetails.date.$error"
                                         label="Date talk/poster" v-on="on">
                                     </v-text-field>
                                 </template>
-                                <v-date-picker v-model="itemDetails.date"
+                                <v-date-picker v-model="$v.itemDetails.date.$model"
                                     @input="itemDetails.show_start = false"
                                     no-title
                                 ></v-date-picker>
@@ -167,6 +168,11 @@
                     </v-col>
                 </v-row>
                 <v-row align-content="center" justify="center" class="pt-6">
+                    <v-col cols="3" v-if="formError">
+                        <v-row justify="end">
+                            <p class="caption red--text">Unable to submit form.</p>
+                        </v-row>
+                    </v-col>
                     <div>
                         <v-btn type="submit"
                             outlined color="blue">Update</v-btn>
@@ -188,6 +194,7 @@
 
 <script>
 import subUtil from '@/components/common/submit-utils'
+import time from '@/components/common/date-utils'
 import { requiredIf, maxLength } from 'vuelidate/lib/validators'
 
 
@@ -229,6 +236,7 @@ export default {
             itemDetails: {
                 communication_raw: null,
                 labs_details: [],
+                date: null,
             },
             searchLabs: [],
             toDeleteLab: [],
@@ -268,49 +276,52 @@ export default {
             }
         },
         submitForm () {
-            if (this.$store.state.session.loggedIn
-                && !this.$v.$invalid
-            ) {
-                this.progress = true;
-                let personID = this.$store.state.session.personID;
-                this.itemDetails.isUnstructured = this.isUnstructured;
-                this.itemDetails.convertToStructured = this.convertToStructured;
-                this.itemDetails.toDeleteLab = this.toDeleteLab;
-                let urlUpdate = [
-                    {
-                        url: 'api/people/' + personID
-                            + '/communications/' + this.itemDetails.id,
-                        body: this.itemDetails,
-                    }
-                ];
-                Promise.all(urlUpdate.map(el =>
-                    this.$http.put(el.url,
-                        { data: el.body, },
-                        { headers:
-                            {'Authorization': 'Bearer ' + localStorage['v2-token']
-                        },
-                    }))
-                )
-                .then(() => {
-                    this.progress = false;
-                    this.success = true;
-                    this.$root.$emit('updatedCommunication')
-                    setTimeout(() => {
-                        this.success = false;
-                        this.toDeleteLab = [];
-                        this.itemDetails = {
-                            labs_details: [],
-                        };
-                        this.initialize();
-                    }, 1500);
-                })
-                .catch((error) => {
-                    this.progress = false;
-                    this.error = true;
-                    setTimeout(() => {this.error = false;}, 6000)
-                    // eslint-disable-next-line
-                    console.log(error)
-                })
+            if (this.$v.$invalid) {
+                this.formError = true;
+                setTimeout(() => {this.formError = false;}, 3000)
+            } else {
+                if (this.$store.state.session.loggedIn) {
+                    this.progress = true;
+                    let personID = this.$store.state.session.personID;
+                    this.itemDetails.isUnstructured = this.isUnstructured;
+                    this.itemDetails.convertToStructured = this.convertToStructured;
+                    this.itemDetails.toDeleteLab = this.toDeleteLab;
+                    let urlUpdate = [
+                        {
+                            url: 'api/people/' + personID
+                                + '/communications/' + this.itemDetails.id,
+                            body: this.itemDetails,
+                        }
+                    ];
+                    Promise.all(urlUpdate.map(el =>
+                        this.$http.put(el.url,
+                            { data: el.body, },
+                            { headers:
+                                {'Authorization': 'Bearer ' + localStorage['v2-token']
+                            },
+                        }))
+                    )
+                    .then(() => {
+                        this.progress = false;
+                        this.success = true;
+                        this.$root.$emit('updatedCommunication')
+                        setTimeout(() => {
+                            this.success = false;
+                            this.toDeleteLab = [];
+                            this.itemDetails = {
+                                labs_details: [],
+                            };
+                            this.initialize();
+                        }, 1500);
+                    })
+                    .catch((error) => {
+                        this.progress = false;
+                        this.error = true;
+                        setTimeout(() => {this.error = false;}, 6000)
+                        // eslint-disable-next-line
+                        console.log(error)
+                    })
+                }
             }
         },
         getCountries() {
@@ -383,6 +394,7 @@ export default {
     },
     validations: {
         itemDetails: {
+            date: { isValid: time.validate },
             communication_raw: {
                 required: requiredIf(function () { return this.isUnstructured}),
                 maxLength: maxLength(3000),

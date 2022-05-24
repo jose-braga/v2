@@ -94,11 +94,12 @@
                                         transition="scale-transition"
                                         offset-y min-width="290px">
                                         <template v-slot:activator="{ on }">
-                                            <v-text-field v-model="data.newProject.start"
+                                            <v-text-field v-model="$v.data.newProject.start.$model"
+                                                :error="$v.data.newProject.start.$error"
                                                 label="Start date" v-on="on">
                                             </v-text-field>
                                         </template>
-                                        <v-date-picker v-model="data.newProject.start"
+                                        <v-date-picker v-model="$v.data.newProject.start.$model"
                                             @input="data.newProject.show_start = false"
                                             no-title
                                         ></v-date-picker>
@@ -112,11 +113,12 @@
                                         transition="scale-transition"
                                         offset-y min-width="290px">
                                         <template v-slot:activator="{ on }">
-                                            <v-text-field v-model="data.newProject.end"
+                                            <v-text-field v-model="$v.data.newProject.end.$model"
+                                                :error="$v.data.newProject.end.$error"
                                                 label="End date" v-on="on">
                                             </v-text-field>
                                         </template>
-                                        <v-date-picker v-model="data.newProject.end"
+                                        <v-date-picker v-model="$v.data.newProject.end.$model"
                                             @input="data.newProject.show_end = false"
                                             no-title
                                         ></v-date-picker>
@@ -316,6 +318,11 @@
                                 </v-col>
                             </v-row>
                             <v-row align-content="center" justify="center" class="pt-6">
+                                <v-col cols="3" v-if="formError">
+                                    <v-row justify="end">
+                                        <p class="caption red--text">Unable to submit form.</p>
+                                    </v-row>
+                                </v-col>
                                 <div>
                                     <v-btn type="submit"
                                         outlined color="blue">Save</v-btn>
@@ -441,6 +448,7 @@ export default {
             progress: false,
             success: false,
             error: false,
+            formError: false,
             search: '',
             dialog: false,
             dialogNewProject: false,
@@ -473,6 +481,8 @@ export default {
                     title: '',
                     amount: null,
                     global_amount: null,
+                    start: null,
+                    end: null,
                     notes: null,
                     confidential: false,
                     partners: [],
@@ -577,48 +587,51 @@ export default {
             }
         },
         submitForm () {
-            if (this.$store.state.session.loggedIn
-                && !this.$v.$invalid
-            ) {
-                this.progress = true;
-                let personID = this.$store.state.session.personID;
+            if (this.$v.$invalid) {
+                this.formError = true;
+                setTimeout(() => {this.formError = false;}, 3000)
+            } else {
+                if (this.$store.state.session.loggedIn) {
+                    this.progress = true;
+                    let personID = this.$store.state.session.personID;
 
-                let urlCreate = [
-                    {
-                        url: 'api/people/' + personID
-                            + '/industry-projects',
-                        body: this.data.newProject,
-                    }
-                ];
-                Promise.all(urlCreate.map(el =>
-                    this.$http.post(el.url,
-                        { data: el.body, },
-                        { headers:
-                            {'Authorization': 'Bearer ' + localStorage['v2-token']
-                        },
-                    }))
-                )
-                .then(() => {
-                    this.progress = false;
-                    this.success = true;
-                    setTimeout(() => {
-                        this.success = false;
-                        this.data.newProject = {
-                            confidential: false,
-                            partners: [],
-                            person_details: [],
-                            labs_details: [],
-                        };
-                        this.initialize();
-                    }, 1500);
-                })
-                .catch((error) => {
-                    this.progress = false;
-                    this.error = true;
-                    setTimeout(() => {this.error = false;}, 6000)
-                    // eslint-disable-next-line
-                    console.log(error)
-                })
+                    let urlCreate = [
+                        {
+                            url: 'api/people/' + personID
+                                + '/industry-projects',
+                            body: this.data.newProject,
+                        }
+                    ];
+                    Promise.all(urlCreate.map(el =>
+                        this.$http.post(el.url,
+                            { data: el.body, },
+                            { headers:
+                                {'Authorization': 'Bearer ' + localStorage['v2-token']
+                            },
+                        }))
+                    )
+                    .then(() => {
+                        this.progress = false;
+                        this.success = true;
+                        setTimeout(() => {
+                            this.success = false;
+                            this.data.newProject = {
+                                confidential: false,
+                                partners: [],
+                                person_details: [],
+                                labs_details: [],
+                            };
+                            this.initialize();
+                        }, 1500);
+                    })
+                    .catch((error) => {
+                        this.progress = false;
+                        this.error = true;
+                        setTimeout(() => {this.error = false;}, 6000)
+                        // eslint-disable-next-line
+                        console.log(error)
+                    })
+                }
             }
         },
         submitNewAssociations () {
@@ -736,7 +749,9 @@ export default {
                 title: { maxLength: maxLength(200) },
                 amount: { integer },
                 global_amount: { integer },
-                notes: { maxLength: maxLength(500) }
+                notes: { maxLength: maxLength(500) },
+                start: { isValid: time.validate },
+                end: { isValid: time.validate },
             },
         },
     },

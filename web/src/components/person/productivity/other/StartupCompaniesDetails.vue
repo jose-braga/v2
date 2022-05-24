@@ -25,11 +25,12 @@
                         transition="scale-transition"
                         offset-y min-width="290px">
                         <template v-slot:activator="{ on }">
-                            <v-text-field v-model="itemDetails.item_details.start"
+                            <v-text-field v-model="$v.itemDetails.item_details.start.$model"
+                                :error="$v.itemDetails.item_details.start.$error"
                                 label="Started" v-on="on">
                             </v-text-field>
                         </template>
-                        <v-date-picker v-model="itemDetails.item_details.start"
+                        <v-date-picker v-model="$v.itemDetails.item_details.start.$model"
                             @input="itemDetails.item_details.show_start_date = false"
                             no-title
                         ></v-date-picker>
@@ -43,11 +44,12 @@
                         transition="scale-transition"
                         offset-y min-width="290px">
                         <template v-slot:activator="{ on }">
-                            <v-text-field v-model="itemDetails.item_details.end"
+                            <v-text-field v-model="$v.itemDetails.item_details.end.$model"
+                                :error="$v.itemDetails.item_details.end.$error"
                                 label="Ended" v-on="on">
                             </v-text-field>
                         </template>
-                        <v-date-picker v-model="itemDetails.item_details.end"
+                        <v-date-picker v-model="$v.itemDetails.item_details.end.$model"
                             @input="itemDetails.item_details.show_end_date = false"
                             no-title
                         ></v-date-picker>
@@ -145,6 +147,11 @@
                 </v-col>
             </v-row>
             <v-row align-content="center" justify="center" class="pt-6">
+                <v-col cols="3" v-if="formError">
+                    <v-row justify="end">
+                        <p class="caption red--text">Unable to submit form.</p>
+                    </v-row>
+                </v-col>
                 <div>
                     <v-btn type="submit"
                         outlined color="blue">Save</v-btn>
@@ -167,6 +174,7 @@
 
 <script>
 import subUtil from '@/components/common/submit-utils'
+import time from '@/components/common/date-utils'
 import { maxLength } from 'vuelidate/lib/validators'
 
 function prepareStringComparison(str) {
@@ -204,6 +212,8 @@ export default {
                 item_details: {
                     name: '',
                     short_description: null,
+                    start: null,
+                    end: null,
                 },
                 labs_details: [],
                 person_details: [],
@@ -232,51 +242,54 @@ export default {
             this.itemDetails = Object.assign({}, this.itemData);
         },
         submitForm () {
-            if (this.$store.state.session.loggedIn
-                && !this.$v.$invalid
-            ) {
-                this.progress = true;
-                let personID = this.$store.state.session.personID;
-                this.itemDetails.toDeletePerson = this.toDeletePerson;
-                this.itemDetails.toDeleteLab = this.toDeleteLab;
-                let urlUpdate = [
-                    {
-                        url: 'api/people/' + personID
-                            + '/startups/' + this.itemDetails.startup_id,
-                        body: this.itemDetails,
-                    }
-                ];
-                Promise.all(urlUpdate.map(el =>
-                    this.$http.put(el.url,
-                        { data: el.body, },
-                        { headers:
-                            {'Authorization': 'Bearer ' + localStorage['v2-token']
-                        },
-                    }))
-                )
-                .then(() => {
-                    this.progress = false;
-                    this.success = true;
-                    this.$root.$emit('updatedStartup')
-                    setTimeout(() => {
-                        this.success = false;
-                        this.toDeletePerson = [];
-                        this.toDeleteLab = [];
-                        this.itemDetails = {
-                            labs_details: [],
-                            person_details: [],
-                        };
-                        //this.$root.$emit('updatedPatent')
-                        this.initialize();
-                    }, 1500);
-                })
-                .catch((error) => {
-                    this.progress = false;
-                    this.error = true;
-                    setTimeout(() => {this.error = false;}, 6000)
-                    // eslint-disable-next-line
-                    console.log(error)
-                })
+            if (this.$v.$invalid) {
+                this.formError = true;
+                setTimeout(() => {this.formError = false;}, 3000)
+            } else {
+                if (this.$store.state.session.loggedIn) {
+                    this.progress = true;
+                    let personID = this.$store.state.session.personID;
+                    this.itemDetails.toDeletePerson = this.toDeletePerson;
+                    this.itemDetails.toDeleteLab = this.toDeleteLab;
+                    let urlUpdate = [
+                        {
+                            url: 'api/people/' + personID
+                                + '/startups/' + this.itemDetails.startup_id,
+                            body: this.itemDetails,
+                        }
+                    ];
+                    Promise.all(urlUpdate.map(el =>
+                        this.$http.put(el.url,
+                            { data: el.body, },
+                            { headers:
+                                {'Authorization': 'Bearer ' + localStorage['v2-token']
+                            },
+                        }))
+                    )
+                    .then(() => {
+                        this.progress = false;
+                        this.success = true;
+                        this.$root.$emit('updatedStartup')
+                        setTimeout(() => {
+                            this.success = false;
+                            this.toDeletePerson = [];
+                            this.toDeleteLab = [];
+                            this.itemDetails = {
+                                labs_details: [],
+                                person_details: [],
+                            };
+                            //this.$root.$emit('updatedPatent')
+                            this.initialize();
+                        }, 1500);
+                    })
+                    .catch((error) => {
+                        this.progress = false;
+                        this.error = true;
+                        setTimeout(() => {this.error = false;}, 6000)
+                        // eslint-disable-next-line
+                        console.log(error)
+                    })
+                }
             }
         },
         getPeople () {
@@ -332,7 +345,9 @@ export default {
     validations: {
         itemDetails: {
             item_details: {
-                short_description: { maxLength: maxLength(500) }
+                short_description: { maxLength: maxLength(500) },
+                start: { isValid: time.validate },
+                end: { isValid: time.validate },
             },
         },
     },
