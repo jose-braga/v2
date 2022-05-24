@@ -54,11 +54,12 @@
                             transition="scale-transition"
                             offset-y min-width="290px">
                             <template v-slot:activator="{ on }">
-                                <v-text-field v-model="itemDetails.item_details.start_date"
+                                <v-text-field v-model="$v.itemDetails.item_details.start_date.$model"
+                                    :error="$v.itemDetails.item_details.start_date.$error"
                                     label="Start date" v-on="on">
                                 </v-text-field>
                             </template>
-                            <v-date-picker v-model="itemDetails.item_details.start_date"
+                            <v-date-picker v-model="$v.itemDetails.item_details.start_date.$model"
                                 @input="itemDetails.item_details.show_start = false"
                                 no-title
                             ></v-date-picker>
@@ -72,11 +73,12 @@
                             transition="scale-transition"
                             offset-y min-width="290px">
                             <template v-slot:activator="{ on }">
-                                <v-text-field v-model="itemDetails.item_details.end_date"
+                                <v-text-field v-model="$v.itemDetails.item_details.end_date.$model"
+                                    :error="$v.itemDetails.item_details.end_date.$error"
                                     label="End date" v-on="on">
                                 </v-text-field>
                             </template>
-                            <v-date-picker v-model="itemDetails.item_details.end_date"
+                            <v-date-picker v-model="$v.itemDetails.item_details.end_date.$model"
                                 @input="itemDetails.item_details.show_end = false"
                                 no-title
                             ></v-date-picker>
@@ -174,6 +176,11 @@
                     </v-col>
                 </v-row>
                 <v-row align-content="center" justify="center" class="pt-6">
+                    <v-col cols="3" v-if="formError">
+                        <v-row justify="end">
+                            <p class="caption red--text">Unable to submit form.</p>
+                        </v-row>
+                    </v-col>
                     <div>
                         <v-btn type="submit"
                             outlined color="blue">Save</v-btn>
@@ -195,6 +202,7 @@
 
 <script>
 import subUtil from '@/components/common/submit-utils'
+import time from '@/components/common/date-utils'
 import { maxLength } from 'vuelidate/lib/validators'
 
 function prepareStringComparison(str) {
@@ -233,6 +241,8 @@ export default {
                     board_name: '',
                     short_description: '',
                     role: '',
+                    start_date: null,
+                    end_date: null,
                 },
                 labs_details: [],
                 person_details: [],
@@ -263,51 +273,54 @@ export default {
             this.itemDetails = Object.assign({}, this.itemData);
         },
         submitForm () {
-            if (this.$store.state.session.loggedIn
-                && !this.$v.$invalid
-            ) {
-                this.progress = true;
-                let personID = this.$store.state.session.personID;
-                this.itemDetails.toDeletePerson = this.toDeletePerson;
-                this.itemDetails.toDeleteLab = this.toDeleteLab;
-                let urlUpdate = [
-                    {
-                        url: 'api/people/' + personID
-                            + '/boards/' + this.itemDetails.board_id,
-                        body: this.itemDetails,
-                    }
-                ];
-                Promise.all(urlUpdate.map(el =>
-                    this.$http.put(el.url,
-                        { data: el.body, },
-                        { headers:
-                            {'Authorization': 'Bearer ' + localStorage['v2-token']
-                        },
-                    }))
-                )
-                .then(() => {
-                    this.progress = false;
-                    this.success = true;
-                    this.$root.$emit('updatedBoard')
-                    setTimeout(() => {
-                        this.success = false;
-                        this.toDeletePerson = [];
-                        this.toDeleteLab = [];
-                        this.itemDetails = {
-                            labs_details: [],
-                            person_details: [],
-                        };
-                        //this.$root.$emit('updatedPatent')
-                        this.initialize();
-                    }, 1500);
-                })
-                .catch((error) => {
-                    this.progress = false;
-                    this.error = true;
-                    setTimeout(() => {this.error = false;}, 6000)
-                    // eslint-disable-next-line
-                    console.log(error)
-                })
+            if (this.$v.$invalid) {
+                this.formError = true;
+                setTimeout(() => {this.formError = false;}, 3000)
+            } else {
+                if (this.$store.state.session.loggedIn) {
+                    this.progress = true;
+                    let personID = this.$store.state.session.personID;
+                    this.itemDetails.toDeletePerson = this.toDeletePerson;
+                    this.itemDetails.toDeleteLab = this.toDeleteLab;
+                    let urlUpdate = [
+                        {
+                            url: 'api/people/' + personID
+                                + '/boards/' + this.itemDetails.board_id,
+                            body: this.itemDetails,
+                        }
+                    ];
+                    Promise.all(urlUpdate.map(el =>
+                        this.$http.put(el.url,
+                            { data: el.body, },
+                            { headers:
+                                {'Authorization': 'Bearer ' + localStorage['v2-token']
+                            },
+                        }))
+                    )
+                    .then(() => {
+                        this.progress = false;
+                        this.success = true;
+                        this.$root.$emit('updatedBoard')
+                        setTimeout(() => {
+                            this.success = false;
+                            this.toDeletePerson = [];
+                            this.toDeleteLab = [];
+                            this.itemDetails = {
+                                labs_details: [],
+                                person_details: [],
+                            };
+                            //this.$root.$emit('updatedPatent')
+                            this.initialize();
+                        }, 1500);
+                    })
+                    .catch((error) => {
+                        this.progress = false;
+                        this.error = true;
+                        setTimeout(() => {this.error = false;}, 6000)
+                        // eslint-disable-next-line
+                        console.log(error)
+                    })
+                }
             }
         },
         getPeople () {
@@ -372,7 +385,9 @@ export default {
             item_details: {
                 short_description: { maxLength: maxLength(400) },
                 board_name: { maxLength: maxLength(100) },
-                role: { maxLength: maxLength(45) }
+                role: { maxLength: maxLength(45) },
+                start_date: { isValid: time.validate },
+                end_date: { isValid: time.validate },
             },
         },
     },

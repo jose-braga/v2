@@ -28,7 +28,8 @@
                         offset-y min-width="290px">
                         <template v-slot:activator="{ on }">
                             <v-text-field v-model="identification.$model.valid_until"
-                                :error="!identification.valid_until.isValid"
+                                :error="identification.valid_until.$error"
+                                @input="identification.valid_until.$touch()"
                                 label="Valid until" v-on="on">
                             </v-text-field>
                         </template>

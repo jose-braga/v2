@@ -11,47 +11,51 @@
             <p v-if="data.academicAffiliations.length === 0">
                 No data.
             </p>
-            <div v-for="(department, i) in data.academicAffiliations"
+            <div v-for="(department, i) in $v.data.academicAffiliations.$each.$iter"
                 :key="i">
                 <v-row align="center" class="px-2">
                     <v-col cols="12" sm="4">
                         <v-select
-                            v-model="department.department_id"
+                            v-model="department.$model.department_id"
                             :items="departments" item-value="id" item-text="short_str_department_en"
                             label="Academic Institution">
                         </v-select>
                     </v-col>
                     <v-col cols="12" sm="3">
                         <v-menu ref="department.show_date_start"
-                            v-model="department.show_date_start"
+                            v-model="department.$model.show_date_start"
                             :close-on-content-click="false"
                             :nudge-right="10"
                             transition="scale-transition"
                             offset-y min-width="290px">
                             <template v-slot:activator="{ on }">
-                                <v-text-field v-model="department.valid_from"
+                                <v-text-field v-model="department.$model.valid_from"
+                                    :error="department.valid_from.$error"
+                                    @input="department.valid_from.$touch()"
                                     label="Started" v-on="on">
                                 </v-text-field>
                             </template>
-                            <v-date-picker v-model="department.valid_from"
-                                    @input="department.show_date_start = false"
+                            <v-date-picker v-model="department.$model.valid_from"
+                                    @input="department.$model.show_date_start = false"
                                     no-title></v-date-picker>
                         </v-menu>
                     </v-col>
                     <v-col cols="12" sm="3">
                         <v-menu ref="department.show_date_end"
-                            v-model="department.show_date_end"
+                            v-model="department.$model.show_date_end"
                             :close-on-content-click="false"
                             :nudge-right="10"
                             transition="scale-transition"
                             offset-y min-width="290px">
                             <template v-slot:activator="{ on }">
-                                <v-text-field v-model="department.valid_until"
+                                <v-text-field v-model="department.$model.valid_until"
+                                    :error="department.valid_until.$error"
+                                    @input="department.valid_until.$touch()"
                                     label="Ended" v-on="on">
                                 </v-text-field>
                             </template>
-                            <v-date-picker v-model="department.valid_until"
-                                    @input="department.show_date_end = false"
+                            <v-date-picker v-model="department.$model.valid_until"
+                                    @input="department.$model.show_date_end = false"
                                     no-title></v-date-picker>
                         </v-menu>
                     </v-col>
@@ -190,73 +194,78 @@ export default {
             }
         },
         submitForm () {
-            if (this.$store.state.session.loggedIn) {
-                this.progress = true;
-                let urlCreate = [];
-                let urlDelete = [];
-                let urlUpdate = [];
-                let personID = this.$store.state.session.personID;
-                let affiliations = this.data.academicAffiliations;
-                for (let ind in affiliations) {
-                    if (affiliations[ind].id === 'new') {
-                        affiliations[ind].person_id = personID;
-                        urlCreate.push({
-                                url: 'api/people/' + personID + '/academic-affiliations',
-                                body: affiliations[ind],
-                            });
+            if (this.$v.$invalid) {
+                this.formError = true;
+                setTimeout(() => {this.formError = false;}, 3000)
+            } else {
+                if (this.$store.state.session.loggedIn) {
+                    this.progress = true;
+                    let urlCreate = [];
+                    let urlDelete = [];
+                    let urlUpdate = [];
+                    let personID = this.$store.state.session.personID;
+                    let affiliations = this.data.academicAffiliations;
+                    for (let ind in affiliations) {
+                        if (affiliations[ind].id === 'new') {
+                            affiliations[ind].person_id = personID;
+                            urlCreate.push({
+                                    url: 'api/people/' + personID + '/academic-affiliations',
+                                    body: affiliations[ind],
+                                });
 
-                    } else {
-                        urlUpdate.push({
-                                url: 'api/people/' + personID
-                                        + '/academic-affiliations/' + affiliations[ind].id,
-                                body: affiliations[ind],
-                            });
+                        } else {
+                            urlUpdate.push({
+                                    url: 'api/people/' + personID
+                                            + '/academic-affiliations/' + affiliations[ind].id,
+                                    body: affiliations[ind],
+                                });
+                        }
                     }
-                }
-                for (let ind in this.toDelete) {
-                    urlDelete.push('api/people/' + personID
-                                + '/academic-affiliations/' + this.toDelete[ind].id);
-                }
-                Promise.all(
-                    urlUpdate.map(el =>
-                        this.$http.put(el.url,
-                            { data: el.body, },
-                            { headers:
-                                {'Authorization': 'Bearer ' + localStorage['v2-token']
-                            },
-                        }))
-                    .concat(
-                        urlCreate.map(el =>
-                            this.$http.post(el.url,
+                    for (let ind in this.toDelete) {
+                        urlDelete.push('api/people/' + personID
+                                    + '/academic-affiliations/' + this.toDelete[ind].id);
+                    }
+                    Promise.all(
+                        urlUpdate.map(el =>
+                            this.$http.put(el.url,
                                 { data: el.body, },
                                 { headers:
                                     {'Authorization': 'Bearer ' + localStorage['v2-token']
                                 },
-                            })))
-                    .concat(
-                        urlDelete.map(el =>
-                            this.$http.delete(el,
-                                { headers:
-                                    {'Authorization': 'Bearer ' + localStorage['v2-token']
-                                },
-                            })))
-                )
-                .then( () => {
-                    this.progress = false;
-                    this.success = true;
-                    setTimeout(() => {this.success = false;}, 1500)
-                    this.toDelete = [];
-                    this.initialize();
-                })
-                .catch((error) => {
-                    this.progress = false;
-                    this.error = true;
-                    this.toDelete = [];
-                    this.initialize();
-                    setTimeout(() => {this.error = false;}, 6000)
-                    // eslint-disable-next-line
-                    console.log(error)
-                })
+                            }))
+                        .concat(
+                            urlCreate.map(el =>
+                                this.$http.post(el.url,
+                                    { data: el.body, },
+                                    { headers:
+                                        {'Authorization': 'Bearer ' + localStorage['v2-token']
+                                    },
+                                })))
+                        .concat(
+                            urlDelete.map(el =>
+                                this.$http.delete(el,
+                                    { headers:
+                                        {'Authorization': 'Bearer ' + localStorage['v2-token']
+                                    },
+                                })))
+                    )
+                    .then( () => {
+                        this.progress = false;
+                        this.success = true;
+                        setTimeout(() => {this.success = false;}, 1500)
+                        this.toDelete = [];
+                        this.initialize();
+                    })
+                    .catch((error) => {
+                        this.progress = false;
+                        this.error = true;
+                        this.toDelete = [];
+                        this.initialize();
+                        setTimeout(() => {this.error = false;}, 6000)
+                        // eslint-disable-next-line
+                        console.log(error)
+                    })
+                }
             }
         },
         submitWorkplace () {
@@ -328,7 +337,17 @@ export default {
             }
             list.splice(ind, 1);
         },
-    }
+    },
+    validations: {
+        data: {
+            academicAffiliations: {
+                $each: {
+                    valid_from: { isValid: time.validate },
+                    valid_until: { isValid: time.validate },
+                },
+            }
+        },
+    },
 
 }
 </script>

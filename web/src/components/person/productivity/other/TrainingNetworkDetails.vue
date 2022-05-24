@@ -69,11 +69,12 @@
                         transition="scale-transition"
                         offset-y min-width="290px">
                         <template v-slot:activator="{ on }">
-                            <v-text-field v-model="projectDetails.project_details.start"
+                            <v-text-field v-model="$v.projectDetails.project_details.start.$model"
+                                :error="$v.projectDetails.project_details.start.$error"
                                 label="Start date" v-on="on">
                             </v-text-field>
                         </template>
-                        <v-date-picker v-model="projectDetails.project_details.start"
+                        <v-date-picker v-model="$v.projectDetails.project_details.start.$model"
                             @input="projectDetails.project_details.show_start = false"
                             no-title
                         ></v-date-picker>
@@ -87,11 +88,12 @@
                         transition="scale-transition"
                         offset-y min-width="290px">
                         <template v-slot:activator="{ on }">
-                            <v-text-field v-model="projectDetails.project_details.end"
+                            <v-text-field v-model="$v.projectDetails.project_details.end.$model"
+                                :error="$v.projectDetails.project_details.end.$error"
                                 label="End date" v-on="on">
                             </v-text-field>
                         </template>
-                        <v-date-picker v-model="projectDetails.project_details.end"
+                        <v-date-picker v-model="$v.projectDetails.project_details.end.$model"
                             @input="projectDetails.project_details.show_end = false"
                             no-title
                         ></v-date-picker>
@@ -215,6 +217,11 @@
                 </v-col>
             </v-row>
             <v-row align-content="center" justify="center" class="pt-6">
+                <v-col cols="3" v-if="formError">
+                    <v-row justify="end">
+                        <p class="caption red--text">Unable to submit form.</p>
+                    </v-row>
+                </v-col>
                 <div>
                     <v-btn type="submit"
                         outlined color="blue">Update</v-btn>
@@ -236,6 +243,7 @@
 <script>
 import subUtil from '@/components/common/submit-utils'
 import { integer, maxLength } from 'vuelidate/lib/validators'
+import time from '@/components/common/date-utils'
 
 function prepareStringComparison(str) {
     if (str === null || str === undefined) {
@@ -319,56 +327,59 @@ export default {
             }
         },
         submitForm () {
-            if (this.$store.state.session.loggedIn
-                && !this.$v.$invalid
-            ) {
-                this.progress = true;
-                let personID = this.$store.state.session.personID;
-                this.projectDetails.toDeletePerson = this.toDeletePerson;
-                this.projectDetails.toDeleteLab = this.toDeleteLab;
-                let urlUpdate = [
-                    {
-                        url: 'api/people/' + personID
-                            + '/training-networks/' + this.projectDetails.training_id,
-                        body: this.projectDetails,
-                    }
-                ];
-                Promise.all(urlUpdate.map(el =>
-                    this.$http.put(el.url,
-                        { data: el.body, },
-                        { headers:
-                            {'Authorization': 'Bearer ' + localStorage['v2-token']
-                        },
-                    }))
-                )
-                .then(() => {
-                    this.progress = false;
-                    this.success = true;
-                    setTimeout(() => {
-                        this.success = false;
-                        this.toDeletePerson = [];
-                        this.toDeleteLab = [];
-                        this.projectDetails = {
-                            project_details: {
-                                network_name: '',
-                                title: '',
-                                management_entities: {},
+            if (this.$v.$invalid) {
+                this.formError = true;
+                setTimeout(() => {this.formError = false;}, 3000)
+            } else {
+                if (this.$store.state.session.loggedIn) {
+                    this.progress = true;
+                    let personID = this.$store.state.session.personID;
+                    this.projectDetails.toDeletePerson = this.toDeletePerson;
+                    this.projectDetails.toDeleteLab = this.toDeleteLab;
+                    let urlUpdate = [
+                        {
+                            url: 'api/people/' + personID
+                                + '/training-networks/' + this.projectDetails.training_id,
+                            body: this.projectDetails,
+                        }
+                    ];
+                    Promise.all(urlUpdate.map(el =>
+                        this.$http.put(el.url,
+                            { data: el.body, },
+                            { headers:
+                                {'Authorization': 'Bearer ' + localStorage['v2-token']
                             },
-                            labs_details: [],
-                            person_details: [],
+                        }))
+                    )
+                    .then(() => {
+                        this.progress = false;
+                        this.success = true;
+                        setTimeout(() => {
+                            this.success = false;
+                            this.toDeletePerson = [];
+                            this.toDeleteLab = [];
+                            this.projectDetails = {
+                                project_details: {
+                                    network_name: '',
+                                    title: '',
+                                    management_entities: {},
+                                },
+                                labs_details: [],
+                                person_details: [],
 
-                        };
-                        this.initialize();
-                        this.$root.$emit('updatedTrainingNetwork')
-                    }, 1500);
-                })
-                .catch((error) => {
-                    this.progress = false;
-                    this.error = true;
-                    setTimeout(() => {this.error = false;}, 6000)
-                    // eslint-disable-next-line
-                    console.log(error)
-                })
+                            };
+                            this.initialize();
+                            this.$root.$emit('updatedTrainingNetwork')
+                        }, 1500);
+                    })
+                    .catch((error) => {
+                        this.progress = false;
+                        this.error = true;
+                        setTimeout(() => {this.error = false;}, 6000)
+                        // eslint-disable-next-line
+                        console.log(error)
+                    })
+                }
             }
         },
         getPeople () {
@@ -443,7 +454,9 @@ export default {
                     amount: { integer },
                 },
                 global_amount: { integer },
-                notes: { maxLength: maxLength(500) }
+                notes: { maxLength: maxLength(500) },
+                start: { isValid: time.validate },
+                end: { isValid: time.validate },
             },
         },
     },

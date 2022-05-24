@@ -59,11 +59,12 @@
                         transition="scale-transition"
                         offset-y min-width="290px">
                         <template v-slot:activator="{ on }">
-                            <v-text-field v-model="itemDetails.item_details.status_date"
+                            <v-text-field v-model="$v.itemDetails.item_details.status_date.$model"
+                                :error="$v.itemDetails.item_details.status_date.$error"
                                 label="Status date" v-on="on">
                             </v-text-field>
                         </template>
-                        <v-date-picker v-model="itemDetails.item_details.status_date"
+                        <v-date-picker v-model="$v.itemDetails.item_details.status_date.$model"
                             @input="itemDetails.item_details.show_date = false"
                             no-title
                         ></v-date-picker>
@@ -161,6 +162,11 @@
                 </v-col>
             </v-row>
             <v-row align-content="center" justify="center" class="pt-6">
+                <v-col cols="3" v-if="formError">
+                    <v-row justify="end">
+                        <p class="caption red--text">Unable to submit form.</p>
+                    </v-row>
+                </v-col>
                 <div>
                     <v-btn type="submit"
                         outlined color="blue">Update</v-btn>
@@ -181,6 +187,7 @@
 
 <script>
 import subUtil from '@/components/common/submit-utils'
+import time from '@/components/common/date-utils'
 import { maxLength } from 'vuelidate/lib/validators'
 
 function prepareStringComparison(str) {
@@ -220,6 +227,7 @@ export default {
                     authors_raw: '',
                     description: '',
                     reference_number1: '',
+                    status_date: null,
                 },
                 labs_details: [],
                 person_details: [],
@@ -252,51 +260,54 @@ export default {
             this.itemDetails = Object.assign({}, this.itemData);
         },
         submitForm () {
-            if (this.$store.state.session.loggedIn
-                && !this.$v.$invalid
-            ) {
-                this.progress = true;
-                let personID = this.$store.state.session.personID;
-                this.itemDetails.toDeletePerson = this.toDeletePerson;
-                this.itemDetails.toDeleteLab = this.toDeleteLab;
-                let urlUpdate = [
-                    {
-                        url: 'api/people/' + personID
-                            + '/patents/' + this.itemDetails.patent_id,
-                        body: this.itemDetails,
-                    }
-                ];
-                Promise.all(urlUpdate.map(el =>
-                    this.$http.put(el.url,
-                        { data: el.body, },
-                        { headers:
-                            {'Authorization': 'Bearer ' + localStorage['v2-token']
-                        },
-                    }))
-                )
-                .then(() => {
-                    this.progress = false;
-                    this.success = true;
-                    this.$root.$emit('updatedPatent')
-                    setTimeout(() => {
-                        this.success = false;
-                        this.toDeletePerson = [];
-                        this.toDeleteLab = [];
-                        this.itemDetails = {
-                            labs_details: [],
-                            person_details: [],
-                        };
-                        //this.$root.$emit('updatedPatent')
-                        this.initialize();
-                    }, 1500);
-                })
-                .catch((error) => {
-                    this.progress = false;
-                    this.error = true;
-                    setTimeout(() => {this.error = false;}, 6000)
-                    // eslint-disable-next-line
-                    console.log(error)
-                })
+            if (this.$v.$invalid) {
+                this.formError = true;
+                setTimeout(() => {this.formError = false;}, 3000)
+            } else {
+                if (this.$store.state.session.loggedIn) {
+                    this.progress = true;
+                    let personID = this.$store.state.session.personID;
+                    this.itemDetails.toDeletePerson = this.toDeletePerson;
+                    this.itemDetails.toDeleteLab = this.toDeleteLab;
+                    let urlUpdate = [
+                        {
+                            url: 'api/people/' + personID
+                                + '/patents/' + this.itemDetails.patent_id,
+                            body: this.itemDetails,
+                        }
+                    ];
+                    Promise.all(urlUpdate.map(el =>
+                        this.$http.put(el.url,
+                            { data: el.body, },
+                            { headers:
+                                {'Authorization': 'Bearer ' + localStorage['v2-token']
+                            },
+                        }))
+                    )
+                    .then(() => {
+                        this.progress = false;
+                        this.success = true;
+                        this.$root.$emit('updatedPatent')
+                        setTimeout(() => {
+                            this.success = false;
+                            this.toDeletePerson = [];
+                            this.toDeleteLab = [];
+                            this.itemDetails = {
+                                labs_details: [],
+                                person_details: [],
+                            };
+                            //this.$root.$emit('updatedPatent')
+                            this.initialize();
+                        }, 1500);
+                    })
+                    .catch((error) => {
+                        this.progress = false;
+                        this.error = true;
+                        setTimeout(() => {this.error = false;}, 6000)
+                        // eslint-disable-next-line
+                        console.log(error)
+                    })
+                }
             }
         },
         getPeople () {
@@ -366,6 +377,7 @@ export default {
                 title: { maxLength: maxLength(300) },
                 authors_raw: { maxLength: maxLength(500) },
                 description: { maxLength: maxLength(1000) },
+                status_date: { isValid: time.validate },
             },
         },
     },

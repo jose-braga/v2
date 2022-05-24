@@ -26,49 +26,51 @@
                                 </v-row>
                             </v-col>
                         </v-row>
-                        <v-row v-for="(position, i) in studentDetails.lab_data"
+                        <v-row v-for="(position, i) in $v.studentDetails.lab_data.$each.$iter"
                             :key="i"
                         >
                             <v-col cols="12" sm="3">
-                                <v-select v-model="position.lab_id" v-if="position.id !== 'new'"
+                                <v-select v-model="position.$model.lab_id" v-if="position.$model.id !== 'new'"
                                     :items="labs" item-value="id" item-text="name"
                                     disabled
                                     label="Lab/Group">
                                 </v-select>
-                                <v-select v-model="position.lab_id" v-else
+                                <v-select v-model="position.$model.lab_id" v-else
                                     :items="myLabs" item-value="lab_id" item-text="lab_name"
                                     label="Lab/Group">
                                 </v-select>
                             </v-col>
                             <v-col cols="12" sm="3">
-                                <v-select v-model="position.lab_position_id"
+                                <v-select v-model="position.$model.lab_position_id"
                                     :items="labPositions" item-value="id" item-text="name_en"
-                                    :disabled="position.can_edit !== true"
+                                    :disabled="position.$model.can_edit !== true"
                                     label="Position">
                                 </v-select>
                             </v-col>
                             <v-col cols="12" sm="1">
                                 <v-text-field
-                                    v-model="position.dedication"
-                                    :disabled="position.can_edit !== true"
+                                    v-model="position.$model.dedication"
+                                    :disabled="position.$model.can_edit !== true"
                                     label="Dedication">
                                 </v-text-field>
                             </v-col>
                             <v-col cols="12" sm="2">
                                 <v-menu ref="date_menu"
-                                    v-model="position.show_valid_from"
+                                    v-model="position.$model.show_valid_from"
                                     :close-on-content-click="false"
                                     :nudge-right="10"
                                     transition="scale-transition"
                                     offset-y min-width="290px">
                                     <template v-slot:activator="{ on }">
-                                        <v-text-field v-model="position.valid_from"
-                                            :disabled="position.can_edit !== true"
+                                        <v-text-field v-model="position.$model.valid_from"
+                                            :error="position.valid_from.$error"
+                                            @input="position.valid_from.$touch()"
+                                            :disabled="position.$model.can_edit !== true"
                                             label="Start date" v-on="on">
                                         </v-text-field>
                                     </template>
-                                    <v-date-picker v-model="position.valid_from"
-                                        @input="position.show_valid_from = false"
+                                    <v-date-picker v-model="position.$model.valid_from"
+                                        @input="position.$model.show_valid_from = false"
                                         no-title
                                     ></v-date-picker>
                                 </v-menu>
@@ -81,21 +83,23 @@
                                     transition="scale-transition"
                                     offset-y min-width="290px">
                                     <template v-slot:activator="{ on, attrs }">
-                                        <v-text-field v-model="position.valid_until"
-                                            :disabled="position.can_edit !== true"
+                                        <v-text-field v-model="position.$model.valid_until"
+                                            :error="position.valid_until.$error"
+                                            @input="position.valid_until.$touch()"
+                                            :disabled="position.$model.can_edit !== true"
                                             label="End date"
                                             v-on="on"
                                             v-bind="attrs"
                                         >
                                         </v-text-field>
                                     </template>
-                                    <v-date-picker v-model="position.valid_until"
-                                        @click="position.show_valid_until = false"
+                                    <v-date-picker v-model="position.$model.valid_until"
+                                        @click="position.$model.show_valid_until = false"
                                         no-title
                                     ></v-date-picker>
                                 </v-menu>
                             </v-col>
-                            <v-col cols="12" sm="1" v-if="position.can_edit">
+                            <v-col cols="12" sm="1" v-if="position.$model.can_edit">
                                 <v-btn icon @click.stop="removeItem(studentDetails.lab_data, i, 'lab')" class="mt-3">
                                     <v-icon color="red darken">mdi-delete</v-icon>
                                 </v-btn>
@@ -114,68 +118,72 @@
                                 </v-row>
                             </v-col>
                         </v-row>
-                        <v-row v-for="(position, i) in studentDetails.technician_data"
+                        <v-row v-for="(position, i) in $v.studentDetails.technician_data.$each.$iter"
                             :key="'technician' + '-' +  i"
                         >
                             <v-col cols="12" sm="2">
-                                <v-select v-model="position.technician_office_id"
+                                <v-select v-model="position.$model.technician_office_id"
                                     :items="facilities" item-value="id" item-text="name_en"
                                     label="Facility">
                                 </v-select>
                             </v-col>
                             <v-col cols="12" sm="2">
-                                <v-select v-model="position.unit_id"
+                                <v-select v-model="position.$model.unit_id"
                                     :items="units" item-value="id" item-text="short_name"
                                     label="Unit">
                                 </v-select>
                             </v-col>
                             <v-col cols="12" sm="2">
-                                <v-select v-model="position.technician_position_id"
+                                <v-select v-model="position.$model.technician_position_id"
                                     :items="technicianPositions" item-value="id" item-text="name_en"
                                     label="Position">
                                 </v-select>
                             </v-col>
                             <v-col cols="12" sm="1">
                                 <v-text-field
-                                    v-model="position.dedication"
+                                    v-model="position.$model.dedication"
                                     label="Dedication">
                                 </v-text-field>
                             </v-col>
                             <v-col cols="12" sm="2">
                                 <v-menu ref="date_menu"
-                                    v-model="position.show_valid_from"
+                                    v-model="position.$model.show_valid_from"
                                     :close-on-content-click="false"
                                     :nudge-right="10"
                                     transition="scale-transition"
                                     offset-y min-width="290px">
                                     <template v-slot:activator="{ on }">
-                                        <v-text-field v-model="position.valid_from"
+                                        <v-text-field v-model="position.$model.valid_from"
+                                            :error="position.valid_from.$error"
+                                            @input="position.valid_from.$touch()"
                                             label="Start date" v-on="on">
                                         </v-text-field>
                                     </template>
-                                    <v-date-picker v-model="position.valid_from"
-                                        @input="position.show_valid_from = false"
+                                    <v-date-picker v-model="position.$model.valid_from"
+                                        @input="position.$model.show_valid_from = false"
                                         no-title
                                     ></v-date-picker>
                                 </v-menu>
                             </v-col>
                             <v-col cols="12" sm="2">
                                 <v-menu ref="menu_end_date"
-                                    v-model="position.show_valid_until"
+                                    v-model="position.$model.show_valid_until"
                                     :close-on-content-click="false"
                                     :nudge-right="10"
                                     transition="scale-transition"
                                     offset-y min-width="290px">
                                     <template v-slot:activator="{ on, attrs }">
-                                        <v-text-field v-model="position.valid_until"
+                                        <v-text-field v-model="position.$model.valid_until"
+                                            :error="position.valid_until.$error"
+                                            @input="position.valid_until.$touch()"
                                             label="End date"
                                             v-on="on"
                                             v-bind="attrs"
                                         >
                                         </v-text-field>
                                     </template>
-                                    <v-date-picker v-model="position.valid_until"
-                                        @click="position.show_valid_until = false"
+                                    <v-date-picker v-model="position.$model.valid_until"
+                                        @click="position.$model.show_valid_until = false"
                                         no-title
                                     ></v-date-picker>
                                 </v-menu>
@@ -199,68 +207,72 @@
                                 </v-row>
                             </v-col>
                         </v-row>
-                        <v-row v-for="(position, i) in studentDetails.science_manager_data"
+                        <v-row v-for="(position, i) in $v.studentDetails.science_manager_data.$each.$iter"
                             :key="'sc-man' + '-' +  i"
                         >
                             <v-col cols="12" sm="2">
-                                <v-select v-model="position.science_manager_office_id"
+                                <v-select v-model="position.$model.science_manager_office_id"
                                     :items="scienceManagerOffices" item-value="id" item-text="name_en"
                                     label="Sc. Man. Office">
                                 </v-select>
                             </v-col>
                             <v-col cols="12" sm="2">
-                                <v-select v-model="position.unit_id"
+                                <v-select v-model="position.$model.unit_id"
                                     :items="units" item-value="id" item-text="short_name"
                                     label="Unit">
                                 </v-select>
                             </v-col>
                             <v-col cols="12" sm="2">
-                                <v-select v-model="position.science_manager_position_id"
+                                <v-select v-model="position.$model.science_manager_position_id"
                                     :items="scienceManagerPositions" item-value="id" item-text="name_en"
                                     label="Position">
                                 </v-select>
                             </v-col>
                             <v-col cols="12" sm="1">
                                 <v-text-field
-                                    v-model="position.dedication"
+                                    v-model="position.$model.dedication"
                                     label="Dedication">
                                 </v-text-field>
                             </v-col>
                             <v-col cols="12" sm="2">
                                 <v-menu ref="date_menu"
-                                    v-model="position.show_valid_from"
+                                    v-model="position.$model.show_valid_from"
                                     :close-on-content-click="false"
                                     :nudge-right="10"
                                     transition="scale-transition"
                                     offset-y min-width="290px">
                                     <template v-slot:activator="{ on }">
-                                        <v-text-field v-model="position.valid_from"
+                                        <v-text-field v-model="position.$model.valid_from"
+                                            :error="position.valid_from.$error"
+                                            @input="position.valid_from.$touch()"
                                             label="Start date" v-on="on">
                                         </v-text-field>
                                     </template>
-                                    <v-date-picker v-model="position.valid_from"
-                                        @input="position.show_valid_from = false"
+                                    <v-date-picker v-model="position.$model.valid_from"
+                                        @input="position.$model.show_valid_from = false"
                                         no-title
                                     ></v-date-picker>
                                 </v-menu>
                             </v-col>
                             <v-col cols="12" sm="2">
                                 <v-menu ref="menu_end_date"
-                                    v-model="position.show_valid_until"
+                                    v-model="position.$model.show_valid_until"
                                     :close-on-content-click="false"
                                     :nudge-right="10"
                                     transition="scale-transition"
                                     offset-y min-width="290px">
                                     <template v-slot:activator="{ on, attrs }">
-                                        <v-text-field v-model="position.valid_until"
+                                        <v-text-field v-model="position.$model.valid_until"
+                                            :error="position.valid_until.$error"
+                                            @input="position.valid_until.$touch()"
                                             label="End date"
                                             v-on="on"
                                             v-bind="attrs"
                                         >
                                         </v-text-field>
                                     </template>
-                                    <v-date-picker v-model="position.valid_until"
-                                        @click="position.show_valid_until = false"
+                                    <v-date-picker v-model="position.$model.valid_until"
+                                        @click="position.$model.show_valid_until = false"
                                         no-title
                                     ></v-date-picker>
                                 </v-menu>
@@ -284,68 +296,72 @@
                                 </v-row>
                             </v-col>
                         </v-row>
-                        <v-row v-for="(position, i) in studentDetails.administrative_data"
+                        <v-row v-for="(position, i) in $v.studentDetails.administrative_data.$each.$iter"
                             :key="'administrative' + '-' +  i"
                         >
                             <v-col cols="12" sm="2">
-                                <v-select v-model="position.administrative_office_id"
+                                <v-select v-model="position.$model.administrative_office_id"
                                     :items="administrativeOffices" item-value="id" item-text="name_en"
                                     label="Office">
                                 </v-select>
                             </v-col>
                             <v-col cols="12" sm="2">
-                                <v-select v-model="position.unit_id"
+                                <v-select v-model="position.$model.unit_id"
                                     :items="units" item-value="id" item-text="short_name"
                                     label="Unit">
                                 </v-select>
                             </v-col>
                             <v-col cols="12" sm="2">
-                                <v-select v-model="position.administrative_position_id"
+                                <v-select v-model="position.$model.administrative_position_id"
                                     :items="administrativePositions" item-value="id" item-text="name_en"
                                     label="Position">
                                 </v-select>
                             </v-col>
                             <v-col cols="12" sm="1">
                                 <v-text-field
-                                    v-model="position.dedication"
+                                    v-model="position.$model.dedication"
                                     label="Dedication">
                                 </v-text-field>
                             </v-col>
                             <v-col cols="12" sm="2">
                                 <v-menu ref="date_menu"
-                                    v-model="position.show_valid_from"
+                                    v-model="position.$model.show_valid_from"
                                     :close-on-content-click="false"
                                     :nudge-right="10"
                                     transition="scale-transition"
                                     offset-y min-width="290px">
                                     <template v-slot:activator="{ on }">
-                                        <v-text-field v-model="position.valid_from"
+                                        <v-text-field v-model="position.$model.valid_from"
+                                            :error="position.valid_from.$error"
+                                            @input="position.valid_from.$touch()"
                                             label="Start date" v-on="on">
                                         </v-text-field>
                                     </template>
-                                    <v-date-picker v-model="position.valid_from"
-                                        @input="position.show_valid_from = false"
+                                    <v-date-picker v-model="position.$model.valid_from"
+                                        @input="position.$model.show_valid_from = false"
                                         no-title
                                     ></v-date-picker>
                                 </v-menu>
                             </v-col>
                             <v-col cols="12" sm="2">
                                 <v-menu ref="menu_end_date"
-                                    v-model="position.show_valid_until"
+                                    v-model="position.$model.show_valid_until"
                                     :close-on-content-click="false"
                                     :nudge-right="10"
                                     transition="scale-transition"
                                     offset-y min-width="290px">
                                     <template v-slot:activator="{ on, attrs }">
-                                        <v-text-field v-model="position.valid_until"
+                                        <v-text-field v-model="position.$model.valid_until"
+                                            :error="position.valid_until.$error"
+                                            @input="position.valid_until.$touch()"
                                             label="End date"
                                             v-on="on"
                                             v-bind="attrs"
                                         >
                                         </v-text-field>
                                     </template>
-                                    <v-date-picker v-model="position.valid_until"
-                                        @click="position.show_valid_until = false"
+                                    <v-date-picker v-model="position.$model.valid_until"
+                                        @click="position.$model.show_valid_until = false"
                                         no-title
                                     ></v-date-picker>
                                 </v-menu>
@@ -363,52 +379,56 @@
                         <h2>Supervisors</h2>
                     </v-expansion-panel-header>
                     <v-expansion-panel-content>
-                        <ul v-for="(supervisor, i) in studentDetails.supervisors"
+                        <ul v-for="(supervisor, i) in $v.studentDetails.supervisors.$each.$iter"
                             :key="'supervisors' + i"
                         >
-                            <li v-if="supervisor.can_edit">
+                            <li v-if="supervisor.$model.can_edit">
                                 <v-row align="center">
                                     <v-col cols="12" sm="3">
-                                        {{supervisor.colloquial_name}}:
+                                        {{supervisor.$model.colloquial_name}}:
                                     </v-col>
                                     <v-col cols="12" sm="3">
-                                        <v-select v-model="supervisor.responsible_type_id"
+                                        <v-select v-model="supervisor.$model.responsible_type_id"
                                             :items="responsibleTypes" item-value="id" item-text="name_en"
                                             label="Type">
                                         </v-select>
                                     </v-col>
                                     <v-col cols="5" sm="2">
                                         <v-menu ref="date_menu"
-                                            v-model="supervisor.show_valid_from"
+                                            v-model="supervisor.$model.show_valid_from"
                                             :close-on-content-click="false"
                                             :nudge-right="10"
                                             transition="scale-transition"
                                             offset-y min-width="290px">
                                             <template v-slot:activator="{ on }">
-                                                <v-text-field v-model="supervisor.valid_from"
+                                                <v-text-field v-model="supervisor.$model.valid_from"
+                                                    :error="supervisor.valid_from.$error"
+                                                    @input="supervisor.valid_from.$touch()"
                                                     label="Start date" v-on="on">
                                                 </v-text-field>
                                             </template>
-                                            <v-date-picker v-model="supervisor.valid_from"
-                                                @input="supervisor.show_valid_from = false"
+                                            <v-date-picker v-model="supervisor.$model.valid_from"
+                                                @input="supervisor.$model.show_valid_from = false"
                                                 no-title
                                             ></v-date-picker>
                                         </v-menu>
                                     </v-col>
                                     <v-col cols="5" sm="2">
                                         <v-menu ref="date_menu"
-                                            v-model="supervisor.show_valid_until"
+                                            v-model="supervisor.$model.show_valid_until"
                                             :close-on-content-click="false"
                                             :nudge-right="10"
                                             transition="scale-transition"
                                             offset-y min-width="290px">
                                             <template v-slot:activator="{ on }">
-                                                <v-text-field v-model="supervisor.valid_until"
+                                                <v-text-field v-model="supervisor.$model.valid_until"
+                                                    :error="supervisor.valid_until.$error"
+                                                    @input="supervisor.valid_until.$touch()"
                                                     label="End date" v-on="on">
                                                 </v-text-field>
                                             </template>
-                                            <v-date-picker v-model="supervisor.valid_until"
-                                                @input="supervisor.show_valid_until = false"
+                                            <v-date-picker v-model="supervisor.$model.valid_until"
+                                                @input="supervisor.$model.show_valid_until = false"
                                                 no-title
                                             ></v-date-picker>
                                         </v-menu>
@@ -421,13 +441,18 @@
                                 </v-row>
                             </li>
                             <li v-else>
-                                {{supervisor.colloquial_name}} ({{supervisor.responsible_type_name_en}}): {{supervisor.valid_from_show}} - {{supervisor.valid_until_show}}
+                                {{supervisor.$model.colloquial_name}} ({{supervisor.$model.responsible_type_name_en}}): {{supervisor.$model.valid_from_show}} - {{supervisor.$model.valid_until_show}}
                             </li>
                         </ul>
                     </v-expansion-panel-content>
                 </v-expansion-panel>
             </v-expansion-panels>
             <v-row align-content="center" justify="end" class="mt-3 mb-1">
+                <v-col cols="3" v-if="formError">
+                    <v-row justify="end">
+                        <p class="caption red--text">Unable to submit form.</p>
+                    </v-row>
+                </v-col>
                 <v-col cols="2" align-self="end">
                     <v-row justify="end">
                         <v-btn type="submit"
@@ -560,278 +585,283 @@ export default {
             })
         },
         submitForm () {
-            if (this.$store.state.session.loggedIn) {
-                this.progress = true;
-                let urlCreateLab = [];
-                let urlDeleteLab = [];
-                let urlUpdateLab = [];
-                let urlCreateFacility = [];
-                let urlDeleteFacility = [];
-                let urlUpdateFacility = [];
-                let urlCreateScienceManagement = [];
-                let urlDeleteScienceManagement = [];
-                let urlUpdateScienceManagement = [];
-                let urlCreateAdministrative = [];
-                let urlDeleteAdministrative = [];
-                let urlUpdateAdministrative = [];
-                let urlDeleteSupervisor = [];
-                let urlUpdateSupervisor = [];
-                let personID = this.$store.state.session.personID;
-                for (let ind in this.studentDetails.lab_data) {
-                    let datum = this.studentDetails.lab_data[ind]
-                    if (datum.id === 'new') {
-                        urlCreateLab.push({
+            if (this.$v.$invalid) {
+                this.formError = true;
+                setTimeout(() => {this.formError = false;}, 3000)
+            } else {
+                if (this.$store.state.session.loggedIn) {
+                    this.progress = true;
+                    let urlCreateLab = [];
+                    let urlDeleteLab = [];
+                    let urlUpdateLab = [];
+                    let urlCreateFacility = [];
+                    let urlDeleteFacility = [];
+                    let urlUpdateFacility = [];
+                    let urlCreateScienceManagement = [];
+                    let urlDeleteScienceManagement = [];
+                    let urlUpdateScienceManagement = [];
+                    let urlCreateAdministrative = [];
+                    let urlDeleteAdministrative = [];
+                    let urlUpdateAdministrative = [];
+                    let urlDeleteSupervisor = [];
+                    let urlUpdateSupervisor = [];
+                    let personID = this.$store.state.session.personID;
+                    for (let ind in this.studentDetails.lab_data) {
+                        let datum = this.studentDetails.lab_data[ind]
+                        if (datum.id === 'new') {
+                            urlCreateLab.push({
+                                url: 'api/people/' + personID
+                                    + '/students/' + this.studentId
+                                    + '/lab-position',
+                                body: datum,
+                            });
+                        } else {
+                            urlUpdateLab.push({
+                                url: 'api/people/' + personID
+                                    + '/students/' + this.studentId
+                                    + '/lab-position/' + datum.id,
+                                body: datum,
+                            });
+                        }
+                    }
+                    for (let ind in this.studentDetails.technician_data) {
+                        let datum = this.studentDetails.technician_data[ind]
+                        if (datum.id === 'new') {
+                            urlCreateFacility.push({
+                                url: 'api/people/' + personID
+                                    + '/students/' + this.studentId
+                                    + '/facility-position',
+                                body: datum,
+                            });
+                        } else {
+                            urlUpdateFacility.push({
+                                url: 'api/people/' + personID
+                                    + '/students/' + this.studentId
+                                    + '/facility-position/' + datum.id,
+                                body: datum,
+                            });
+                        }
+                    }
+                    for (let ind in this.studentDetails.science_manager_data) {
+                        let datum = this.studentDetails.science_manager_data[ind]
+                        if (datum.id === 'new') {
+                            urlCreateScienceManagement.push({
+                                url: 'api/people/' + personID
+                                    + '/students/' + this.studentId
+                                    + '/science-management-position',
+                                body: datum,
+                            });
+                        } else {
+                            urlUpdateScienceManagement.push({
+                                url: 'api/people/' + personID
+                                    + '/students/' + this.studentId
+                                    + '/science-management-position/' + datum.id,
+                                body: datum,
+                            });
+                        }
+                    }
+                    for (let ind in this.studentDetails.administrative_data) {
+                        let datum = this.studentDetails.administrative_data[ind]
+                        if (datum.id === 'new') {
+                            urlCreateAdministrative.push({
+                                url: 'api/people/' + personID
+                                    + '/students/' + this.studentId
+                                    + '/administrative-position',
+                                body: datum,
+                            });
+                        } else {
+                            urlUpdateAdministrative.push({
+                                url: 'api/people/' + personID
+                                    + '/students/' + this.studentId
+                                    + '/administrative-position/' + datum.id,
+                                body: datum,
+                            });
+                        }
+                    }
+                    for (let ind in this.toDeleteLabPositions) {
+                        let datum = this.toDeleteLabPositions[ind]
+                        urlDeleteLab.push('api/people/' + personID
+                                    + '/students/' + this.studentId
+                                    + '/lab-position/' + datum.id)
+                    }
+                    for (let ind in this.toDeleteFacilityPositions) {
+                        let datum = this.toDeleteFacilityPositions[ind]
+                        urlDeleteFacility.push('api/people/' + personID
+                                    + '/students/' + this.studentId
+                                    + '/facility-position/' + datum.id)
+                    }
+                    for (let ind in this.toDeleteScienceManagementPositions) {
+                        let datum = this.toDeleteScienceManagementPositions[ind]
+                        urlDeleteScienceManagement.push('api/people/' + personID
+                                    + '/students/' + this.studentId
+                                    + '/science-management-position/' + datum.id)
+                    }
+                    for (let ind in this.toDeleteAdministrativePositions) {
+                        let datum = this.toDeleteAdministrativePositions[ind]
+                        urlDeleteAdministrative.push('api/people/' + personID
+                                    + '/students/' + this.studentId
+                                    + '/administrative-position/' + datum.id)
+                    }
+                    for (let ind in this.studentDetails.supervisors) {
+                        let datum = this.studentDetails.supervisors[ind];
+                        urlUpdateSupervisor.push({
                             url: 'api/people/' + personID
                                 + '/students/' + this.studentId
-                                + '/lab-position',
-                            body: datum,
-                        });
-                    } else {
-                        urlUpdateLab.push({
-                            url: 'api/people/' + personID
-                                + '/students/' + this.studentId
-                                + '/lab-position/' + datum.id,
+                                + '/supervisors/' + datum.id,
                             body: datum,
                         });
                     }
-                }
-                for (let ind in this.studentDetails.technician_data) {
-                    let datum = this.studentDetails.technician_data[ind]
-                    if (datum.id === 'new') {
-                        urlCreateFacility.push({
-                            url: 'api/people/' + personID
-                                + '/students/' + this.studentId
-                                + '/facility-position',
-                            body: datum,
-                        });
-                    } else {
-                        urlUpdateFacility.push({
-                            url: 'api/people/' + personID
-                                + '/students/' + this.studentId
-                                + '/facility-position/' + datum.id,
-                            body: datum,
-                        });
+                    for (let ind in this.toDeleteSupervisors) {
+                        let datum = this.toDeleteSupervisors[ind]
+                        urlDeleteSupervisor.push('api/people/' + personID
+                                    + '/students/' + this.studentId
+                                    + '/supervisors/' + datum.id)
                     }
-                }
-                for (let ind in this.studentDetails.science_manager_data) {
-                    let datum = this.studentDetails.science_manager_data[ind]
-                    if (datum.id === 'new') {
-                        urlCreateScienceManagement.push({
-                            url: 'api/people/' + personID
-                                + '/students/' + this.studentId
-                                + '/science-management-position',
-                            body: datum,
-                        });
-                    } else {
-                        urlUpdateScienceManagement.push({
-                            url: 'api/people/' + personID
-                                + '/students/' + this.studentId
-                                + '/science-management-position/' + datum.id,
-                            body: datum,
-                        });
-                    }
-                }
-                for (let ind in this.studentDetails.administrative_data) {
-                    let datum = this.studentDetails.administrative_data[ind]
-                    if (datum.id === 'new') {
-                        urlCreateAdministrative.push({
-                            url: 'api/people/' + personID
-                                + '/students/' + this.studentId
-                                + '/administrative-position',
-                            body: datum,
-                        });
-                    } else {
-                        urlUpdateAdministrative.push({
-                            url: 'api/people/' + personID
-                                + '/students/' + this.studentId
-                                + '/administrative-position/' + datum.id,
-                            body: datum,
-                        });
-                    }
-                }
-                for (let ind in this.toDeleteLabPositions) {
-                    let datum = this.toDeleteLabPositions[ind]
-                    urlDeleteLab.push('api/people/' + personID
-                                + '/students/' + this.studentId
-                                + '/lab-position/' + datum.id)
-                }
-                for (let ind in this.toDeleteFacilityPositions) {
-                    let datum = this.toDeleteFacilityPositions[ind]
-                    urlDeleteFacility.push('api/people/' + personID
-                                + '/students/' + this.studentId
-                                + '/facility-position/' + datum.id)
-                }
-                for (let ind in this.toDeleteScienceManagementPositions) {
-                    let datum = this.toDeleteScienceManagementPositions[ind]
-                    urlDeleteScienceManagement.push('api/people/' + personID
-                                + '/students/' + this.studentId
-                                + '/science-management-position/' + datum.id)
-                }
-                for (let ind in this.toDeleteAdministrativePositions) {
-                    let datum = this.toDeleteAdministrativePositions[ind]
-                    urlDeleteAdministrative.push('api/people/' + personID
-                                + '/students/' + this.studentId
-                                + '/administrative-position/' + datum.id)
-                }
-                for (let ind in this.studentDetails.supervisors) {
-                    let datum = this.studentDetails.supervisors[ind];
-                    urlUpdateSupervisor.push({
-                        url: 'api/people/' + personID
-                            + '/students/' + this.studentId
-                            + '/supervisors/' + datum.id,
-                        body: datum,
-                    });
-                }
-                for (let ind in this.toDeleteSupervisors) {
-                    let datum = this.toDeleteSupervisors[ind]
-                    urlDeleteSupervisor.push('api/people/' + personID
-                                + '/students/' + this.studentId
-                                + '/supervisors/' + datum.id)
-                }
-                Promise.all(
-                    urlDeleteLab.map(el =>
-                        this.$http.delete(el,
-                            { headers:
-                                {'Authorization': 'Bearer ' + localStorage['v2-token']
-                            },
-                        }))
-                    .concat(
-                        urlDeleteFacility.map(el =>
+                    Promise.all(
+                        urlDeleteLab.map(el =>
                             this.$http.delete(el,
                                 { headers:
                                     {'Authorization': 'Bearer ' + localStorage['v2-token']
                                 },
                             }))
+                        .concat(
+                            urlDeleteFacility.map(el =>
+                                this.$http.delete(el,
+                                    { headers:
+                                        {'Authorization': 'Bearer ' + localStorage['v2-token']
+                                    },
+                                }))
+                        )
+                        .concat(
+                            urlDeleteScienceManagement.map(el =>
+                                this.$http.delete(el,
+                                    { headers:
+                                        {'Authorization': 'Bearer ' + localStorage['v2-token']
+                                    },
+                                }))
+                        )
+                        .concat(
+                            urlDeleteAdministrative.map(el =>
+                                this.$http.delete(el,
+                                    { headers:
+                                        {'Authorization': 'Bearer ' + localStorage['v2-token']
+                                    },
+                                }))
+                        )
+                        .concat(
+                            urlCreateLab.map(el =>
+                                this.$http.post(el.url,
+                                    { data: el.body, },
+                                    { headers:
+                                        {'Authorization': 'Bearer ' + localStorage['v2-token']
+                                    },
+                                }))
+                        )
+                        .concat(
+                            urlUpdateLab.map(el =>
+                                this.$http.put(el.url,
+                                    { data: el.body, },
+                                    { headers:
+                                        {'Authorization': 'Bearer ' + localStorage['v2-token']
+                                    },
+                                }))
+                        )
+                        .concat(
+                            urlCreateFacility.map(el =>
+                                this.$http.post(el.url,
+                                    { data: el.body, },
+                                    { headers:
+                                        {'Authorization': 'Bearer ' + localStorage['v2-token']
+                                    },
+                                }))
+                        )
+                        .concat(
+                            urlUpdateFacility.map(el =>
+                                this.$http.put(el.url,
+                                    { data: el.body, },
+                                    { headers:
+                                        {'Authorization': 'Bearer ' + localStorage['v2-token']
+                                    },
+                                }))
+                        )
+                        .concat(
+                            urlCreateScienceManagement.map(el =>
+                                this.$http.post(el.url,
+                                    { data: el.body, },
+                                    { headers:
+                                        {'Authorization': 'Bearer ' + localStorage['v2-token']
+                                    },
+                                }))
+                        )
+                        .concat(
+                            urlUpdateScienceManagement.map(el =>
+                                this.$http.put(el.url,
+                                    { data: el.body, },
+                                    { headers:
+                                        {'Authorization': 'Bearer ' + localStorage['v2-token']
+                                    },
+                                }))
+                        )
+                        .concat(
+                            urlCreateAdministrative.map(el =>
+                                this.$http.post(el.url,
+                                    { data: el.body, },
+                                    { headers:
+                                        {'Authorization': 'Bearer ' + localStorage['v2-token']
+                                    },
+                                }))
+                        )
+                        .concat(
+                            urlUpdateAdministrative.map(el =>
+                                this.$http.put(el.url,
+                                    { data: el.body, },
+                                    { headers:
+                                        {'Authorization': 'Bearer ' + localStorage['v2-token']
+                                    },
+                                }))
+                        )
+                        .concat(
+                            urlUpdateSupervisor.map(el =>
+                                this.$http.put(el.url,
+                                    { data: el.body, },
+                                    { headers:
+                                        {'Authorization': 'Bearer ' + localStorage['v2-token']
+                                    },
+                                }))
+                        )
+                        .concat(
+                            urlDeleteSupervisor.map(el =>
+                                this.$http.delete(el,
+                                    { headers:
+                                        {'Authorization': 'Bearer ' + localStorage['v2-token']
+                                    },
+                                }))
+                        )
                     )
-                    .concat(
-                        urlDeleteScienceManagement.map(el =>
-                            this.$http.delete(el,
-                                { headers:
-                                    {'Authorization': 'Bearer ' + localStorage['v2-token']
-                                },
-                            }))
-                    )
-                    .concat(
-                        urlDeleteAdministrative.map(el =>
-                            this.$http.delete(el,
-                                { headers:
-                                    {'Authorization': 'Bearer ' + localStorage['v2-token']
-                                },
-                            }))
-                    )
-                    .concat(
-                        urlCreateLab.map(el =>
-                            this.$http.post(el.url,
-                                { data: el.body, },
-                                { headers:
-                                    {'Authorization': 'Bearer ' + localStorage['v2-token']
-                                },
-                            }))
-                    )
-                    .concat(
-                        urlUpdateLab.map(el =>
-                            this.$http.put(el.url,
-                                { data: el.body, },
-                                { headers:
-                                    {'Authorization': 'Bearer ' + localStorage['v2-token']
-                                },
-                            }))
-                    )
-                    .concat(
-                        urlCreateFacility.map(el =>
-                            this.$http.post(el.url,
-                                { data: el.body, },
-                                { headers:
-                                    {'Authorization': 'Bearer ' + localStorage['v2-token']
-                                },
-                            }))
-                    )
-                    .concat(
-                        urlUpdateFacility.map(el =>
-                            this.$http.put(el.url,
-                                { data: el.body, },
-                                { headers:
-                                    {'Authorization': 'Bearer ' + localStorage['v2-token']
-                                },
-                            }))
-                    )
-                    .concat(
-                        urlCreateScienceManagement.map(el =>
-                            this.$http.post(el.url,
-                                { data: el.body, },
-                                { headers:
-                                    {'Authorization': 'Bearer ' + localStorage['v2-token']
-                                },
-                            }))
-                    )
-                    .concat(
-                        urlUpdateScienceManagement.map(el =>
-                            this.$http.put(el.url,
-                                { data: el.body, },
-                                { headers:
-                                    {'Authorization': 'Bearer ' + localStorage['v2-token']
-                                },
-                            }))
-                    )
-                    .concat(
-                        urlCreateAdministrative.map(el =>
-                            this.$http.post(el.url,
-                                { data: el.body, },
-                                { headers:
-                                    {'Authorization': 'Bearer ' + localStorage['v2-token']
-                                },
-                            }))
-                    )
-                    .concat(
-                        urlUpdateAdministrative.map(el =>
-                            this.$http.put(el.url,
-                                { data: el.body, },
-                                { headers:
-                                    {'Authorization': 'Bearer ' + localStorage['v2-token']
-                                },
-                            }))
-                    )
-                    .concat(
-                        urlUpdateSupervisor.map(el =>
-                            this.$http.put(el.url,
-                                { data: el.body, },
-                                { headers:
-                                    {'Authorization': 'Bearer ' + localStorage['v2-token']
-                                },
-                            }))
-                    )
-                    .concat(
-                        urlDeleteSupervisor.map(el =>
-                            this.$http.delete(el,
-                                { headers:
-                                    {'Authorization': 'Bearer ' + localStorage['v2-token']
-                                },
-                            }))
-                    )
-                )
-                .then(() => {
-                    this.progress = false;
-                    this.success = true;
-                    setTimeout(() => {this.success = false;}, 1500)
-                    this.toDeleteLabPositions = [];
-                    this.toDeleteFacilityPositions = [];
-                    this.toDeleteScienceManagementPositions = [];
-                    this.toDeleteAdministrativePositions = [];
-                    this.$root.$emit('updateSupervisorTable')
-                    //this.initialize();
-                })
-                .catch((error) => {
-                    this.progress = false;
-                    this.error = true;
-                    this.toDeleteLabPositions = [];
-                    this.toDeleteFacilityPositions = [];
-                    this.toDeleteScienceManagementPositions = [];
-                    this.toDeleteAdministrativePositions = [];
-                    this.initialize();
-                    setTimeout(() => {this.error = false;}, 6000)
-                    // eslint-disable-next-line
-                    console.log(error)
-                })
+                    .then(() => {
+                        this.progress = false;
+                        this.success = true;
+                        setTimeout(() => {this.success = false;}, 1500)
+                        this.toDeleteLabPositions = [];
+                        this.toDeleteFacilityPositions = [];
+                        this.toDeleteScienceManagementPositions = [];
+                        this.toDeleteAdministrativePositions = [];
+                        this.$root.$emit('updateSupervisorTable')
+                        //this.initialize();
+                    })
+                    .catch((error) => {
+                        this.progress = false;
+                        this.error = true;
+                        this.toDeleteLabPositions = [];
+                        this.toDeleteFacilityPositions = [];
+                        this.toDeleteScienceManagementPositions = [];
+                        this.toDeleteAdministrativePositions = [];
+                        this.initialize();
+                        setTimeout(() => {this.error = false;}, 6000)
+                        // eslint-disable-next-line
+                        console.log(error)
+                    })
+                }
             }
         },
         getResponsibleTypes() {
@@ -965,6 +995,41 @@ export default {
         },
 
     },
+    validations: {
+        studentDetails: {
+            lab_data: {
+                $each: {
+                    valid_from: { isValid: time.validate },
+                    valid_until: { isValid: time.validate },
+                }
+            },
+            technician_data: {
+                $each: {
+                    valid_from: { isValid: time.validate },
+                    valid_until: { isValid: time.validate },
+                }
+            },
+            science_manager_data: {
+                $each: {
+                    valid_from: { isValid: time.validate },
+                    valid_until: { isValid: time.validate },
+                }
+            },
+            administrative_data: {
+                $each: {
+                    valid_from: { isValid: time.validate },
+                    valid_until: { isValid: time.validate },
+                }
+            },
+            supervisors: {
+                $each: {
+                    valid_from: { isValid: time.validate },
+                    valid_until: { isValid: time.validate },
+                }
+            },
+
+        }
+    }
 }
 </script>
 

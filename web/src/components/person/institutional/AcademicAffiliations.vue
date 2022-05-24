@@ -1,5 +1,6 @@
 <template>
 <v-card>
+    <!-- This file is not used currently !!!!!!! -->
     <v-card-title primary-title>
         <div>
             <h3 class="headline">Affiliations to Academic Institutions</h3>
@@ -11,12 +12,12 @@
             <p v-if="data.academicAffiliations.length === 0">
                 No data.
             </p>
-            <div v-for="(department, i) in data.academicAffiliations"
+            <div v-for="(department, i) in $v.data.academicAffiliations.$each.$iter"
                 :key="i">
                 <v-row align="center" class="px-2">
                     <v-col cols="12" sm="4">
                         <v-select
-                            v-model="department.department_id"
+                            v-model="department.$model.department_id"
                             :items="departments" item-value="id" item-text="short_str_department_en"
                             label="Academic Institution">
                         </v-select>
@@ -209,8 +210,6 @@ export default {
                 })
             }
         },
-
-
         getDepartments () {
             let vm = this;
             if (this.$store.state.session.loggedIn) {
@@ -228,7 +227,17 @@ export default {
             }
             list.splice(ind, 1);
         },
-    }
+    },
+    validations: {
+        data: {
+            academicAffiliations: {
+                $each: {
+                    valid_from: { isValid: time.validate },
+                    valid_until: { isValid: time.validate },
+                },
+            }
+        },
+    },
 
 }
 </script>

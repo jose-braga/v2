@@ -42,12 +42,16 @@
                     transition="scale-transition"
                     offset-y min-width="290px">
                     <template v-slot:activator="{ on }">
-                        <v-text-field v-model="data.birth_date"
-                             @input="addValue"
+                        <v-text-field v-model="$v.data.birth_date.$model"
+                            :error="$v.data.birth_date.$error"
+                            @input="addValue"
                             label="Birth date" v-on="on">
                         </v-text-field>
+                        <div v-show="$v.data.birth_date.$error">
+                            <p v-show="!$v.data.birth_date.isValid" class="caption red--text">Date format should be 'YYYY-MM-DD' (or empty)</p>
+                        </div>
                     </template>
-                    <v-date-picker v-model="data.birth_date"
+                    <v-date-picker v-model="$v.data.birth_date.$model"
                         @input="date_menu = false; addValue()"
                         no-title
                     ></v-date-picker>
@@ -76,6 +80,7 @@
 
 <script>
 import subUtil from '@/components/common/submit-utils'
+import time from '@/components/common/date-utils'
 import {maxLength, required} from 'vuelidate/lib/validators'
 
 export default {
@@ -115,6 +120,7 @@ export default {
         data: {
             name: { maxLength: maxLength(100), required },
             colloquial_name: { maxLength: maxLength(100), required },
+            birth_date: { isValid: time.validate },
         }
     }
 

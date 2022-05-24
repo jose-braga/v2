@@ -507,6 +507,9 @@ export default {
                                 affiliations = affiliations + result[ind].lab_data[indPos].groups_units[indGroup].name;
                                 counter++;
                             }
+                            if (result[ind].lab_data[indPos].groups_units.length > 0) {
+                                affiliations = affiliations + '@' + result[ind].lab_data[indPos].groups_units[0].unit_short_name;
+                            }
                             affiliations = affiliations + '@' + result[ind].lab_data[indPos].groups_units[0].unit_short_name;
                             affiliations = affiliations + '</li>'
                         }
