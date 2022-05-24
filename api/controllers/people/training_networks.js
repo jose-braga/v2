@@ -185,6 +185,7 @@ var actionCreateProject = function (options) {
     let data = req.body.data;
     if (data.start === '') data.start = null;
     if (data.end === '') data.end = null;
+    if (data.global_amount === '') data.global_amount = null;
     var querySQL = '';
     var places = [];
     querySQL = querySQL
@@ -336,11 +337,15 @@ var actionUpdateProject = function (options) {
     let data = req.body.data.project_details;
     let start = null;
     let end = null;
+    let global_amount = null;
     if (data.start !== null && data.start !== undefined && data.start !== '') {
         start = data.start
     }
     if (data.end !== null && data.end !== undefined && data.end !== '') {
         end = data.end
+    }
+    if (data.global_amount !== null && data.global_amount !== undefined && data.global_amount !== '') {
+        global_amount = data.global_amount
     }
     var querySQL = '';
     var places = [];
@@ -368,7 +373,7 @@ var actionUpdateProject = function (options) {
         data.country_id,
         start,
         end,
-        data.global_amount,
+        global_amount,
         data.website,
         data.notes,
         projectID
