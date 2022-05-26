@@ -63,6 +63,8 @@
                                     offset-y min-width="290px">
                                     <template v-slot:activator="{ on }">
                                         <v-text-field v-model="v.$model.valid_from"
+                                            :error="v.valid_from.$error"
+                                            @input="v.valid_from.$touch()"
                                             label="Started" v-on="on">
                                         </v-text-field>
                                     </template>
@@ -79,6 +81,8 @@
                                     offset-y min-width="290px">
                                     <template v-slot:activator="{ on }">
                                         <v-text-field v-model="v.$model.valid_until"
+                                            :error="v.valid_until.$error"
+                                            @input="v.valid_until.$touch()"
                                             label="Ended" v-on="on">
                                         </v-text-field>
                                     </template>
@@ -681,7 +685,9 @@ export default {
                         minValue: minValue(0),
                         maxValue: maxValue(100),
                         integer
-                    }
+                    },
+                    valid_from: { isValid: time.validate },
+                    valid_until: { isValid: time.validate },
                 }
             },
         },

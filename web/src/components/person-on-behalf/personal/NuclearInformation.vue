@@ -43,11 +43,14 @@
                         transition="scale-transition"
                         offset-y min-width="290px">
                         <template v-slot:activator="{ on }">
-                            <v-text-field v-model="data.birth_date"
+                            <v-text-field v-model="$v.data.birth_date.$model"
+                                :error="$v.data.birth_date.$error"
                                 label="Birth date" v-on="on">
                             </v-text-field>
                         </template>
-                        <v-date-picker v-model="data.birth_date" @input="date_menu = false" no-title></v-date-picker>
+                        <v-date-picker v-model="$v.data.birth_date.$model"
+                            @input="date_menu = false" no-title>
+                        </v-date-picker>
                     </v-menu>
                 </v-col>
                 <v-col cols="12" sm="4">
@@ -256,6 +259,7 @@ export default {
         data: {
             name: { maxLength: maxLength(100), required },
             colloquial_name: { maxLength: maxLength(100), required },
+            birth_date: { isValid: time.validate },
         }
     }
 

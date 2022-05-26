@@ -101,7 +101,10 @@
                                                                 offset-y min-width="290px">
                                                                 <template v-slot:activator="{ on }">
                                                                     <v-text-field v-model="v.$model.start"
-                                                                        label="Started" v-on="on">
+                                                                        :error="v.start.$error"
+                                                                        @input="v.start.$touch()"
+                                                                        label="Started" v-on="on"
+                                                                    >
                                                                     </v-text-field>
                                                                 </template>
                                                                 <v-date-picker v-model="v.$model.start"
@@ -117,7 +120,10 @@
                                                                 offset-y min-width="290px">
                                                                 <template v-slot:activator="{ on }">
                                                                     <v-text-field v-model="v.$model.end"
-                                                                        label="Ended" v-on="on">
+                                                                        :error="v.end.$error"
+                                                                        @input="v.end.$touch()"
+                                                                        label="Ended" v-on="on"
+                                                                    >
                                                                     </v-text-field>
                                                                 </template>
                                                                 <v-date-picker v-model="v.$model.end"
@@ -134,7 +140,7 @@
                                                     <v-row>
                                                         <v-expansion-panels>
                                                             <v-expansion-panel v-model="v.$model.supervisors_panel"
-                                                                v-for="(vsup,j) in v.$model.supervisors"
+                                                                v-for="(vsup,j) in v.supervisors.$each.$iter"
                                                                 :key="i.toString() + '-' + j.toString()">
                                                                 <v-expansion-panel-header>
                                                                     <div><b>{{vsup.colloquial_name}}</b></div>
@@ -148,7 +154,7 @@
                                                                         <v-row>
                                                                             <v-col>
                                                                                 <v-autocomplete
-                                                                                    v-model="vsup.supervisor_id"
+                                                                                    v-model="vsup.$model.supervisor_id"
                                                                                     @change="updateSelect(vsup, 'supervisor_id', 'colloquial_name', people,'id','colloquial_name')"
                                                                                     :loading="loadingPeople"
                                                                                     :items="people" item-value="id" item-text="colloquial_name"
@@ -164,7 +170,7 @@
                                                                         </v-row>
                                                                         <v-row>
                                                                             <v-col cols="12" sm="6">
-                                                                                <v-select v-model="vsup.supervisor_type_id"
+                                                                                <v-select v-model="vsup.$model.supervisor_type_id"
                                                                                     :items="supervisorTypes" item-value="id" item-text="name_en"
                                                                                     label="Supervisor type">
                                                                                 </v-select>
@@ -176,11 +182,13 @@
                                                                                     transition="scale-transition"
                                                                                     offset-y min-width="290px">
                                                                                     <template v-slot:activator="{ on }">
-                                                                                        <v-text-field v-model="vsup.valid_from"
+                                                                                        <v-text-field v-model="vsup.$model.valid_from"
+                                                                                            :error="vsup.valid_from.$error"
+                                                                                            @input="vsup.valid_from.$touch()"
                                                                                             label="Started" v-on="on">
                                                                                         </v-text-field>
                                                                                     </template>
-                                                                                    <v-date-picker v-model="vsup.valid_from"
+                                                                                    <v-date-picker v-model="vsup.$model.valid_from"
                                                                                             @input="vsup.show_date_start = false"
                                                                                             no-title></v-date-picker>
                                                                                 </v-menu>
@@ -192,11 +200,13 @@
                                                                                     transition="scale-transition"
                                                                                     offset-y min-width="290px">
                                                                                     <template v-slot:activator="{ on }">
-                                                                                        <v-text-field v-model="vsup.valid_until"
+                                                                                        <v-text-field v-model="vsup.$model.valid_until"
+                                                                                            :error="vsup.valid_until.$error"
+                                                                                            @input="vsup.valid_until.$touch()"
                                                                                             label="Ended" v-on="on">
                                                                                         </v-text-field>
                                                                                     </template>
-                                                                                    <v-date-picker v-model="vsup.valid_until"
+                                                                                    <v-date-picker v-model="vsup.$model.valid_until"
                                                                                             @input="vsup.show_date_end = false"
                                                                                             no-title></v-date-picker>
                                                                                 </v-menu>
@@ -268,6 +278,8 @@
                                                                                     offset-y min-width="290px">
                                                                                     <template v-slot:activator="{ on }">
                                                                                         <v-text-field v-model="vsup.$model.valid_from"
+                                                                                            :error="vsup.valid_from.$error"
+                                                                                            @input="vsup.valid_from.$touch()"
                                                                                             label="Started" v-on="on">
                                                                                         </v-text-field>
                                                                                     </template>
@@ -284,6 +296,8 @@
                                                                                     offset-y min-width="290px">
                                                                                     <template v-slot:activator="{ on }">
                                                                                         <v-text-field v-model="vsup.$model.valid_until"
+                                                                                            :error="vsup.valid_until.$error"
+                                                                                            @input="vsup.valid_until.$touch()"
                                                                                             label="Ended" v-on="on">
                                                                                         </v-text-field>
                                                                                     </template>
@@ -445,6 +459,8 @@
                                                                 offset-y min-width="290px">
                                                                 <template v-slot:activator="{ on }">
                                                                     <v-text-field v-model="v.$model.start"
+                                                                        :error="v.start.$error"
+                                                                        @input="v.start.$touch()"
                                                                         label="Started" v-on="on">
                                                                     </v-text-field>
                                                                 </template>
@@ -461,6 +477,8 @@
                                                                 offset-y min-width="290px">
                                                                 <template v-slot:activator="{ on }">
                                                                     <v-text-field v-model="v.$model.end"
+                                                                        :error="v.end.$error"
+                                                                        @input="v.end.$touch()"
                                                                         label="Ended" v-on="on">
                                                                     </v-text-field>
                                                                 </template>
@@ -477,9 +495,11 @@
                                                                 offset-y min-width="290px">
                                                                 <template v-slot:activator="{ on }">
                                                                     <v-text-field v-model="v.$model.estimate_end"
+                                                                        :error="v.estimate_end.$error"
+                                                                        @input="v.estimate_end.$touch()"
                                                                         label="Estimated end" v-on="on">
                                                                     </v-text-field>
-                                                                </template>
+v-for                                                                </template>
                                                                 <v-date-picker v-model="v.$model.estimate_end"
                                                                         @input="v.$model.show_date_estimate_end = false"
                                                                         no-title></v-date-picker>
@@ -494,7 +514,7 @@
                                                     <v-row>
                                                         <v-expansion-panels>
                                                             <v-expansion-panel v-model="v.$model.supervisors_panel"
-                                                                v-for="(vsup,j) in v.$model.supervisors"
+                                                                v-for="(vsup,j) in v.supervisors.$each.$iter"
                                                                 :key="i.toString() + '-' + j.toString() + '-ongoing'">
                                                                 <v-expansion-panel-header>
                                                                     <div><b>{{vsup.colloquial_name}}</b></div>
@@ -508,7 +528,7 @@
                                                                         <v-row>
                                                                             <v-col>
                                                                                 <v-autocomplete
-                                                                                    v-model="vsup.supervisor_id"
+                                                                                    v-model="vsup.$model.supervisor_id"
                                                                                     @change="updateSelect(vsup, 'supervisor_id', 'colloquial_name', people,'id','colloquial_name')"
                                                                                     :loading="loadingPeople"
                                                                                     :items="people" item-value="id" item-text="colloquial_name"
@@ -524,40 +544,44 @@
                                                                         </v-row>
                                                                         <v-row>
                                                                             <v-col cols="12" sm="6">
-                                                                                <v-select v-model="vsup.supervisor_type_id"
+                                                                                <v-select v-model="vsup.$model.supervisor_type_id"
                                                                                     :items="supervisorTypes" item-value="id" item-text="name_en"
                                                                                     label="Supervisor type">
                                                                                 </v-select>
                                                                             </v-col>
                                                                             <v-col cols="12" sm="3">
-                                                                                <v-menu ref="vsup.show_date_start" v-model="vsup.show_date_start"
+                                                                                <v-menu ref="vsup.show_date_start" v-model="vsup.$model.show_date_start"
                                                                                     :close-on-content-click="false"
                                                                                     :nudge-right="10"
                                                                                     transition="scale-transition"
                                                                                     offset-y min-width="290px">
                                                                                     <template v-slot:activator="{ on }">
-                                                                                        <v-text-field v-model="vsup.valid_from"
+                                                                                        <v-text-field v-model="vsup.$model.valid_from"
+                                                                                            :error="vsup.valid_from.$error"
+                                                                                            @input="vsup.valid_from.$touch()"
                                                                                             label="Started" v-on="on">
                                                                                         </v-text-field>
                                                                                     </template>
-                                                                                    <v-date-picker v-model="vsup.valid_from"
-                                                                                            @input="vsup.show_date_start = false"
+                                                                                    <v-date-picker v-model="vsup.$model.valid_from"
+                                                                                            @input="vsup.$model.show_date_start = false"
                                                                                             no-title></v-date-picker>
                                                                                 </v-menu>
                                                                             </v-col>
                                                                             <v-col cols="12" sm="3">
-                                                                                <v-menu ref="vsup.show_date_end" v-model="vsup.show_date_end"
+                                                                                <v-menu ref="vsup.show_date_end" v-model="vsup.$model.show_date_end"
                                                                                     :close-on-content-click="false"
                                                                                     :nudge-right="10"
                                                                                     transition="scale-transition"
                                                                                     offset-y min-width="290px">
                                                                                     <template v-slot:activator="{ on }">
-                                                                                        <v-text-field v-model="vsup.valid_until"
+                                                                                        <v-text-field v-model="vsup.$model.valid_until"
+                                                                                            :error="vsup.valid_until.$error"
+                                                                                            @input="vsup.valid_until.$touch()"
                                                                                             label="Ended" v-on="on">
                                                                                         </v-text-field>
                                                                                     </template>
-                                                                                    <v-date-picker v-model="vsup.valid_until"
-                                                                                            @input="vsup.show_date_end = false"
+                                                                                    <v-date-picker v-model="vsup.$model.valid_until"
+                                                                                            @input="vsup.$model.show_date_end = false"
                                                                                             no-title></v-date-picker>
                                                                                 </v-menu>
                                                                             </v-col>
@@ -626,6 +650,8 @@
                                                                                     offset-y min-width="290px">
                                                                                     <template v-slot:activator="{ on }">
                                                                                         <v-text-field v-model="vsup.$model.valid_from"
+                                                                                            :error="vsup.valid_from.$error"
+                                                                                            @input="vsup.valid_from.$touch()"
                                                                                             label="Started" v-on="on">
                                                                                         </v-text-field>
                                                                                     </template>
@@ -642,6 +668,8 @@
                                                                                     offset-y min-width="290px">
                                                                                     <template v-slot:activator="{ on }">
                                                                                         <v-text-field v-model="vsup.$model.valid_until"
+                                                                                            :error="vsup.valid_until.$error"
+                                                                                            @input="vsup.valid_until.$touch()"
                                                                                             label="Ended" v-on="on">
                                                                                         </v-text-field>
                                                                                     </template>
@@ -1007,7 +1035,8 @@ export default {
         addItem(list, type, panel) {
             if (type === 'degree') {
                 list.push({id: 'new', degree_id: null, area: null, program: null,
-                    institution: null, start: null, end: null, title: null,
+                    institution: null, start: null, end: null, estimate_end:null,
+                    title: null,
                     supervisors: [], external_supervisors:[],
                     deleteSupervisors: [], deleteExtSupervisors: [],
                     show_date_start: false, show_date_end: false})
@@ -1068,11 +1097,20 @@ export default {
                     area: { maxLength: maxLength(100), },
                     institution: { maxLength: maxLength(100), },
                     title: { maxLength: maxLength(300), },
-                    supervisors: {},
+                    start: { isValid: time.validate },
+                    end: { isValid: time.validate },
+                    supervisors: {
+                        $each: {
+                            valid_from: { isValid: time.validate },
+                            valid_until: { isValid: time.validate },
+                        },
+                    },
                     external_supervisors: {
                         $each: {
                             colloquial_name: { maxLength: maxLength(100)},
                             organization: { maxLength: maxLength(100)},
+                            valid_from: { isValid: time.validate },
+                            valid_until: { isValid: time.validate },
                         }
                     },
                 }
@@ -1083,11 +1121,21 @@ export default {
                     area: { maxLength: maxLength(100), },
                     institution: { maxLength: maxLength(100), },
                     title: { maxLength: maxLength(300), },
-                    supervisors: {},
+                    start: { isValid: time.validate },
+                    end: { isValid: time.validate },
+                    estimate_end: { isValid: time.validate },
+                    supervisors: {
+                        $each: {
+                            valid_from: { isValid: time.validate },
+                            valid_until: { isValid: time.validate },
+                        },
+                    },
                     external_supervisors: {
                         $each: {
                             colloquial_name: { maxLength: maxLength(100)},
                             organization: { maxLength: maxLength(100)},
+                            valid_from: { isValid: time.validate },
+                            valid_until: { isValid: time.validate },
                         }
                     },
                 }
