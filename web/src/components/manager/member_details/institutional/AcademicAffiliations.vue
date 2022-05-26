@@ -163,6 +163,7 @@ export default {
     },
     watch: {
         personId () {
+            this.data.workplace = {};
             this.initialize();
         },
     },

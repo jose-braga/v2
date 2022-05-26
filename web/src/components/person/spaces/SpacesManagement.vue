@@ -221,6 +221,9 @@ export default {
             maps: [
                 {name: 'Piso 0 - Ambiente', link:'Piso-0-Ambiente-2021.jpg'},
                 {name: 'Piso 1 - Ambiente', link:'Piso-1-Ambiente-2021.jpg'},
+                {name: 'Piso 2 - Ambiente', link:'Piso-2-Ambiente-2021.jpg'},
+                {name: 'Piso 3 - Ambiente', link:'Piso-3-Ambiente-2021.jpg'},
+                {name: 'Piso 4 - Ambiente', link:'Piso-4-Ambiente-2021.jpg'},
                 {name: 'Piso 1 - DQ', link:'Piso-1-DQ-2021.jpg'},
                 {name: 'Piso 2 - DQ', link:'Piso-2-DQ-2021.jpg'},
                 {name: 'Piso 3 - DQ', link:'Piso-3-DQ-2021.jpg'},

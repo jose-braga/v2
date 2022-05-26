@@ -245,7 +245,8 @@ function removeExistingPublications(orcidPublications, dbPublications) {
                         .replace('doi ','');
         }
         // search existing DOI, then existing titles
-        if (orcidDOI === null || dbDOIs.indexOf(orcidDOI) === -1) {
+        if (orcidDOI === null || dbDOIs.indexOf(orcidDOI) === -1
+        && orcidPublications[ind].title !== null) {
             let orcidTitle = orcidPublications[ind].title
                             .toLowerCase()
                             .replace(/[-;,:]/g,'')
@@ -412,7 +413,7 @@ function determineJournal(pub, journals) {
             let dissimilarityMetric = (min_short_full * 1.0)/(pub.journal_name.length * 1.0);
             if (dissimilarityMetric < 0.1) {
                 mostSimilarJournalID = journals[bestInd].id;
-            }            
+            }
         }
         pub.journal_id = mostSimilarJournalID;
     }

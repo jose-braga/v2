@@ -247,7 +247,8 @@ function removeExistingPublications(orcidPublications, dbPublications) {
                         .replace('doi ','');
         }
         // search existing DOI, then existing titles
-        if (orcidDOI === null || dbDOIs.indexOf(orcidDOI) === -1) {
+        if (orcidDOI === null || dbDOIs.indexOf(orcidDOI) === -1
+        && orcidPublications[ind].title !== null) {
             let orcidTitle = orcidPublications[ind].title
                             .toLowerCase()
                             .replace(/[-;,:]/g,'')

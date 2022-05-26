@@ -57,11 +57,12 @@
                         transition="scale-transition"
                         offset-y min-width="290px">
                         <template v-slot:activator="{ on }">
-                            <v-text-field v-model="data.newStudent.valid_from"
+                            <v-text-field v-model="$v.data.newStudent.valid_from.$model"
+                                :error="$v.data.newStudent.valid_from.$error"
                                 label="Start date" v-on="on">
                             </v-text-field>
                         </template>
-                        <v-date-picker v-model="data.newStudent.valid_from"
+                        <v-date-picker v-model="$v.data.newStudent.valid_from.$model"
                             @input="data.newStudent.show_valid_from = false"
                             no-title
                         ></v-date-picker>
@@ -75,20 +76,26 @@
                         transition="scale-transition"
                         offset-y min-width="290px">
                         <template v-slot:activator="{ on, attrs }">
-                            <v-text-field v-model="data.newStudent.valid_until"
+                            <v-text-field v-model="$v.data.newStudent.valid_until.$model"
+                                :error="$v.data.newStudent.valid_until.$error"
                                 label="End date"
                                 v-on="on"
                                 v-bind="attrs"
                             >
                             </v-text-field>
                         </template>
-                        <v-date-picker v-model="data.newStudent.valid_until"
+                        <v-date-picker v-model="$v.data.newStudent.valid_until.$model"
                             @input="data.newStudent.show_valid_until = false"
                             no-title
                         ></v-date-picker>
                     </v-menu>
                 </v-col>
                 <v-col cols="2" align-self="center">
+                    <v-col cols="3" v-if="formError">
+                        <v-row justify="end">
+                            <p class="caption red--text">Unable to submit form.</p>
+                        </v-row>
+                    </v-col>
                     <v-row justify="end">
                         <v-btn type="submit"
                         outlined color="red">Add</v-btn>
@@ -394,6 +401,7 @@ export default {
                     dedication: null,
                     city_id: null,
                     valid_from: null,
+                    valid_until: null,
                 },
                 students: [],
                 pastStudents: [],
@@ -592,40 +600,45 @@ export default {
             }
         },
         submitForm () {
-            if (this.$store.state.session.loggedIn) {
-                this.progress = true;
-                let urlCreate = [];
-                let personID = this.$store.state.session.personID;
-                urlCreate.push({
-                    url: 'api/people/' + personID
-                        + '/students',
-                    body: this.data.newStudent,
-                });
-                Promise.all(
-                    urlCreate.map(el =>
-                        this.$http.post(el.url,
-                            { data: el.body, },
-                            { headers:
-                                {'Authorization': 'Bearer ' + localStorage['v2-token']
-                            },
-                        }))
-                )
-                .then( () => {
-                    this.progress = false;
-                    this.success = true;
-                    setTimeout(() => {this.success = false;}, 1500)
-                    this.toDeleteLabPositions = []; // add the others
-                    this.data.newStudent = {}
-                    this.addingFromDB = false;
-                    this.initialize();
-                })
-                .catch((error) => {
-                    this.progress = false;
-                    this.error = true;
-                    setTimeout(() => {this.error = false;}, 6000)
-                    // eslint-disable-next-line
-                    console.log(error)
-                })
+            if (this.$v.$invalid) {
+                this.formError = true;
+                setTimeout(() => {this.formError = false;}, 3000)
+            } else {
+                if (this.$store.state.session.loggedIn) {
+                    this.progress = true;
+                    let urlCreate = [];
+                    let personID = this.$store.state.session.personID;
+                    urlCreate.push({
+                        url: 'api/people/' + personID
+                            + '/students',
+                        body: this.data.newStudent,
+                    });
+                    Promise.all(
+                        urlCreate.map(el =>
+                            this.$http.post(el.url,
+                                { data: el.body, },
+                                { headers:
+                                    {'Authorization': 'Bearer ' + localStorage['v2-token']
+                                },
+                            }))
+                    )
+                    .then( () => {
+                        this.progress = false;
+                        this.success = true;
+                        setTimeout(() => {this.success = false;}, 1500)
+                        this.toDeleteLabPositions = []; // add the others
+                        this.data.newStudent = {}
+                        this.addingFromDB = false;
+                        this.initialize();
+                    })
+                    .catch((error) => {
+                        this.progress = false;
+                        this.error = true;
+                        setTimeout(() => {this.error = false;}, 6000)
+                        // eslint-disable-next-line
+                        console.log(error)
+                    })
+                }
             }
         },
         preRegister () {
@@ -830,7 +843,13 @@ export default {
                 lab_position_id: { required: requiredIf(function () { return this.addingPreregistration}), },
                 dedication: { integer, between: between(0,100)},
                 city_id: { required: requiredIf(function () { return this.addingPreregistration}), },
-                valid_from: { required: requiredIf(function () { return this.addingPreregistration}), }
+                valid_from: {
+                    required: requiredIf(function () { return this.addingPreregistration}),
+                    isValid: time.validate,
+                },
+                valid_until: {
+                    isValid: time.validate,
+                }
             }
         }
     },

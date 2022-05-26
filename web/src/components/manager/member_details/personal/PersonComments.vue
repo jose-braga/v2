@@ -58,6 +58,11 @@ export default {
             error: false,
         }
     },
+    watch: {
+        personId () {
+            this.initialize();
+        },
+    },
     created () {
         this.initialize();
     },
