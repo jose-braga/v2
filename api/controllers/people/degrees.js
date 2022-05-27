@@ -361,6 +361,8 @@ var actionUpdateSupervisors = function (options) {
     let data = req.body.data.supervisors[i];
     var querySQL = '';
     var places = [];
+    if (data.valid_from === '') { data.valid_from = null; }
+    if (data.valid_until === '') { data.valid_until = null; }
     querySQL = querySQL + 'UPDATE degrees_supervisors'
                         + ' SET supervisor_type_id = ?,'
                         + ' supervisor_id = ?,'
@@ -415,6 +417,8 @@ var actionCreateSupervisors = function (options) {
     let data = req.body.data.supervisors[i];
     var querySQL = '';
     var places = [];
+    if (data.valid_from === '') { data.valid_from = null; }
+    if (data.valid_until === '') { data.valid_until = null; }
     querySQL = querySQL + 'INSERT INTO degrees_supervisors'
                         + ' (degree_person_id, supervisor_type_id, supervisor_id, valid_from, valid_until)'
                         + ' VALUES (?,?,?,?,?);';

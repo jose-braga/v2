@@ -499,7 +499,7 @@
                                                                         @input="v.estimate_end.$touch()"
                                                                         label="Estimated end" v-on="on">
                                                                     </v-text-field>
-v-for                                                                </template>
+                                                                </template>
                                                                 <v-date-picker v-model="v.$model.estimate_end"
                                                                         @input="v.$model.show_date_estimate_end = false"
                                                                         no-title></v-date-picker>
@@ -941,7 +941,7 @@ export default {
                 setTimeout(() => {this.ongoingFormError = false;}, 3000)
             } else {
                 if (this.$store.state.session.loggedIn) {
-                    let personID = this.$store.state.session.personID;
+                    let personID = this.otherPersonId;
                     let urlCreate = [];
                     let urlDelete = [];
                     let urlUpdate = [];

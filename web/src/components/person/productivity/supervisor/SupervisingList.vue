@@ -838,7 +838,8 @@ export default {
                 },
                 email: {
                     required: requiredIf(function () { return this.addingPreregistration}),
-                    email },
+                    email
+                },
                 lab_id: { required: requiredIf(function () { return this.addingPreregistration}), },
                 lab_position_id: { required: requiredIf(function () { return this.addingPreregistration}), },
                 dedication: { integer, between: between(0,100)},

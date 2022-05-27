@@ -10,14 +10,14 @@
         </v-col>
     </v-row>
     <v-row
-        v-for="(v,i) in data.responsibles"
+        v-for="(v,i) in $v.data.responsibles.$each.$iter"
         :key="i">
         <v-col cols="12" sm="8">
             <v-autocomplete
-                v-model="v.responsible_id"
+                v-model="v.$model.responsible_id"
                 :loading="loadingPeople"
                 :items="people" item-value="id" item-text="colloquial_name"
-                :search-input.sync="v.responsible_search"
+                :search-input.sync="v.$model.responsible_search"
                 :filter="customSearch"
                 cache-items
                 flat
@@ -27,7 +27,7 @@
             </v-autocomplete>
         </v-col>
         <v-col cols="12" sm="4">
-            <v-select v-model="v.responsible_type_id"
+            <v-select v-model="v.$model.responsible_type_id"
                 :items="responsibleTypes" item-value="id" item-text="name_en"
                 label="Type">
             </v-select>
@@ -39,11 +39,13 @@
                 transition="scale-transition"
                 offset-y min-width="290px">
                 <template v-slot:activator="{ on }">
-                    <v-text-field v-model="v.valid_from"
+                    <v-text-field v-model="v.$model.valid_from"
+                        :error="v.valid_from.$error"
+                        @input="v.valid_from.$touch()"
                         label="Started" v-on="on">
                     </v-text-field>
                 </template>
-                <v-date-picker v-model="v.valid_from"
+                <v-date-picker v-model="v.$model.valid_from"
                         @input="v.show_date_start = false"
                         no-title></v-date-picker>
             </v-menu>
@@ -55,11 +57,13 @@
                 transition="scale-transition"
                 offset-y min-width="290px">
                 <template v-slot:activator="{ on }">
-                    <v-text-field v-model="v.valid_until"
+                    <v-text-field v-model="v.$model.valid_until"
+                        :error="v.valid_until.$error"
+                        @input="v.valid_until.$touch()"
                         label="Ended" v-on="on">
                     </v-text-field>
                 </template>
-                <v-date-picker v-model="v.valid_until"
+                <v-date-picker v-model="v.$model.valid_until"
                         @input="v.show_date_end = false"
                         no-title></v-date-picker>
             </v-menu>
@@ -74,6 +78,11 @@
         </v-col>
     </v-row>
     <v-row align-content="center" justify="end" class="mb-1">
+        <v-col cols="3" v-if="formError">
+            <v-row justify="end">
+                <p class="caption red--text">Unable to submit form.</p>
+            </v-row>
+        </v-col>
         <v-col cols="2" align-self="end">
             <v-row justify="end">
                 <v-btn type="submit"
@@ -171,67 +180,72 @@ export default {
             }
         },
         submitForm() {
-            if (this.$store.state.session.loggedIn) {
-                let urlCreate = [];
-                let urlDelete = [];
-                let urlUpdate = [];
-                this.progress = true;
-                for (let ind in this.data.responsibles) {
-                    if (this.data.responsibles[ind].id === 'new') {
-                        urlCreate.push({
-                            url: 'api/people/' + this.otherPersonId + '/responsibles',
-                            body: this.data.responsibles[ind],
-                        });
-                    } else {
-                        urlUpdate.push({
-                            url: 'api/people/' + this.otherPersonId
-                                    + '/responsibles/' + this.data.responsibles[ind].id,
-                            body: this.data.responsibles[ind],
-                        });
+            if (this.$v.$invalid) {
+                this.formError = true;
+                setTimeout(() => {this.formError = false;}, 3000)
+            } else {
+                if (this.$store.state.session.loggedIn) {
+                    let urlCreate = [];
+                    let urlDelete = [];
+                    let urlUpdate = [];
+                    this.progress = true;
+                    for (let ind in this.data.responsibles) {
+                        if (this.data.responsibles[ind].id === 'new') {
+                            urlCreate.push({
+                                url: 'api/people/' + this.otherPersonId + '/responsibles',
+                                body: this.data.responsibles[ind],
+                            });
+                        } else {
+                            urlUpdate.push({
+                                url: 'api/people/' + this.otherPersonId
+                                        + '/responsibles/' + this.data.responsibles[ind].id,
+                                body: this.data.responsibles[ind],
+                            });
+                        }
                     }
-                }
-                for (let ind in this.toDelete) {
-                    urlDelete.push('api/people/' + this.otherPersonId
-                            + '/responsibles/' + this.toDelete[ind].id);
-                }
-                Promise.all(
-                    urlUpdate.map(el =>
-                        this.$http.put(el.url,
-                            { data: el.body, },
-                            { headers:
-                                {'Authorization': 'Bearer ' + localStorage['v2-token']
-                            },
-                        }))
-                    .concat(
-                        urlCreate.map(el =>
-                            this.$http.post(el.url,
+                    for (let ind in this.toDelete) {
+                        urlDelete.push('api/people/' + this.otherPersonId
+                                + '/responsibles/' + this.toDelete[ind].id);
+                    }
+                    Promise.all(
+                        urlUpdate.map(el =>
+                            this.$http.put(el.url,
                                 { data: el.body, },
                                 { headers:
                                     {'Authorization': 'Bearer ' + localStorage['v2-token']
                                 },
-                            })))
-                    .concat(
-                        urlDelete.map(el =>
-                            this.$http.delete(el,
-                                { headers:
-                                    {'Authorization': 'Bearer ' + localStorage['v2-token']
-                                },
-                            })))
-                )
-                .then( () => {
-                    this.progress = false;
-                    this.success = true;
-                    setTimeout(() => {this.success = false;}, 1500)
-                    this.initialize();
-                })
-                .catch((error) => {
-                    this.progress = false;
-                    this.error = true;
-                    this.initialize();
-                    setTimeout(() => {this.error = false;}, 6000)
-                    // eslint-disable-next-line
-                    console.log(error)
-                })
+                            }))
+                        .concat(
+                            urlCreate.map(el =>
+                                this.$http.post(el.url,
+                                    { data: el.body, },
+                                    { headers:
+                                        {'Authorization': 'Bearer ' + localStorage['v2-token']
+                                    },
+                                })))
+                        .concat(
+                            urlDelete.map(el =>
+                                this.$http.delete(el,
+                                    { headers:
+                                        {'Authorization': 'Bearer ' + localStorage['v2-token']
+                                    },
+                                })))
+                    )
+                    .then( () => {
+                        this.progress = false;
+                        this.success = true;
+                        setTimeout(() => {this.success = false;}, 1500)
+                        this.initialize();
+                    })
+                    .catch((error) => {
+                        this.progress = false;
+                        this.error = true;
+                        this.initialize();
+                        setTimeout(() => {this.error = false;}, 6000)
+                        // eslint-disable-next-line
+                        console.log(error)
+                    })
+                }
             }
         },
         getPeople() {
@@ -276,7 +290,17 @@ export default {
             }
             return true;
         },
-    }
+    },
+    validations: {
+        data: {
+            responsibles: {
+                $each: {
+                    valid_from: { isValid: time.validate },
+                    valid_until: { isValid: time.validate },
+                },
+            }
+        },
+    },
 }
 </script>
 

@@ -354,7 +354,7 @@
 </template>
 
 <script>
-import { integer, maxLength } from 'vuelidate/lib/validators'
+import { decimal, maxLength } from 'vuelidate/lib/validators'
 import subUtil from '@/components/common/submit-utils'
 import time from '@/components/common/date-utils'
 
@@ -665,8 +665,8 @@ export default {
         data: {
             newProject: {
                 title: { maxLength: maxLength(200) },
-                amount: { integer },
-                global_amount: { integer },
+                amount: { decimal },
+                global_amount: { decimal },
                 notes: { maxLength: maxLength(500) },
                 start: { isValid: time.validate },
                 end: { isValid: time.validate },

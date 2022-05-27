@@ -53,7 +53,8 @@
                     ></v-text-field>
                 </v-col>
                 <v-col cols="12" sm="3">
-                    <v-text-field v-model="projectDetails.project_details.global_amount"
+                    <v-text-field v-model="$v.projectDetails.project_details.global_amount.$model"
+                        :error="$v.projectDetails.project_details.global_amount.$error"
                         label="Global amount (€)"
                     ></v-text-field>
                 </v-col>
@@ -134,7 +135,8 @@
                 </v-col>
 
                 <v-col cols="12" sm="3">
-                    <v-text-field v-model="projectDetails.project_details.management_entities.amount"
+                    <v-text-field v-model="$v.projectDetails.project_details.management_entities.amount.$model"
+                        :error="$v.projectDetails.project_details.management_entities.amount.$error"
                         label="Mngmt Entity Amount (€)"
                     ></v-text-field>
                 </v-col>
@@ -403,6 +405,7 @@
 <script>
 import subUtil from '@/components/common/submit-utils'
 import time from '@/components/common/date-utils'
+import { decimal } from 'vuelidate/lib/validators'
 
 function prepareStringComparison(str) {
     if (str === null || str === undefined) {
@@ -440,7 +443,9 @@ export default {
                     title: '',
                     start: null,
                     end: null,
-                    management_entities: {},
+                    global_amount: null,
+                    amount: null,
+                    management_entities: {amount: null},
                     funding_agencies: [],
                 },
             },
@@ -510,6 +515,9 @@ export default {
                         this.$set(this.projectDetails.project_details, 'funding_agencies',
                        [{id: 'other', official_name: 'Other'}])
                         this.otherFundingAgency = true;
+                    }
+                    if (this.projectDetails.project_details.management_entities.amount === undefined) {
+                        this.$set(this.projectDetails.project_details.management_entities, 'amount', null)
                     }
                 }
             })
@@ -685,6 +693,8 @@ export default {
     validations: {
         projectDetails: {
             project_details: {
+                management_entities: {amount: { decimal }},
+                global_amount: { decimal },
                 start: { isValid: time.validate },
                 end: { isValid: time.validate },
             }
