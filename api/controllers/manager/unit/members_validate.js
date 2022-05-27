@@ -3,6 +3,7 @@ const time = require('../../utilities/time');
 const responses = require('../../utilities/responses');
 const permissions = require('../../utilities/permissions');
 const nodemailer = require('../../../config/emailer');
+const notifications = require('../../utilities/notifications');
 let transporter = nodemailer.transporter;
 
 var actionGetMembersValidate = function (options) {
@@ -115,6 +116,8 @@ var actionValidate = function (options) {
     places.push(personID);
     return sql.makeSQLOperation(req, res, querySQL, places,
         (options) => {
+            let notificationConfig = { operation: 'create', entityID: personID };
+            notifications.notifyWebsiteAPI(notificationConfig)
             return addPersonHistory(options);
         },
         options);
