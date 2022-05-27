@@ -1,12 +1,12 @@
 const http = require('./axios-improved')
 
 var notifyWebsiteAPI = function (options) {
-    let { entityType, entityID, operation, baseURL} = options;
+    let { entityType, entityID, operation, baseURL, startedWith, errorStart } = options;
     if (baseURL === undefined) {
         if (process.env.NODE_ENV === 'production') {
             baseURL = 'https://ucibio.pt/api'
         } else {
-            baseURL = 'http://ucibio_website_legacy_web_1/api'
+            baseURL = 'https://ucibio.pt/api'
         }
     }
     if (operation === undefined) {
@@ -19,8 +19,20 @@ var notifyWebsiteAPI = function (options) {
     if (operation === 'update' || operation === 'delete') {
         return http.get(url)
         .then((result) => {
-            let date = new Date()
-            console.log(date.toISOString(),'- Notification to', url,'was successful.')
+            let date = new Date();
+            if (result.data.statusCode === 200) {
+                console.log(date.toISOString(),'- (1) Notification to', url,'was successful.')
+            } else {
+                if (startedWith !== undefined ) {
+                    console.log(date.toISOString(),'- Notification to', url,
+                        'had a problem:', result.data.statusCode,
+                        '- Notification started with a "' + startedWith + '" operation',
+                        '(initial error code: ' + errorStart + ')')
+                } else {
+                    console.log(date.toISOString(),'- Notification to', url,
+                        'had a problem:', result.data.statusCode)
+                }
+            }
         })
         .catch(function (error) {
             console.log(error);
@@ -34,12 +46,14 @@ var notifyWebsiteAPI = function (options) {
                     entityID,
                     entityType,
                     baseURL,
-                    operation: 'update'
+                    operation: 'update',
+                    startedWith: 'create',
+                    errorStart: result.data.statusCode
                 }
                 return notifyWebsiteAPI(updateConfig)
             } else {
                 let date = new Date()
-                console.log(date.toISOString(),'- Notification to', url,'was successful.')
+                console.log(date.toISOString(),'- (2) Notification to', url,'was successful.')
             }
         })
         .catch((err) => {
