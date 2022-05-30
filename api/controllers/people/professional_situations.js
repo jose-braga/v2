@@ -535,9 +535,11 @@ var insertFellowshipFundingAgencyRelationship = function (options, i) {
         (options) => {
             if (i + 1 < data.funding_agencies.length) {
                 return insertFellowshipFundingAgencyRelationship(options, i + 1);
-            } else if (data.management_entities.length > 0) {
+            } else if (data.management_entities !== undefined && data.management_entities.length > 0) {
                 return insertFellowshipManagementEntityRelationship(options, 0);
             } else {
+
+
                 let notificationConfig = { entityID: personID };
                 notifications.notifyWebsiteAPI(notificationConfig);
                 responses.sendJSONResponseOptions({
@@ -615,9 +617,9 @@ var deleteFellowshipManagementEntities = function (options) {
     return sql.makeSQLOperation(req, res, querySQL, places,
         (options) => {
             if (options.actionFellowship === 'update' && data !== undefined) {
-                if (data.funding_agencies.length > 0) {
+                if (data.funding_agencies !== undefined && data.funding_agencies.length > 0) {
                     return insertFellowshipFundingAgencyRelationship(options, 0)
-                } else if (data.management_entities.length > 0) {
+                } else if (data.management_entities !== undefined && data.management_entities.length > 0) {
                     return insertFellowshipManagementEntityRelationship(options, 0)
                 } else {
                     let notificationConfig = { entityID: personID };
@@ -772,7 +774,7 @@ var insertContractFundingAgencyRelationship = function (options, i) {
         (options) => {
             if (i + 1 < data.funding_agencies.length) {
                 return insertContractFundingAgencyRelationship(options, i + 1);
-            } else if (data.management_entities.length > 0) {
+            } else if (data.management_entities !== undefined && data.management_entities.length > 0) {
                 return insertContractManagementEntityRelationship(options, 0);
             } else {
                 let notificationConfig = { entityID: personID };
@@ -852,9 +854,9 @@ var deleteContractManagementEntities = function (options) {
     return sql.makeSQLOperation(req, res, querySQL, places,
         (options) => {
             if (options.actionContract === 'update' && data !== undefined) {
-                if (data.funding_agencies.length > 0) {
+                if (data.funding_agencies !== undefined && data.funding_agencies.length > 0) {
                     return insertContractFundingAgencyRelationship(options, 0)
-                } else if (data.management_entities.length > 0) {
+                } else if (data.management_entities !== undefined && data.management_entities.length > 0) {
                     return insertContractManagementEntityRelationship(options, 0)
                 } else {
                     let notificationConfig = { entityID: personID };

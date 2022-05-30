@@ -727,14 +727,17 @@ function processResultsProductivity(vm, people) {
             data['Website'] = item.website;
             data['Global amount (€)'] = item.global_amount;
 
-            let text = '';
+            let textMngEnt = '';
+            let textMngEntAmount = '';
             for (let indText in item.management_entities) {
-                text = text
-                    + item.management_entities[indText].official_name + ': '
+                textMngEnt = textMngEnt
+                    + item.management_entities[indText].official_name + '\n';
+                textMngEntAmount = textMngEntAmount
                     + item.management_entities[indText].amount + '€\n';
             }
-            data['Mngmt. Entities'] = text;
-            text = '';
+            data['Mngmt. Entities'] = textMngEnt;
+            data['Mngmt. Entities Amount (€)'] = textMngEntAmount;
+            let text = '';
             for (let indText in item.funding_entities) {
                 text = text
                     + item.funding_entities[indText].official_name + '\n';
@@ -765,6 +768,7 @@ function processResultsProductivity(vm, people) {
                 dataUnique['Website'] = data['Website'];
                 dataUnique['Global amount (€)'] = data['Global amount (€)'];
                 dataUnique['Mngmt. Entities'] = data['Mngmt. Entities'];
+                dataUnique['Mngmt. Entities Amount (€)'] = data['Mngmt. Entities Amount (€)'];
                 dataUnique['Fund. Agencies'] = data['Fund. Agencies'];
                 dataUnique['Areas'] = data['Areas'];
                 dataUnique['Notes'] = data['Notes'];
@@ -1230,9 +1234,9 @@ function processResultsSupervision(vm, dataSupervisors) {
     //let publications = [];
     for (let indPeople in dataSupervisors) {
         let person = dataSupervisors[indPeople];
-        for (let indSupervisor in person.supervisors) {
+        for (let indSupervisor in person.supervises) {
             let data = {};
-            let supervisor = person.supervisors[indSupervisor];
+            let supervisor = person.supervises[indSupervisor];
             data['Student Name'] = supervisor.student_name;
             data['Supervisor Name'] = supervisor.supervisor_name;
             data['Supervisor Type'] = supervisor.supervisor_type_name;
@@ -1244,6 +1248,24 @@ function processResultsSupervision(vm, dataSupervisors) {
             data['Degree Estimated End'] = time.momentToDate(supervisor.degree_estimate_end);
             data['Degree End'] = time.momentToDate(supervisor.degree_end);
             data['Degree Program'] = supervisor.degree_program;
+            data['From Table'] = 'Responsibles';
+            peopleSupervisors.push(data);
+        }
+        for (let indSupervisor in person.degrees_supervised) {
+            let data = {};
+            let supervisor = person.degrees_supervised[indSupervisor];
+            data['Student Name'] = supervisor.student_name;
+            data['Supervisor Name'] = supervisor.supervisor_name;
+            data['Supervisor Type'] = supervisor.supervisor_type_name;
+            data['Supervision From'] = time.momentToDate(supervisor.valid_from);
+            data['Supervision Until'] = time.momentToDate(supervisor.valid_until);
+            data['Dep. Team Name'] = supervisor.department_team_name;
+            data['Degree'] = supervisor.degree_name;
+            data['Degree Start'] = time.momentToDate(supervisor.degree_start);
+            data['Degree Estimated End'] = time.momentToDate(supervisor.degree_estimate_end);
+            data['Degree End'] = time.momentToDate(supervisor.degree_end);
+            data['Degree Program'] = supervisor.degree_program;
+            data['From Table'] = 'Degrees';
             peopleSupervisors.push(data);
         }
     }
