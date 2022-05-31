@@ -1376,23 +1376,6 @@ var getSupervisionDegreesPerson = function (options) {
         + ' LEFT JOIN people_team_department ON people_team_department.person_id = responsibles.id'
         + ' LEFT JOIN teams_department ON teams_department.id = people_team_department.team_id'
         + ' WHERE degrees_supervisors.supervisor_id = ?;'
-
-        //+ 'SELECT degrees_supervisors.*,'
-        //+ ' people.name AS student_name,'
-        //+ ' responsibles.name AS supervisor_name,'
-        //+ ' supervisor_types.name_en AS supervisor_type_name,'
-        //+ ' teams_department.name AS department_team_name,'
-        //+ ' degrees_people.start AS degree_start, degrees_people.end AS degree_end, degrees_people.estimate_end AS degree_estimate_end,'
-        //+ ' degrees_people.program AS degree_program, degrees.name_en AS degree_name'
-        //+ ' FROM degrees_supervisors'
-        //+ ' JOIN degrees_people ON degrees_people.id = degrees_supervisors.degree_person_id'
-        //+ ' LEFT JOIN degrees ON degrees_people.degree_id = degrees.id'
-        //+ ' JOIN people ON people.id = degrees_supervisors.degree_person_id'
-        //+ ' JOIN people AS responsibles ON responsibles.id = degrees_supervisors.supervisor_id'
-        //+ ' LEFT JOIN supervisor_types ON supervisor_types.id = degrees_supervisors.supervisor_type_id'
-        //+ ' LEFT JOIN people_team_department ON people_team_department.person_id = responsibles.id'
-        //+ ' LEFT JOIN teams_department ON teams_department.id = people_team_department.team_id'
-        //+ ' WHERE degrees_people.person_id = ?'
         ;
     places.push(person.id);
     return sql.getSQLOperationResult(req, res, querySQL, places,

@@ -78,7 +78,7 @@ var actionUpdateMember = function (options) {
     let { req, res, next } = options;
     let memberID = req.params.memberID;
     let data = req.body.data;
-    console.log(req.body.data)
+    //console.log(req.body.data)
     //let today = time.moment().format('YYYY-MM-DD');
     var querySQL = '';
     var places = [];
@@ -191,7 +191,7 @@ var actionUpdateRequestedMember = function (options) {
     let { req, res, next } = options;
     let memberID = req.params.memberID;
     let data = req.body.data;
-    console.log(req.body.data)
+    //console.log(req.body.data)
     //let today = time.moment().format('YYYY-MM-DD');
     var querySQL = '';
     var places = [];
@@ -300,7 +300,7 @@ var actionUpdateRemovedMember = function (options) {
     let { req, res, next } = options;
     let memberID = req.params.memberID;
     let data = req.body.data;
-    console.log(req.body.data)
+    //console.log(req.body.data)
     //let today = time.moment().format('YYYY-MM-DD');
     var querySQL = '';
     var places = [];

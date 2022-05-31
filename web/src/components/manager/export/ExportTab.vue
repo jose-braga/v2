@@ -388,26 +388,31 @@ function processResults(vm, people) {
 function processForSpreadsheet(members) {
     let membersCurated = [];
     let today = time.moment();
+    //sort by highest degree
+    members.sort((a,b) => {
+        if (a.current_higher_finished_degree !== undefined && b.current_higher_finished_degree !== undefined) {
+            if (a.current_higher_finished_degree.degree_sort_order !== undefined && a.current_higher_finished_degree.degree_sort_order !== null
+                && b.current_higher_finished_degree.degree_sort_order !== undefined && b.current_higher_finished_degree.degree_sort_order !== null
+            ) {
+                return a.current_higher_finished_degree.degree_sort_order - b.current_higher_finished_degree.degree_sort_order;
+            } else if (a.current_higher_finished_degree.degree_sort_order !== undefined && a.current_higher_finished_degree.degree_sort_order !== null) {
+                return -1;
+            } else if (b.current_higher_finished_degree.degree_sort_order !== undefined && b.current_higher_finished_degree.degree_sort_order !== null) {
+                return +1;
+            } else {
+                return 0;
+            }
+        } else if (a.current_higher_finished_degree !== undefined) {
+            return -1;
+        } else if (b.current_higher_finished_degree !== undefined) {
+            return +1;
+        } else {
+            return 0;
+        }
+
+    })
     for (let ind in members) {
         let thisMember = {};
-        thisMember['Person ID'] = members[ind].id;
-        thisMember.Name = members[ind].name;
-        thisMember['Colloquial Name'] = members[ind].colloquial_name;
-        thisMember['Birth Date'] = '';
-        thisMember['Age'] = '';
-        if (members[ind].birth_date !== null && members[ind].birth_date !== undefined) {
-            thisMember['Birth Date'] = time.momentToDate(members[ind].birth_date);
-            thisMember['Age'] = today.diff(time.moment(members[ind].birth_date),'years');
-        }
-        thisMember['Gender'] = members[ind].gender;
-        thisMember.Email = '';
-        if (members[ind].personal_email.length > 0) {
-            thisMember.Email = members[ind].personal_email[0].email;
-        }
-        thisMember['Work Email'] = '';
-        if (members[ind].email.length > 0) {
-            thisMember['Work Email'] = members[ind].email[0].email;
-        }
         thisMember['Pole (Curr.)'] = members[ind].current_pole.city;
         thisMember['Pole (Curr.): From'] = members[ind].current_pole.valid_from;
         thisMember['Pole (Curr.): Until'] = members[ind].current_pole.valid_until;
@@ -439,45 +444,6 @@ function processForSpreadsheet(members) {
         thisMember['Lab (Sel. Time): From'] = members[ind].within_range_lab.valid_from;
         thisMember['Lab (Sel. Time): Until'] = members[ind].within_range_lab.valid_until;
 
-        thisMember['Lab History'] = undefined;
-        if (members[ind].has_other_current_labs || members[ind].has_other_labs_within_range) {
-            thisMember['Lab History'] = ''
-            for (let indHistory in members[ind].history) {
-                if (members[ind].history[indHistory].valid_from !== null) {
-                    members[ind].history[indHistory].valid_from = time.moment(members[ind].history[indHistory].valid_from)
-                                                                    .format('YYYY-MM-DD')
-                }
-                if (members[ind].history[indHistory].valid_until !== null) {
-                    members[ind].history[indHistory].valid_until = time.moment(members[ind].history[indHistory].valid_until)
-                                                                    .format('YYYY-MM-DD')
-                }
-                thisMember['Lab History'] = thisMember['Lab History']
-                            + members[ind].history[indHistory].lab_position_name_en
-                            + ', ' + members[ind].history[indHistory].dedication + '%, '
-                            + members[ind].history[indHistory].lab_name
-                            + ' (' + members[ind].history[indHistory].valid_from
-                            + ', ' + members[ind].history[indHistory].valid_until
-                            + ')\n';
-            }
-        }
-        thisMember['DQ (FCT NOVA) Team'] = undefined;
-        if (members[ind].departmentTeams !== undefined && members[ind].departmentTeams.length > 0) {
-            thisMember['DQ (FCT NOVA) Team'] = '';
-            for (let indDep in members[ind].departmentTeams) {
-                thisMember['DQ (FCT NOVA) Team'] = thisMember['DQ (FCT NOVA) Team']
-                    + members[ind].departmentTeams[indDep].team_name + ', ';
-            }
-        }
-
-        if (members[ind].researchers_info.length > 0) {
-            thisMember['Association Key'] = members[ind].researchers_info[0].association_key;
-            thisMember['Ciência ID'] = members[ind].researchers_info[0].ciencia_id;
-            thisMember.ORCID = members[ind].researchers_info[0].ORCID;
-        } else {
-            thisMember['Association Key'] = undefined;
-            thisMember['Ciência ID'] = undefined;
-            thisMember.ORCID = undefined;
-        }
         thisMember['High. Degree (Curr.)'] = members[ind].current_higher_finished_degree.name_en;
         thisMember['High. Degree (Curr.): From'] = members[ind].current_higher_finished_degree.start;
         thisMember['High. Degree (Curr.): Until'] = members[ind].current_higher_finished_degree.end;
@@ -497,28 +463,6 @@ function processForSpreadsheet(members) {
                 + ' to ' + degrees_history + members[ind].finished_degrees[indDegree].end
                 + '\n'
         }
-        thisMember['Finished Degrees'] = degrees_history;
-        degrees_history = ''
-        for (let indDegree in members[ind].ongoing_degrees) {
-            degrees_history = degrees_history + members[ind].ongoing_degrees[indDegree].name_en
-                + ', ' + degrees_history + members[ind].ongoing_degrees[indDegree].start
-                + '\n'
-        }
-        thisMember['Ongoing Degrees'] = degrees_history;
-
-        let contracts = '';
-        let fellowships = '';
-        for (let indData in members[ind].current_job.contracts) {
-            contracts = contracts + members[ind].current_job.contracts[indData].reference
-        }
-        for (let indData in members[ind].current_job.fellowships) {
-            fellowships = fellowships
-                + members[ind].current_job.fellowships[indData].fellowship_acronym
-                + ' (' + members[ind].current_job.fellowships[indData].reference + ')'
-                + members[ind].current_job.fellowships[indData].funding_agency_official_name
-                + ', Mngmt: ' + members[ind].current_job.fellowships[indData].management_entity_official_name
-        }
-
         thisMember['Job Situation (Curr.)'] = members[ind].current_job.category_name_en;
         thisMember['Job Category (Curr.)'] = members[ind].current_job.situation_name_en;
         thisMember['Job Organization (Curr.)'] = members[ind].current_job.organization;
@@ -580,6 +524,85 @@ function processForSpreadsheet(members) {
                         +'\n';
         }
 
+        thisMember['Person ID'] = members[ind].id;
+        thisMember.Name = members[ind].name;
+        thisMember['Colloquial Name'] = members[ind].colloquial_name;
+        thisMember['Birth Date'] = '';
+        thisMember['Age'] = '';
+        if (members[ind].birth_date !== null && members[ind].birth_date !== undefined) {
+            thisMember['Birth Date'] = time.momentToDate(members[ind].birth_date);
+            thisMember['Age'] = today.diff(time.moment(members[ind].birth_date),'years');
+        }
+        thisMember['Gender'] = members[ind].gender;
+        thisMember.Email = '';
+        if (members[ind].personal_email.length > 0) {
+            thisMember.Email = members[ind].personal_email[0].email;
+        }
+        thisMember['Work Email'] = '';
+        if (members[ind].email.length > 0) {
+            thisMember['Work Email'] = members[ind].email[0].email;
+        }
+
+        thisMember['DQ (FCT NOVA) Team'] = undefined;
+        if (members[ind].departmentTeams !== undefined && members[ind].departmentTeams.length > 0) {
+            thisMember['DQ (FCT NOVA) Team'] = '';
+            for (let indDep in members[ind].departmentTeams) {
+                thisMember['DQ (FCT NOVA) Team'] = thisMember['DQ (FCT NOVA) Team']
+                    + members[ind].departmentTeams[indDep].team_name + ', ';
+            }
+        }
+
+        if (members[ind].researchers_info.length > 0) {
+            thisMember['Association Key'] = members[ind].researchers_info[0].association_key;
+            thisMember['Ciência ID'] = members[ind].researchers_info[0].ciencia_id;
+            thisMember.ORCID = members[ind].researchers_info[0].ORCID;
+        } else {
+            thisMember['Association Key'] = undefined;
+            thisMember['Ciência ID'] = undefined;
+            thisMember.ORCID = undefined;
+        }
+        thisMember['Lab History'] = undefined;
+        if (members[ind].has_other_current_labs || members[ind].has_other_labs_within_range) {
+            thisMember['Lab History'] = ''
+            for (let indHistory in members[ind].history) {
+                if (members[ind].history[indHistory].valid_from !== null) {
+                    members[ind].history[indHistory].valid_from = time.moment(members[ind].history[indHistory].valid_from)
+                                                                    .format('YYYY-MM-DD')
+                }
+                if (members[ind].history[indHistory].valid_until !== null) {
+                    members[ind].history[indHistory].valid_until = time.moment(members[ind].history[indHistory].valid_until)
+                                                                    .format('YYYY-MM-DD')
+                }
+                thisMember['Lab History'] = thisMember['Lab History']
+                            + members[ind].history[indHistory].lab_position_name_en
+                            + ', ' + members[ind].history[indHistory].dedication + '%, '
+                            + members[ind].history[indHistory].lab_name
+                            + ' (' + members[ind].history[indHistory].valid_from
+                            + ', ' + members[ind].history[indHistory].valid_until
+                            + ')\n';
+            }
+        }
+        thisMember['Finished Degrees'] = degrees_history;
+        degrees_history = ''
+        for (let indDegree in members[ind].ongoing_degrees) {
+            degrees_history = degrees_history + members[ind].ongoing_degrees[indDegree].name_en
+                + ', ' + degrees_history + members[ind].ongoing_degrees[indDegree].start
+                + '\n'
+        }
+        thisMember['Ongoing Degrees'] = degrees_history;
+
+        let contracts = '';
+        let fellowships = '';
+        for (let indData in members[ind].current_job.contracts) {
+            contracts = contracts + members[ind].current_job.contracts[indData].reference
+        }
+        for (let indData in members[ind].current_job.fellowships) {
+            fellowships = fellowships
+                + members[ind].current_job.fellowships[indData].fellowship_acronym
+                + ' (' + members[ind].current_job.fellowships[indData].reference + ')'
+                + members[ind].current_job.fellowships[indData].funding_agency_official_name
+                + ', Mngmt: ' + members[ind].current_job.fellowships[indData].management_entity_official_name
+        }
         thisMember['Department (Curr.)'] = members[ind].current_department.department;
         thisMember['School (Curr.)'] = members[ind].current_department.school_shortname_en;
         thisMember['University (Curr.)'] = members[ind].current_department.university_shortname_en;
@@ -638,6 +661,7 @@ function processForSpreadsheet(members) {
         }
         membersCurated.push(thisMember);
     }
+
     return membersCurated;
 }
 function processResultsProductivity(vm, people) {
@@ -669,7 +693,9 @@ function processResultsProductivity(vm, people) {
             }
             data['Pub. Type'] = publicationTypes;
             peoplePublications.push(data)
-            if (usedPubIDs.indexOf(publication.publication_id) === -1) {
+            if (usedPubIDs.indexOf(publication.publication_id) === -1
+                && person.can_supervise === 1
+            ) {
                 dataUnique['Year'] = publication.year;
                 dataUnique['Authors'] = publication.authors_raw;
                 dataUnique['Title'] = publication.title;
@@ -777,6 +803,23 @@ function processResultsProductivity(vm, people) {
             }
         }
     }
+    projects.sort((a, b) => {
+        if (a['Project Start'] === null || a['Project Start'] === undefined ) {
+            a['date_sort'] = time.moment('1000-01-01');
+        } else {
+            a['date_sort'] = time.moment(a['Project Start']);
+        }
+        if (b['Project Start'] === null || b['Project Start'] === undefined) {
+            b['date_sort'] = time.moment('1000-01-01');
+        } else {
+            b['date_sort'] = time.moment(b['Project Start']);
+        }
+        if (a['date_sort'].isAfter(b['date_sort'])) {
+            return -1;
+        } else {
+            return 1;
+        }
+    });
 
     usedIDs = [];
     let peopleIndustryProjects = [];
@@ -841,6 +884,23 @@ function processResultsProductivity(vm, people) {
             }
         }
     }
+    industryProjects.sort((a, b) => {
+        if (a['Start'] === null || a['Start'] === undefined ) {
+            a['date_sort'] = time.moment('1000-01-01');
+        } else {
+            a['date_sort'] = time.moment(a['Start']);
+        }
+        if (b['Start'] === null || b['Start'] === undefined) {
+            b['date_sort'] = time.moment('1000-01-01');
+        } else {
+            b['date_sort'] = time.moment(b['Start']);
+        }
+        if (a['date_sort'].isAfter(b['date_sort'])) {
+            return -1;
+        } else {
+            return 1;
+        }
+    });
 
     usedIDs = [];
     let peopleTrainingNetworks = [];
@@ -1240,14 +1300,14 @@ function processResultsSupervision(vm, dataSupervisors) {
             data['Student Name'] = supervisor.student_name;
             data['Supervisor Name'] = supervisor.supervisor_name;
             data['Supervisor Type'] = supervisor.supervisor_type_name;
-            data['Supervision From'] = time.momentToDate(supervisor.valid_from);
-            data['Supervision Until'] = time.momentToDate(supervisor.valid_until);
-            data['Dep. Team Name'] = supervisor.department_team_name;
             data['Degree'] = supervisor.degree_name;
             data['Degree Start'] = time.momentToDate(supervisor.degree_start);
             data['Degree Estimated End'] = time.momentToDate(supervisor.degree_estimate_end);
             data['Degree End'] = time.momentToDate(supervisor.degree_end);
             data['Degree Program'] = supervisor.degree_program;
+            data['Supervision From'] = time.momentToDate(supervisor.valid_from);
+            data['Supervision Until'] = time.momentToDate(supervisor.valid_until);
+            data['Dep. Team Name'] = supervisor.department_team_name;
             data['From Table'] = 'Responsibles';
             peopleSupervisors.push(data);
         }
