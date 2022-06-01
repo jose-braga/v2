@@ -1328,7 +1328,7 @@ module.exports.getSpacesData = function (req, res, next) {
 var getSupervisionPerson = function (options) {
     let { req, res, next, people, i } = options;
     let person = people[i]
-    console.log(person)
+    //console.log(person)
     var querySQL = '';
     var places = [];
     querySQL = querySQL
