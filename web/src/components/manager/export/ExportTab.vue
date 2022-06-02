@@ -5,7 +5,9 @@
             <h3 class="headline">Export data acording to the following filters</h3>
         </div>
     </v-card-title>
-    <v-card-text></v-card-text>
+    <v-card-text>
+        {{queryString}}
+    </v-card-text>
     <v-container>
         <v-row align="center">
             <v-col cols="12" md="2">
@@ -46,6 +48,35 @@
                     label="Lab">
                 </v-select>
             </v-col>
+            <v-col cols="10" md="7">
+                <v-combobox
+                    v-model="filterChosenPeople"
+                    :items="people"
+                    item-value="id" item-text="name"
+                    :search-input.sync="searchPeople"
+                    :filter="customSearch"
+                    chips
+                    clearable
+                    label="People chosen"
+                    multiple
+
+                >
+                    <template v-slot:selection="{ attrs, item, select, selected }">
+                    <v-chip
+                        v-bind="attrs"
+                        :input-value="selected"
+                        close
+                        @click="select"
+                        @click:close="removePerson(item)"
+                    >
+                        <strong>{{ item.name }}</strong>&nbsp;(id: {{item.id}})
+                    </v-chip>
+                    </template>
+                </v-combobox>
+
+            </v-col>
+        </v-row>
+        <v-row>
             <v-col cols="5" sm="3">
                 <v-menu ref="showDateFrom"
                     v-model="showDateFrom"
@@ -178,7 +209,6 @@
 import subUtil from '@/components/common/submit-utils'
 import time from '@/components/common/date-utils'
 import XLSX from 'xlsx'
-
 
 function processResults(vm, people) {
     let currentMembers = [];
@@ -1336,6 +1366,25 @@ function processResultsSupervision(vm, dataSupervisors) {
 function processForSupervisionSpreadsheet(data) {
     return data
 }
+function prepareStringComparison(str) {
+    if (str === null || str === undefined) {
+        return null;
+    } else {
+        return str.toLocaleLowerCase()
+            .replace(/[áàãâä]/g, 'a')
+            .replace(/[éèêë]/g, 'e')
+            .replace(/[íìîï]/g, 'i')
+            .replace(/[óòõôö]/g, 'o')
+            .replace(/[úùûü]/g, 'u')
+            .replace(/[ç]/g, 'c')
+            .replace(/[ñ]/g, 'n')
+            .replace(/(\.\s)/g, '')
+            .replace(/(\.)/g, '')
+            .replace(/[-:()]/g, ' ')
+            .trim()
+            ;
+    }
+}
 
 export default {
     data () {
@@ -1348,10 +1397,13 @@ export default {
             filterDepartmentID: null,
             filterLabID: null,
             filterDepartmentTeamID: null,
+            filterChosenPeople: [],
             filterDateFrom: null,
             showDateFrom: false,
             filterDateUntil: null,
             showDateUntil: false,
+            searchPeople: '',
+            people: [],
             units: [],
             poles: [],
             departments: [],
@@ -1366,6 +1418,7 @@ export default {
         this.getPoles();
         this.getDepartments();
         this.getLabs();
+        this.getPeople();
         this.getDepartmentTeams();
     },
     computed: {
@@ -1386,6 +1439,20 @@ export default {
                     query = query + '?pole=' + this.filterPoleID;
                 } else {
                     query = query + '&pole=' + this.filterPoleID;
+                }
+            }
+            if (this.filterChosenPeople !== undefined
+                && this.filterChosenPeople.length > 0) {
+                let peopleQuery = ''
+                for (let indPeople in this.filterChosenPeople) {
+                    peopleQuery = peopleQuery + this.filterChosenPeople[indPeople].id + ','
+                }
+                peopleQuery = peopleQuery.slice(0, -1);
+                if (firstOnQuery) {
+                    firstOnQuery = false;
+                    query = query + '?people=' + peopleQuery;
+                } else {
+                    query = query + '&people=' + peopleQuery;
                 }
             }
             if (this.filterDepartmentID) {
@@ -1455,6 +1522,13 @@ export default {
                 return subUtil.getPublicInfo(vm, urlSubmit, 'departmentTeams');
             }
         },
+        getPeople() {
+            var vm = this;
+            if (this.$store.state.session.loggedIn) {
+                const urlSubmit = 'api/v2/' + 'people-simple';
+                return subUtil.getPublicInfo(vm, urlSubmit, 'people', 'name');
+            }
+        },
         getLabs() {
             var vm = this;
             if (this.$store.state.session.loggedIn) {
@@ -1508,6 +1582,16 @@ export default {
             }
             if (this.filterLabID !== null && this.filterLabID !== undefined) {
                 filename = filename + '_lab_' + this.filterLabID;
+            }
+            if (this.filterChosenPeople !== null && this.filterChosenPeople !== undefined
+                && this.filterChosenPeople.length > 0) {
+                //let peopleQuery = ''
+                //for (let indPeople in this.filterChosenPeople) {
+                //    peopleQuery = peopleQuery + this.filterChosenPeople[indPeople].id + ','
+                //}
+                //peopleQuery = peopleQuery.slice(0, -1);
+                //filename = filename + '_people_' + peopleQuery;
+                filename = filename + '_specific people_';
             }
             if (this.filterDepartmentTeamID !== null && this.filterDepartmentTeamID !== undefined) {
                 filename = filename + '_depTeam_' + this.filterDepartmentTeamID;
@@ -1755,8 +1839,25 @@ export default {
             this.filterPoleID = null;
             this.filterDepartmentID = null;
             this.filterDepartmentTeamID = null;
+            this.filterLabID = null;
             this.filterDateFrom = null;
             this.filterDateUntil = null;
+            this.filterChosenPeople = [];
+        },
+        customSearch (item, queryText, itemText) {
+            let queryPre = prepareStringComparison(queryText);
+            let query = queryPre.split(' ');
+            let text = prepareStringComparison(itemText);
+            for (let ind in query) {
+                if (text.indexOf(query[ind]) === -1) {
+                    return false;
+                }
+            }
+            return true;
+        },
+        removePerson (item) {
+            this.filterChosenPeople.splice(this.filterChosenPeople.indexOf(item), 1)
+            //this.chips = [...this.chips]
         },
     }
 }

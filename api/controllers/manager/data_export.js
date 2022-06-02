@@ -29,6 +29,18 @@ var filterPeople = function (options) {
     } else if (dateFrom !== null && dateUntil === null) {
         dateUntil = dateFrom;
     }
+    if (req.query.people !== undefined) {
+        let peopleSet = req.query.people;
+        let peopleArray = peopleSet.split(',');
+        whereStatements = whereStatements + ' AND people.id IN (';
+        let addPlaceholder = ''
+        for (let indPeople in peopleArray) {
+            addPlaceholder = addPlaceholder + '?,'
+        }
+        addPlaceholder = addPlaceholder.slice(0, -1);
+        whereStatements = whereStatements + addPlaceholder + ')';
+        places = places.concat(peopleArray);
+    }
     if (req.query.unit !== undefined) {
         unitID = parseInt(req.query.unit, 10);
         joinStatements = joinStatements
@@ -136,6 +148,8 @@ var filterPeople = function (options) {
         + whereStatements
         + ' ORDER BY id ASC'
         ;
+    console.log(querySQL)
+    console.log(places)
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             options.people = resQuery;
