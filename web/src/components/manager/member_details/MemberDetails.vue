@@ -122,6 +122,47 @@
                             :manager-id="managerId"
                             :endpoint="endpoint"
                         ></Photo>
+                        <v-expansion-panels multiple v-model="openPanel">
+                            <v-expansion-panel>
+                                <v-expansion-panel-header>
+                                    <h3>Short CV</h3>
+                                </v-expansion-panel-header>
+                                <v-expansion-panel-content>
+                                    <ShortCv
+                                        :person-id="personId"
+                                        :manager-id="managerId"
+                                        :endpoint="endpoint"
+                                        class="mt-3"
+                                    ></ShortCv>
+                                </v-expansion-panel-content>
+                            </v-expansion-panel>
+                            <v-expansion-panel>
+                                <v-expansion-panel-header>
+                                    <h3>Personal URLs</h3>
+                                </v-expansion-panel-header>
+                                <v-expansion-panel-content>
+                                    <PersonalURLs
+                                        :person-id="personId"
+                                        :manager-id="managerId"
+                                        :endpoint="endpoint"
+                                        class="mt-3"
+                                    ></PersonalURLs>
+                                </v-expansion-panel-content>
+                            </v-expansion-panel>
+                            <v-expansion-panel>
+                                <v-expansion-panel-header>
+                                    <h3>Editors of data</h3>
+                                </v-expansion-panel-header>
+                                <v-expansion-panel-content>
+                                    <DataEditors
+                                        :person-id="personId"
+                                        :manager-id="managerId"
+                                        :endpoint="endpoint"
+                                        class="mt-3"
+                                    ></DataEditors>
+                                </v-expansion-panel-content>
+                            </v-expansion-panel>
+                        </v-expansion-panels>
                     </v-col>
                 </v-row>
             </v-tab-item>
@@ -149,6 +190,11 @@
                             :endpoint="endpoint"
                             :is-laqv="isLAQV"
                         ></Roles>
+                        <ResearchInterests
+                            :person-id="personId"
+                            :manager-id="managerId"
+                            :endpoint="endpoint"
+                        ></ResearchInterests>
                     </v-col>
                     <v-col cols="12" md="6">
                         <ScientificIdentifications
@@ -358,6 +404,9 @@ const PersonComments = () => import(/* webpackChunkName: "manager-details-person
 const Authorization = () => import(/* webpackChunkName: "manager-details-authorization" */ './personal/Authorization')
 const NuclearInformation = () => import(/* webpackChunkName: "manager-details-nuclear-information" */ './personal/NuclearInformation')
 const Photo = () => import(/* webpackChunkName: "manager-details-photo" */ './personal/Photo')
+const ShortCv = () => import(/* webpackChunkName: "manager-details-short-cv" */ './personal/ShortCV')
+const PersonalURLs = () => import(/* webpackChunkName: "manager-details-personal-urls" */ './personal/PersonalURLs')
+const DataEditors = () => import(/* webpackChunkName: "manager-details-data-editors" */ './personal/DataEditors')
 const PersonalContacts = () => import(/* webpackChunkName: "manager-details-personal-contacts" */ './personal/PersonalContacts')
 const EmergencyContacts = () => import(/* webpackChunkName: "manager-details-emergency-contacts" */ './personal/EmergencyContacts')
 const Identifications = () => import(/* webpackChunkName: "manager-details-identifications" */ './personal/Identifications')
@@ -365,6 +414,7 @@ const Cars = () => import(/* webpackChunkName: "manager-details-cars" */ './pers
 const Degrees = () => import(/* webpackChunkName: "manager-details-degrees" */ './academic/Degrees')
 const StatusFct = () => import(/* webpackChunkName: "manager-details-status-fct" */ './institutional/StatusFct')
 const Roles = () => import(/* webpackChunkName: "manager-details-roles" */ './institutional/roles/Roles')
+const ResearchInterests = () => import(/* webpackChunkName: "manager-details-roles" */ './institutional/ResearchInterests')
 const ScientificIdentifications = () => import(/* webpackChunkName: "manager-details-sc-identifications" */ './institutional/Identifications')
 const InstitutionalContacts = () => import(/* webpackChunkName: "manager-details-institutional-contacts" */ './institutional/InstitutionalContacts')
 const AcademicAffiliations = () => import(/* webpackChunkName: "manager-details-academic-affiliations" */ './institutional/AcademicAffiliations')
@@ -392,6 +442,9 @@ export default {
         PersonComments,
         NuclearInformation,
         Photo,
+        ShortCv,
+        PersonalURLs,
+        DataEditors,
         PersonalContacts,
         EmergencyContacts,
         Identifications,
@@ -399,6 +452,7 @@ export default {
         Degrees,
         StatusFct,
         Roles,
+        ResearchInterests,
         ScientificIdentifications,
         InstitutionalContacts,
         AcademicAffiliations,
@@ -427,6 +481,7 @@ export default {
         return {
             activeTab: 2,
             openPanel: [],
+            openPanel2: [],
             isLAQV: false,
             isSupervisor: false,
             isUCIBIO: false,

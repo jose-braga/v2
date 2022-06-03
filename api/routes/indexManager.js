@@ -28,9 +28,11 @@ const membersCity = require('../controllers/manager/city/members');
 const membersUnknown = require('../controllers/manager/unknown_associations/members');
 const manageFCTMCTESmembers = require('../controllers/manager/unit/fct_mctes_management');
 const users = require('../controllers/people/users');
+const informationEditors = require('../controllers/people/information_editors');
 const nuclearInformation = require('../controllers/people/nuclear_information');
 const photo = require('../controllers/people/photo');
 const personalContacts = require('../controllers/people/personal_contacts');
+const personalURLs = require('../controllers/people/personal_urls');
 const emergencyContacts = require('../controllers/people/emergency_contacts');
 const identifications = require('../controllers/people/identifications');
 const cars = require('../controllers/people/cars');
@@ -40,6 +42,7 @@ const institutionalAffiliations = require('../controllers/people/institutional_a
 const costCenters = require('../controllers/people/cost_centers');
 const institutionalResponsibles = require('../controllers/people/institutional_responsibles');
 const researchIDs = require('../controllers/people/research_IDs');
+const researchInterests = require('../controllers/people/research_interests');
 const academicAffiliations = require('../controllers/people/academic_affiliations');
 const professionalSituations = require('../controllers/people/professional_situations');
 const publicationsList = require('../controllers/people/publications_list');
@@ -63,6 +66,7 @@ const datasets = require('../controllers/people/datasets');
 const outreaches = require('../controllers/people/outreaches');
 const departmentTeams = require('../controllers/manager/unit/department_teams');
 const spaceManagement = require('../controllers/manager/spaces/spaces');
+const websiteTexts = require('../controllers/people/website_texts');
 
 const managePermissionLevels = require('../controllers/manager/unit/manage_permission_levels');
 const managePermissionsUnit = require('../controllers/manager/unit/manage_permissions');
@@ -89,6 +93,8 @@ router.post('/:userID/units/:unitID/members', cors(corsOptions), addMember.addMe
 router.get('/:userID/unknown-associations', cors(corsOptions), membersUnknown.getMembersList);
 router.get('/:userID/members/:personID/users/:username', cors(corsOptions), users.checkUserExistence);
 router.get('/:userID/members/:personID/users', cors(corsOptions), users.getUsername);
+
+router.get('/:userID/members/:personID/information-editors', cors(corsOptions), informationEditors.getEditors);
 
 router.get('/:userID/members/:personID/comments', cors(corsOptions), nuclearInformation.getPersonComments);
 router.put('/:userID/members/:personID/comments', cors(corsOptions), nuclearInformation.updatePersonComments);
@@ -137,6 +143,20 @@ router.get('/:userID/members/:personID/cost-centers', cors(corsOptions), costCen
 router.post('/:userID/members/:personID/cost-centers', cors(corsOptions), costCenters.createCostCenters);
 router.put('/:userID/members/:personID/cost-centers/:costCenterID', cors(corsOptions), costCenters.updateCostCenters);
 router.delete('/:userID/members/:personID/cost-centers/:costCenterID', cors(corsOptions), costCenters.deleteCostCenters);
+
+router.get('/:userID/members/:personID/text-types/:textTypeID/website-texts', cors(corsOptions), websiteTexts.getWebsiteTexts);
+router.post('/:userID/members/:personID/text-types/:textTypeID/website-texts', cors(corsOptions), websiteTexts.createWebsiteTexts);
+router.put('/:userID/members/:personID/text-types/:textTypeID/website-texts/:textID', cors(corsOptions), websiteTexts.updateWebsiteTexts);
+
+router.get('/:userID/members/:personID/personal-urls', cors(corsOptions), personalURLs.getPersonalURLs);
+router.post('/:userID/members/:personID/personal-urls', cors(corsOptions), personalURLs.createPersonalURLs);
+router.put('/:userID/members/:personID/personal-urls/:urlID', cors(corsOptions), personalURLs.updatePersonalURLs);
+router.delete('/:userID/members/:personID/personal-urls/:urlID', cors(corsOptions), personalURLs.deletePersonalURLs);
+
+router.get('/:userID/members/:personID/research-interests', cors(corsOptions), researchInterests.getResearchInterests);
+router.post('/:userID/members/:personID/research-interests', cors(corsOptions), researchInterests.createResearchInterests);
+router.put('/:userID/members/:personID/research-interests/:interestID', cors(corsOptions), researchInterests.updateResearchInterests);
+router.delete('/:userID/members/:personID/research-interests/:interestID', cors(corsOptions), researchInterests.deleteResearchInterests);
 
 router.get('/:userID/members/:personID/poles', cors(corsOptions), institutionalAffiliations.getPoles);
 router.post('/:userID/members/:personID/poles', cors(corsOptions), institutionalAffiliations.createPole);
@@ -338,6 +358,8 @@ router.get('/:userID/units/:unitID/cities/:cityID/fct-status/:personID', cors(co
 router.post('/:userID/units/:unitID/cities/:cityID/fct-status/:personID', cors(corsOptions), manageFCTMCTESmembers.createPersonStatus);
 router.put('/:userID/units/:unitID/cities/:cityID/fct-status/:personID/status/:statusID', cors(corsOptions), manageFCTMCTESmembers.updatePersonStatus);
 
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/information-editors', cors(corsOptions), informationEditors.getEditors);
+
 router.get('/:userID/units/:unitID/cities/:cityID/to-add-fct-mctes-members', cors(corsOptions), manageFCTMCTESmembers.getMembersList);
 router.put('/:userID/units/:unitID/cities/:cityID/to-add-fct-mctes-members/:memberID', cors(corsOptions), manageFCTMCTESmembers.updateMember);
 router.get('/:userID/units/:unitID/cities/:cityID/requested-fct-mctes-members', cors(corsOptions), manageFCTMCTESmembers.getRequestedMembersList);
@@ -389,12 +411,24 @@ router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/cost-center
 router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/cost-centers/:costCenterID', cors(corsOptions), costCenters.updateCostCenters);
 router.delete('/:userID/units/:unitID/cities/:cityID/members/:personID/cost-centers/:costCenterID', cors(corsOptions), costCenters.deleteCostCenters);
 
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/text-types/:textTypeID/website-texts', cors(corsOptions), websiteTexts.getWebsiteTexts);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/text-types/:textTypeID/website-texts', cors(corsOptions), websiteTexts.createWebsiteTexts);
+router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/text-types/:textTypeID/website-texts/:textID', cors(corsOptions), websiteTexts.updateWebsiteTexts);
+
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/personal-urls', cors(corsOptions), personalURLs.getPersonalURLs);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/personal-urls', cors(corsOptions), personalURLs.createPersonalURLs);
+router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/personal-urls/:urlID', cors(corsOptions), personalURLs.updatePersonalURLs);
+router.delete('/:userID/units/:unitID/cities/:cityID/members/:personID/personal-urls/:urlID', cors(corsOptions), personalURLs.deletePersonalURLs);
 
 router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/department-teams', cors(corsOptions), departmentTeams.getPersonDepartmentTeam);
 router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/department-teams', cors(corsOptions), departmentTeams.createPersonDepartmentTeam);
 router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/department-teams/:departmentTeamID', cors(corsOptions), departmentTeams.updatePersonDepartmentTeam);
 router.delete('/:userID/units/:unitID/cities/:cityID/members/:personID/department-teams/:departmentTeamID', cors(corsOptions), departmentTeams.deletePersonDepartmentTeam);
 
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/research-interests', cors(corsOptions), researchInterests.getResearchInterests);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/research-interests', cors(corsOptions), researchInterests.createResearchInterests);
+router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/research-interests/:interestID', cors(corsOptions), researchInterests.updateResearchInterests);
+router.delete('/:userID/units/:unitID/cities/:cityID/members/:personID/research-interests/:interestID', cors(corsOptions), researchInterests.deleteResearchInterests);
 
 router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/poles', cors(corsOptions), institutionalAffiliations.getPoles);
 router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/poles', cors(corsOptions), institutionalAffiliations.createPole);
@@ -595,6 +629,9 @@ router.get('/:userID/cities/:cityID/members/:personID/users/:username', cors(cor
 router.get('/:userID/cities/:cityID/members/:personID/users', cors(corsOptions), users.getUsername);
 router.put('/:userID/cities/:cityID/members/:personID/users/:userID', cors(corsOptions), users.updateUsername);
 router.put('/:userID/cities/:cityID/members/:personID/password/:userID', cors(corsOptions), users.updatePassword);
+
+router.get('/:userID/cities/:cityID/members/:personID/information-editors', cors(corsOptions), informationEditors.getEditors);
+
 // routes for manager with access to
 router.get('/:userID/cities/:cityID/to-add-fct-mctes-members', cors(corsOptions), manageFCTMCTESmembers.getMembersList);
 router.put('/:userID/cities/:cityID/to-add-fct-mctes-members/:memberID', cors(corsOptions), manageFCTMCTESmembers.updateMember);
@@ -645,6 +682,20 @@ router.get('/:userID/cities/:cityID/members/:personID/cost-centers', cors(corsOp
 router.post('/:userID/cities/:cityID/members/:personID/cost-centers', cors(corsOptions), costCenters.createCostCenters);
 router.put('/:userID/cities/:cityID/members/:personID/cost-centers/:costCenterID', cors(corsOptions), costCenters.updateCostCenters);
 router.delete('/:userID/cities/:cityID/members/:personID/cost-centers/:costCenterID', cors(corsOptions), costCenters.deleteCostCenters);
+
+router.get('/:userID/cities/:cityID/members/:personID/text-types/:textTypeID/website-texts', cors(corsOptions), websiteTexts.getWebsiteTexts);
+router.post('/:userID/cities/:cityID/members/:personID/text-types/:textTypeID/website-texts', cors(corsOptions), websiteTexts.createWebsiteTexts);
+router.put('/:userID/cities/:cityID/members/:personID/text-types/:textTypeID/website-texts/:textID', cors(corsOptions), websiteTexts.updateWebsiteTexts);
+
+router.get('/:userID/cities/:cityID/members/:personID/personal-urls', cors(corsOptions), personalURLs.getPersonalURLs);
+router.post('/:userID/cities/:cityID/members/:personID/personal-urls', cors(corsOptions), personalURLs.createPersonalURLs);
+router.put('/:userID/cities/:cityID/members/:personID/personal-urls/:urlID', cors(corsOptions), personalURLs.updatePersonalURLs);
+router.delete('/:userID/cities/:cityID/members/:personID/personal-urls/:urlID', cors(corsOptions), personalURLs.deletePersonalURLs);
+
+router.get('/:userID/cities/:cityID/members/:personID/research-interests', cors(corsOptions), researchInterests.getResearchInterests);
+router.post('/:userID/cities/:cityID/members/:personID/research-interests', cors(corsOptions), researchInterests.createResearchInterests);
+router.put('/:userID/cities/:cityID/members/:personID/research-interests/:interestID', cors(corsOptions), researchInterests.updateResearchInterests);
+router.delete('/:userID/cities/:cityID/members/:personID/research-interests/:interestID', cors(corsOptions), researchInterests.deleteResearchInterests);
 
 router.get('/:userID/cities/:cityID/members/:personID/poles', cors(corsOptions), institutionalAffiliations.getPoles);
 router.post('/:userID/cities/:cityID/members/:personID/poles', cors(corsOptions), institutionalAffiliations.createPole);
@@ -853,6 +904,8 @@ router.get('/:userID/units/:unitID/fct-status/:personID', cors(corsOptions), man
 router.post('/:userID/units/:unitID/fct-status/:personID', cors(corsOptions), manageFCTMCTESmembers.createPersonStatus);
 router.put('/:userID/units/:unitID/fct-status/:personID/status/:statusID', cors(corsOptions), manageFCTMCTESmembers.updatePersonStatus);
 
+router.get('/:userID/units/:unitID/members/:personID/information-editors', cors(corsOptions), informationEditors.getEditors);
+
 router.get('/:userID/units/:unitID/to-add-fct-mctes-members', cors(corsOptions), manageFCTMCTESmembers.getMembersList);
 router.put('/:userID/units/:unitID/to-add-fct-mctes-members/:memberID', cors(corsOptions), manageFCTMCTESmembers.updateMember);
 router.get('/:userID/units/:unitID/requested-fct-mctes-members', cors(corsOptions), manageFCTMCTESmembers.getRequestedMembersList);
@@ -903,6 +956,20 @@ router.get('/:userID/units/:unitID/members/:personID/cost-centers', cors(corsOpt
 router.post('/:userID/units/:unitID/members/:personID/cost-centers', cors(corsOptions), costCenters.createCostCenters);
 router.put('/:userID/units/:unitID/members/:personID/cost-centers/:costCenterID', cors(corsOptions), costCenters.updateCostCenters);
 router.delete('/:userID/units/:unitID/members/:personID/cost-centers/:costCenterID', cors(corsOptions), costCenters.deleteCostCenters);
+
+router.get('/:userID/units/:unitID/members/:personID/text-types/:textTypeID/website-texts', cors(corsOptions), websiteTexts.getWebsiteTexts);
+router.post('/:userID/units/:unitID/members/:personID/text-types/:textTypeID/website-texts', cors(corsOptions), websiteTexts.createWebsiteTexts);
+router.put('/:userID/units/:unitID/members/:personID/text-types/:textTypeID/website-texts/:textID', cors(corsOptions), websiteTexts.updateWebsiteTexts);
+
+router.get('/:userID/units/:unitID/members/:personID/personal-urls', cors(corsOptions), personalURLs.getPersonalURLs);
+router.post('/:userID/units/:unitID/members/:personID/personal-urls', cors(corsOptions), personalURLs.createPersonalURLs);
+router.put('/:userID/units/:unitID/members/:personID/personal-urls/:urlID', cors(corsOptions), personalURLs.updatePersonalURLs);
+router.delete('/:userID/units/:unitID/members/:personID/personal-urls/:urlID', cors(corsOptions), personalURLs.deletePersonalURLs);
+
+router.get('/:userID/units/:unitID/members/:personID/research-interests', cors(corsOptions), researchInterests.getResearchInterests);
+router.post('/:userID/units/:unitID/members/:personID/research-interests', cors(corsOptions), researchInterests.createResearchInterests);
+router.put('/:userID/units/:unitID/members/:personID/research-interests/:interestID', cors(corsOptions), researchInterests.updateResearchInterests);
+router.delete('/:userID/units/:unitID/members/:personID/research-interests/:interestID', cors(corsOptions), researchInterests.deleteResearchInterests);
 
 router.get('/:userID/units/:unitID/members/:personID/poles', cors(corsOptions), institutionalAffiliations.getPoles);
 router.post('/:userID/units/:unitID/members/:personID/poles', cors(corsOptions), institutionalAffiliations.createPole);
