@@ -45,6 +45,7 @@ const researchIDs = require('../controllers/people/research_IDs');
 const researchInterests = require('../controllers/people/research_interests');
 const academicAffiliations = require('../controllers/people/academic_affiliations');
 const professionalSituations = require('../controllers/people/professional_situations');
+const authorNames = require('../controllers/people/author_names');
 const publicationsList = require('../controllers/people/publications_list');
 const supervising = require('../controllers/people/supervising');
 const spaces = require('../controllers/people/spaces');
@@ -224,6 +225,11 @@ router.delete('/:userID/members/:personID/people-publications/:publicationID', c
 router.put('/:userID/members/:personID/publications/:publicationID', cors(corsOptions), publicationsList.updatePublication);
 router.post('/:userID/members/:personID/journals', cors(corsOptions), addPubORCID.createJournal);
 router.post('/:userID/members/:personID/journals/:journalID/publications', cors(corsOptions), addPubORCID.createPublication);
+
+router.get('/:userID/members/:personID/author-names', cors(corsOptions), authorNames.getAuthorNames);
+router.post('/:userID/members/:personID/author-names', cors(corsOptions), authorNames.createAuthorName);
+router.put('/:userID/members/:personID/author-names/:authorID', cors(corsOptions), authorNames.updateAuthorName);
+router.delete('/:userID/members/:personID/author-names/:authorID', cors(corsOptions), authorNames.deleteAuthorName);
 //Permissions
 router.get('/:userID/members/:personID/app-area-permissions', cors(corsOptions), manageAppAreaPermissionsUnit.getPermissions);
 router.post('/:userID/members/:personID/app-area-permissions', cors(corsOptions), manageAppAreaPermissionsUnit.createPermissions);
@@ -496,6 +502,11 @@ router.delete('/:userID/units/:unitID/cities/:cityID/members/:personID/people-pu
 router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/publications/:publicationID', cors(corsOptions), publicationsList.updatePublication);
 router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/journals', cors(corsOptions), addPubORCID.createJournal);
 router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/journals/:journalID/publications', cors(corsOptions), addPubORCID.createPublication);
+
+router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/author-names', cors(corsOptions), authorNames.getAuthorNames);
+router.post('/:userID/units/:unitID/cities/:cityID/members/:personID/author-names', cors(corsOptions), authorNames.createAuthorName);
+router.put('/:userID/units/:unitID/cities/:cityID/members/:personID/author-names/:authorID', cors(corsOptions), authorNames.updateAuthorName);
+router.delete('/:userID/units/:unitID/cities/:cityID/members/:personID/author-names/:authorID', cors(corsOptions), authorNames.deleteAuthorName);
 //Projects
 router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/all-projects', cors(corsOptions), projects.getAllProjects);
 router.get('/:userID/units/:unitID/cities/:cityID/members/:personID/projects', cors(corsOptions), projects.getPersonProjects);
@@ -764,6 +775,11 @@ router.delete('/:userID/cities/:cityID/members/:personID/people-publications/:pu
 router.put('/:userID/cities/:cityID/members/:personID/publications/:publicationID', cors(corsOptions), publicationsList.updatePublication);
 router.post('/:userID/cities/:cityID/members/:personID/journals', cors(corsOptions), addPubORCID.createJournal);
 router.post('/:userID/cities/:cityID/members/:personID/journals/:journalID/publications', cors(corsOptions), addPubORCID.createPublication);
+
+router.get('/:userID/cities/:cityID/members/:personID/author-names', cors(corsOptions), authorNames.getAuthorNames);
+router.post('/:userID/cities/:cityID/members/:personID/author-names', cors(corsOptions), authorNames.createAuthorName);
+router.put('/:userID/cities/:cityID/members/:personID/author-names/:authorID', cors(corsOptions), authorNames.updateAuthorName);
+router.delete('/:userID/cities/:cityID/members/:personID/author-names/:authorID', cors(corsOptions), authorNames.deleteAuthorName);
 //Projects
 router.get('/:userID/cities/:cityID/members/:personID/all-projects', cors(corsOptions), projects.getAllProjects);
 router.get('/:userID/cities/:cityID/members/:personID/projects', cors(corsOptions), projects.getPersonProjects);
@@ -1038,6 +1054,11 @@ router.delete('/:userID/units/:unitID/members/:personID/people-publications/:pub
 router.put('/:userID/units/:unitID/members/:personID/publications/:publicationID', cors(corsOptions), publicationsList.updatePublication);
 router.post('/:userID/units/:unitID/members/:personID/journals', cors(corsOptions), addPubORCID.createJournal);
 router.post('/:userID/units/:unitID/members/:personID/journals/:journalID/publications', cors(corsOptions), addPubORCID.createPublication);
+
+router.get('/:userID/units/:unitID/members/:personID/author-names', cors(corsOptions), authorNames.getAuthorNames);
+router.post('/:userID/units/:unitID/members/:personID/author-names', cors(corsOptions), authorNames.createAuthorName);
+router.put('/:userID/units/:unitID/members/:personID/author-names/:authorID', cors(corsOptions), authorNames.updateAuthorName);
+router.delete('/:userID/units/:unitID/members/:personID/author-names/:authorID', cors(corsOptions), authorNames.deleteAuthorName);
 //Projects
 router.get('/:userID/units/:unitID/members/:personID/all-projects', cors(corsOptions), projects.getAllProjects);
 router.get('/:userID/units/:unitID/members/:personID/projects', cors(corsOptions), projects.getPersonProjects);

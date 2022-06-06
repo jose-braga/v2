@@ -236,6 +236,16 @@
                 ></SupervisingList>
             </v-tab-item>
             <v-tab-item>
+                <v-row>
+                    <v-col>
+                        <AuthorNames
+                            :person-id="personId"
+                            :manager-id="managerId"
+                            :endpoint="endpoint"
+                        >
+                        </AuthorNames>
+                    </v-col>
+                </v-row>
                 <v-expansion-panels multiple v-model="openPanel" class="mt-4">
                     <v-expansion-panel>
                         <v-expansion-panel-header>
@@ -420,6 +430,7 @@ const InstitutionalContacts = () => import(/* webpackChunkName: "manager-details
 const AcademicAffiliations = () => import(/* webpackChunkName: "manager-details-academic-affiliations" */ './institutional/AcademicAffiliations')
 const CostCenters = () => import(/* webpackChunkName: "manager-details-cost-centers" */ './institutional/CostCenters')
 const ProfessionalSituations = () => import(/* webpackChunkName: "manager-details-professional-situations" */ './professional/ProfessionalSituations')
+const AuthorNames = () => import(/* webpackChunkName: "manager-details-author-names" */ './productivity/publications/AuthorNames')
 const PublicationsList = () => import(/* webpackChunkName: "manager-details-publications-list" */ './productivity/publications/PublicationsList')
 const SupervisingList = () => import(/* webpackChunkName: "manager-details-supervising-list" */ './supervisor/SupervisingList')
 const SpacesManagement = () => import(/* webpackChunkName: "manager-details-supervising-list" */ './spaces/SpacesManagement')
@@ -458,6 +469,7 @@ export default {
         AcademicAffiliations,
         CostCenters,
         ProfessionalSituations,
+        AuthorNames,
         PublicationsList,
         SupervisingList,
         SpacesManagement,
