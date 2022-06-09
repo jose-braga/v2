@@ -133,6 +133,8 @@ export default {
         initialize () {
             this.data.username = '';
             this.data.originalUsername = '';
+            this.data.password = '';
+            this.data.passwordConfirm = '';
             this.data.userID = null;
             if (this.$store.state.session.loggedIn) {
                 let personID = this.personId;

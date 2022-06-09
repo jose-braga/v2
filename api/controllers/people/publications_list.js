@@ -239,6 +239,11 @@ var actionUpdatePublication = function (options) {
     let data = req.body.data;
     var querySQL = '';
     var places = [];
+    if (data.publication_date !== null && data.publication_date !== undefined && data.publication_date !== '') {
+        data.publication_date = data.publication_date
+            .replace(/-undefined/g,'')
+            .replace(/undefined/g,'');
+    }
     querySQL = querySQL + 'UPDATE publications'
                         + ' SET authors_raw = ?,'
                         + ' number_authors = ?,'

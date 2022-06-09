@@ -43,6 +43,11 @@ var actionCreatePublication = function (options) {
     let data = req.body.data;
     var querySQL = '';
     var places = [];
+    if (data.publication_date !== null && data.publication_date !== undefined && data.publication_date !== '') {
+        data.publication_date = data.publication_date
+            .replace(/-undefined/g,'')
+            .replace(/undefined/g,'');
+    }
     querySQL = querySQL + 'INSERT INTO publications'
                         + ' (authors_raw, number_authors, title, journal_id,'
                         + ' volume, page_start, page_end, doi, wos, pubmed_id,'
