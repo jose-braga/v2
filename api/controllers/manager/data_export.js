@@ -148,8 +148,8 @@ var filterPeople = function (options) {
         + whereStatements
         + ' ORDER BY id ASC'
         ;
-    console.log(querySQL)
-    console.log(places)
+    //console.log(querySQL)
+    //console.log(places)
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             options.people = resQuery;

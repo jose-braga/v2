@@ -6,7 +6,6 @@
         </div>
     </v-card-title>
     <v-card-text>
-        {{queryString}}
     </v-card-text>
     <v-container>
         <v-row align="center">
@@ -212,8 +211,13 @@ import XLSX from 'xlsx'
 
 function processResults(vm, people) {
     let currentMembers = [];
-    let today = time.moment();
+    //let today = time.moment();
     for (let ind in people) {
+        if (people[ind].id === 157) {
+            console.log(people[ind])
+        }
+        /*
+
         let current_lab = {};
         let count_current_labs = 0;
         let within_range_lab = {}; // gets the most recent lab within time range
@@ -412,6 +416,7 @@ function processResults(vm, people) {
         people[ind].finished_degrees = finished_degrees;
 
         currentMembers.push(people[ind]);
+        */
     }
     return currentMembers;
 }
