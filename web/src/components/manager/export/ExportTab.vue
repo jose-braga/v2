@@ -211,14 +211,13 @@ import XLSX from 'xlsx'
 
 function processResults(vm, people) {
     let currentMembers = [];
-    //let today = time.moment();
+    let today = time.moment();
     for (let ind in people) {
-        if (people[ind].id === 157) {
-            console.log(people[ind])
-        }
-        /*
-
+        //if (people[ind].id === 157) {
+        //    console.log(people[ind])
+        //}
         let current_lab = {};
+        let last_lab = {};
         let count_current_labs = 0;
         let within_range_lab = {}; // gets the most recent lab within time range
         let count_labs_within_range = 0;
@@ -255,6 +254,9 @@ function processResults(vm, people) {
             for (let indHistory in people[ind].history) {
                 let validFrom = people[ind].history[indHistory].valid_from;
                 let validUntil = people[ind].history[indHistory].valid_until;
+                if (indHistory === '0') {
+                    last_lab = people[ind].history[indHistory]
+                }
                 if ((validFrom === null || time.moment(validFrom).isBefore(today))
                     && (validUntil === null || time.moment(validUntil).isAfter(today))
                 ) {
@@ -268,6 +270,9 @@ function processResults(vm, people) {
                         count_labs_within_range++;
                         within_range_lab = people[ind].history[indHistory];
                     }
+                }
+                if (validUntil === null || time.moment(validUntil).isAfter(last_lab.valid_until)) {
+                    last_lab = people[ind].history[indHistory];
                 }
                 people[ind].history[indHistory].valid_from = time.momentToDate(people[ind].history[indHistory].valid_from);
                 people[ind].history[indHistory].valid_until = time.momentToDate(people[ind].history[indHistory].valid_until);
@@ -401,6 +406,7 @@ function processResults(vm, people) {
         if (count_current_labs > 1) people[ind].has_other_current_labs = true;
         people[ind].within_range_lab = within_range_lab;
         if (count_labs_within_range > 1) people[ind].has_other_labs_within_range = true;
+        people[ind].last_lab = last_lab;
 
         people[ind].current_job = current_job;
         people[ind].within_range_job = within_range_job;
@@ -416,7 +422,6 @@ function processResults(vm, people) {
         people[ind].finished_degrees = finished_degrees;
 
         currentMembers.push(people[ind]);
-        */
     }
     return currentMembers;
 }
@@ -461,7 +466,7 @@ function processForSpreadsheet(members) {
             thisMember['Unit (Curr.)'] = members[ind].current_lab.groups[0].units[0].short_name;
             thisMember['Group (Curr.)'] = members[ind].current_lab.groups[0].name;
         }
-        thisMember['Lab (Curr.)'] = members[ind].current_lab.name;
+        thisMember['Lab (Curr.)'] = members[ind].current_lab.lab_name;
         thisMember['Lab Position (Curr.)'] = members[ind].current_lab.lab_position_name_en;
         thisMember['Dedication (Curr.)'] = members[ind].current_lab.dedication;
         thisMember['Lab (Curr.): From'] = members[ind].current_lab.valid_from;
@@ -478,6 +483,18 @@ function processForSpreadsheet(members) {
         thisMember['Dedication (Sel.)'] = members[ind].within_range_lab.dedication;
         thisMember['Lab (Sel. Time): From'] = members[ind].within_range_lab.valid_from;
         thisMember['Lab (Sel. Time): Until'] = members[ind].within_range_lab.valid_until;
+
+        thisMember['Last Unit'] = undefined
+        thisMember['Last Group'] = undefined
+        if (members[ind].last_lab.groups !== undefined && members[ind].last_lab.groups.length > 0) {
+            thisMember['Last Unit'] = members[ind].last_lab.groups[0].units[0].short_name;
+            thisMember['Last Group'] = members[ind].last_lab.groups[0].name;
+        }
+        thisMember['Last Lab'] = members[ind].last_lab.lab_name;
+        thisMember['Last Lab Position'] = members[ind].last_lab.lab_position_name_en;
+        thisMember['Last Dedication'] = members[ind].last_lab.dedication;
+        thisMember['Last Lab: From'] = members[ind].last_lab.valid_from;
+        thisMember['Last Lab: Until'] = members[ind].last_lab.valid_until;
 
         thisMember['High. Degree (Curr.)'] = members[ind].current_higher_finished_degree.name_en;
         thisMember['High. Degree (Curr.): From'] = members[ind].current_higher_finished_degree.start;
@@ -572,6 +589,13 @@ function processForSpreadsheet(members) {
         thisMember.Email = '';
         if (members[ind].personal_email.length > 0) {
             thisMember.Email = members[ind].personal_email[0].email;
+        }
+        thisMember['Nationalities'] = '';
+        if (members[ind].countries.length > 0) {
+            for (let indCountry in members[ind].countries) {
+                thisMember['Nationalities'] = thisMember['Nationalities']
+                    + members[ind].countries[indCountry].country_name + '\n';
+            }
         }
         thisMember['Work Email'] = '';
         if (members[ind].email.length > 0) {

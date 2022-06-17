@@ -156,7 +156,7 @@ var filterPeople = function (options) {
             options.i = 0;
             if (resQuery.length > 0) {
                 if (options.exportType === 'people') {
-                    return getWorkPhone(options)
+                    return getNationalities(options)
                 } else if (options.exportType === 'productivity') {
                     return getPublicationsPerson(options)
                 } else if (options.exportType === 'spaces') {
@@ -180,6 +180,25 @@ var filterPeople = function (options) {
         options);
 };
 
+var getNationalities = function (options) {
+    let { req, res, next, people, i } = options;
+    let person = people[i]
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'SELECT people_countries.*, countries.name AS country_name'
+        + ' FROM people_countries'
+        + ' JOIN countries ON countries.id = people_countries.country_id'
+        + ' WHERE person_id = ?'
+        +';';
+    places.push(person.id);
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            people[i].countries = resQuery;
+            return getWorkPhone(options)
+        },
+        options);
+};
 var getWorkPhone = function (options) {
     let { req, res, next, people, i } = options;
     let person = people[i]
@@ -546,7 +565,7 @@ var getDepartmentTeams = function (options) {
             people[i].departmentTeams = resQuery;
             if (i + 1 < people.length) {
                 options.i = i + 1;
-                return getWorkPhone(options);
+                return getNationalities(options);
             } else {
                 return responses.sendJSONResponseOptions({
                     response: res,
