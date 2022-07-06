@@ -257,21 +257,21 @@ function processResults(vm, people) {
                 if (indHistory === '0') {
                     last_lab = people[ind].history[indHistory]
                 }
-                if ((validFrom === null || time.moment(validFrom).isBefore(today))
-                    && (validUntil === null || time.moment(validUntil).isAfter(today))
+                if ((validFrom === null || time.moment(validFrom).isSameOrBefore(today))
+                    && (validUntil === null || time.moment(validUntil).isSameOrAfter(today))
                 ) {
                     count_current_labs++;
                     current_lab = people[ind].history[indHistory];
                 }
                 if (filterDateFrom !== null || filterDateUntil !== null) {
-                    if ((validFrom === null || time.moment(validFrom).isBefore(filterDateFrom))
-                        && (validUntil === null || time.moment(validUntil).isAfter(filterDateUntil))
+                    if ((validFrom === null || time.moment(validFrom).isSameOrBefore(filterDateUntil))
+                        && (validUntil === null || time.moment(validUntil).isSameOrAfter(filterDateFrom))
                     ) {
                         count_labs_within_range++;
                         within_range_lab = people[ind].history[indHistory];
                     }
                 }
-                if (validUntil === null || time.moment(validUntil).isAfter(last_lab.valid_until)) {
+                if (validUntil === null || time.moment(validUntil).isSameOrAfter(last_lab.valid_until)) {
                     last_lab = people[ind].history[indHistory];
                 }
                 people[ind].history[indHistory].valid_from = time.momentToDate(people[ind].history[indHistory].valid_from);
@@ -282,14 +282,14 @@ function processResults(vm, people) {
             for (let indJob in people[ind].jobs) {
                 let validFrom = people[ind].jobs[indJob].valid_from;
                 let validUntil = people[ind].jobs[indJob].valid_until;
-                if ((validFrom === null || time.moment(validFrom).isBefore(today))
-                    && (validUntil === null || time.moment(validUntil).isAfter(today))
+                if ((validFrom === null || time.moment(validFrom).isSameOrBefore(today))
+                    && (validUntil === null || time.moment(validUntil).isSameOrAfter(today))
                 ) {
                     current_job = people[ind].jobs[indJob];
                 }
                 if (filterDateFrom !== null || filterDateUntil !== null) {
-                    if ((validFrom === null || time.moment(validFrom).isBefore(filterDateFrom))
-                        && (validUntil === null || time.moment(validUntil).isAfter(filterDateUntil))
+                    if ((validFrom === null || time.moment(validFrom).isSameOrBefore(filterDateUntil))
+                        && (validUntil === null || time.moment(validUntil).isSameOrAfter(filterDateFrom))
                     ) {
                         within_range_job = people[ind].jobs[indJob];
                     }
@@ -310,17 +310,17 @@ function processResults(vm, people) {
                     current_higher_finished_degree = people[ind].degrees[indDeg];
                 }
                 if (filterDateFrom !== null || filterDateUntil !== null) {
-                    if (time.moment(validUntil).isBefore(filterDateUntil)
+                    if (time.moment(validUntil).isSameOrBefore(filterDateUntil)
                         && ( people[ind].degrees[indDeg].degree_id < minDegreeID2)
                     ) {
                         minDegreeID2 = people[ind].degrees[indDeg].degree_id;
                         within_range_higher_finished_degree = people[ind].degrees[indDeg];
                     }
                 }
-                if (time.moment(validUntil).isBefore(today)) {
+                if (time.moment(validUntil).isSameOrBefore(today)) {
                     finished_degrees.push(people[ind].degrees[indDeg])
                 }
-                if (validUntil === null || time.moment(validUntil).isAfter(today)) {
+                if (validUntil === null || time.moment(validUntil).isSameOrAfter(today)) {
                     ongoing_degrees.push(people[ind].degrees[indDeg])
                 }
                 people[ind].degrees[indDeg].start = time.momentToDate(people[ind].degrees[indDeg].start);
@@ -331,14 +331,14 @@ function processResults(vm, people) {
             for (let indPole in people[ind].pole) {
                 let validFrom = people[ind].pole[indPole].valid_from;
                 let validUntil = people[ind].pole[indPole].valid_until;
-                if ((validFrom === null || time.moment(validFrom).isBefore(today))
-                    && (validUntil === null || time.moment(validUntil).isAfter(today))
+                if ((validFrom === null || time.moment(validFrom).isSameOrBefore(today))
+                    && (validUntil === null || time.moment(validUntil).isSameOrAfter(today))
                 ) {
                     current_pole = people[ind].pole[indPole];
                 }
                 if (filterDateFrom !== null || filterDateUntil !== null) {
-                    if ((validFrom === null || time.moment(validFrom).isBefore(filterDateFrom))
-                        && (validUntil === null || time.moment(validUntil).isAfter(filterDateUntil))
+                    if ((validFrom === null || time.moment(validFrom).isSameOrBefore(filterDateUntil))
+                        && (validUntil === null || time.moment(validUntil).isSameOrAfter(filterDateFrom))
                     ) {
                         within_range_pole = people[ind].pole[indPole];
                     }
@@ -351,14 +351,14 @@ function processResults(vm, people) {
             for (let indJob in people[ind].departments) {
                 let validFrom = people[ind].departments[indJob].department_start;
                 let validUntil = people[ind].departments[indJob].department_end;
-                if ((validFrom === null || time.moment(validFrom).isBefore(today))
-                    && (validUntil === null || time.moment(validUntil).isAfter(today))
+                if ((validFrom === null || time.moment(validFrom).isSameOrBefore(today))
+                    && (validUntil === null || time.moment(validUntil).isSameOrAfter(today))
                 ) {
                     current_department = people[ind].departments[indJob];
                 }
                 if (filterDateFrom !== null || filterDateUntil !== null) {
-                    if ((validFrom === null || time.moment(validFrom).isBefore(filterDateFrom))
-                        && (validUntil === null || time.moment(validUntil).isAfter(filterDateUntil))
+                    if ((validFrom === null || time.moment(validFrom).isSameOrBefore(filterDateUntil))
+                        && (validUntil === null || time.moment(validUntil).isSameOrAfter(filterDateFrom))
                     ) {
                         within_range_department = people[ind].departments[indJob];
                     }
@@ -377,14 +377,14 @@ function processResults(vm, people) {
             for (let indCC in people[ind].cost_centers) {
                 let validFrom = people[ind].cost_centers[indCC].valid_from;
                 let validUntil = people[ind].cost_centers[indCC].valid_until;
-                if ((validFrom === null || time.moment(validFrom).isBefore(today))
-                    && (validUntil === null || time.moment(validUntil).isAfter(today))
+                if ((validFrom === null || time.moment(validFrom).isSameOrBefore(today))
+                    && (validUntil === null || time.moment(validUntil).isSameOrAfter(today))
                 ) {
                     current_cost_center = people[ind].cost_centers[indCC];
                 }
                 if (filterDateFrom !== null || filterDateUntil !== null) {
-                    if ((validFrom === null || time.moment(validFrom).isBefore(filterDateFrom))
-                        && (validUntil === null || time.moment(validUntil).isAfter(filterDateUntil))
+                    if ((validFrom === null || time.moment(validFrom).isSameOrBefore(filterDateUntil))
+                        && (validUntil === null || time.moment(validUntil).isSameOrAfter(filterDateFrom))
                     ) {
                         within_range_cost_center = people[ind].cost_centers[indCC];
                     }
@@ -420,7 +420,6 @@ function processResults(vm, people) {
         people[ind].within_range_higher_finished_degree = within_range_higher_finished_degree;
         people[ind].ongoing_degrees = ongoing_degrees;
         people[ind].finished_degrees = finished_degrees;
-
         currentMembers.push(people[ind]);
     }
     return currentMembers;
@@ -453,6 +452,9 @@ function processForSpreadsheet(members) {
     })
     for (let ind in members) {
         let thisMember = {};
+        thisMember.Name = members[ind].name;
+        thisMember['Colloquial Name'] = members[ind].colloquial_name;
+
         thisMember['Pole (Curr.)'] = members[ind].current_pole.city;
         thisMember['Pole (Curr.): From'] = members[ind].current_pole.valid_from;
         thisMember['Pole (Curr.): Until'] = members[ind].current_pole.valid_until;
@@ -505,16 +507,6 @@ function processForSpreadsheet(members) {
         thisMember['High. Degree (Selec.): Until'] = members[ind].within_range_higher_finished_degree.end;
 
         thisMember['PhD Year'] = undefined;
-        let degrees_history = ''
-        for (let indDegree in members[ind].finished_degrees) {
-            if (members[ind].finished_degrees[indDegree].name_en === 'PhD') {
-                thisMember['PhD Year'] = time.moment(members[ind].finished_degrees[indDegree].end).year()
-            }
-            degrees_history = degrees_history + members[ind].finished_degrees[indDegree].name_en
-                + ', ' + degrees_history + members[ind].finished_degrees[indDegree].start
-                + ' to ' + degrees_history + members[ind].finished_degrees[indDegree].end
-                + '\n'
-        }
         thisMember['Job Situation (Curr.)'] = members[ind].current_job.category_name_en;
         thisMember['Job Category (Curr.)'] = members[ind].current_job.situation_name_en;
         thisMember['Job Organization (Curr.)'] = members[ind].current_job.organization;
@@ -575,10 +567,6 @@ function processForSpreadsheet(members) {
                         + ', Fellowships: ' + fellowships
                         +'\n';
         }
-
-        thisMember['Person ID'] = members[ind].id;
-        thisMember.Name = members[ind].name;
-        thisMember['Colloquial Name'] = members[ind].colloquial_name;
         thisMember['Birth Date'] = '';
         thisMember['Age'] = '';
         if (members[ind].birth_date !== null && members[ind].birth_date !== undefined) {
@@ -641,11 +629,21 @@ function processForSpreadsheet(members) {
                             + ')\n';
             }
         }
+        let degrees_history = ''
+        for (let indDegree in members[ind].finished_degrees) {
+            if (members[ind].finished_degrees[indDegree].name_en === 'PhD') {
+                thisMember['PhD Year'] = time.moment(members[ind].finished_degrees[indDegree].end).year()
+            }
+            degrees_history = degrees_history + members[ind].finished_degrees[indDegree].name_en
+                + ', ' + members[ind].finished_degrees[indDegree].start
+                + ' to ' + members[ind].finished_degrees[indDegree].end
+                + '\n'
+        }
         thisMember['Finished Degrees'] = degrees_history;
         degrees_history = ''
         for (let indDegree in members[ind].ongoing_degrees) {
             degrees_history = degrees_history + members[ind].ongoing_degrees[indDegree].name_en
-                + ', ' + degrees_history + members[ind].ongoing_degrees[indDegree].start
+                + ', ' + members[ind].ongoing_degrees[indDegree].start
                 + '\n'
         }
         thisMember['Ongoing Degrees'] = degrees_history;
@@ -718,6 +716,7 @@ function processForSpreadsheet(members) {
                         + ')'
                         + '\n'
         }
+        thisMember['Person ID'] = members[ind].id;
         membersCurated.push(thisMember);
     }
 
@@ -1415,6 +1414,7 @@ function prepareStringComparison(str) {
     }
 }
 
+
 export default {
     data () {
         return {
@@ -1526,6 +1526,52 @@ export default {
             }
             return query;
         },
+        namesFilters () {
+            let labName;
+            let unitName;
+            let poleName;
+            let departmentName;
+            //let labName;
+            if (this.filterLabID) {
+                for (let ind in this.labs) {
+                    if (this.filterLabID === this.labs[ind].id) {
+                        labName = this.labs[ind].name
+                            .replace(/[^A-zÀ-ú0-9]/g, '');
+                    }
+                }
+            }
+            if (this.filterUnitID) {
+                for (let ind in this.units) {
+                    if (this.filterUnitID === this.units[ind].id) {
+                        unitName = this.units[ind].short_name
+                            .replace(/[^A-zÀ-ú0-9]/g, '');
+                    }
+                }
+            }
+            if (this.filterPoleID) {
+                for (let ind in this.poles) {
+                    if (this.filterPoleID === this.poles[ind].id) {
+                        poleName = this.poles[ind].city
+                            .replace(/[^A-zÀ-ú0-9]/g, '');
+                    }
+                }
+            }
+            if (this.filterDepartmentID) {
+                for (let ind in this.departments) {
+                    if (this.filterDepartmentID === this.departments[ind].id) {
+                        departmentName = this.departments[ind].short_str_department_pt
+                            .replace(/[^A-zÀ-ú0-9]/g, '');
+                    }
+                }
+            }
+
+            return {
+                labName,
+                unitName,
+                poleName,
+                departmentName,
+             }
+        }
 
     },
     methods: {
@@ -1601,16 +1647,16 @@ export default {
             XLSX.utils.book_append_sheet(wb, ws, 'Data');
             let filename = 'members_'
             if (this.filterUnitID !== null && this.filterUnitID !== undefined) {
-                filename = filename + 'unit_' + this.filterUnitID;
+                filename = filename + 'unit_' + this.namesFilters.unitName + '_' + this.filterUnitID;
             }
             if (this.filterPoleID !== null && this.filterPoleID !== undefined) {
-                filename = filename + '_city_' + this.filterPoleID;
+                filename = filename + '_city_' + this.namesFilters.poleName + '_'  + this.filterPoleID;
             }
             if (this.filterDepartmentID !== null && this.filterDepartmentID !== undefined) {
-                filename = filename + '_department_' + this.filterDepartmentID;
+                filename = filename + '_department_' + this.namesFilters.departmentName + '_'   + this.filterDepartmentID;
             }
             if (this.filterLabID !== null && this.filterLabID !== undefined) {
-                filename = filename + '_lab_' + this.filterLabID;
+                filename = filename + '_lab_' + this.namesFilters.labName + '_'   + this.filterLabID;
             }
             if (this.filterChosenPeople !== null && this.filterChosenPeople !== undefined
                 && this.filterChosenPeople.length > 0) {
@@ -1719,13 +1765,16 @@ export default {
 
             let filename = 'people_productivity_'
             if (this.filterUnitID !== null && this.filterUnitID !== undefined) {
-                filename = filename + 'unit_' + this.filterUnitID;
+                filename = filename + 'unit_' + this.namesFilters.unitName + '_'  + this.filterUnitID;
             }
             if (this.filterPoleID !== null && this.filterPoleID !== undefined) {
-                filename = filename + '_city_' + this.filterPoleID;
+                filename = filename + '_city_' + this.namesFilters.poleName + '_'  + this.filterPoleID;
             }
             if (this.filterDepartmentID !== null && this.filterDepartmentID !== undefined) {
-                filename = filename + '_department_' + this.filterDepartmentID;
+                filename = filename + '_department_' + this.namesFilters.departmentName + '_'  + this.filterDepartmentID;
+            }
+            if (this.filterLabID !== null && this.filterLabID !== undefined) {
+                filename = filename + '_lab_' + this.namesFilters.labName + '_'   + this.filterLabID;
             }
             if (this.filterDepartmentTeamID !== null && this.filterDepartmentTeamID !== undefined) {
                 filename = filename + '_depTeam_' + this.filterDepartmentTeamID;
@@ -1780,13 +1829,16 @@ export default {
 
             let filename = 'people_teams_spaces_'
             if (this.filterUnitID !== null && this.filterUnitID !== undefined) {
-                filename = filename + 'unit_' + this.filterUnitID;
+                filename = filename + 'unit_' + this.namesFilters.unitName + '_'  + this.filterUnitID;
             }
             if (this.filterPoleID !== null && this.filterPoleID !== undefined) {
-                filename = filename + '_city_' + this.filterPoleID;
+                filename = filename + '_city_' + this.namesFilters.poleName + '_'  + this.filterPoleID;
             }
             if (this.filterDepartmentID !== null && this.filterDepartmentID !== undefined) {
-                filename = filename + '_department_' + this.filterDepartmentID;
+                filename = filename + '_department_' + this.namesFilters.departmentName + '_'  + this.filterDepartmentID;
+            }
+            if (this.filterLabID !== null && this.filterLabID !== undefined) {
+                filename = filename + '_lab_' + this.namesFilters.labName + '_'   + this.filterLabID;
             }
             if (this.filterDepartmentTeamID !== null && this.filterDepartmentTeamID !== undefined) {
                 filename = filename + '_depTeam_' + this.filterDepartmentTeamID;
@@ -1840,13 +1892,16 @@ export default {
 
             let filename = 'people_supervision_'
             if (this.filterUnitID !== null && this.filterUnitID !== undefined) {
-                filename = filename + 'unit_' + this.filterUnitID;
+                filename = filename + 'unit_' + this.namesFilters.unitName + '_'  + this.filterUnitID;
             }
             if (this.filterPoleID !== null && this.filterPoleID !== undefined) {
-                filename = filename + '_city_' + this.filterPoleID;
+                filename = filename + '_city_' + this.namesFilters.poleName + '_'  + this.filterPoleID;
             }
             if (this.filterDepartmentID !== null && this.filterDepartmentID !== undefined) {
-                filename = filename + '_department_' + this.filterDepartmentID;
+                filename = filename + '_department_' + this.namesFilters.departmentName + '_'  + this.filterDepartmentID;
+            }
+            if (this.filterLabID !== null && this.filterLabID !== undefined) {
+                filename = filename + '_lab_' + this.namesFilters.labName + '_'   + this.filterLabID;
             }
             if (this.filterDepartmentTeamID !== null && this.filterDepartmentTeamID !== undefined) {
                 filename = filename + '_depTeam_' + this.filterDepartmentTeamID;

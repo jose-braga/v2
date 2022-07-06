@@ -119,6 +119,12 @@ var createDocAddRemainingDataDB = function (req, res, next) {
     } else if (docData.attachment_url !== null && docData.attachment_url !== undefined) {
         url = docData.attachment_url.replace(/\s/g,'%20');
     }
+    let sortOrder = null;
+    if (docData.sort_order !== null && docData.sort_order !== undefined
+        && docData.sort_order !== '' && docData.sort_order !== 'undefined') {
+        sortOrder = docData.sort_order;
+    }
+
     let querySQL = '';
     let places = [];
     querySQL = 'UPDATE unit_documents'
@@ -136,7 +142,7 @@ var createDocAddRemainingDataDB = function (req, res, next) {
                 url,
                 valid_from,
                 valid_until,
-                docData.sort_order,
+                sortOrder,
                 req.docID);
     return sql.makeSQLOperation(req, res, querySQL, places);
 };

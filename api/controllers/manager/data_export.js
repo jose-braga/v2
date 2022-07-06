@@ -61,7 +61,7 @@ var filterPeople = function (options) {
                 + ' AND (people_labs.valid_until IS NULL OR people_labs.valid_until >= ?)'
                 + ')'
                 ;
-            places.push(dateFrom, dateUntil);
+            places.push(dateUntil, dateFrom); //it is really like this to get overlap of time ranges
         }
     }
     if (req.query.pole !== undefined) {
@@ -80,7 +80,7 @@ var filterPeople = function (options) {
                 + ' AND (people_institution_city.valid_until IS NULL OR people_institution_city.valid_until >= ?)'
                 + ')'
                 ;
-            places.push(dateFrom, dateUntil);
+            places.push(dateUntil,dateFrom);
         }
     }
     if (req.query.department !== undefined) {
@@ -99,7 +99,7 @@ var filterPeople = function (options) {
                 + ' AND (people_departments.valid_until IS NULL OR people_departments.valid_until >= ?)'
                 + ')'
                 ;
-            places.push(dateFrom, dateUntil);
+            places.push(dateUntil, dateFrom);
         }
     }
     if (req.query.lab !== undefined) {
@@ -118,7 +118,7 @@ var filterPeople = function (options) {
                 + ' AND (people_labs.valid_until IS NULL OR people_labs.valid_until >= ?)'
                 + ')'
                 ;
-            places.push(dateFrom, dateUntil);
+            places.push(dateUntil, dateFrom);
         }
     }
     if (req.query.depTeam !== undefined) {
@@ -137,7 +137,7 @@ var filterPeople = function (options) {
                 + ' AND (people_team_department.valid_until IS NULL OR people_team_department.valid_until >= ?)'
                 + ')'
                 ;
-            places.push(dateFrom, dateUntil);
+            places.push(dateUntil, dateFrom);
         }
     }
     var querySQL = '';
