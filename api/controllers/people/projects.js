@@ -700,8 +700,7 @@ var actionAddProjectOtherFundingAgencies = function (options) {
 var actionAddProjectManagementEntities = function (options) {
     let { req, res, next, projectID} = options;
     let data = req.body.data;
-    let item = data.management_entities;
-    if (item.management_entity_id !== undefined) {
+    if (data.management_entity_id !== undefined) {
         var querySQL = '';
         var places = [];
         querySQL = querySQL
@@ -710,7 +709,7 @@ var actionAddProjectManagementEntities = function (options) {
             +' VALUES (?,?,?);';
         places.push(
             projectID,
-            item.management_entity_id,
+            data.management_entity_id,
             data.amount,
         )
         return sql.getSQLOperationResult(req, res, querySQL, places,
@@ -805,9 +804,9 @@ var actionAddProjectAreas = function (options) {
         )
         return sql.getSQLOperationResult(req, res, querySQL, places,
             (resQuery, options) => {
-                if (i + 1 < data.labs_details.length) {
+                if (i + 1 < data.project_areas.length) {
                     options.i = i + 1;
-                    return actionAddProjectLabs(options);
+                    return actionAddProjectAreas(options);
                 } else {
                     responses.sendJSONResponseOptions({
                         response: res,
