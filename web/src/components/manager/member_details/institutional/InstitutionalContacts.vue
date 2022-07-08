@@ -92,6 +92,9 @@ export default {
     },
     methods: {
         initialize () {
+            this.data.emails.email = undefined;
+            this.data.phones.phone = undefined;
+            this.data.phones.extension = undefined;
             if (this.$store.state.session.loggedIn) {
                 let personID = this.personId;
                 subUtil.getInfoPopulate(this, 'api' + this.endpoint

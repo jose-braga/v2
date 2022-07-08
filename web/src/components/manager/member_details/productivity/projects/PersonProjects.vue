@@ -456,6 +456,7 @@ export default {
     },
     methods: {
         initialize () {
+            this.data.projects = [];
             let personID = this.personId;
             let urlSubmit = 'api' + this.endpoint
                             + '/members'

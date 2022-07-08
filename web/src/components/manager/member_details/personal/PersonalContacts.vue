@@ -116,6 +116,15 @@ export default {
     },
     methods: {
         initialize () {
+            this.data =  {
+                personal_addresses: {
+                    address: undefined,
+                    postal_code: undefined,
+                    city: undefined,
+                },
+                personal_emails: { email: undefined },
+                personal_phones: { phone: undefined },
+            };
             if (this.$store.state.session.loggedIn) {
                 let personID = this.personId;
                 let urlSubmit = 'api' + this.endpoint

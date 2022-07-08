@@ -107,6 +107,7 @@ export default {
     },
     methods: {
         initialize () {
+            this.data.identifications = [];
             if (this.$store.state.session.loggedIn) {
                 let personID = this.personId;
                 subUtil.getInfoPopulate(this, 'api' + this.endpoint

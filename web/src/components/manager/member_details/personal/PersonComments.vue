@@ -68,6 +68,7 @@ export default {
     },
     methods: {
         initialize () {
+            this.data.comments = {};
             if (this.$store.state.session.loggedIn) {
                 let personID = this.personId;
                 let urlSubmit = 'api' + this.endpoint
