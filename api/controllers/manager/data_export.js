@@ -237,6 +237,20 @@ var getPersonalEmails = function (options) {
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             people[i].personal_email = resQuery;
+            return getWorkplace(options)
+        },
+        options);
+};
+var getWorkplace = function (options) {
+    let { req, res, next, people, i } = options;
+    let person = people[i]
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT * FROM workplaces WHERE person_id = ?';
+    places.push(person.id);
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            people[i].workplace = resQuery;
             return getResearcherIDs(options)
         },
         options);

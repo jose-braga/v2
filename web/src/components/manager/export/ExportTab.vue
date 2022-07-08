@@ -452,8 +452,10 @@ function processForSpreadsheet(members) {
     })
     for (let ind in members) {
         let thisMember = {};
+        //console.log(members[ind])
         thisMember.Name = members[ind].name;
         thisMember['Colloquial Name'] = members[ind].colloquial_name;
+        thisMember['Comments'] = members[ind].comments;
 
         thisMember['Pole (Curr.)'] = members[ind].current_pole.city;
         thisMember['Pole (Curr.): From'] = members[ind].current_pole.valid_from;
@@ -691,7 +693,10 @@ function processForSpreadsheet(members) {
                         + ')'
                         + '\n'
         }
-
+        thisMember['Workplace'] = '';
+        if (members[ind].workplace.length > 0) {
+            thisMember['Workplace'] = members[ind].workplace[0].workplace;
+        }
         thisMember['Cost Center (Curr.)'] = members[ind].current_cost_center.short_name;
         thisMember['Cost Center (Curr.): From'] = members[ind].current_cost_center.valid_from;
         thisMember['Cost Center (Curr.): Until'] = members[ind].current_cost_center.valid_until;
