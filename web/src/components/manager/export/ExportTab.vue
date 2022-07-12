@@ -1419,7 +1419,6 @@ function prepareStringComparison(str) {
     }
 }
 
-
 export default {
     data () {
         return {
