@@ -11,6 +11,7 @@
             <li>After pressing "Pre-register", the new user will receive an email with a link for a form in which additional data is filled.</li>
             <li>Finally, a member from the Science Management will approve the new registration.</li>
         </ul>
+        {{success}}
     </v-card-text>
     <v-container class="px-6">
         <v-form ref="form"
@@ -282,19 +283,19 @@ export default {
                         this.progress = false;
                         this.success = true;
                         setTimeout(() => {
+                            this.data.person = {
+                                username: '',
+                                email: '',
+                                team_id: null,
+                                lab_id: null,
+                                lab_position_id: null,
+                                dedication: null,
+                                city_id: null,
+                                valid_from: null,
+                            };
+                            this.$v.$reset()
                             this.success = false;
-                            //this.$refs.form.reset();
-                        }, 1500);
-                        this.data.person = {
-                            username: '',
-                            email: '',
-                            team_id: null,
-                            lab_id: null,
-                            lab_position_id: null,
-                            dedication: null,
-                            city_id: null,
-                            valid_from: null,
-                        };
+                        }, 2500);
                     })
                     .catch((error) => {
                         this.progress = false;
@@ -334,7 +335,8 @@ export default {
                 username: {
                     required,
                     isUnique (value) {
-                        if (this.$store.state.session.loggedIn && value !== undefined) {
+                        if (this.$store.state.session.loggedIn
+                             && value !== undefined && value !== null) {
                             if (value.length > 0) {
                                 let urlSubmit = 'api/people/' + this.$store.state.session.personID
                                     + '/users/' + value;
