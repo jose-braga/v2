@@ -804,6 +804,35 @@ var actionUpdatePersonFinal = function (options) {
         personID);
     sql.makeSQLOperation(req, res, querySQL, places,
         (options) => {
+            return actionGetResponsible(options);
+        },
+        options);
+};
+var actionGetResponsible = function (options) {
+    let { req, res, next } = options;
+    let personID = req.params.personID;
+    //let person = req.body.data;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+            + 'SELECT emails.*'
+            + ' FROM people_history'
+            + ' JOIN people ON people.user_id = people_history.changed_by'
+            + ' JOIN emails ON emails.person_id = people.id'
+            + ' WHERE people_history.person_id = ? AND people_history.status = 2;'
+
+    places.push(
+        personID,
+    );
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            if (resQuery.length > 0
+                    && resQuery[0].email !== null && resQuery[0].email !== undefined
+                    && resQuery[0].email !== '') {
+                options.responsibleEmail = resQuery[0];
+            } else {
+                options.responsibleEmail = null;
+            }
             return actionUpdatePersonFinalHistory(options);
         },
         options);
@@ -856,6 +885,9 @@ var getRecipientsGroupsPreReg = function (options, email_type_id) {
             actionSendUserMessage(options, resQuery)
             .then(() => {
                 actionSendManagersMessage(options, resQuery)
+            })
+            .then(() => {
+                actionSendResponsibleMessage(options, resQuery)
             })
             .then(() => {
                 writeMessageDB(options)
@@ -964,6 +996,57 @@ async function actionSendManagersMessage(options, recipientEmails) {
         let info = await transporter.sendMail(mailOptions);
         console.log('Message %s sent: %s', info.messageId, info.response);
         //return writeMessageDB(options);
+    }
+};
+async function actionSendResponsibleMessage(options, recipientEmails) {
+    let { req, res, next, responsibleEmail } = options;
+    let person = req.body.data;
+    let recipients = '';
+    if (responsibleEmail !== null
+        && responsibleEmail.email !== null && responsibleEmail.email !== undefined
+        && responsibleEmail.email !== ''
+        ) {
+        recipients = responsibleEmail.email;
+    }
+    console.log(recipients)
+    if (recipients !== '') {
+        let mailOptions;
+        let subjectText = 'LAQV/UCIBIO Data Management - Registration process: ' + person.name;
+        let emailBody = 'Hi,\n\n'
+            + ' The user ' + person.name  + ' has submitted the registration form for validation by a science manager.\n'
+            + 'Best regards,\nAdmin';
+        let emailBodyHtml = '<p>Hi,</p><br>'
+            + '<p> The user <b>'+ person.name + '</b> has submitted the registration form for validation by a science manager.</p><br>'
+            + '<p>Best regards,</p>'
+            + '<p>Admin</p>';
+        if (process.env.NODE_ENV === 'production') {
+            mailOptions = {
+                from: '"Admin" <admin@laqv-ucibio.info>', // sender address
+                to: recipients, // list of receivers (comma-separated)
+                subject: subjectText, // Subject line
+                text: emailBody,
+                html: emailBodyHtml,
+            };
+            // send mail with defined transport object
+            let info = await transporter.sendMail(mailOptions);
+            console.log('Message %s sent: %s', info.messageId, info.response);
+            //return writeMessageDB(options);
+
+        } else {
+            // just for testing purposes
+            mailOptions = {
+                from: '"Admin" <admin@laqv-ucibio.info>', // sender address
+                //to: recipients, // list of receivers (comma-separated)
+                to: 'josecbraga@gmail.com', // list of receivers (comma-separated)
+                subject: 'TESTING: ' + subjectText, // Subject line
+                text: emailBody,
+                html: emailBodyHtml,
+            };
+            // send mail with defined transport object
+            let info = await transporter.sendMail(mailOptions);
+            console.log('Message %s sent: %s', info.messageId, info.response);
+            //return writeMessageDB(options);
+        }
     }
 };
 var writeMessageDB = function (options, error) {
