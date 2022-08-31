@@ -32,6 +32,7 @@
                                     {{fields}}
                                 </li>
                             </ul>
+                            <br>
                             <span v-if="thisUnit.comments.length > 0">Additionally you have the following comments:</span>
                             <ul>
                                 <li v-for="(fields,j) in thisUnit.comments"
@@ -41,8 +42,8 @@
                                 </li>
                             </ul><br>
                             <span :class="thisUnit.unitName === 'LAQV' ? 'yellow--text text--accent-2': 'orange--text text--lighten-1'">
-                                Note: This just verifies which fields are filled.
-                                You have to verify if information is updated and correct.
+                                Note: This just verifies which fields are filled.<br>
+                                You must check if information is updated and correct!
                             </span>
 
                         </v-tooltip>
