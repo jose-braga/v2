@@ -785,7 +785,7 @@ async function sendEmailUser (options) {
         // just for testing purposes
         mailOptions = {
             from: '"Admin" <admin@laqv-ucibio.info>', // sender address
-            to: recipients, // list of receivers (comma-separated)
+            to: 'josecbraga@gmail.com', // list of receivers (comma-separated)
             subject: 'TESTING: ' + subjectText, // Subject line
             text: emailBody,
             html: emailBodyHtml,

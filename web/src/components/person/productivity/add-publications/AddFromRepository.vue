@@ -407,6 +407,7 @@ export default {
                     this.progress = false;
                     this.success = true;
                     this.getRepositoryPublications();
+                    this.$root.$emit('updateCompleteness');
                     setTimeout(() => {this.success = false;}, 1500)
                 })
                 .catch((error) => {

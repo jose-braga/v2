@@ -611,6 +611,7 @@ export default {
                     this.progress = false;
                     this.success = true;
                     this.data.publications = removeExistingPublications(this.data.publications, this.data.publicationsDB);
+                    this.$root.$emit('updateCompleteness');
                     setTimeout(() => {this.success = false;}, 1500)
                 })
                 .catch((error) => {

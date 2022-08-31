@@ -66,6 +66,7 @@ const manageFinances = require('../controllers/store/manage_finances');
 const websiteTexts = require('../controllers/people/website_texts');
 const users = require('../controllers/people/users');
 const userContacts = require('../controllers/people/user_contacts');
+const profileCompleteness = require('../controllers/people/profile_completeness');
 
 //const permissions = require('../controllers/manager/unit/manage_permissions');
 const preRegister = require('../controllers/team/members');
@@ -73,6 +74,8 @@ const preRegister = require('../controllers/team/members');
 //remove lines below???
 //var routesAPIUserOnBehalf = require('./routes/indexUserOnBehalf');
 //router.use('/:personID/users-on-behalf', routesAPIUserOnBehalf)
+
+router.get('/:personID/profile-completeness', cors(corsOptions), profileCompleteness.getProfileCompleteness);
 
 router.get('/:personID/users/:username', cors(corsOptions), users.checkUserExistence);
 router.get('/:personID/is-supervisor', cors(corsOptions), nuclearInformation.checkSupervising);

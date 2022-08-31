@@ -207,6 +207,7 @@ export default {
                     setTimeout(() => {this.success = false;}, 1500)
                     this.toDeleteRoles = []; // add the others
                     this.$root.$emit('updatePersonSpacesTable')
+                    this.$root.$emit('updateCompleteness');
                     //this.initialize();
                 })
                 .catch((error) => {

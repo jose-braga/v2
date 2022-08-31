@@ -210,8 +210,8 @@ var updateOrder = function (options) {
         + ' total_cost_tax = ?'
         + ' WHERE id = ?;';
     places.push(
-        order.order_cost,
-        order.order_cost_tax,
+        order.total_cost,
+        order.total_cost_tax,
         orderID
     );
     return sql.getSQLOperationResult(req, res, querySQL, places,

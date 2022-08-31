@@ -290,7 +290,7 @@ var actionUpdateDegrees = function (options) {
         data.end = null;
     }
     if (data.estimate_end === '') {
-        data.end = null;
+        data.estimate_end = null;
     }
     var querySQL = '';
     var places = [];

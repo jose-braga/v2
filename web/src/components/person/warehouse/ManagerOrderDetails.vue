@@ -3,7 +3,7 @@
 <v-form ref="form"
     @submit.prevent="submitForm">
     <v-card-title>
-        Details of order: {{data.thisOrder.order_id}}
+        Details of order: #{{data.thisOrder.id}}
     </v-card-title>
     <v-card-text>
     </v-card-text>
@@ -56,6 +56,7 @@
                 <div v-if="data.thisOrder.orderNotClosed">
                     <v-text-field
                         v-model="item.change_reason"
+                        @input="computeCostOrder(item)"
                         label="Reason">
                     </v-text-field>
                 </div>

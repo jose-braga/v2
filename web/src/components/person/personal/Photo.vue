@@ -192,6 +192,7 @@ export default {
                     } else {
                         this.progress = false;
                         this.success = true;
+                        this.$root.$emit('updateCompleteness');
                         setTimeout(() => {this.success = false;}, 1500)
                         this.resetCropper();
                         this.initialize();

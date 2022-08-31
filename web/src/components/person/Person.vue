@@ -1,5 +1,57 @@
 <template>
 <div>
+    <div v-if="loggedIn">
+        <v-container>
+            <v-row>
+                <v-col>
+                    <v-row v-for="(thisUnit,i) in data.completeness.normalizedScore"
+                        :key="i"
+                    >
+                        <v-tooltip bottom
+                            :color="thisUnit.unitName === 'LAQV' ? 'green': 'primary'"
+                            content-class='custom-tooltip'
+                        >
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-progress-linear class="mt-2"
+                                    v-model="thisUnit.score"
+                                    v-bind="attrs"
+                                    v-on="on"
+                                    :color="thisUnit.unitName === 'LAQV' ? 'green': 'primary'"
+                                    height="25"
+                                >
+                                    {{ thisUnit.unitName }} profile completeness:&nbsp;
+                                    <strong>{{ Math.ceil(thisUnit.score) }}%</strong>
+                                    &nbsp;(hover for details)
+                                </v-progress-linear>
+                            </template>
+                            <span v-if="thisUnit.notFilled.length > 0">To complete your {{ thisUnit.unitName }} profile you will need to fill the following fields:</span>
+                            <ul>
+                                <li v-for="(fields,j) in thisUnit.notFilled"
+                                    :key="i + '-' + j"
+                                >
+                                    {{fields}}
+                                </li>
+                            </ul>
+                            <span v-if="thisUnit.comments.length > 0">Additionally you have the following comments:</span>
+                            <ul>
+                                <li v-for="(fields,j) in thisUnit.comments"
+                                    :key="i + '-' + j + '-comments'"
+                                >
+                                    {{fields}}
+                                </li>
+                            </ul><br>
+                            <span :class="thisUnit.unitName === 'LAQV' ? 'yellow--text text--accent-2': 'orange--text text--lighten-1'">
+                                Note: This just verifies which fields are filled.
+                                You have to verify if information is updated and correct.
+                            </span>
+
+                        </v-tooltip>
+
+                    </v-row>
+                </v-col>
+            </v-row>
+        </v-container>
+    </div>
     <v-tabs
             v-if="loggedIn"
             show-arrows
@@ -93,6 +145,9 @@ export default {
         return {
             news: [],
             activeTab: 0,
+            data: {
+                completeness: {},
+            },
         }
     },
     created () {
@@ -103,6 +158,11 @@ export default {
             newTile: 0,
             newToolbarText: 'Edit your personal details'
         });
+        this.$root.$on('updateCompleteness',
+            () => {
+                this.initialize();
+            }
+        );
     },
     computed: {
         loggedIn () {
@@ -136,11 +196,28 @@ export default {
             }
 
         },
+        personID () {
+            return this.$store.state.session.personID;
+        },
+    },
+    watch: {
+        personID () {
+            this.initialize();
+        },
     },
     methods: {
         initialize () {
             const urlSubmit = 'api/v2/' + 'news';
             subUtil.getPublicInfo(this, urlSubmit, 'news');
+            if (this.$store.state.session.loggedIn) {
+                let personID = this.$store.state.session.personID;
+                subUtil.getInfoPopulate(this, 'api/people/' + personID + '/profile-completeness', true)
+                .then( (result) => {
+                    // only works if this.data and result have the same keys
+                    this.data.completeness = result;
+
+                })
+            }
         },
         tabChanged: function(tab) {
             this.activeTab = tab;
@@ -152,6 +229,11 @@ export default {
 </script>
 
 <style scoped>
+
+.custom-tooltip {
+    opacity: 1 !important;
+}
+
 .selected-tab {
     background-color: #ffffff;
 }

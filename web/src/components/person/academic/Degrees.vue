@@ -919,6 +919,7 @@ export default {
                     .then( () => {
                         this.progress = false;
                         this.success = true;
+                        this.$root.$emit('updateCompleteness');
                         setTimeout(() => {this.success = false;}, 1500)
                         this.toDelete = [];
                         this.initialize();
@@ -995,6 +996,7 @@ export default {
                     .then( () => {
                         this.progress = false;
                         this.success = true;
+                        this.$root.$emit('updateCompleteness');
                         setTimeout(() => {this.success = false;}, 1500)
                         this.toDelete = [];
                         this.initialize();
