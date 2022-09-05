@@ -227,7 +227,7 @@ var getPeopleAlreadyReceived = function (options) {
         options);
 };
 
-// the set people who didn't receive an email this year yet
+// the set of people who didn't receive an email this year yet
 // is divided between the remainig days of the year
 var selectTodayRecipients = function (options) {
     let { req, res, next, peopleList, peopleReceived } = options;
@@ -243,6 +243,16 @@ var selectTodayRecipients = function (options) {
                 "status": "success",
                 "statusCode": 200,
                 "message": "Script didn't run. Too early in the year.",
+            }
+        });
+    } else if (today.isAfter(endYear)) {
+        return responses.sendJSONResponseOptions({
+            response: res,
+            status: 200,
+            message: {
+                "status": "success",
+                "statusCode": 200,
+                "message": "Script didn't run. Last days of the year.",
             }
         });
     } else {
