@@ -249,6 +249,8 @@ function processResults(vm, people) {
         let within_range_department = {};
         let current_cost_center = {};
         let within_range_cost_center = {};
+        let total_current_dedication = 0.0;
+        let total_within_range_dedication = 0.0;
         // still missing the code for "department teams"
         if (people[ind].history.length > 0) {
             for (let indHistory in people[ind].history) {
@@ -260,6 +262,7 @@ function processResults(vm, people) {
                 if ((validFrom === null || time.moment(validFrom).isSameOrBefore(today))
                     && (validUntil === null || time.moment(validUntil).isSameOrAfter(today))
                 ) {
+                    total_current_dedication = total_current_dedication + people[ind].history[indHistory].dedication;
                     count_current_labs++;
                     current_lab = people[ind].history[indHistory];
                 }
@@ -269,6 +272,13 @@ function processResults(vm, people) {
                     ) {
                         count_labs_within_range++;
                         within_range_lab = people[ind].history[indHistory];
+                    }
+                    if (((validFrom === null || time.moment(validFrom).isSameOrBefore(filterDateUntil))
+                        && (validUntil === null || time.moment(validUntil).isSameOrAfter(filterDateUntil))
+                    )) {
+                        // total dedication in the selected time range is given as the the total
+                        // dedication at the end of the interval
+                        total_within_range_dedication = total_within_range_dedication + people[ind].history[indHistory].dedication;
                     }
                 }
                 if (validUntil === null || time.moment(validUntil).isSameOrAfter(last_lab.valid_until)) {
@@ -403,9 +413,11 @@ function processResults(vm, people) {
             within_range_cost_center = current_cost_center;
         }
         people[ind].current_lab = current_lab;
+        people[ind].current_lab.total_current_dedication = total_current_dedication;
         if (count_current_labs > 1) people[ind].has_other_current_labs = true;
         people[ind].within_range_lab = within_range_lab;
         if (count_labs_within_range > 1) people[ind].has_other_labs_within_range = true;
+        people[ind].within_range_lab.total_within_range_dedication = total_within_range_dedication;
         people[ind].last_lab = last_lab;
 
         people[ind].current_job = current_job;
@@ -470,6 +482,7 @@ function processForSpreadsheet(members) {
             thisMember['Unit (Curr.)'] = members[ind].current_lab.groups[0].units[0].short_name;
             thisMember['Group (Curr.)'] = members[ind].current_lab.groups[0].name;
         }
+        thisMember['Total ded. (Curr.)'] = members[ind].current_lab.total_current_dedication;
         thisMember['Lab (Curr.)'] = members[ind].current_lab.lab_name;
         thisMember['Lab Position (Curr.)'] = members[ind].current_lab.lab_position_name_en;
         thisMember['Dedication (Curr.)'] = members[ind].current_lab.dedication;
@@ -482,6 +495,7 @@ function processForSpreadsheet(members) {
             thisMember['Unit (Sel. Time.)'] = members[ind].within_range_lab.groups[0].units[0].short_name;
             thisMember['Group (Sel. Time.)'] = members[ind].within_range_lab.groups[0].name;
         }
+        thisMember['Total ded. (Sel. Time)'] = members[ind].within_range_lab.total_within_range_dedication;
         thisMember['Lab (Sel. Time)'] = members[ind].within_range_lab.lab_name;
         thisMember['Lab Position (Sel.)'] = members[ind].within_range_lab.lab_position_name_en;
         thisMember['Dedication (Sel.)'] = members[ind].within_range_lab.dedication;
