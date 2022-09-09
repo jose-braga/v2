@@ -1075,7 +1075,7 @@ var getStartupsPerson = function (options) {
     querySQL = querySQL
         + 'SELECT people_startups.*,'
         + ' startups.name AS startup_name,'
-        + ' startups.start AS startup_start, startups.start AS startup_end,'
+        + ' startups.start AS startup_start, startups.end AS startup_end,'
         + ' startups.short_description'
         + ' FROM people_startups'
         + ' JOIN startups ON startups.id = people_startups.startup_id'
