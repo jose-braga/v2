@@ -2,12 +2,67 @@
 <v-card>
     <v-card-title primary-title>
         <div>
-            <h3 class="headline">Help for "Personal" Tab</h3>
+            <h3 class="headline">Fields to fill</h3>
         </div>
     </v-card-title>
     <v-card-text>
         <v-container>
             <v-row>
+                <v-col cols="12">
+                    Depending on the unit you belong to you should fill the following fields:
+                    (specific help for this page below)
+                </v-col>
+                <v-col cols="3"><b>LAQV</b></v-col>
+                <v-col cols="3"><b>UCIBIO</b></v-col>
+            </v-row>
+            <v-row class="mt-1">
+                <v-col cols="3">
+                    <ul>
+                        <li>Data visibility authorization</li>
+                        <li>Nuclear Information - Gender</li>
+                        <li>Photo</li>
+                        <li>Short CV</li>
+                        <li>Personal URLs - Personal webpage</li>
+                        <li>Personal URLs - CV</li>
+                        <li>Degrees</li>
+                        <li>Jobs</li>
+                        <li>Academic Institutions</li>
+                        <li>Workplace</li>
+                        <li>CiênciaID</li>
+                        <li>ORCID</li>
+                        <li>Institutional Contacts</li>
+                        <li>Cost Centers</li>
+                        <li>Publications</li>
+                        <li>Spaces</li>
+                    </ul>
+                </v-col>
+                <v-col cols="3">
+                    <ul>
+                        <li>Data visibility authorization</li>
+                        <li>Nuclear Information - Gender</li>
+                        <li>Photo</li>
+                        <li>Nationality</li>
+                        <li>Personal URLs - Personal webpage</li>
+                        <li>Personal URLs - CV</li>
+                        <li>Degrees</li>
+                        <li>Jobs</li>
+                        <li>Academic Institutions</li>
+                        <li>Workplace</li>
+                        <li>CiênciaID</li>
+                        <li>ORCID</li>
+                        <li>Research Interests</li>
+                        <li>Institutional Contacts</li>
+                        <li>Publications</li>
+                        <li>Spaces</li>
+                    </ul>
+                </v-col>
+            </v-row>
+            <v-row class="mt-8">
+                <v-col cols="12">
+                    <h2><b>Help for "Personal" Tab:</b></h2>
+                </v-col>
+            </v-row>
+            <v-row class="mt-6">
                 <v-col cols="12" md="3">
                     <b>Data visibility authorization</b>
                 </v-col>

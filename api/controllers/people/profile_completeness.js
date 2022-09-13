@@ -287,7 +287,7 @@ var checkPersonalURLs = function (options) {
     places.push(personID)
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
-            console.log(resQuery)
+            //console.log(resQuery)
             if (resQuery.length >= 1) {
                 let noCV = true;
                 let noPersonalPage = true;

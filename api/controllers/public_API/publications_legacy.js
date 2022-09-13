@@ -266,7 +266,7 @@ module.exports.getLatestUnitPublications = function (req, res, next) {
     if (req.query.hasOwnProperty('size')) {
         numberPublications = parseInt(req.query.size, 10);
     }
-    if (now.isAfter(moment(currentYear + '-04-30'))) {
+    if (now.isAfter(time.moment(currentYear + '-04-30'))) {
         querySQL = 'SELECT publications.*, journals.name AS journal_name'
                 + ' FROM publications'
                 + ' LEFT JOIN journals ON journals.id = publications.journal_id'
