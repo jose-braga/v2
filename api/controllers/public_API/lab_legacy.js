@@ -114,7 +114,7 @@ var getLabHistory = function(options) {
                     "status": "success",
                     "statusCode": 200,
                     "count": 1,
-                    "result": options.lab,
+                    "result": [options.lab],
                 });
             return;
 
