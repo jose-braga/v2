@@ -105,7 +105,12 @@ var getResponsibleTypes = function (req, res, next) {
 var getSituations = function (req, res, next) {
     var querySQL = '';
     var places = [];
-    querySQL = querySQL + 'SELECT * from situations;';
+    querySQL = querySQL
+        + 'SELECT *'
+        + ' FROM situations'
+        + ' WHERE visible = 1'
+        + ' ORDER BY sort_order ASC;'
+        ;
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             options.situations = resQuery;
@@ -117,7 +122,12 @@ var getCategories = function (options) {
     let { req, res, next } = options;
     var querySQL = '';
     var places = [];
-    querySQL = querySQL + 'SELECT * from categories;';
+    querySQL = querySQL
+        + 'SELECT *'
+        + ' FROM categories'
+        + ' WHERE visible = 1'
+        + ' ORDER BY sort_order ASC;'
+        ;
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             options.categories = resQuery;
@@ -136,6 +146,8 @@ var getSituationsCategoriesRelationships = function (options) {
                         + ' FROM categories_situations'
                         + ' JOIN categories ON categories.id = categories_situations.category_id'
                         + ' JOIN situations ON situations.id = categories_situations.situation_id'
+                        + ' WHERE categories_situations.visible = 1'
+                        + ' ORDER BY categories_situations.sort_order ASC'
                         ;
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {

@@ -523,8 +523,8 @@ function processForSpreadsheet(members) {
         thisMember['High. Degree (Selec.): Until'] = members[ind].within_range_higher_finished_degree.end;
 
         thisMember['PhD Year'] = undefined;
-        thisMember['Job Situation (Curr.)'] = members[ind].current_job.category_name_en;
-        thisMember['Job Category (Curr.)'] = members[ind].current_job.situation_name_en;
+        thisMember['Job Situation (Curr.)'] = members[ind].current_job.situation_name_en;
+        thisMember['Job Category (Curr.)'] = members[ind].current_job.category_name_en;
         thisMember['Job Organization (Curr.)'] = members[ind].current_job.organization;
         thisMember['Job (Curr.): From'] = members[ind].current_job.valid_from;
         thisMember['Job (Curr.): Until'] = members[ind].current_job.valid_until;
@@ -574,8 +574,8 @@ function processForSpreadsheet(members) {
                     + ', Mngmt: ' + members[ind].jobs[indJob].fellowships[indData].management_entity_official_name
             }
             thisMember['Jobs History'] = thisMember['Jobs History']
-                        + members[ind].jobs[indJob].category_name_en
-                        + ', ' + members[ind].jobs[indJob].situation_name_en
+                        + members[ind].jobs[indJob].situation_name_en
+                        + ', ' + members[ind].jobs[indJob].category_name_en
                         + ' @ ' + members[ind].jobs[indJob].organization
                         + ' (' + members[ind].jobs[indJob].valid_from
                         + ', ' + members[ind].jobs[indJob].valid_until

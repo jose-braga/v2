@@ -647,19 +647,42 @@ var getAdministrativeUnit = function(options) {
     );
 };
 var queryTotal = function(options) {
-    let { req, res, next, people, querySQLForTotals, placeholdersForTotals } = options;
+    let { req, res, next, people,
+        querySQLForTotals, placeholdersForTotals,
+        limit, offset,
+    } = options;
     return sql.getSQLOperationResult(req, res, querySQLForTotals, placeholdersForTotals,
         (resQuery, options) => {
             let nav = {}
             if (options.offset + options.limit < resQuery.length) {
-                nav.next = req.path
+                nav.next = req.baseUrl + req.path;
+                if (options.unit !== null && options.unit !== undefined) {
+                    nav.next = nav.next
+                    + '?unit=' + options.unit
+                    + '&limit=' + options.limit
+                    + '&offset=' + (options.offset + options.limit);
+                } else {
+                    nav.next = nav.next
                     + '?limit=' + options.limit
-                    + '&offset=' + (options.offset + options.limit)
+                    + '&offset=' + (options.offset + options.limit);
+                }
             }
             if (options.offset - options.limit >= 0) {
-                nav.previous = req.path
+                nav.previous = req.baseUrl + req.path;
+                if (options.unit !== null && options.unit !== undefined) {
+                    nav.previous = nav.previous
+                    + '?unit=' + options.unit
+                    + '&limit=' + options.limit
+                    + '&offset=' + (options.offset - options.limit);
+                } else {
+                    nav.previous = nav.previous
                     + '?limit=' + options.limit
-                    + '&offset=' + (options.offset - options.limit)
+                    + '&offset=' + (options.offset - options.limit);
+                }
+            }
+            if (req.query.limit === 'all') {
+                limit = 'all';
+                offset = 0;
             }
             responses.sendJSONResponse(res, 200,
                 {
@@ -667,8 +690,8 @@ var queryTotal = function(options) {
                     "statusCode": 200,
                     "count": people.length,
                     "total": resQuery.length,
-                    "limit": options.limit,
-                    "offset": options.offset,
+                    "limit": limit,
+                    "offset": offset,
                     "result": options.people,
                     nav
                 });
@@ -739,6 +762,20 @@ module.exports.searchPeople = function (req, res, next) {
     }
     if (req.query.hasOwnProperty('unit')) {
         unitID = req.query.unit;
+    }
+    if (req.query.hasOwnProperty('limit')) {
+        if (req.query.limit === 'all') {
+            limit = 1e8;
+        } else {
+            limit = parseInt(req.query.limit,10);
+        }
+    }
+    if (req.query.hasOwnProperty('offset')) {
+        if (req.query.limit === 'all') {
+            offset = 0;
+        } else {
+            offset = parseInt(req.query.offset,10);
+        }
     }
     var querySQL;
     var places = [];
@@ -811,6 +848,7 @@ module.exports.searchPeople = function (req, res, next) {
             if (resQuery.length > 0) {
                 options.querySQLForTotals = querySQLForTotals;
                 options.placeholdersForTotals = placeholdersForTotals;
+                options.unit = unitID;
                 options.limit = limit;
                 options.offset = offset;
                 options.people = resQuery;

@@ -643,7 +643,7 @@ router.put('/:userID/cities/:cityID/members/:personID/password/:userID', cors(co
 
 router.get('/:userID/cities/:cityID/members/:personID/information-editors', cors(corsOptions), informationEditors.getEditors);
 
-// routes for manager with access to
+// routes for manager with access to Unit City
 router.get('/:userID/cities/:cityID/to-add-fct-mctes-members', cors(corsOptions), manageFCTMCTESmembers.getMembersList);
 router.put('/:userID/cities/:cityID/to-add-fct-mctes-members/:memberID', cors(corsOptions), manageFCTMCTESmembers.updateMember);
 router.get('/:userID/cities/:cityID/requested-fct-mctes-members', cors(corsOptions), manageFCTMCTESmembers.getRequestedMembersList);

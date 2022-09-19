@@ -6,6 +6,8 @@
         </div>
     </v-card-title>
     <v-container>
+        <p>A list of all the professional situations & categories is found
+            <a :href="professionalSituationsList">here</a>.</p>
         <v-form ref="form" class="pa-4"
                 @submit.prevent="submitForm">
             <v-row>
@@ -38,7 +40,7 @@
                             </v-col>
                             <v-col cols="12" md="3">
                                 <v-text-field v-model="v.$model.organization"
-                                    label="Organization">
+                                    label="Contract Institution">
                                 </v-text-field>
                             </v-col>
                             <v-col cols="12" md="1">
@@ -325,9 +327,14 @@ export default {
             toDelete: [],
             toDeleteFellowships: [],
             toDeleteContracts: [],
+            publicPath: process.env.VUE_APP_REQUEST_ORIGIN,
         }
     },
-    computed: {},
+    computed: {
+        professionalSituationsList () {
+            return this.publicPath + '/images/help/' + 'professional_situations_list.xlsx'
+        }
+    },
     watch: {},
     mounted() {
         this.getSituationsCategories();

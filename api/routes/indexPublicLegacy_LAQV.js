@@ -28,6 +28,7 @@ router.get('/science-management-offices/:officeID/people', lab.getScienceManagem
 router.get('/administrative-offices', lab.getAdministrativeOfficesList);
 router.get('/administrative-offices/:officeID/people', lab.getAdministrativeOfficeMembers);
 
+router.get('/publications/:pubID', cors(corsOptions), publication.getPublicationInfo);
 router.get('/people/:personID/publications', cors(corsOptions), publication.getPersonPublications);
 router.get('/groups/:groupID/publications', cors(corsOptions), publication.getGroupPublications);
 

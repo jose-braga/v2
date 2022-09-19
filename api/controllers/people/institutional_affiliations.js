@@ -347,6 +347,38 @@ var actionCreateLabAffiliation = function (options) {
         ;
     places.push(personID, data.lab_id, data.lab_position_id, data.dedication,
         data.pluriannual, data.integrated, data.nuclearCV, data.valid_from, data.valid_until);
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            options.peopleLabsId = resQuery.insertId;
+            return insertLabAffiliationHistoryOnCreate(options);
+        },
+        options
+    );
+};
+var insertLabAffiliationHistoryOnCreate = function (options) {
+    let { req, res, next, peopleLabsId } = options;
+    let personID = req.params.personID;
+    let userID = req.payload.userID;
+    let data = req.body.data;
+    var querySQL = '';
+    var places = [];
+    if (data.valid_from === '') {
+        data.valid_from = null;
+    }
+    if (data.valid_until === '') {
+        data.valid_until = null;
+    }
+    if (data.dedication === '') {
+        data.dedication = null;
+    }
+    querySQL = querySQL + 'INSERT INTO people_labs_history'
+        + ' (people_labs_id, person_id, lab_id, lab_position_id, dedication,'
+        + ' pluriannual, integrated, nuclearCV, valid_from, valid_until, created, operation, changed_by)'
+        + ' VALUES (?,?,?,?,?,?,?,?,?,?,NOW(),?,?);'
+        ;
+    places.push(peopleLabsId, personID, data.lab_id, data.lab_position_id, data.dedication,
+        data.pluriannual, data.integrated, data.nuclearCV, data.valid_from, data.valid_until,
+        'C',userID);
     return sql.makeSQLOperation(req, res, querySQL, places,
         (options) => {
             let notificationConfig = { entityID: personID };
@@ -361,6 +393,7 @@ var actionCreateLabAffiliation = function (options) {
                 "result": "Inserted new person affiliation."
             }
         });
+
 };
 module.exports.createLabAffiliation = function (req, res, next) {
     permissions.checkPermissions(
@@ -398,6 +431,37 @@ var actionUpdateLabAffiliation = function (options) {
     places.push(data.lab_id, data.lab_position_id, data.dedication,
         data.pluriannual, data.integrated, data.nuclearCV, data.valid_from, data.valid_until,
         affiliationID);
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            return insertLabAffiliationHistoryOnUpdate(options)
+        },
+        options);
+};
+var insertLabAffiliationHistoryOnUpdate = function (options) {
+    let { req, res, next } = options;
+    let personID = req.params.personID;
+    let userID = req.payload.userID;
+    let affiliationID = req.params.affiliationID;
+    let data = req.body.data;
+    var querySQL = '';
+    var places = [];
+    if (data.valid_from === '') {
+        data.valid_from = null;
+    }
+    if (data.valid_until === '') {
+        data.valid_until = null;
+    }
+    if (data.dedication === '') {
+        data.dedication = null;
+    }
+    querySQL = querySQL + 'INSERT INTO people_labs_history'
+        + ' (people_labs_id, person_id, lab_id, lab_position_id, dedication,'
+        + ' pluriannual, integrated, nuclearCV, valid_from, valid_until, updated, operation, changed_by)'
+        + ' VALUES (?,?,?,?,?,?,?,?,?,?,NOW(),?,?);'
+        ;
+    places.push(affiliationID, personID, data.lab_id, data.lab_position_id, data.dedication,
+        data.pluriannual, data.integrated, data.nuclearCV, data.valid_from, data.valid_until,
+        'U', userID);
     return sql.makeSQLOperation(req, res, querySQL, places,
         (options) => {
             let notificationConfig = { entityID: personID };
@@ -412,6 +476,7 @@ var actionUpdateLabAffiliation = function (options) {
                 "result": "Updated person affiliation."
             }
         });
+
 };
 module.exports.updateLabAffiliation = function (req, res, next) {
     permissions.checkPermissions(
@@ -427,6 +492,25 @@ var actionDeleteLabAffiliation = function (options) {
     var places = [];
     querySQL = querySQL + 'DELETE FROM people_labs WHERE id = ?;';
     places.push(affiliationID);
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            return insertLabAffiliationHistoryOnDelete(options);
+        },
+        options);
+};
+var insertLabAffiliationHistoryOnDelete = function (options) {
+    let { req, res, next } = options;
+    let personID = req.params.personID;
+    let userID = req.payload.userID;
+    let affiliationID = req.params.affiliationID;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'INSERT INTO people_labs_history'
+        + ' (people_labs_id, person_id,'
+        + ' updated, operation, changed_by)'
+        + ' VALUES (?,?,NOW(),?,?);'
+        ;
+    places.push(affiliationID, personID, 'D', userID);
     return sql.makeSQLOperation(req, res, querySQL, places,
         (options) => {
             let notificationConfig = { entityID: personID };
