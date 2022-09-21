@@ -28,10 +28,21 @@ var makeLogin = function (req, res, next) {
             if (req.body.changePassword) {
                 return actionChangePassword(req, res, next);
             } else {
-
-                responses.sendJSONResponse(res, 200, {
-                    "token": token
-                });
+                var querySQL = '';
+                var places = [];
+                querySQL = querySQL
+                        + 'UPDATE users'
+                        + ' SET last_login = NOW()'
+                        + ' WHERE id = ?;';
+                places.push(user.user_id)
+                return sql.makeSQLOperation(req, res, querySQL, places,
+                    (options) => {
+                        return responses.sendJSONResponse(res, 200, {
+                            "token": token
+                        });
+                    },
+                    {req, res, next}
+                );
             }
         } else {
             responses.sendJSONResponse(res, 401, info);
