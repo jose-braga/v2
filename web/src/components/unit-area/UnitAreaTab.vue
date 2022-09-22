@@ -78,7 +78,6 @@ export default {
                             && this_session.currentCity.city_id === this.cityID) {
                         this.hasPermissions = true;
                         // gets unit documents for this city
-
                         for (let ind in this_session.permissionsEndpoints) {
                             let decomposedPath = this_session.permissionsEndpoints[ind].decomposedPath;
                             if (decomposedPath[0] === 'unit-areas'
@@ -86,6 +85,18 @@ export default {
                                 && decomposedPath.length === 5
                                 && this_session.permissionsEndpoints[ind].method_name === 'POST') {
                                 this.hasManagement = true;
+                            }
+                        }
+                    } else {
+                        for (let ind in this_session.permissionsEndpoints) {
+                            let decomposedPath = this_session.permissionsEndpoints[ind].decomposedPath;
+                            if (decomposedPath[0] === 'unit-areas'
+                                && decomposedPath[2] === 'cities'
+                                && decomposedPath[3] == this.cityID
+                                && decomposedPath.length === 5
+                                && this_session.permissionsEndpoints[ind].method_name === 'POST') {
+                                this.hasManagement = true;
+                                this.hasPermissions = true;
                             }
                         }
                     }

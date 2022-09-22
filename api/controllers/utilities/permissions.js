@@ -261,6 +261,15 @@ module.exports.checkPermissions = function (callback, callbackOptions) {
                         });
                         return;
                     }
+                } else if (hasAccessEndpoint(reqMethod, reqEndpoint, permissionsEndpoints)) {
+                    return callback(callbackOptions);
+                } else {
+                    responses.sendJSONResponse(res, 403, {
+                        "status": "error",
+                        "statusCode": 403,
+                        "error": "User is not authorized to this operation (units-cities)."
+                    });
+                    return;
                 }
             } else {
                 if (reqMethod === 'GET') {
