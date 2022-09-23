@@ -293,8 +293,8 @@
                     <v-col cols="6">
                         <v-virtual-scroll
                             :items="data.people"
-                            height="300"
-                            item-height="50"
+                            height="400"
+                            item-height="30"
                         >
                             <template v-slot:default="{ item }">
                                 <v-list-item :key="item.id">
@@ -873,7 +873,7 @@ export default {
                     this.data.poll.valid_from = time.momentToDate(this.data.poll.valid_from)
                     this.data.isManager = true;
                     this.$store.commit('setActiveTile', {
-                        newTile: 9,
+                        newTile: 10,
                         newToolbarText: 'Edit poll: ' + this.data.poll.title
                     });
                 }

@@ -70,7 +70,7 @@ export default {
     },
     mounted: function () {
         this.$store.commit('setActiveTile', {
-            newTile: 9,
+            newTile: 10,
             newToolbarText: 'Manage polls'
         });
     },

@@ -20,8 +20,10 @@
                 >
                     {{text.text}}
                 </span>
-                <span v-else>
-
+                <span v-else-if="text.text_type_name_en === 'Small letter text'"
+                    class="poll-small-text"
+                >
+                    {{text.text}}
                 </span>
             </v-row>
         </v-container>
@@ -44,7 +46,11 @@
                                         <template v-slot:label>
                                             <h3 class="black--text mb-2">
                                                 {{v.$model.question}}
+                                                <span v-if="v.$model.required === 1" class="red--text mb-2">
+                                                    *
+                                                </span>
                                             </h3>
+
                                         </template>
                                         <v-radio v-for="(option, j) in v.$model.options"
                                             :key="i + '-' + j"
@@ -63,7 +69,10 @@
                                     <v-text-field
                                         v-model="v.$model.answer"
                                         :error="v.answer.$error"
-                                        :label="v.$model.question">
+                                    >
+                                        <template v-slot:label>
+                                            {{v.$model.question}} <span v-if="v.$model.required === 1" class="red--text mb-2">*</span>
+                                        </template>
                                     </v-text-field>
                                     <div v-if="v.answer.$error">
                                         <p v-if="!v.answer.required" class="caption red--text">Answer is required.</p>
@@ -76,7 +85,10 @@
                                     <v-textarea
                                         v-model="v.$model.answer"
                                         :error="v.answer.$error"
-                                        :label="v.$model.question">
+                                    >
+                                        <template v-slot:label>
+                                            {{v.$model.question}} <span v-if="v.$model.required === 1" class="red--text mb-2">*</span>
+                                        </template>
                                     </v-textarea>
                                     <div v-if="v.answer.$error">
                                         <p v-if="!v.answer.required" class="caption red--text">Answer is required.</p>
@@ -92,7 +104,7 @@
                         <p class="caption red--text">Check if you answered all required questions.</p>
                     </v-col>
                 </v-row>
-                <v-row align-content="center" justify="start">
+                <v-row align-content="center" justify="start" class="mb-4">
                     <v-col cols="2" align-self="end">
                         <v-row justify="end">
                             <v-btn type="submit" class="white--text"
@@ -113,7 +125,9 @@
             </v-container>
         </v-form>
     </v-card>
-    <p v-else>You are not allowed to vote in this poll. Contact Science Management if you have any doubts.</p>
+    <p v-else>You are not allowed to vote in this poll.
+        Contact Science Management (josebraga@fct.unl.pt)
+        if you have any doubts.</p>
 </div>
 </template>
 
@@ -144,7 +158,7 @@ export default {
     },
     mounted: function () {
         this.$store.commit('setActiveTile', {
-            newTile: 9,
+            newTile: 10,
             newToolbarText: 'Answer poll questions'
         });
     },
@@ -167,9 +181,9 @@ export default {
                 if (result !== null && result !== undefined) {
                     for (let ind in result.questions) {
                         this.$set(result.questions[ind], 'answer', null);
-                        if (result.questions[ind].required === 1) {
-                            result.questions[ind].question = result.questions[ind].question + '*';
-                        }
+                        //if (result.questions[ind].required === 1) {
+                        //    result.questions[ind].question = result.questions[ind].question + '*';
+                        //}
                     }
                     this.poll = result;
                     this.isVoter = true;
@@ -239,10 +253,13 @@ export default {
 
 <style scoped>
 .poll-title-text {
-    font-size: 1.2em;
+    font-size: 1.4em;
     font-weight: 600;
 }
 .poll-normal-text {
-    color:darkgrey;
+    color: darkslategrey;
+}
+.poll-small-text {
+    font-size: 0.7em;
 }
 </style>

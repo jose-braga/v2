@@ -169,13 +169,13 @@ export default {
                 link: '/platform-news',
                 isActive: false,
             },
-            //{
-            //    text: 'Polls',
-            //    icon: 'mdi-poll',
-            //    image: false,
-            //    link: '/polls',
-            //    isActive: false,
-            //},
+            {
+                text: 'Polls',
+                icon: 'mdi-poll',
+                image: false,
+                link: '/polls',
+                isActive: false,
+            },
         ]
     })
 }
