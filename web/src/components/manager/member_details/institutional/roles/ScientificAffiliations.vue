@@ -186,14 +186,36 @@ export default {
                     let vm = this;
                     subUtil.getPublicInfo(vm, urlSubmit, 'units')
                     .then( () => {
+                        let now  = time.moment();
                         for (let ind in this.data.current_positions) {
-                            for (let indUnit in this.units) {
-                                if (this.units[indUnit].id === this.data.current_positions[ind].groups[0].units[0].id) {
-                                    this.$set(this.data.current_positions[ind], 'unit_groups', this.units[indUnit].groups);
-                                    for (let indGroup in this.units[indUnit].groups) {
-                                        if (this.units[indUnit].groups[indGroup].id
+                            let unitsClone = JSON.parse(JSON.stringify(this.units))
+                            for (let indUnit in unitsClone) {
+                                if (unitsClone[indUnit].id === this.data.current_positions[ind].groups[0].units[0].id) {
+                                    let unit_group_altered = [];
+                                    for (let indItem in unitsClone[indUnit].groups) {
+                                        if (unitsClone[indUnit].groups[indItem].finished !== null &&
+                                            time.moment(unitsClone[indUnit].groups[indItem].finished).isBefore(now)) {
+                                                unitsClone[indUnit].groups[indItem].name = '(Closed) ' +
+                                                    unitsClone[indUnit].groups[indItem].name;
+                                        }
+                                        unit_group_altered.push(unitsClone[indUnit].groups[indItem])
+                                    }
+                                    unit_group_altered.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
+                                    this.$set(this.data.current_positions[ind], 'unit_groups', unit_group_altered);
+                                    for (let indGroup in unitsClone[indUnit].groups) {
+                                        if (unitsClone[indUnit].groups[indGroup].id
                                                 === this.data.current_positions[ind].groups[0].id) {
-                                            this.$set(this.data.current_positions[ind], 'unit_group_labs', this.units[indUnit].groups[indGroup].labs);
+                                            let unit_group_lab_altered = [];
+                                            for (let indItem in unitsClone[indUnit].groups[indGroup].labs) {
+                                                if (unitsClone[indUnit].groups[indGroup].labs[indItem].finished !== null &&
+                                                    time.moment(unitsClone[indUnit].groups[indGroup].labs[indItem].finished).isBefore(now)) {
+                                                        unitsClone[indUnit].groups[indGroup].labs[indItem].name = '(Closed) ' +
+                                                        unitsClone[indUnit].groups[indGroup].labs[indItem].name
+                                                }
+                                                unit_group_lab_altered.push(unitsClone[indUnit].groups[indGroup].labs[indItem])
+                                            }
+                                            unit_group_lab_altered.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
+                                            this.$set(this.data.current_positions[ind], 'unit_group_labs', unit_group_lab_altered);
                                             break;
                                         }
                                     }
@@ -314,9 +336,20 @@ export default {
             }
         },
         changeGroupsList(unit_id, ind) {
+            let now  = time.moment();
             for (let indUnit in this.units) {
                 if (this.units[indUnit].id === unit_id) {
-                    this.$set(this.data.current_positions[ind], 'unit_groups', this.units[indUnit].groups);
+                    let unit_group_altered = [];
+                    for (let indItem in this.units[indUnit].groups) {
+                        if (this.units[indUnit].groups[indItem].finished !== null &&
+                            time.moment(this.units[indUnit].groups[indItem].finished).isBefore(now)) {
+                                this.units[indUnit].groups[indItem].name = '(Closed) ' +
+                                    this.units[indUnit].groups[indItem].name
+                        }
+                        unit_group_altered.push(this.units[indUnit].groups[indItem])
+                    }
+                    unit_group_altered.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0))
+                    this.$set(this.data.current_positions[ind], 'unit_groups', unit_group_altered);
                     this.$set(this.data.current_positions[ind], 'unit_group_labs', []);
                     this.$set(this.data.current_positions[ind].groups[0], 'id', null);
                     break;
@@ -324,13 +357,24 @@ export default {
             }
         },
         changeLabsList(unit_id, group_id, ind) {
+            let now  = time.moment();
             for (let indUnit in this.units) {
                 if (this.units[indUnit].id === unit_id) {
                     for (let indGroup in this.units[indUnit].groups) {
                         if (this.units[indUnit].groups[indGroup].id === group_id) {
+                            let unit_group_lab_altered = [];
+                            for (let indItem in this.units[indUnit].groups[indGroup].labs) {
+                                if (this.units[indUnit].groups[indGroup].labs[indItem].finished !== null &&
+                                    time.moment(this.units[indUnit].groups[indGroup].labs[indItem].finished).isBefore(now)) {
+                                        this.units[indUnit].groups[indGroup].labs[indItem].name = '(Closed) ' +
+                                        this.units[indUnit].groups[indGroup].labs[indItem].name
+                                }
+                                unit_group_lab_altered.push(this.units[indUnit].groups[indGroup].labs[indItem])
+                            }
+                            unit_group_lab_altered.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0))
                             this.$set(this.data.current_positions[ind],
                                 'unit_group_labs',
-                                this.units[indUnit].groups[indGroup].labs);
+                                unit_group_lab_altered);
                             this.$set(this.data.current_positions[ind], 'lab_id', null);
                             break;
                         }
