@@ -21,7 +21,7 @@
                     <v-text-field
                         v-model="$v.data.person.username.$model"
                         :error="$v.data.person.username.$error"
-                        label="Username*">
+                        label="Username (for credentials)*">
                     </v-text-field>
                     <div v-if="$v.data.person.username.$error">
                         <div v-if="!$v.data.person.username.required">

@@ -121,7 +121,7 @@
                                         :error="$v.data.newStudent.username.$error"
                                         v-bind="attrs"
                                         v-on="on"
-                                        label="Username*"
+                                        label="Username (for credentials)*"
                                     >
                                     </v-text-field>
                                 </template>
