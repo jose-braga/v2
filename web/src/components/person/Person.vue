@@ -13,7 +13,7 @@
                         >
                             <template v-slot:activator="{ on, attrs }">
                                 <v-progress-linear class="mt-2"
-                                    v-model="thisUnit.score"
+                                    :value="thisUnit.score"
                                     v-bind="attrs"
                                     v-on="on"
                                     :color="thisUnit.unitName === 'LAQV' ? 'green': 'primary'"

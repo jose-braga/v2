@@ -52,7 +52,7 @@
                 <v-text-field
                     v-model="search"
                     append-icon="mdi-magnify"
-                    label="Search by name"
+                    label="Search by name/email/Ciência ID"
                     single-line
                     hide-details
                     @input="filterData"

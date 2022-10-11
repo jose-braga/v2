@@ -12,7 +12,7 @@
                 <v-text-field
                     v-model="search"
                     append-icon="mdi-magnify"
-                    label="Search by name"
+                    label="Search by name/email/Ciência ID"
                     single-line
                     hide-details
                     @input="filterData"
@@ -467,7 +467,7 @@ export default {
                                 this.data.members.sort((el1, el2) => el1.name.localeCompare(el2.name))
                                 this.loading = false;
                             }
-                            
+
                         });
                     } else if ( this.segmentType === 'unit-city'
                         && decomposedPath.length === 6

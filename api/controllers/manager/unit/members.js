@@ -20,11 +20,21 @@ var actionGetCurrentMembersList = function (options) {
         for (let ind in qSplit) {
             qArray.push('%' + qSplit[ind] + '%');
             if (likeNameExpression === '') {
-                likeNameExpression = likeNameExpression + ' AND (people.name LIKE ?';
+                likeNameExpression = likeNameExpression + ' AND ((people.name LIKE ?';
             } else {
                 likeNameExpression = likeNameExpression + ' AND people.name LIKE ?';
             }
         }
+        likeNameExpression = likeNameExpression + ')';
+        likeNameExpression = likeNameExpression + ' OR ';
+        likeNameExpression = likeNameExpression + 'emails.email LIKE ?';
+        qArray.push(qraw);
+        likeNameExpression = likeNameExpression + ' OR ';
+        likeNameExpression = likeNameExpression + 'personal_emails.email LIKE ?';
+        qArray.push(qraw);
+        likeNameExpression = likeNameExpression + ' OR ';
+        likeNameExpression = likeNameExpression + 'researchers_info.ciencia_id LIKE ?';
+        qArray.push(qraw);
         likeNameExpression = likeNameExpression + ')';
     }
     if (req.query.lab !== undefined) {
@@ -51,6 +61,9 @@ var actionGetCurrentMembersList = function (options) {
         + ' JOIN labs_groups ON labs_groups.lab_id = labs.id'
         + ' JOIN `groups` ON `groups`.id = labs_groups.group_id'
         + ' JOIN groups_units ON groups_units.group_id = `groups`.id'
+        + ' LEFT JOIN emails ON emails.person_id = people.id'
+        + ' LEFT JOIN personal_emails ON personal_emails.person_id = people.id'
+        + ' LEFT JOIN researchers_info ON researchers_info.person_id = people.id'
         + ' WHERE people.status = 1 AND groups_units.unit_id = ?'
         + likeNameExpression
         + ' AND (labs.name LIKE ? OR labs.short_name = ?)'
@@ -65,6 +78,9 @@ var actionGetCurrentMembersList = function (options) {
         + ' JOIN technicians ON technicians.person_id = people.id'
         + ' JOIN technician_offices ON technician_offices.id = technicians.technician_office_id'
         + ' JOIN technicians_units ON technicians_units.technician_id = technicians.id'
+        + ' LEFT JOIN emails ON emails.person_id = people.id'
+        + ' LEFT JOIN personal_emails ON personal_emails.person_id = people.id'
+        + ' LEFT JOIN researchers_info ON researchers_info.person_id = people.id'
         + ' WHERE people.status = 1 AND technicians_units.unit_id = ?'
         + likeNameExpression
         + ' AND (technician_offices.name_en LIKE ? OR technician_offices.name_pt LIKE ?)'
@@ -78,6 +94,9 @@ var actionGetCurrentMembersList = function (options) {
         + ' JOIN science_managers ON science_managers.person_id = people.id'
         + ' JOIN science_manager_offices ON science_manager_offices.id = science_managers.science_manager_office_id'
         + ' JOIN science_managers_units ON science_managers_units.science_manager_id = science_managers.id'
+        + ' LEFT JOIN emails ON emails.person_id = people.id'
+        + ' LEFT JOIN personal_emails ON personal_emails.person_id = people.id'
+        + ' LEFT JOIN researchers_info ON researchers_info.person_id = people.id'
         + ' WHERE people.status = 1 AND science_managers_units.unit_id = ?'
         + likeNameExpression
         + ' AND (science_manager_offices.name_en LIKE ? OR science_manager_offices.name_pt LIKE ?)'
@@ -91,6 +110,9 @@ var actionGetCurrentMembersList = function (options) {
         + ' JOIN people_administrative_offices ON people_administrative_offices.person_id = people.id'
         + ' JOIN administrative_offices ON administrative_offices.id = people_administrative_offices.administrative_office_id'
         + ' JOIN people_administrative_units ON people_administrative_units.administrative_id = people_administrative_offices.id'
+        + ' LEFT JOIN emails ON emails.person_id = people.id'
+        + ' LEFT JOIN personal_emails ON personal_emails.person_id = people.id'
+        + ' LEFT JOIN researchers_info ON researchers_info.person_id = people.id'
         + ' WHERE people.status = 1 AND people_administrative_units.unit_id = ?'
         + likeNameExpression
         + ' AND (administrative_offices.name_en LIKE ? OR administrative_offices.name_pt LIKE ?)'
