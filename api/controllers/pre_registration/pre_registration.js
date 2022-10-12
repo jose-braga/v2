@@ -334,7 +334,7 @@ var actionCreateAcademicAffiliations = function (options) {
         );
         sql.makeSQLOperation(req, res, querySQL, places,
             (options) => {
-                if (i + 1 < person.responsibles.length) {
+                if (i + 1 < person.academicAffiliations.length) {
                     options.i = i + 1;
                     return actionCreateAcademicAffiliations(options);
                 } else {
