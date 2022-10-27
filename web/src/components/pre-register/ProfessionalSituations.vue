@@ -8,7 +8,7 @@
     <v-card-text></v-card-text>
     <v-container class="px-6">
         <v-row>
-            <v-col>
+            <v-col class="mb-2">
                 <v-btn small outlined
                     @click="addItem(data.situations)">
                     Add professional situation

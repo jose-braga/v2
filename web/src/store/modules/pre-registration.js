@@ -1,8 +1,17 @@
 const preregistration = {
     state: {
         person: {
+            name: '',
+            selectCar: false,
+            selectAccess: false,
+        },
 
-        }
+    },
+    getters: {
+        preRegisterData: state => {
+            return state;
+        },
+
     },
     mutations: {
         addPersonData(state, payload) {
@@ -19,6 +28,11 @@ const preregistration = {
                 }
 
             });
+        },
+    },
+    actions: {
+        addPersonData({ commit }, payload) {
+            commit('addPersonData', payload)
         },
     },
 };

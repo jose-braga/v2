@@ -65,7 +65,7 @@
             </v-row>
             <v-divider v-if="i < data.academicAffiliations.length - 1"></v-divider>
         </div>
-        <v-row class="ml-4">
+        <v-row class="ml-4 mb-2">
             <v-btn outlined @click="addItem()">
                 Add an affiliation
             </v-btn>

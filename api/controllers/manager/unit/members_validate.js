@@ -134,10 +134,41 @@ var addPersonHistory = function (options) {
     places.push(personID, 1, 'U');
     return sql.makeSQLOperation(req, res, querySQL, places,
         (options) => {
-            return getPersonCars(options);
+            return getPersonDepartments(options);
         },
         options);
 };
+var getPersonDepartments = function (options) {
+    let { req, res, next } = options;
+    let personID = req.params.personID;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + ' SELECT departments.*'
+        + ' FROM people_departments'
+        + ' JOIN departments ON departments.id = people_departments.department_id'
+        + ' WHERE people_departments.person_id = ?;';
+    places.push(personID);
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            if (resQuery.length > 0) {
+                let department = resQuery[0];
+                options.departmentString = '-----------'
+                if (department.name_en === 'Chemistry') {
+                    options.departmentString = 'DQ';
+                } else if (department.name_en === 'Life Sciences') {
+                    options.departmentString = 'DCV';
+                } else if (department.name_en === 'Conservation and Restoration') {
+                    options.departmentString = 'DCR';
+                }
+                return getPersonCars(options);
+            } else {
+                return getPersonPersonalEmail(options);
+            }
+        },
+        options);
+}
+
 var getPersonCars = function (options) {
     let { req, res, next } = options;
     let personID = req.params.personID;
@@ -152,7 +183,7 @@ var getPersonCars = function (options) {
                 options.cars = resQuery;
                 return getRecipientsGroupCar(options, 3, 1);
             } else {
-                return getPersonPersonalEmail(options);
+                return getPersonPostRegistrationActions(options);
             }
         },
         options);
@@ -167,7 +198,9 @@ var getRecipientsGroupCar = function (options, email_type_id, city_id) {
         + ' LEFT JOIN emails ON emails.person_id = people_recipient_groups.person_id'
         + ' WHERE recipient_groups.city_id = ?'
         + ' AND recipient_groups.any_cities = 0'
-        + ' AND recipient_groups.email_type_id = ?;';
+        + ' AND recipient_groups.email_type_id = ?'
+        + ' AND recipient_groups.name_en LIKE "FCT car%'+ options.departmentString +'%";'
+        ;
     places.push(city_id, email_type_id);
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
@@ -175,15 +208,15 @@ var getRecipientsGroupCar = function (options, email_type_id, city_id) {
                 options.recipientGroupCar = resQuery[0].id;
                 actionSendCarManagerMessage(options, resQuery)
                 .then(() => {
-                    getPersonPersonalEmail(options)
+                    getPersonPostRegistrationActions(options)
                 })
                 .catch((e) => {
                     console.log(e);
-                    return getPersonPersonalEmail(options);
+                    return getPersonPostRegistrationActions(options);
                 });
 
             } else {
-                return getPersonPersonalEmail(options);
+                return getPersonPostRegistrationActions(options);
             }
 
         },
@@ -226,6 +259,115 @@ async function actionSendCarManagerMessage(options, recipientEmails) {
         emailBodyHtml = emailBodyHtml + '<p>Plate: ' + cars[ind].plate + '</p>';
     }
 
+    emailBodyHtml = emailBodyHtml + '<br><p>Best regards,</p>'
+            + '<p>Admin</p>';
+    options.subjectText = subjectText;
+    options.emailBody = emailBody;
+    if (process.env.NODE_ENV === 'production') {
+        mailOptions = {
+            from: '"Admin" <admin@laqv-ucibio.info>', // sender address
+            to: recipients, // list of receivers (comma-separated)
+            subject: subjectText, // Subject line
+            text: emailBody,
+            html: emailBodyHtml,
+        };
+        // send mail with defined transport object
+        let info = await transporter.sendMail(mailOptions);
+        console.log('Message %s sent: %s', info.messageId, info.response);
+        //return writeMessageDB(options);
+
+    } else {
+        // just for testing purposes
+        mailOptions = {
+            from: '"Admin" <admin@laqv-ucibio.info>', // sender address
+            to: recipients, // list of receivers (comma-separated)
+            subject: 'TESTING: ' + subjectText, // Subject line
+            text: emailBody,
+            html: emailBodyHtml,
+        };
+        // send mail with defined transport object
+        let info = await transporter.sendMail(mailOptions);
+        console.log('Message %s sent: %s', info.messageId, info.response);
+    }
+};
+
+var getPersonPostRegistrationActions = function (options) {
+    let { req, res, next } = options;
+    let personID = req.params.personID;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + ' SELECT * FROM people_post_registration WHERE person_id = ?;';
+    places.push(personID);
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            let depAccess = false;
+            for (let ind in resQuery) {
+                if (resQuery[ind].action_id === 1) {
+                    depAccess = true;
+                }
+            }
+            if (depAccess) {
+                return getRecipientsGroupAccess(options, 2, 1);
+            } else {
+                return getPersonPersonalEmail(options);
+            }
+        },
+        options);
+}
+var getRecipientsGroupAccess = function (options, email_type_id, city_id) {
+    let { req, res, next } = options;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT recipient_groups.*, emails.person_id, emails.email'
+        + ' FROM recipient_groups'
+        + ' LEFT JOIN people_recipient_groups ON people_recipient_groups.recipient_group_id = recipient_groups.id'
+        + ' LEFT JOIN emails ON emails.person_id = people_recipient_groups.person_id'
+        + ' WHERE recipient_groups.city_id = ?'
+        + ' AND recipient_groups.any_cities = 0'
+        + ' AND recipient_groups.email_type_id = ?'
+        + ' AND recipient_groups.name_en LIKE "FCT Security%'+ options.departmentString +'%";'
+        ;
+    places.push(city_id, email_type_id);
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            if (resQuery.length > 0) {
+                options.recipientGroupCar = resQuery[0].id;
+                actionSendAccessManagerMessage(options, resQuery)
+                .then(() => {
+                    getPersonPersonalEmail(options)
+                })
+                .catch((e) => {
+                    console.log(e);
+                    return getPersonPersonalEmail(options);
+                });
+
+            } else {
+                return getPersonPersonalEmail(options);
+            }
+
+        },
+        options);
+};
+async function actionSendAccessManagerMessage(options, recipientEmails) {
+    let { req, res, next } = options;
+    let personName = ''
+    if (req.body.data !== undefined) {
+        personName = req.body.data.name;
+    }
+    let recipients = '';
+    for (let el in recipientEmails) {
+        recipients = recipients + recipientEmails[el].email + ', ';
+    }
+    let mailOptions;
+    let subjectText = 'LAQV/UCIBIO Data Management - "Departamental" access request by ' + personName;
+    let emailBody = 'Hi,\n\n'
+        + 'The recently added user ' + personName + ' requests access to "Departamental"'
+        + ' building outside normal working hours.\n\n'
+    emailBody = emailBody + '\nBest regards,\nAdmin';
+    let emailBodyHtml = '<p>Hi,</p><br>'
+        + '<p>The recently added user ' + personName + ' requests access to "Departamental"'
+        + ' building outside normal working hours.</p>'
     emailBodyHtml = emailBodyHtml + '<br><p>Best regards,</p>'
             + '<p>Admin</p>';
     options.subjectText = subjectText;

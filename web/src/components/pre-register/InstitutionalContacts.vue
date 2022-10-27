@@ -44,8 +44,8 @@
         </v-row>
         <v-row v-if="data.emails.requestEmail" justify="end">
             <span class="small-text">A PDF file will be generated on submission.<br>
-            Be sure to fill in department data on "Academic Affiliations".<br>
-            Please, print, sign and deliver it to your department's secretariat.</span>
+            You must fill in department data on "Academic Affiliations".<br>
+            <span class="red--text">Please sign the form and send it to your department's secretariat.</span></span>
         </v-row>
     </v-container>
 </v-card>

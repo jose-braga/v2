@@ -804,9 +804,31 @@ var actionUpdatePersonFinal = function (options) {
         personID);
     sql.makeSQLOperation(req, res, querySQL, places,
         (options) => {
-            return actionGetResponsible(options);
+            return actionCreatePostRegistrationActions(options);
         },
         options);
+};
+var actionCreatePostRegistrationActions = function (options) {
+    let { req, res, next } = options;
+    let personID = req.params.personID;
+    let person = req.body.data;
+    if (person.selectAccess) {
+        var querySQL = '';
+        var places = [];
+        querySQL = querySQL + 'INSERT INTO people_post_registration'
+                        + ' (person_id, action_id) '
+                        + ' VALUES (?,?);';
+        places.push(personID, 1);
+        sql.makeSQLOperation(req, res, querySQL, places,
+            (options) => {
+                return actionGetResponsible(options);
+            },
+            options);
+
+    } else {
+        return actionGetResponsible(options);
+    }
+
 };
 var actionGetResponsible = function (options) {
     let { req, res, next } = options;
@@ -866,6 +888,7 @@ var actionUpdatePersonFinalHistory = function (options) {
         },
         options);
 };
+
 var getRecipientsGroupsPreReg = function (options, email_type_id) {
     let { req, res, next } = options;
     var querySQL = '';
@@ -932,7 +955,7 @@ async function actionSendUserMessage(options, recipientEmails) {
         // just for testing purposes
         mailOptions = {
             from: '"Admin" <admin@laqv-ucibio.info>', // sender address
-            to: recipients, // list of receivers (comma-separated)
+            to: 'josecbraga@gmail.com', // list of receivers (comma-separated)
             subject: 'TESTING: ' + subjectText, // Subject line
             text: emailBody,
             html: emailBodyHtml,
@@ -987,7 +1010,7 @@ async function actionSendManagersMessage(options, recipientEmails) {
         // just for testing purposes
         mailOptions = {
             from: '"Admin" <admin@laqv-ucibio.info>', // sender address
-            to: recipients, // list of receivers (comma-separated)
+            to: 'josebraga@fct.unl.pt', // list of receivers (comma-separated)
             subject: 'TESTING: ' + subjectText, // Subject line
             text: emailBody,
             html: emailBodyHtml,
@@ -1008,7 +1031,6 @@ async function actionSendResponsibleMessage(options, recipientEmails) {
         ) {
         recipients = responsibleEmail.email;
     }
-    console.log(recipients)
     if (recipients !== '') {
         let mailOptions;
         let subjectText = 'LAQV/UCIBIO Data Management - Registration process: ' + person.name;

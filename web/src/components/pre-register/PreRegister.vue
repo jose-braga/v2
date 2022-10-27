@@ -63,10 +63,11 @@
                     <Responsibles ref="responsibles"></Responsibles>
                     <AcademicAffiliations ref="academicAffiliations"></AcademicAffiliations>
                     <ScientificIdentifications ref="scientificIdentifications"></ScientificIdentifications>
-                    <Cars ref="cars"></Cars>
+                    <AdministrativeInformation></AdministrativeInformation>
+                    <Cars v-if="preRegisterData.person.selectCar" ref="cars"></Cars>
                 </v-col>
             </v-row>
-            <v-row align-content="center" justify="center">
+            <v-row align-content="center" justify="center" class="mb-4">
                 <v-col cols="3" v-if="formError">
                     <v-row justify="end">
                         <p class="caption red--text">Unable to submit form.</p>
@@ -86,6 +87,8 @@
                             color="primary"></v-progress-circular>
                     <v-icon v-show="success" color="green">mdi-check</v-icon>
                     <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
+                    <span v-show="success" class="green--text">Your submission was successful.
+                        Wait for validation by a science manager.</span>
                 </v-col>
             </v-row>
 
@@ -101,6 +104,7 @@
 import PreRegisterHelp from './PreRegisterHelp'
 import Password from './Password'
 import NuclearInformation from './NuclearInformation'
+import AdministrativeInformation from './AdministrativeInformation'
 import Authorization from './Authorization'
 import Photo from './Photo'
 import Cars from './Cars'
@@ -125,6 +129,7 @@ export default {
         PreRegisterHelp,
         Password,
         NuclearInformation,
+        AdministrativeInformation,
         Authorization,
         Photo,
         Cars,
@@ -148,6 +153,7 @@ export default {
             token: '',
             personID: null,
             userID: null,
+            person: {},
             cropStyle: [
                 {
                     width: 196,
@@ -166,10 +172,12 @@ export default {
     created() {
         this.checkLogin();
         this.getDepartments();
-
     },
     mounted() {},
     computed: {
+        preRegisterData () {
+            return this.$store.getters.preRegisterData;
+        },
         showHelp2: {
             get() {
                 return this.$store.state.navigation.showHelp;
@@ -237,7 +245,12 @@ export default {
                     || (person.emails !== undefined
                         && person.emails.requestEmail
                         && !affiliationFCT)
-                    ) {
+                    || ((person.selectCar || person.selectAccess)
+                        && !affiliationFCT)
+                    || (person.selectCar
+                        && (person.cars === undefined
+                            || person.cars.length === 0 ))
+                ) {
                     this.formError = true;
                     setTimeout(() => {
                         this.formError = false;
@@ -304,10 +317,13 @@ export default {
             .then( () => {
                 this.progress = false;
                 this.success = true;
-                setTimeout(() => {this.success = false;}, 1500)
                 if (person.emails !== undefined && person.emails.requestEmail) {
                     this.fillPDF(person);
                 }
+                setTimeout(() => {
+                    this.success = false;
+                    this.$router.push({ path: '/person/personal' });
+                }, 4000)
             })
             .catch((error) => {
                 this.progress = false;

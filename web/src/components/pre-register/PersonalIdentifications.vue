@@ -54,7 +54,7 @@
             <v-divider v-if="i < data.identifications.length - 1"></v-divider>
         </div>
         <v-row>
-            <v-btn class="ml-2" outlined @click="addItem()">
+            <v-btn class="ml-2 mb-4" outlined @click="addItem()">
                 Add an identification
             </v-btn>
         </v-row>

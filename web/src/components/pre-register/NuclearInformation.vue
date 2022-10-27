@@ -108,7 +108,7 @@ export default {
     },
     methods: {
         addValue () {
-            this.$store.commit('addPersonData', this.data);
+            this.$store.dispatch('addPersonData', this.data);
         },
         getCountries() {
             var this_vm = this;

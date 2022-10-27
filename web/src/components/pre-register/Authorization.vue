@@ -38,7 +38,7 @@
                     </ul>
                 </v-col>
             </v-row>
-                <v-row justify="center" align="center">
+                <v-row justify="center" align="center"  class="mb-2">
                     <v-switch v-model="data.visible_public"
                         :label="authorizedText"
                         @change="changeAuthorization()"

@@ -2,7 +2,7 @@
 <v-card  class="mb-4">
     <v-card-title primary-title>
         <div>
-            <h3 class="headline">Cars (only for NOVA ST)</h3>
+            <h3 class="headline">Cars</h3>
         </div>
     </v-card-title>
     <v-container class="px-6">
@@ -74,9 +74,7 @@ export default {
             },
         }
     },
-
     methods: {
-
         addValue () {
             this.$store.commit('addPersonData', this.data);
         },
@@ -90,7 +88,7 @@ export default {
             }
             list.splice(ind, 1);
         },
-    }
+    },
 }
 </script>
 

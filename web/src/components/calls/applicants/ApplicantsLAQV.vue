@@ -142,7 +142,7 @@
                         :size="20" :width="2"
                         color="primary"></v-progress-circular>
                 <v-icon v-show="success" color="green">mdi-check</v-icon>
-                <span v-show="success" class="green--text">Your submission was succesful</span>
+                <span v-show="success" class="green--text">Your submission was successful</span>
                 <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
                 <span v-show="error" class="red--text">A problem occurred</span>
             </v-col>
