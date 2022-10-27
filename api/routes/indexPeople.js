@@ -28,6 +28,7 @@ const addPubORCID = require('../controllers/people/add_pub_ORCID');
 const addPubRepository = require('../controllers/people/add_pub_repository');
 const authorNames = require('../controllers/people/author_names');
 const cars = require('../controllers/people/cars');
+const accessRequest = require('../controllers/people/access_request');
 const costCenters = require('../controllers/people/cost_centers');
 const degrees = require('../controllers/people/degrees');
 const emergencyContacts = require('../controllers/people/emergency_contacts');
@@ -112,6 +113,7 @@ router.get('/:personID/identifications', cors(corsOptions), identifications.getI
 router.post('/:personID/identifications', cors(corsOptions), identifications.createIdentification);
 router.put('/:personID/identifications/:identificationID', cors(corsOptions), identifications.updateIdentification);
 router.delete('/:personID/identifications/:identificationID', cors(corsOptions), identifications.deleteIdentification);
+router.post('/:personID/access-request', cors(corsOptions), accessRequest.sendMessage);
 router.get('/:personID/cars', cors(corsOptions), cars.getCars);
 router.post('/:personID/cars', cors(corsOptions), cars.createCar);
 router.put('/:personID/cars/:carID', cors(corsOptions), cars.updateCar);

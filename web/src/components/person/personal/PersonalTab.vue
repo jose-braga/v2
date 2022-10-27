@@ -61,6 +61,14 @@
                 </v-expansion-panel>
                 <v-expansion-panel>
                     <v-expansion-panel-header>
+                        <h3>Renew access to "Departamental" building (FCT NOVA only)</h3>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                        <AccessRenovation></AccessRenovation>
+                    </v-expansion-panel-content>
+                </v-expansion-panel>
+                <v-expansion-panel>
+                    <v-expansion-panel-header>
                         <h3>Editors of your data</h3>
                     </v-expansion-panel-header>
                     <v-expansion-panel-content>
@@ -82,12 +90,14 @@ const PersonalContacts = () => import(/* webpackChunkName: "person-personal-pers
 const EmergencyContacts = () => import(/* webpackChunkName: "person-personal-emergency-contacts" */ './EmergencyContacts')
 const Identifications = () => import(/* webpackChunkName: "person-personal-identifications" */ './Identifications')
 const Cars = () => import(/* webpackChunkName: "person-personal-cars" */ './Cars')
+const AccessRenovation = () => import(/* webpackChunkName: "person-personal-access-renovation" */ './AccessRenovation')
 const DataEditors = () => import(/* webpackChunkName: "person-personal-data-editors" */ './DataEditors')
 
 export default {
     components: {
         Authorization,
         EmergencyContacts,
+        AccessRenovation,
         Cars,
         Identifications,
         NuclearInformation,

@@ -332,7 +332,6 @@ var getRecipientsGroupAccess = function (options, email_type_id, city_id) {
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             if (resQuery.length > 0) {
-                options.recipientGroupCar = resQuery[0].id;
                 actionSendAccessManagerMessage(options, resQuery)
                 .then(() => {
                     getPersonPersonalEmail(options)
