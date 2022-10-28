@@ -447,8 +447,54 @@ var getLabs = function (req, res, next) {
     var places = [];
     querySQL = querySQL + 'SELECT * FROM labs;';
     //places.push()
-    sql.makeSQLOperation(req, res, querySQL, places);
-    return;
+    //sql.makeSQLOperation(req, res, querySQL, places);
+    //return;
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            let ucibioLabsActive = [];
+            let ucibioLabsClosed = [];
+            let laqvLabsActive = [];
+            let laqvLabsClosed = [];
+            let allLAQV = [72,73,74,75,76,77,78,
+                71,79,80,81,82,83,84,85,86,87,123];
+            for (let ind in resQuery) {
+                let lab = resQuery[ind]
+                if (allLAQV.indexOf(lab.id) === -1) {
+                    // this is a UCIBIO lab
+                    if (lab.finished === null) {
+                        lab.name = 'UCIBIO: ' + lab.name;
+                        ucibioLabsActive.push(lab);
+                    } else {
+                        lab.name = '(Closed) UCIBIO: ' + lab.name;
+                        ucibioLabsClosed.push(lab);
+                    }
+                } else {
+                    if (lab.finished === null) {
+                        lab.name = 'LAQV: ' + lab.name;
+                        laqvLabsActive.push(lab);
+                    } else {
+                        lab.name = '(Closed) LAQV: ' + lab.name;
+                        laqvLabsClosed.push(lab);
+                    }
+                }
+            }
+            ucibioLabsActive.sort((a,b) => a.name.localeCompare(b.name));
+            ucibioLabsClosed.sort((a,b) => a.name.localeCompare(b.name));
+            laqvLabsActive.sort((a,b) => a.name.localeCompare(b.name));
+            laqvLabsClosed.sort((a,b) => a.name.localeCompare(b.name));
+            let labs = laqvLabsActive.concat(ucibioLabsActive,
+                laqvLabsClosed, ucibioLabsClosed);
+            responses.sendJSONResponseOptions({
+                response: res,
+                status: 200,
+                message: {
+                    "status": "success", "statusCode": 200,
+                    "result":  labs,
+                }
+            });
+            return;
+        },
+        {req, res, next});
 };
 var getGroups = function (req, res, next) {
     var querySQL = '';
