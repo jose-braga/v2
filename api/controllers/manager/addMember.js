@@ -388,36 +388,54 @@ var addLab = function (options) {
     let { req, res, next, personID, i } = options;
     let data = req.body.data;
     let position = data.current_positions[i];
-    let places = [];
-    if (position.valid_from === '') {
-        position.valid_from = null;
+    if (position.lab_id !== null && position.lab_id !== undefined) {
+        let places = [];
+        if (position.valid_from === '') {
+            position.valid_from = null;
+        }
+        if (position.valid_until === '') {
+            position.valid_until = null;
+        }
+        if (position.dedication === '') {
+            position.dedication = null;
+        }
+        querySQL = 'INSERT INTO people_labs'
+            + ' (person_id, lab_id, lab_position_id, dedication, valid_from, valid_until, pluriannual, integrated, nuclearCV)'
+            + ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);';
+        places.push(
+            personID,
+            position.lab_id,
+            position.lab_position_id,
+            position.dedication,
+            position.valid_from,
+            position.valid_until,
+            position.plurianual,
+            position.integrated,
+            position.nuclearCV,
+        );
+        return sql.getSQLOperationResult(req, res, querySQL, places,
+            (resQuery, options) => {
+                options.peopleLabsId = resQuery.insertId;
+                return addPersonLabHistory(options);
+            },
+            options);
+    } else if (i + 1 < data.current_positions.length) {
+        options.i = i + 1;
+        return addLab(options);
+    } else {
+        if (data.tech_current_positions.length > 0) {
+            options.i = 0;
+            return addFacility(options);
+        } else if (data.scm_current_positions.length > 0) {
+            options.i = 0;
+            return addScienceManagement(options);
+        } else if (data.adm_current_positions.length > 0) {
+            options.i = 0;
+            return addAdministrative(options);
+        } else {
+            return addJob(options);
+        }
     }
-    if (position.valid_until === '') {
-        position.valid_until = null;
-    }
-    if (position.dedication === '') {
-        position.dedication = null;
-    }
-    querySQL = 'INSERT INTO people_labs'
-        + ' (person_id, lab_id, lab_position_id, dedication, valid_from, valid_until, pluriannual, integrated, nuclearCV)'
-        + ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);';
-    places.push(
-        personID,
-        position.lab_id,
-        position.lab_position_id,
-        position.dedication,
-        position.valid_from,
-        position.valid_until,
-        position.plurianual,
-        position.integrated,
-        position.nuclearCV,
-    );
-    return sql.getSQLOperationResult(req, res, querySQL, places,
-        (resQuery, options) => {
-            options.peopleLabsId = resQuery.insertId;
-            return addPersonLabHistory(options);
-        },
-        options);
 };
 var addPersonLabHistory = function (options) {
     let { req, res, next, personID, peopleLabsId, i } = options;
