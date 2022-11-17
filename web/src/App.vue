@@ -40,8 +40,13 @@
 <script>
 import Drawer from './components/navigation/Drawer'
 import UpperToolbar from './components/navigation/UpperToolbar'
+import jwtDecode from 'jwt-decode'
 
 import io from 'socket.io-client'
+
+var readLocalStorage = function (token) {
+    return jwtDecode(token)
+};
 
 export default {
     name: 'App',
@@ -58,6 +63,8 @@ export default {
             messages: [],
             socketConnected: false,
             socket: {},
+            sessionEndApproaching: false,
+            checkTime: null,
         }
     },
     watch: {
@@ -78,6 +85,13 @@ export default {
     },
     created () {
         this.initialize()
+    },
+    mounted() {
+        this.checkTime = setInterval(() => this.checkSessionEndApproaching(),
+            60 * 1000)
+    },
+    beforeDestroy() {
+        clearInterval(this.checkTime)
     },
     computed: {
         showHelp: {
@@ -108,6 +122,24 @@ export default {
                         this.messages = history;
                     }
                 });
+            }
+        },
+        checkSessionEndApproaching () {
+            if (localStorage['v2-token']) {
+                let token_json = readLocalStorage(localStorage['v2-token']);
+                //token_json.exp = 1668692626
+                // if token expiry is less than hour ahead (times in seconds)
+                if (token_json.exp - 3600 < Date.now() / 1000
+                    && this.sessionEndApproaching === false
+                ) {
+                    this.sessionEndApproaching = true; // to show only once
+                    let now = new Date();
+                    this.messages.push({
+                        show: true,
+                        msg: 'Your session will expire in less than 1 hour.',
+                        time: now.toISOString(),
+                    })
+                }
             }
         },
     },
