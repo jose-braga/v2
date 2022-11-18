@@ -127,7 +127,6 @@ export default {
         checkSessionEndApproaching () {
             if (localStorage['v2-token']) {
                 let token_json = readLocalStorage(localStorage['v2-token']);
-                //token_json.exp = 1668692626
                 // if token expiry is less than hour ahead (times in seconds)
                 if (token_json.exp - 3600 < Date.now() / 1000
                     && this.sessionEndApproaching === false
