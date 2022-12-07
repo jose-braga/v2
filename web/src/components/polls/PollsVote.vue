@@ -7,7 +7,7 @@
             </div>
         </v-card-title>
         <v-container class="px-6">
-            <v-row v-for="(text, i) in poll.texts"
+            <v-row v-for="(text, i) in poll.texts"  class="pl-4"
                 :key="i"
             >
                 <span v-if="text.text_type_name_en === 'Title'"
