@@ -105,13 +105,13 @@
                     </v-col>
                 </v-row>
                 <v-row align-content="center" justify="start" class="mb-4">
-                    <v-col cols="2" align-self="end">
+                    <v-col cols="6" sm="2" align-self="end">
                         <v-row justify="end">
                             <v-btn type="submit" class="white--text"
                             color="blue">Vote</v-btn>
                         </v-row>
                     </v-col>
-                    <v-col cols="10">
+                    <v-col cols="6" sm="10">
                         <v-progress-circular indeterminate
                                 v-show="progress"
                                 :size="20" :width="2"
