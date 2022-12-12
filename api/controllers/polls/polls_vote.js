@@ -2,8 +2,12 @@ const sql = require('../utilities/sql')
 const responses = require('../utilities/responses');
 
 var checkPermissions = function (options, callback)  {
-    let { req, res, next } = options;
+    let { req, res, next, action } = options;
     let personID = req.params.personID;
+    if (action === 'vote') {
+        let data = req.body.data.poll;
+        personID = data.personID;
+    }
     let pollID = req.params.pollID;
     var querySQL = '';
     var places = [];
@@ -159,7 +163,8 @@ module.exports.getPollData = function (req, res, next) {
 var checkVoteValid = function (options) {
     let { req, res, next, i } = options;
     let pollID = req.params.pollID;
-    let personID = req.params.personID;
+    let data = req.body.data.poll;
+    let personID = data.personID;
     var querySQL = '';
     var places = [];
     querySQL = querySQL
@@ -222,7 +227,8 @@ var registerUserVote = function (options) {
 var markPersonVoted = function (options) {
     let { req, res, next } = options;
     let pollID = req.params.pollID;
-    let personID = req.params.personID;
+    let data = req.body.data.poll;
+    let personID = data.personID;
     var querySQL = '';
     var places = [];
     querySQL = querySQL
@@ -310,5 +316,6 @@ var writeUserChoices = function (options) {
 };
 module.exports.writeUserVote = function (req, res, next) {
     let options = { req, res, next };
+    options.action = 'vote';
     return checkPermissions(options, checkVoteValid)
 };

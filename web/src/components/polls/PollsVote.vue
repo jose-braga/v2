@@ -202,10 +202,12 @@ export default {
             } else {
                 this.progress = true;
                 let urlCreate = [];
+                let body = { poll: this.poll };
+                body.poll.personID = personID;
                 urlCreate.push({
                     url: 'api/polls/' + this.poll.id
-                        + '/people/' + personID,
-                    body: { poll: this.poll },
+                        + '/people',
+                    body: body,
                 });
                 Promise.all(
                     urlCreate.map(el =>

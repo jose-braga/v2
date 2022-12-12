@@ -29,7 +29,7 @@
                 <v-col cols="8" >
                     <v-text-field v-model="newName"
                         label="New name to add"
-                        @change="addName"
+                        @input="addName"
                         single-line
                     >
                     </v-text-field>
@@ -81,6 +81,9 @@ export default {
      watch: {
         personId () {
             this.data.authorNames = [];
+            this.toCreate = [];
+            this.toDelete = [];
+            this.newName = null;
             this.initialize();
         },
     },
@@ -143,6 +146,7 @@ export default {
                     setTimeout(() => {this.success = false;}, 1500)
                     this.toDelete = [];
                     this.toCreate = [];
+                    this.newName = null;
                     this.initialize();
                 })
                 .catch((error) => {
@@ -150,6 +154,7 @@ export default {
                     this.error = true;
                     this.toDelete = [];
                     this.toCreate = [];
+                    this.newName = null;
                     this.initialize();
                     setTimeout(() => {this.error = false;}, 6000)
                     // eslint-disable-next-line
@@ -163,13 +168,10 @@ export default {
                 && this.newName !== undefined
                 && this.newName !== null
             ) {
-                let newItem = {
+                this.toCreate = [{
                     id: 'new',
                     name: this.newName,
-                };
-                this.data.authorNames.push(newItem);
-                this.toCreate.push(newItem);
-                this.newName = null;
+                }];
             }
         },
         removeName (author) {

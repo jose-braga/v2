@@ -23,7 +23,7 @@ const polls_vote = require('../controllers/polls/polls_vote');
 // to vote
 router.get('/people/:personID', cors(corsOptions), polls_vote.getPollsList);
 router.get('/:pollID/people/:personID', cors(corsOptions), polls_vote.getPollData);
-router.post('/:pollID/people/:personID', cors(corsOptions), polls_vote.writeUserVote);
+router.post('/:pollID/people', cors(corsOptions), polls_vote.writeUserVote);
 
 // specific to vote management
 router.get('/managers/:managerID', cors(corsOptions), polls_manage.getPollsList);
