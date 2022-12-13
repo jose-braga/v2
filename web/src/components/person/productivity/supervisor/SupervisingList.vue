@@ -1,12 +1,12 @@
 <template>
 <div>
-<v-card>
+<v-card fluid>
     <v-card-title primary-title>
         <div>
             <h3 class="headline">People you currently supervise</h3>
         </div>
     </v-card-title>
-    <v-container>
+    <v-container fluid>
         <v-form ref="form" class="my-2 ml-2"
             @submit.prevent="submitForm">
             <v-row>
@@ -307,14 +307,14 @@
         </v-data-table>
     </v-container>
 </v-card>
-<v-card class="mt-4">
+<v-card class="mt-4" fluid>
     <v-card-title primary-title>
         <div>
             <h3 class="headline">Past supervisions</h3>
         </div>
     </v-card-title>
     <v-card-text></v-card-text>
-    <v-container>
+    <v-container fluid>
         <v-data-table
             item-key="id"
             :search="search"

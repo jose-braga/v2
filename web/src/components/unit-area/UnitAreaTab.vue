@@ -1,4 +1,5 @@
 <template>
+<v-container fluid>
 <v-row>
     <v-col v-if="hasPermissions" cols="12">
         <UsersDocumentsList
@@ -22,6 +23,7 @@
         <div>You do not have permission to access this section.</div>
     </v-col>
 </v-row>
+</v-container>
 </template>
 
 <script>

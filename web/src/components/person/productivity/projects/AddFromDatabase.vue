@@ -6,7 +6,7 @@
         Search results will show only projects that are
         <b>not already associated with you</b>.
     </v-card-text>
-    <v-container>
+    <v-container fluid>
         <v-form ref="form" class="px-4"
                 @submit.prevent="submitForm">
             <v-row>

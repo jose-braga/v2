@@ -6,7 +6,7 @@
         Search results will show only publications that are
         <b>not already associated with you</b>.
     </v-card-text>
-    <v-container>
+    <v-container fluid>
         <v-form ref="form" class="pa-4"
                 @submit.prevent="submitForm">
             <v-row>

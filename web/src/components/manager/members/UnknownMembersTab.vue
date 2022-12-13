@@ -1,5 +1,5 @@
 <template>
-<v-container>
+<v-container fluid>
     <v-row>
         <v-col cols="12">
             <v-card>
@@ -23,7 +23,7 @@
                         ></v-text-field>
                     </v-col>
                 </v-row>
-                <v-container>
+                <v-container fluid>
                     <v-data-table
                         item-key="person_id"
                         :headers="headers"

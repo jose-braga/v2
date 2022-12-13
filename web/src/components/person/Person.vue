@@ -90,7 +90,7 @@
             </v-dialog>
         </v-tabs-items>
     </v-tabs>
-    <v-container>
+    <v-container fluid>
         <v-row cols="12" v-if="!loggedIn" class="pa-4">
             <v-col>Please login first (
                 the symbol <v-icon color="green darken">mdi-login</v-icon>

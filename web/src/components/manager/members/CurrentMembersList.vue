@@ -82,7 +82,7 @@
                 ></v-text-field>
             </v-col>
         </v-row>
-        <v-container>
+        <v-container fluid>
             <!--
                 :sort-by="['name']"
                 :sort-desc="[false]"

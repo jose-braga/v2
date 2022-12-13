@@ -16,7 +16,7 @@
                         color="blue"></v-progress-circular>
                 </v-row>
             </v-container>
-            <v-container v-if="!loadingJournals">
+            <v-container v-if="!loadingJournals" fluid>
                 <v-row justify="end">
                     <span class="small">Last updated: {{ publicationUpdated }}</span>
                 </v-row>

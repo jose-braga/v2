@@ -9,7 +9,7 @@
         </v-card-title>
         <v-card-text>
         </v-card-text>
-        <v-container>
+        <v-container fluid>
             <v-row align-content="center" justify="center" class="pt-6">
                 <div>
                     <v-btn type="submit"

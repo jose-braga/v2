@@ -1,6 +1,6 @@
 <template>
 <v-card flat>
-    <v-container>
+    <v-container fluid>
         <v-data-table
             item-key="id"
             :headers="headers"

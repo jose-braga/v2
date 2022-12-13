@@ -10,7 +10,7 @@
     departmentTeamData: {{departmentTeamData}}<br>
     myTeamsDepMan: {{data.myDepartmentTeamsManagement}}<br>
     -->
-    <v-container v-if="loggedIn && hasPermissions && isManagerView">
+    <v-container fluid v-if="loggedIn && hasPermissions && isManagerView">
         <v-row>
             <v-col cols="4">
                 <v-autocomplete

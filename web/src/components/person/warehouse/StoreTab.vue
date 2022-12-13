@@ -1,6 +1,6 @@
 <template>
 <div>
-    <v-container v-if="data.accounts.length > 1" class="mt-4 px-4">
+    <v-container fluid v-if="data.accounts.length > 1" class="mt-4 px-4">
         <v-row>
             <b>Please select the account through which you will make the orders:</b>
         </v-row>
@@ -16,7 +16,7 @@
     <v-container v-if="data.accounts.length === 0">
         <b>You are not associated to any warehouse account. Contact warehouse manager.</b>
     </v-container>
-    <v-container v-if="data.chosenAccount">
+    <v-container fluid v-if="data.chosenAccount">
         <v-row>
             <v-col cols="12"
             >

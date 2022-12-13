@@ -1,5 +1,5 @@
 <template>
-<v-card flat>
+<v-card flat fluid>
     <v-card-title primary-title>
     </v-card-title>
     <v-card-text>Search your ORCID profile (only publicly accessible data).
@@ -10,7 +10,7 @@
 
 
     </v-card-text>
-    <v-container>
+    <v-container fluid>
         <v-form ref="form" class="pa-4"
                 @submit.prevent="submitForm">
             <v-row>

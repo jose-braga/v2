@@ -1,5 +1,5 @@
 <template>
-<v-container>
+<v-container fluid>
     <v-row>
         <v-col cols="12">
             <v-card>
@@ -17,7 +17,7 @@
                     hide-details
                     class="px-2 mb-4"
                 ></v-text-field>
-                <v-container>
+                <v-container fluid>
                     <v-data-table
                         item-key="person_id"
                         :headers="headers"

@@ -1,5 +1,5 @@
 <template>
-<v-card flat>
+<v-card flat fluid>
     <v-card-title primary-title>
     </v-card-title>
     <v-card-text>Shown are publications in your institutional repository
@@ -9,7 +9,7 @@
         crucial data.<br>
         Should a warning about a slow script appear, you can safely choose "Wait".
     </v-card-text>
-    <v-container>
+    <v-container fluid>
         <v-form ref="form" class="pa-4"
                 @submit.prevent="submitForm">
             <v-row>

@@ -1,5 +1,5 @@
 <template>
-<v-card>
+<v-card fluid>
     <v-card-title primary-title>
         <div>
             <h3 class="headline">Publications from team members</h3>
@@ -7,7 +7,7 @@
     </v-card-title>
     <v-card-text>
     </v-card-text>
-    <v-container>
+    <v-container fluid>
         <v-form ref="form" class="pa-4"
                 @submit.prevent="submitForm">
             <v-row align-content="center" justify="end" class="mt-4">

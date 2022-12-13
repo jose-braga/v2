@@ -7,7 +7,7 @@
         </v-card-title>
         <v-card-text>
         </v-card-text>
-        <v-container>
+        <v-container fluid>
             <v-text-field
                 v-model="search"
                 append-icon="mdi-magnify"

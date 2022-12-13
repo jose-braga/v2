@@ -1,11 +1,11 @@
 <template>
-<v-card class="px-4">
+<v-card class="px-4 pb-4">
     <v-card-title primary-title>
         <div>
             <h3 class="headline">Documents</h3>
         </div>
     </v-card-title>
-    <v-container>
+    <v-container fluid>
         <v-row>
             <v-col v-for="(col, i) in data.col_documents"
                 cols="12" md="4"

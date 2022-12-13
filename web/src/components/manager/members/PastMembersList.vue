@@ -42,7 +42,7 @@
                 ></v-text-field>
             </v-col>
         </v-row>
-        <v-container>
+        <v-container fluid>
             <v-data-table
                 item-key="person_id"
                 :headers="headers"

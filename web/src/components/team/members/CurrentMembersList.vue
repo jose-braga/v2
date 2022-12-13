@@ -15,7 +15,7 @@
                 </ul>
             </p>
         </v-card-text>
-        <v-container>
+        <v-container fluid>
             <v-form ref="form" class="my-2 ml-2"
                 v-if="depTeamId !== undefined"
                 @submit.prevent="submitNewMember"

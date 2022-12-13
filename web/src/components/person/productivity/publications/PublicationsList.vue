@@ -6,7 +6,7 @@
         </div>
     </v-card-title>
     <v-card-text></v-card-text>
-    <v-container>
+    <v-container fluid>
         <v-form ref="form" class="pa-4"
                 @submit.prevent="submitForm">
             <v-row class="mb-2" align="center">

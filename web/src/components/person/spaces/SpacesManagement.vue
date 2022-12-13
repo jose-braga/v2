@@ -1,12 +1,12 @@
 <template>
-<v-card>
+<v-card fluid>
     <!-- For managing space associations at the person level -->
     <v-card-title primary-title>
         <div>
             <h3 class="headline">Spaces associated to you</h3>
         </div>
     </v-card-title>
-    <v-container>
+    <v-container fluid>
         <v-form ref="form" class="my-2 ml-2"
             @submit.prevent="submitForm"
         >
