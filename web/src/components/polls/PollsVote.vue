@@ -108,7 +108,11 @@
                     <v-col cols="6" sm="2" align-self="end">
                         <v-row justify="end">
                             <v-btn type="submit" class="white--text"
-                            color="blue">Vote</v-btn>
+                                :disabled="disabled"
+                                color="blue"
+                            >
+                                Vote
+                            </v-btn>
                         </v-row>
                     </v-col>
                     <v-col cols="6" sm="10">
@@ -150,6 +154,7 @@ export default {
             error: false,
             formError: false,
             isVoter: false,
+            disabled: false,
             data: {
             },
             poll: [],
@@ -201,6 +206,7 @@ export default {
                 this.formError = true;
             } else {
                 this.progress = true;
+                this.disabled = true;
                 let urlCreate = [];
                 let body = { poll: this.poll };
                 body.poll.personID = personID;
@@ -223,10 +229,11 @@ export default {
                     this.progress = false;
                     this.success = true;
                     this.submitted = true;
-                    setTimeout(() => {this.success = false;}, 3000)
+                    //setTimeout(() => {this.success = false;}, 3000)
                 })
                 .catch((error) => {
                     this.progress = false;
+                    this.disabled = false;
                     this.error = true;
                     setTimeout(() => {this.error = false;}, 10000)
                     // eslint-disable-next-line
