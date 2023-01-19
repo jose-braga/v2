@@ -598,7 +598,26 @@ var actionGetPeopleList = function (options) {
     var querySQL = '';
     var places = [];
     querySQL = querySQL
+        // for people without affiliations
         + 'SELECT DISTINCT people.id AS person_id, people.user_id, people.name, people.colloquial_name,'
+        + ' lab_positions.name_en AS position_name, labs.name AS lab_name, units.short_name AS unit, institution_city.city'
+        + ' FROM people'
+        + ' LEFT JOIN people_labs ON people_labs.person_id = people.id'
+        + ' LEFT JOIN lab_positions ON lab_positions.id = people_labs.lab_position_id'
+        + ' LEFT JOIN people_institution_city ON people_institution_city.person_id = people.id'
+        + ' LEFT JOIN institution_city ON institution_city.id = people_institution_city.city_id'
+        + ' LEFT JOIN labs ON labs.id = people_labs.lab_id'
+        + ' LEFT JOIN labs_groups ON labs_groups.lab_id = labs.id'
+        + ' LEFT JOIN `groups` ON `groups`.id = labs_groups.group_id'
+        + ' LEFT JOIN groups_units ON groups_units.group_id = `groups`.id'
+        + ' LEFT JOIN units ON units.id = groups_units.unit_id'
+        + ' WHERE people.status = 1'
+        + ' AND people.name LIKE ?'
+        + ' AND people_labs.lab_id IS NULL'
+        + ' AND (institution_city.city LIKE ? OR institution_city.city IS NULL)'
+        + ' UNION'
+        // for people with affiliations
+        + ' SELECT DISTINCT people.id AS person_id, people.user_id, people.name, people.colloquial_name,'
         + ' lab_positions.name_en AS position_name, labs.name AS lab_name, units.short_name AS unit, institution_city.city'
         + ' FROM people'
         + ' JOIN people_labs ON people_labs.person_id = people.id'
@@ -689,6 +708,7 @@ var actionGetPeopleList = function (options) {
         + '    AND (people_institution_city.valid_until IS NULL OR people_institution_city.valid_until >= ?))'
         + ' ORDER BY `name` ' + sortOrder;
         places.push(
+            q, city,
             q, unit, unit, position, city, today, today, today, today, today, today,
             q, unit, unit, position, city, today, today, today, today, today, today,
             q, unit, unit, position, city, today, today, today, today, today, today,
