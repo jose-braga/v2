@@ -65,6 +65,14 @@
                                     mdi-stop
                                 </v-icon>
                             </v-col>
+                            <v-col cols="1" v-if="(item.accounts === undefined && item.active === 0 && item.cost_center_active === 1) || (item.accounts !== undefined && item.active === 0)">
+                                <v-icon
+                                    @click="activateItem(item)"
+                                    color="green"
+                                >
+                                    mdi-play
+                                </v-icon>
+                            </v-col>
                             <v-col cols="1">
                                 <v-progress-circular indeterminate
                                         v-show="item.progress"
@@ -265,6 +273,10 @@ export default {
                         result[ind].new_id = result[ind].id;
                         if (result[ind].accounts.length > 0 ) {
                             for (let indAcc in result[ind].accounts) {
+                                result[ind].accounts[indAcc].cost_center_active = 1;
+                                if (result[ind].active === 0) {
+                                    result[ind].accounts[indAcc].cost_center_active = 0;
+                                }
                                 result[ind].accounts[indAcc].new_id = result[ind].new_id + '-' + result[ind].accounts[indAcc].id
                                 result[ind].accounts[indAcc].finances.sort((a,b) => {
                                     return a.year - b.year;
@@ -434,6 +446,67 @@ export default {
                 )
             } else {
                 this.$set(item, 'active', false)
+                url.push({
+                    url: 'api/people/' + personID
+                        + '/financial-management/cost-centers/' + item.cost_center_id
+                        + '/accounts/' + item.id,
+                    body: item,
+                });
+                action = Promise.all(
+                    url.map(el =>
+                        this.$http.put(el.url,
+                            { data: el.body, },
+                            { headers:
+                                { 'Authorization': 'Bearer ' + localStorage['v2-token'] },
+                            }
+                        ))
+                )
+            }
+            action
+            .then( () => {
+                this.$set(item, 'progress', false);
+                this.$set(item, 'success', true);
+                setTimeout(() => {
+                    this.$set(item, 'success', false);
+                    this.$set(item, 'editName', false)
+                    this.initialize();
+                }, 1500);
+
+            })
+            .catch((error) => {
+                this.$set(item, 'progress', false);
+                this.$set(item, 'error', true);
+                setTimeout(() => {
+                    this.$set(item, 'error', false);
+                    this.initialize();
+                }, 6000);
+                console.log(error)
+            })
+        },
+        activateItem (item) {
+            this.$set(item, 'active', true)
+            //this.$set(item, 'editName', false)
+            this.$set(item, 'progress', true)
+            let personID = this.$store.state.session.personID;
+            let url = [];
+            let action;
+            if (item.accounts) {
+                url.push({
+                    url: 'api/people/' + personID
+                        + '/financial-management/cost-centers/' + item.id,
+                    body: item,
+                });
+                action = Promise.all(
+                    url.map(el =>
+                        this.$http.put(el.url,
+                            { data: el.body, },
+                            { headers:
+                                { 'Authorization': 'Bearer ' + localStorage['v2-token'] },
+                            }
+                        ))
+                )
+            } else {
+                this.$set(item, 'active', true)
                 url.push({
                     url: 'api/people/' + personID
                         + '/financial-management/cost-centers/' + item.cost_center_id
