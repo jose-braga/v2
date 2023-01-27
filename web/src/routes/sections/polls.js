@@ -6,6 +6,8 @@ const PollsManage = () => import(/* webpackChunkName: "polls-manage" */ '@/compo
 const PollsManageHelp = () => import(/* webpackChunkName: "polls-manage-help" */ '@/components/polls/PollsManageHelp.vue')
 const PollsEdit = () => import(/* webpackChunkName: "polls-edit" */ '@/components/polls/PollsEdit.vue')
 const PollsEditHelp = () => import(/* webpackChunkName: "polls-edit-help" */ '@/components/polls/PollsEditHelp.vue')
+const PollsResults = () => import(/* webpackChunkName: "polls-results" */ '@/components/polls/PollsResults.vue')
+const PollsResultsHelp = () => import(/* webpackChunkName: "polls-results-help" */ '@/components/polls/PollsResultsHelp.vue')
 
 const routes = [
     {
@@ -34,6 +36,13 @@ const routes = [
         components: {
             default: PollsVote,
             help: PollsVoteHelp,
+        },
+    },
+    {
+        path: '/polls/:pollId/results',
+        components: {
+            default: PollsResults,
+            help: PollsResultsHelp,
         },
     },
 ]

@@ -39,6 +39,8 @@ router.post('/:pollID/managers/:managerID/questions/:questionID/options', cors(c
 router.put('/:pollID/managers/:managerID/questions/:questionID/options/:optionID', cors(corsOptions), polls_manage.updateQuestionOption);
 router.delete('/:pollID/managers/:managerID/questions/:questionID/options/:optionID', cors(corsOptions), polls_manage.deleteQuestionOption);
 
+router.get('/:pollID/managers/:managerID/results', cors(corsOptions), polls_manage.getResults);
+
 
 router.post('/:pollID/managers/:managerID/texts', cors(corsOptions), polls_manage.addNewText);
 router.put('/:pollID/managers/:managerID/texts/:textID', cors(corsOptions), polls_manage.updateText);

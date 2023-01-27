@@ -133,15 +133,19 @@ var getPollTexts = function (options) {
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             options.poll.texts = resQuery;
-            return responses.sendJSONResponseOptions({
-                response: res,
-                status: 200,
-                message: {
-                    "status": "success", "statusCode": 200,
-                    "count": 1,
-                    "result": options.poll,
-                }
-            });
+            if (options.getPollResults) {
+                return countRegistered(options);
+            } else {
+                return responses.sendJSONResponseOptions({
+                    response: res,
+                    status: 200,
+                    message: {
+                        "status": "success", "statusCode": 200,
+                        "count": 1,
+                        "result": options.poll,
+                    }
+                });
+            }
         },
         options
     );
@@ -797,4 +801,82 @@ var actionDeleteUserPoll = function (options) {
 module.exports.deleteUserPoll = function (req, res, next) {
     let options = { req, res, next };
     return checkPermissions(options, actionDeleteUserPoll)
+};
+
+var countRegistered = function (options) {
+    let { req, res, next, poll } = options;
+    let pollID = req.params.pollID;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'SELECT * FROM people_polls WHERE poll_id = ?;';
+    places.push(pollID);
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            let totalPossibleVoters = resQuery.length;
+            let whoVoted = resQuery.filter(el => el.voted === 1)
+            let numberVoted = whoVoted.length
+            options.poll.voterCount = {totalPossibleVoters, numberVoted}
+            return actionGetResults(options);
+        },
+        options
+    );
+}
+var actionGetResults = function (options) {
+    let { req, res, next, poll } = options;
+    let pollID = req.params.pollID;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'SELECT * FROM polls_results WHERE poll_id = ?;';
+    places.push(pollID);
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            for (let indQuestion in poll.questions) {
+                // beware of the type of question
+                // if line input or multiline input, just collect answers
+                let nonBlankVotes = 0;
+                let questionID = poll.questions[indQuestion].id;
+                if (poll.questions[indQuestion].question_type_name_en === 'Multiple choice') {
+                    for (let indOption in poll.questions[indQuestion].options) {
+                        let optionID = poll.questions[indQuestion].options[indOption].id;
+                        let votedThis = resQuery.filter(el =>
+                            el.poll_question_option_id === optionID && el.poll_question_id === questionID);
+                        poll.questions[indQuestion].options[indOption].votes = votedThis.length;
+                        nonBlankVotes = nonBlankVotes + votedThis.length;
+                    }
+                } else {
+                    let answers = [];
+                    for (let ind in resQuery) {
+                        if (resQuery[ind].poll_question_id === questionID
+                            && resQuery[ind].poll_question_option_text !== null
+                            && resQuery[ind].poll_question_option_text !== ''
+                        ) {
+                            answers.push(resQuery[ind].poll_question_option_text);
+                            nonBlankVotes = nonBlankVotes + 1;
+                        }
+                    }
+                    poll.questions[indQuestion].answers = answers;
+                }
+                poll.questions[indQuestion].totalNonBlank = nonBlankVotes;
+                poll.questions[indQuestion].totalBlank = poll.voterCount.numberVoted - nonBlankVotes;
+            }
+            return responses.sendJSONResponseOptions({
+                response: res,
+                status: 200,
+                message: {
+                    "status": "success", "statusCode": 200,
+                    "count": 1,
+                    "result": poll,
+                }
+            });
+        },
+        options
+    );
+}
+
+module.exports.getResults = function (req, res, next) {
+    let options = { req, res, next };
+    options.getPollResults = true;
+    return checkPermissions(options, actionGetPollData)
 };

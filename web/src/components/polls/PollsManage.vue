@@ -9,7 +9,7 @@
                 <h3 class="headline">All polls:</h3>
             </div>
         </v-card-title>
-        <v-card-text>Please choose the poll in which you want to vote:</v-card-text>
+        <v-card-text>Please choose the poll you want to edit:</v-card-text>
         <v-container class="px-6">
             <v-row align="center">
                 <v-col cols="12">

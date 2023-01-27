@@ -78,7 +78,7 @@
                         <li v-for="(poll, i) in data.pastPolls"
                             :key="i"
                         >
-                            <router-link :to="baseURL + poll.id">
+                            <router-link :to="baseURL + poll.id + '/results'">
                                 <b>{{poll.title}}</b> - Open from
                                 {{poll.date_from_show}}, {{poll.time_from_show}}
                                 to
