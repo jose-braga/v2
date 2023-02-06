@@ -240,6 +240,7 @@ export default {
                 this.$http.post('api/people/' + personID + '/cars-message',
                     {
                         data: {
+                            cars: this.data.cars,
                             message: this.message,
                             personName: this.$store.state.session.personName,
                         }
