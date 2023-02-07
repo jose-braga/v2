@@ -55,8 +55,12 @@ var actionAssociateTeamPublication = function (options) {
     options.currentUnit = currentUnit;
     querySQL = querySQL + 'INSERT INTO labs_publications'
                         + ' (lab_id, group_id, publication_id)'
-                        + ' VALUES (?,?,?);';
-    places.push(labID, currentGroup, publication.id);
+                        + ' SELECT ?, ?, ? FROM DUAL'
+                        + ' WHERE NOT EXISTS (SELECT *'
+                        +       ' FROM labs_publications'
+                        +       ' WHERE lab_id = ? AND group_id = ? AND publication_id = ?'
+                        +    ');';
+    places.push(labID, currentGroup, publication.id, labID, currentGroup, publication.id);
     return sql.makeSQLOperation(req, res, querySQL, places,
         (options) => {
             return actionAssociateUnitPublication(options)
