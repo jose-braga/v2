@@ -56,8 +56,20 @@ var getPersonSupervisor = function (options) {
     places.push(personID);
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
-            options.supervisors = resQuery;
-            return getPersonProfessionalSituation(options);
+            if (resQuery.length > 0) {
+                options.supervisors = resQuery;
+                return getPersonProfessionalSituation(options);
+            } else {
+                return responses.sendJSONResponseOptions({
+                    response: res,
+                    status: 400,
+                    message: {
+                        "status": "success",
+                        "statusCode": 400,
+                        "message": "You did not define any supervisors/responsibles.",
+                    }
+                });
+            }
         },
         options);
 }

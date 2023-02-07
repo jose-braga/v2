@@ -88,6 +88,7 @@
                                         color="primary"></v-progress-circular>
                                 <v-icon v-show="successEmail" color="green">mdi-check</v-icon>
                                 <v-icon v-show="errorEmail" color="red">mdi-alert-circle-outline</v-icon>
+                                <p v-show="errorEmail" class="red--text">{{errorMessage}}</p>
                             </div>
                         </v-card-actions>
                     </v-form>
@@ -130,6 +131,7 @@ export default {
             progressEmail: false,
             successEmail: false,
             errorEmail: false,
+            errorMessage: '',
             formError: false,
             emailFormError: false,
             dialog: false,
@@ -258,6 +260,9 @@ export default {
                     }, 1500);
                 })
                 .catch((error) => {
+                    if (error.response) {
+                        this.errorMessage = error.response.data.message;
+                    }
                     this.progressEmail = false;
                     this.errorEmail = true;
                     setTimeout(() => {this.error = false;}, 6000)
