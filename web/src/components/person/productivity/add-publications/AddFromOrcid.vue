@@ -111,6 +111,7 @@
 import subUtil from '@/components/common/submit-utils'
 import {orderBy} from 'lodash'
 import leven from 'leven'
+import pThrottle from 'p-throttle'
 
 import PublicationDetails from './PublicationDetails'
 
@@ -653,7 +654,7 @@ export default {
                 return subUtil.getPublicInfo(vm, urlSubmit, 'journals');
             }
         },
-        getORCIDPublications () {
+        async getORCIDPublications () {
             let baseURL = 'https://pub.orcid.org';
             let version = 'v2.1';
             let resource = 'works';
@@ -672,12 +673,16 @@ export default {
                         headers: { 'Accept': 'application/json' },
                     });
                 })
-                .then( (result) => {
+                .then( async (result) => {
                     let resultFiltered = filterORCIDData(result.data)
                     resultFiltered = removeExistingPublications(resultFiltered, this.data.publicationsDB);
                     this.data.publications = resultFiltered;
                     this.messageORCIDRequest = 'Processing results'
-                    return Promise.all(
+                    const throttle = pThrottle({
+                        limit: 50,
+                        interval: 1000
+                    });
+                    const pub_data = await Promise.all(
                         this.data.publications.map(el => {
                             let resource = 'work';
                             let url = baseURL
@@ -685,17 +690,23 @@ export default {
                                 + '/' + this.data.orcid
                                 + '/' + resource
                                 + '/' + el.putcode;
-                            return this.$http.get(url, {
-                                headers: { 'Accept': 'application/json' },
-                            });
+                            return throttle( () =>
+                                this.$http.get(url, { headers: { 'Accept': 'application/json' },})
+                            );
                         }
                     ))
-                })
-                .then(  (details) => {
-                    for (let ind in details) {
+                    let pubToAddNumber = pub_data.length;
+                    let counter = 0;
+                    for (let ind in pub_data) {
+                        counter++;
+                        let detail = await pub_data[ind]()
+                        let percentage = (counter * 1.0) / (pubToAddNumber * 1.0) * 100.0;
+                        percentage = percentage.toFixed(1);
+                        this.messageORCIDRequest = 'Processing results: '
+                                                    + percentage + '%'
                         this.$set(this.data.publications[ind], 'publication_id',
                                         parseInt(ind, 10));
-                        this.data.publications[ind] = processDetails(this.data.publications[ind], details[ind]);
+                        this.data.publications[ind] = processDetails(this.data.publications[ind], detail);
                         this.data.publications[ind] = determineJournal(this.data.publications[ind], this.journals);
                         if (this.data.publications[ind].title === null
                             || this.data.publications[ind].authors_raw === null
@@ -707,7 +718,8 @@ export default {
                     this.onResize();
                     this.progressORCID = false;
                     this.finishedGetORCID = true;
-                });
+
+                })
             }
         },
         updateData (publicationData) {
