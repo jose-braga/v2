@@ -656,7 +656,7 @@ export default {
         getORCIDPublications () {
             this.data.publications = [];
             let baseURL = 'https://pub.orcid.org';
-            let version = 'v2.1';
+            let version = 'v3.0';
             let resource = 'works';
             let urlORCID = baseURL
                         + '/' + version
