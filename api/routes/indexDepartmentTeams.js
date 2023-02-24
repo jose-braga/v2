@@ -1,5 +1,5 @@
 var express = require('express');
-var jwt = require('express-jwt');
+var { expressjwt: jwt } = require("express-jwt");
 var cors = require('cors')
 var router = express.Router();
 
