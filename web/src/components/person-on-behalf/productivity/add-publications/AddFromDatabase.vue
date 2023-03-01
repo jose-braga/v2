@@ -97,9 +97,10 @@
 
 <script>
 import subUtil from '@/components/common/submit-utils'
-import {orderBy} from 'lodash'
+import {orderBy, debounce} from 'lodash'
 
 import PublicationDetails from './PublicationDetails'
+let countReq = 0;
 
 export default {
     components: {
@@ -146,7 +147,7 @@ export default {
     watch: {
     },
     methods: {
-        searchPublications (authors, titles) {
+        searchPublications (authors, titles, reqTime) {
             let minimumLength = 3;
             if (authors.length > minimumLength || titles.length > minimumLength) {
                 let personID = this.otherPersonId;
@@ -162,17 +163,23 @@ export default {
                 }
                 subUtil.getInfoPopulate(this, urlSubmit, true)
                 .then( (result) => {
-                    for (let ind in result) {
-                        result[ind].title_show = result[ind].title;
-                        result[ind].authors_raw_show = result[ind].authors_raw;
+                    if (reqTime === countReq) {
+                        for (let ind in result) {
+                            result[ind].title_show = result[ind].title;
+                            result[ind].authors_raw_show = result[ind].authors_raw;
+                        }
+                        this.data.publications = result;
+                        this.onResize();
                     }
-                    this.data.publications = result;
-                    this.onResize();
                 })
             } else {
                 this.data.publications = [];
             }
         },
+        filterData: debounce(function () {
+            countReq++;
+            this.searchPublications(this.searchAuthors, this.searchTitle, countReq);
+        }, 600),
         updateData (publicationData) {
             for (let ind in this.data.publications) {
                 if (this.data.publications[ind].publication_id === publicationData.publication_id) {

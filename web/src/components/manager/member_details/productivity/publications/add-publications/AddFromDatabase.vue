@@ -11,7 +11,7 @@
                 <v-col cols="12" md="6">
                     <v-text-field
                         v-model="searchAuthors"
-                        @input="searchPublications(searchAuthors, searchTitle)"
+                        @input="filterData"
                         append-icon="mdi-magnify"
                         label="Search authors (char > 3)"
                         single-line
@@ -22,7 +22,7 @@
                 <v-col cols="12" md="6">
                     <v-text-field
                         v-model="searchTitle"
-                        @input="searchPublications(searchAuthors, searchTitle)"
+                        @input="filterData"
                         append-icon="mdi-magnify"
                         label="Search titles (char > 3)"
                         single-line
@@ -95,9 +95,11 @@
 
 <script>
 import subUtil from '@/components/common/submit-utils'
-import {orderBy} from 'lodash'
+//import time from '@/components/common/date-utils'
+import {orderBy, debounce} from 'lodash'
 
 import PublicationDetails from './PublicationDetails'
+let countReq = 0;
 
 export default {
     components: {
@@ -117,6 +119,7 @@ export default {
             success: false,
             error: false,
             formError: false,
+            mostRecentRequest: null,
             searchTitle: '',
             searchAuthors: '',
             headers: [
@@ -149,7 +152,8 @@ export default {
         );
     },
     methods: {
-        searchPublications (authors, titles) {
+        searchPublications (authors, titles, reqTime) {
+            console.log(reqTime)
             this.data.publications = [];
             let minimumLength = 3;
             if (authors.length > minimumLength || titles.length > minimumLength) {
@@ -168,17 +172,23 @@ export default {
                 }
                 subUtil.getInfoPopulate(this, urlSubmit, true)
                 .then( (result) => {
-                    for (let ind in result) {
-                        result[ind].title_show = result[ind].title;
-                        result[ind].authors_raw_show = result[ind].authors_raw;
+                    if (reqTime === countReq) {
+                        for (let ind in result) {
+                            result[ind].title_show = result[ind].title;
+                            result[ind].authors_raw_show = result[ind].authors_raw;
+                        }
+                        this.data.publications = result;
+                        this.onResize();
                     }
-                    this.data.publications = result;
-                    this.onResize();
                 })
             } else {
                 this.data.publications = [];
             }
         },
+        filterData: debounce(function () {
+            countReq++;
+            this.searchPublications(this.searchAuthors, this.searchTitle, countReq/*this.mostRecentRequest*/);
+        }, 600),
         updateData (publicationData) {
             for (let ind in this.data.publications) {
                 if (this.data.publications[ind].publication_id === publicationData.publication_id) {
@@ -238,13 +248,13 @@ export default {
                     setTimeout(() => {this.success = false;}, 1500)
                     this.$root.$emit('managerReloadPublicationsList');
                     this.toDelete = [];
-                    this.searchPublications (this.searchAuthors, this.searchTitle);
+                    this.filterData();
                 })
                 .catch((error) => {
                     this.progress = false;
                     this.error = true;
                     this.toDelete = [];
-                    this.searchPublications (this.searchAuthors, this.searchTitle);
+                    this.filterData();
                     setTimeout(() => {this.error = false;}, 6000)
                     // eslint-disable-next-line
                     console.log(error)

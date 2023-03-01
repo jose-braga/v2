@@ -19,9 +19,14 @@ function processQuery(query, prop) {
     } else {
         exactMatches = [];
     }
+    remainingStr = remainingStr.replace(/\"/g,'').trim();
+    let remainingSplit = remainingStr.split(' ');
+    for (let ind in remainingSplit) {
+        remainingSplit[ind] = '%' + remainingSplit[ind].trim().replace(/\s/gi,'%') + '%';
+    }
     return {
         exactMatches,
-        remainingStr,
+        remainingSplit,
     }
 }
 var actionGetPublications = function (options) {
@@ -61,9 +66,11 @@ var actionGetPublications = function (options) {
             conditions = conditions + ' AND REGEXP_LIKE(publications.authors_raw, ?, "c")';
             places.push(queryAuthors.exactMatches[ind])
         }
-        if (queryAuthors.remainingStr !== '') {
-            conditions = conditions + ' AND publications.authors_raw LIKE ?';
-            places.push('%' + queryAuthors.remainingStr.replace(/\s/gi,'%') + '%');
+        if (queryAuthors.remainingSplit !== '') {
+            for (let ind in queryAuthors.remainingSplit) {
+                conditions = conditions + ' AND publications.authors_raw LIKE ?';
+                places.push(queryAuthors.remainingSplit[ind]);
+            }
         }
     }
     if (queryTitle !== undefined) {
@@ -71,9 +78,11 @@ var actionGetPublications = function (options) {
             conditions = conditions + ' AND REGEXP_LIKE(publications.title, ?, "c")';
             places.push(queryTitle.exactMatches[ind])
         }
-        if (queryTitle.remainingStr !== '') {
-            conditions = conditions + ' AND publications.title LIKE ?';
-            places.push('%' + queryTitle.remainingStr.replace(/\s/gi,'%') + '%');
+        if (queryTitle.remainingSplit !== '') {
+            for (let ind in queryTitle.remainingSplit) {
+                conditions = conditions + ' AND publications.title LIKE ?';
+                places.push(queryTitle.remainingSplit[ind]);
+            }
         }
     }
     querySQL = querySQL + conditions + ';';
