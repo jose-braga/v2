@@ -11,7 +11,6 @@
             <li>After pressing "Pre-register", the new user will receive an email with a link for a form in which additional data is filled.</li>
             <li>Finally, a member from the Science Management will approve the new registration.</li>
         </ul>
-        {{success}}
     </v-card-text>
     <v-container class="px-6">
         <v-form ref="form"
