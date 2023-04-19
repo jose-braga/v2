@@ -24,8 +24,8 @@
                             Number of effective voters: {{ poll.voterCount.numberVoted }}
                         </li>
                         <li>
-                            Abstention: {{ poll.voterCount.abstention }}
-                            ({{poll.voterCount.abstentionPercentage}}%)
+                            Poll turnout: {{ poll.voterCount.abstention }}
+                            ({{poll.voterCount.pollTurnout}}%)
                         </li>
                     </ul>
                 </v-row>
@@ -162,8 +162,8 @@
                     this.poll = result.data.result;
                     let abstention = this.poll.voterCount.totalPossibleVoters - this.poll.voterCount.numberVoted
                     this.$set(this.poll.voterCount,'abstention', abstention);
-                    this.$set(this.poll.voterCount,'abstentionPercentage',
-                        (abstention * 1.0 / this.poll.voterCount.totalPossibleVoters * 100)
+                    this.$set(this.poll.voterCount,'pollTurnout',
+                        (100.0 - abstention * 100.0 / this.poll.voterCount.totalPossibleVoters)
                         .toFixed(2)
                         );
                     for (let indQuestion in this.poll.questions) {
@@ -179,7 +179,7 @@
                             this.$set(this.poll.questions[indQuestion],'data', [{values}]);
                         }
                         this.$set(this.poll.questions[indQuestion],'blankPercentage',
-                            (question.totalBlank * 1.0 / (question.totalNonBlank + question.totalBlank))
+                            (question.totalBlank * 100.0 / (question.totalNonBlank + question.totalBlank))
                             .toFixed(2)
                         );
                     }
