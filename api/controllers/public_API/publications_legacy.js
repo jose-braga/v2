@@ -2,6 +2,10 @@ const sql = require('../utilities/sql');
 const time = require('../utilities/time');
 const responses = require('../utilities/responses');
 
+function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+}
+
 var getPeopleAssociatedPublication = function(options) {
     let { req, res, next, publications, i } = options;
     let querySQL;

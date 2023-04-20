@@ -37,6 +37,7 @@
                         </v-card-title>
                         <v-card-text></v-card-text>
                         <v-container>
+                            {{ data.item }}
                             <v-form ref="form"
                                 @submit.prevent="submitForm"
                             >
@@ -301,52 +302,77 @@ export default {
                     urlUpdate = 'api/unit-areas/' + this.unitId
                                 + '/documents/' + this.data.item.id;
                 }
-                const formData = new FormData()
-                formData.append('title',this.data.item.title);
-                formData.append('content',this.data.item.content);
-                formData.append('doc_type_id',this.data.item.doc_type_id);
-                formData.append('sort_order',this.data.item.sort_order);
-                if (this.data.item.valid_from !== null
-                        && this.data.item.valid_from !== undefined) {
-                    formData.append('valid_from', this.data.item.valid_from);
-                }
-                if (this.data.item.valid_until !== null
-                        && this.data.item.valid_until !== undefined) {
-                    formData.append('valid_until', this.data.item.valid_until);
-                }
-                if (this.data.item.attachment_url !== null
-                        && this.data.item.attachment_url !== undefined) {
-                    formData.append('attachment_url', this.data.item.attachment_url);
-                }
-                if (this.data.item.file !== null && this.data.item.file !== undefined) {
-                    formData.append('file_name', this.data.item.file.name);
-                    formData.append('file', this.data.item.file);
-                }
-
-                this.$http.put(urlUpdate,
-                    formData,
-                    {
-                        headers: {
-                            'Authorization': 'Bearer ' + localStorage['v2-token'],
-                            'Content-Type': 'multipart/form-data'
-                        },
+                if (this.data.item.file !== undefined && this.data.item.file !== null) {
+                    const formData = new FormData()
+                    formData.append('title',this.data.item.title);
+                    formData.append('content',this.data.item.content);
+                    formData.append('doc_type_id',this.data.item.doc_type_id);
+                    formData.append('sort_order',this.data.item.sort_order);
+                    if (this.data.item.valid_from !== null
+                            && this.data.item.valid_from !== undefined) {
+                        formData.append('valid_from', this.data.item.valid_from);
                     }
-                )
-                .then(() => {
-                    this.progress = false;
-                    this.success = true;
-                    this.initialize();
-                    this.$root.$emit('updateUnitUserDocumentsList')
-                    setTimeout(() => {this.success = false;}, 1500);
-                })
-                .catch((error) => {
-                    this.progress = false;
-                    this.error = true;
-                    this.initialize();
-                    setTimeout(() => {this.error = false;}, 6000)
-                    // eslint-disable-next-line
-                    console.log(error)
-                });
+                    if (this.data.item.valid_until !== null
+                            && this.data.item.valid_until !== undefined) {
+                        formData.append('valid_until', this.data.item.valid_until);
+                    }
+                    if (this.data.item.attachment_url !== null
+                            && this.data.item.attachment_url !== undefined) {
+                        formData.append('attachment_url', this.data.item.attachment_url);
+                    }
+                    if (this.data.item.file !== null && this.data.item.file !== undefined) {
+                        formData.append('file_name', this.data.item.file.name);
+                        formData.append('file', this.data.item.file);
+                    }
+
+                    this.$http.put(urlUpdate,
+                        formData,
+                        {
+                            headers: {
+                                'Authorization': 'Bearer ' + localStorage['v2-token'],
+                                'Content-Type': 'multipart/form-data'
+                            },
+                        }
+                    )
+                    .then(() => {
+                        this.progress = false;
+                        this.success = true;
+                        this.initialize();
+                        this.$root.$emit('updateUnitUserDocumentsList')
+                        setTimeout(() => {this.success = false;}, 1500);
+                    })
+                    .catch((error) => {
+                        this.progress = false;
+                        this.error = true;
+                        this.initialize();
+                        setTimeout(() => {this.error = false;}, 6000)
+                        // eslint-disable-next-line
+                        console.log(error)
+                    });
+                } else {
+                    this.data.item.type_update = 'only text';
+                    this.$http.put(urlUpdate,
+                        { data: this.data.item, },
+                        { headers:
+                            {'Authorization': 'Bearer ' + localStorage['v2-token']},
+                        }
+                    )
+                    .then(() => {
+                        this.progress = false;
+                        this.success = true;
+                        this.initialize();
+                        this.$root.$emit('updateUnitUserDocumentsList')
+                        setTimeout(() => {this.success = false;}, 1500);
+                    })
+                    .catch((error) => {
+                        this.progress = false;
+                        this.error = true;
+                        this.initialize();
+                        setTimeout(() => {this.error = false;}, 6000)
+                        // eslint-disable-next-line
+                        console.log(error)
+                    });
+                }
             }
         },
         deleteDocuments() {
