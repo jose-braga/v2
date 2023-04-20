@@ -10,7 +10,13 @@ var storage = multer.diskStorage({ //multers disk storage settings
     destination: function (req, file, callback) {
         var unitID = req.params.unitID;
         var cityID = req.params.cityID;
-        let addDocID = req.docID;
+        let addDocID
+        if (req.params === undefined || req.params.docID === undefined) {
+            addDocID = req.docID;
+        } else {
+            addDocID = req.params.docID;
+        }
+        //addDocID = req.docID;
         var tempDirectory;
         if (cityID === undefined) {
             tempDirectory = 'documents/units/' + unitID + '/' + addDocID;
@@ -150,7 +156,6 @@ var createDocAddRemainingDataDB = function (req, res, next) {
                 req.docID);
     return sql.makeSQLOperation(req, res, querySQL, places);
 };
-
 module.exports.createDoc = function (req, res, next) {
     permissions.checkPermissions(
         (options) => { actionCreateDocDBEntry(options) },
@@ -158,18 +163,12 @@ module.exports.createDoc = function (req, res, next) {
     );
 };
 
-var updateDocwriteFile = function (options) {
+var updateReadFormdata = function(options) {
     let { req, res, next } = options;
-    let unitID = req.params.unitID;
-    let cityID = req.params.cityID;
     let docID = req.params.docID;
-    // to keep file system clean the directory is always removed
-    let deleteDirectory = 'documents/units/' + unitID
-                        + '/cities/'+ cityID
-                        + '/' + docID;
-    fs.remove(deleteDirectory)
-    .then(() => {
-        req.docID = docID;
+    if (req.body.data !== undefined && req.body.data !== null ) {
+        return updateOnlyInDB(options);
+    } else {
         var upload = multer({
             storage: storage,
         }).single('file');
@@ -178,13 +177,11 @@ var updateDocwriteFile = function (options) {
                 responses.sendJSONResponse(res, 500, { "status": "error", "statusCode": 500, "error": err.stack });
                 return;
             }
+            req.docID = docID;
             return updateDocDataDB(req, res, next);
         });
-    })
-    .catch((err) => {
-        console.log(err);
-    });
-};
+    }
+}
 var updateDocDataDB = function (req, res, next) {
     var docData = req.body;
     let valid_from = null;
@@ -224,10 +221,46 @@ var updateDocDataDB = function (req, res, next) {
                 req.docID);
     return sql.makeSQLOperation(req, res, querySQL, places);
 };
+var updateOnlyInDB = function (options) {
+    let { req, res, next } = options;
+    var docData = req.body.data;
+    console.log(docData)
+    let docID = req.params.docID;
+    let valid_from = null;
+    let valid_until = null;
+    if (docData.valid_from !== null && docData.valid_from !== undefined && docData.valid_from !== '') {
+        valid_from = time.momentToDate(docData.valid_from);
+    }
+    if (docData.valid_until !== null && docData.valid_until !== undefined && docData.valid_until !== '') {
+        valid_until = time.momentToDate(docData.valid_until);
+    }
+    let url = docData.attachment_url.replace(/\s/g,'%20');
+
+    let querySQL = '';
+    let places = [];
+    querySQL = 'UPDATE unit_city_documents'
+                + ' SET doc_type_id = ?,'
+                + ' title = ?,'
+                + ' content = ?,'
+                + ' attachment_url = ?,'
+                + ' valid_from = ?,'
+                + ' valid_until = ?,'
+                + ' sort_order = ?'
+                + ' WHERE id = ?';
+    places.push(docData.doc_type_id,
+                docData.title,
+                docData.content,
+                url,
+                valid_from,
+                valid_until,
+                docData.sort_order,
+                docID);
+    return sql.makeSQLOperation(req, res, querySQL, places);
+};
 module.exports.updateDoc = function (req, res, next) {
     permissions.checkPermissions(
         (options) => {
-            updateDocwriteFile(options) },
+            updateReadFormdata(options) },
         { req, res, next }
     );
 };
