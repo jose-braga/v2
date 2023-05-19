@@ -5,148 +5,70 @@ var time = require('../utilities/time');
 const nodemailer = require('../../config/emailer');
 let transporter = nodemailer.transporter;
 
+let NUMBER_EMAILS_YEAR = 4;
+let MONTH_NUMBER = 12;
+let MONTH_INTERVAL = Math.floor(MONTH_NUMBER / NUMBER_EMAILS_YEAR);
+let MINIMUM_WAIT_MONTHS = Math.max(1, MONTH_INTERVAL - 1);
+
 var emailTexts = function (options){
     let { req, res, next, peopleListObj, i, todayRecipients } = options;
     let person = peopleListObj[todayRecipients[i]];
     return {
         subjectText: 'A gentle reminder from the platform https://v2.laqv-ucibio.info',
         emailBody: 'Dear ' + person.colloquial_name + ',\n\n'
-            + 'This is an automatic annual reminder from the data management platform '
+            + 'This is an automatic periodic reminder from the data management platform '
             + ' at https://v2.laqv-ucibio.info and its sole purpose is to remind'
             + ' you to check and update your profile.\n\n'
+            + ' A few thing that are really important to check:\n\n'
+            + ' - Professional Situations (tab "Academic & Professional")\n'
+            + ' - Academic degrees (tab "Academic & Professional")\n'
+            + ' - Ciência ID filled in (tab "Institutional & Scientific")\n'
+            + ' - Research Unit Affiliations (tab "Institutional & Scientific")\n\n'
+            + ' And the following are also relevant for reports or your Research Unit website:\n\n'
+            + ' - Data visibility authorization (tab "Personal")\n'
+            + ' - Full name, Gender and Nationalities (tab "Personal")\n'
+            + ' - Photo (tab "Personal")\n'
+            + ' - Personal URLs (tab "Personal")\n'
+            + ' - Short CV (for LAQV) or Research Interests (for UCIBIO)\n'
+            + ' - Institutional Contacts\n\n'
             + ' Your contribution is essential for writing successful institutional'
             + '  applications, activity reports and many science management tasks.\n\n'
             + 'If currently you are no longer associated with LAQV or UCIBIO,'
-            + ' or if you don\'t want to receive more automatic emails like this'
+            //+ ' or if you don\'t want to receive more automatic emails like this'
             + ' please let us know by sending an email to José Braga (josebraga@fct.unl.pt).\n\n'
             + 'Best regards,\n'
             + 'José Braga\n'
             + 'Platform developer',
         emailBodyHtml: '<p>' + 'Dear ' + person.colloquial_name + ',</p>'
-        + '<p>This is an automatic annual reminder from the data management platform at '
+        + '<p>This is an automatic periodic reminder from the data management platform at '
         + '<a href="https://v2.laqv-ucibio.info">https://v2.laqv-ucibio.info</a>'
         + ' and its sole purpose is to remind you to check and update your profile.</p>'
+        + ' <p>A few thing that are really important to check:</p>'
+        + '<ol>'
+            + '<li>Professional Situations (tab "Academic & Professional")</li>'
+            + '<li>Academic degrees (tab "Academic & Professional")</li>'
+            + '<li>Ciência ID filled in (tab "Institutional & Scientific")</li>'
+            + '<li>Research Unit Affiliations (tab "Institutional & Scientific")</li>'
+        + '</ol>'
+            + ' <p>And the following are also relevant for reports or your Research Unit website:</p>'
+        + '<ol>'
+            + '<li>Data visibility authorization (tab "Personal")</li>'
+            + '<li>Full name, Gender and Nationalities (tab "Personal")</li>'
+            + '<li>Photo (tab "Personal")</li>'
+            + '<li>Personal URLs (tab "Personal")</li>'
+            + '<li>Short CV (for LAQV) or Research Interests (for UCIBIO)</li>'
+            + '<li>Institutional Contacts</li>'
+        + '</ol>'
         + '<p>Your contribution is essential for writing successful institutional'
         + ' applications, activity reports and many science management tasks.</p>'
         + '<p>If currently you are no longer associated with LAQV or UCIBIO,'
-        + ' or if you don\'t want to receive more automatic emails like this'
-        + ' please let us know by sending an email to <a href="mailto:josebraga@fct.unl.pt">José Braga</a>.</p>'
+        //+ ' or if you don\'t want to receive more automatic emails like this'
+        + ' please let us know by sending an email to'
+        + ' <a href="mailto:josebraga@fct.unl.pt">José Braga</a>.</p>'
         + '<p>Best regards,<br>'
         + 'José Braga<br>'
         + 'Platform developer</p>'
     };
-    /*
-    if (person.active_unit === undefined && person.inactive_unit === undefined ) {
-        // no affiliations defined
-        return {
-            subjectText: undefined,
-            emailBody: undefined,
-            emailBodyHtml: undefined
-        };
-    } else if (person.active_unit === 'UCIBIO') {
-        return {
-            subjectText: 'Today it\'s your birthday! Congratulations from the UCIBIO Team!',
-            emailBody: 'Dear ' + person.colloquial_name + ',\n\n'
-                + 'The UCIBIO team wishes you a happy birthday!\n\n'
-                + 'We take this opportunity to remind you to complete and update'
-                + ' your information in the UCIBIO data management platform'
-                + ' (just click here: https://v2.laqv-ucibio.info).'
-                + ' Such information is essential for the success of the'
-                + ' Research Unit (applications, activity reports and many other).\n\n'
-                + 'If currently you are no longer associated with UCIBIO,'
-                + ' or if you don\'t want to receive more automatic emails like this'
-                + ' please let us know by sending an email to José Braga (josebraga@fct.unl.pt).\n\n'
-                + 'Best regards,\n'
-                + 'UCIBIO Team',
-            emailBodyHtml: '<p>' + 'Dear ' + person.colloquial_name + ',</p>'
-            + '<p>The UCIBIO team wishes you a happy birthday!</p>'
-            + '<p>We take this opportunity to remind you to complete and update'
-            + ' your information in the UCIBIO data management platform'
-            + ' (just click here <a href="https://v2.laqv-ucibio.info">https://v2.laqv-ucibio.info</a>).'
-            + ' Such information is essential for the success of the Research Unit'
-            + ' (to write institutional applications, activity reports and many other).</p>'
-            + '<p>If currently you are no longer associated with UCIBIO,'
-            + ' or if you don\'t want to receive more automatic emails like this'
-            + ' please let us know by sending an email to <a href="mailto:josebraga@fct.unl.pt">José Braga</a>.</p>'
-            + '<p>Best regards,<br>'
-            + 'UCIBIO Team</p>'
-        };
-    } else if (person.active_unit === 'LAQV') {
-        return {
-            subjectText: 'Today it\'s your birthday! Congratulations from the LAQV Team!',
-            emailBody: 'Dear ' + person.colloquial_name + ',\n\n'
-                + 'The LAQV team wishes you a happy birthday!\n\n'
-                + 'We take this opportunity to remind you to complete and update'
-                + ' your information in the LAQV data management platform'
-                + ' (just click here: https://v2.laqv-ucibio.info).'
-                + ' Such information is essential for the success of the'
-                + ' Research Unit (applications, activity reports and many other).\n\n'
-                + 'If currently you are no longer associated with LAQV,'
-                + ' or if you don\'t want to receive more automatic emails like this'
-                + ' please let us know by sending an email to José Braga (josebraga@fct.unl.pt).\n\n'
-                + 'Best regards,\n'
-                + 'LAQV Team',
-            emailBodyHtml: '<p>' + 'Dear ' + person.colloquial_name + ',</p>'
-            + '<p>The LAQV team wishes you a happy birthday!</p>'
-            + '<p>We take this opportunity to remind you to complete and update'
-            + ' your information in the LAQV data management platform'
-            + ' (just click here <a href="https://v2.laqv-ucibio.info">https://v2.laqv-ucibio.info</a>).'
-            + ' Such information is essential for the success of the Research Unit'
-            + ' (to write institutional applications, activity reports and many other).</p>'
-            + '<p>If currently you are no longer associated with LAQV,'
-            + ' or if you don\'t want to receive more automatic emails like this'
-            + ' please let us know by sending an email to <a href="mailto:josebraga@fct.unl.pt">José Braga</a>.</p>'
-            + '<p>Best regards,<br>'
-            + 'LAQV Team</p>'
-        };
-
-    } else if (person.inactive_unit === 'UCIBIO') {
-        return {
-            subjectText: 'Today it\'s your birthday! Congratulations from the UCIBIO Team!',
-            emailBody: 'Dear ' + person.colloquial_name + ',\n\n'
-                + 'The UCIBIO team wishes you a happy birthday!\n\n'
-                + 'We take this opportunity to inform you that according to our'
-                + ' records you do not have an ongoing affiliation with UCIBIO.'
-                + ' If this information is wrong or if you don\'t want to receive'
-                + ' more automatic emails like this please let us know by'
-                + ' sending an email to José Braga (josebraga@fct.unl.pt).\n\n'
-                + 'Best regards,\n'
-                + 'UCIBIO Team',
-            emailBodyHtml: '<p>' + 'Dear ' + person.colloquial_name + ',</p>'
-            + '<p>The UCIBIO team wishes you a happy birthday!</p>'
-            + '<p>We take this opportunity to inform you that according to our'
-            + ' records you do not have an ongoing affiliation with UCIBIO.'
-            + ' If this information is wrong or if you don\'t want to receive'
-            + ' more automatic emails like this please let us know by'
-            + ' by sending an email to <a href="mailto:josebraga@fct.unl.pt">José Braga</a>.</p>'
-            + '<p>Best regards,<br>'
-            + 'UCIBIO Team</p>'
-        };
-    } else if (person.inactive_unit === 'LAQV') {
-        return {
-            subjectText: 'Today it\'s your birthday! Congratulations from the LAQV Team!',
-            emailBody: 'Dear ' + person.colloquial_name + ',\n\n'
-                + 'The LAQV team wishes you a happy birthday!\n\n'
-                + 'We take this opportunity to inform you that according to our'
-                + ' records you do not have an ongoing affiliation with LAQV.'
-                + ' If this information is wrong or if you don\'t want to receive'
-                + ' more automatic emails like this please let us know by'
-                + ' sending an email to José Braga (josebraga@fct.unl.pt).\n\n'
-                + 'Best regards,\n'
-                + 'LAQV Team',
-            emailBodyHtml: '<p>' + 'Dear ' + person.colloquial_name + ',</p>'
-            + '<p>The LAQV team wishes you a happy birthday!</p>'
-            + '<p>We take this opportunity to inform you that according to our'
-            + ' records you do not have an ongoing affiliation with LAQV.'
-            + ' If this information is wrong or if you don\'t want to receive'
-            + ' more automatic emails like this please let us know by'
-            + ' by sending an email to <a href="mailto:josebraga@fct.unl.pt">José Braga</a>.</p>'
-            + '<p>Best regards,<br>'
-            + 'LAQV Team</p>'
-        };
-
-    }
-    */
 };
 
 var authenticate = function (options) {
@@ -171,18 +93,20 @@ var authenticate = function (options) {
             return;
         }
         if (user) {
-            return getPersonActive(options);
+            return getAllPeopleRecent(options);
 
         } else {
             responses.sendJSONResponse(res, 401, info);
         }
     })(req, res);
-
-
 };
 
-
-var getPersonActive = function (options) {
+/**
+ * This shows all people with a current or with a recently finished association
+ * @param {*} options
+ * @returns
+ */
+var getAllPeopleRecent = function (options) {
     let { req, res, next } = options;
     var querySQL = '';
     var places = [];
@@ -193,10 +117,11 @@ var getPersonActive = function (options) {
         + ' WHERE people.status = 1 AND people.receives_automatic_emails = 1'
         + ' AND ((people_labs.valid_from IS NULL AND people_labs.valid_until IS NULL)'
         + ' OR (people_labs.valid_from <= curdate() AND people_labs.valid_until IS NULL)'
-        + ' OR (people_labs.valid_from IS NULL AND people_labs.valid_until >= curdate())'
-        + ' OR (people_labs.valid_from <= curdate() AND people_labs.valid_until >= curdate()))'
+        + ' OR (people_labs.valid_from IS NULL AND people_labs.valid_until >= DATE_SUB(curdate(), INTERVAL ? MONTH))'
+        + ' OR (people_labs.valid_from <= curdate() AND people_labs.valid_until >= DATE_SUB(curdate(), INTERVAL ? MONTH)))'
         + ' ORDER BY person_id;'
         ;
+    places.push(MONTH_INTERVAL, MONTH_INTERVAL);
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             options.peopleList = resQuery;
@@ -213,28 +138,46 @@ var getPeopleAlreadyReceived = function (options) {
     let { req, res, next } = options;
     var querySQL = '';
     var places = [];
+    let currentMonth = time.moment().month() + 1;
+    let currentDivision = Math.ceil(currentMonth / MONTH_INTERVAL);
+    // Quick algorithm to find the end date of the "division"
+    let endMonthDivision = MONTH_NUMBER;
+    for (let i=1; i<=MONTH_NUMBER; i++) {
+        if (Math.ceil(i / MONTH_INTERVAL) == currentDivision + 1) {
+            endMonthDivision = i - 1;
+            break
+        }
+    }
+    // people who received in the current division
+    // plus people who received recently an email (from a previous division)
     querySQL = querySQL
         + 'SELECT person_id'
-        + ' FROM yearly_notification_email'
+        + ' FROM regular_notification_email'
         + ' WHERE year = year(curdate())'
+        + ' AND division = ?'
+        + ' OR DATEDIFF(curdate(), date_sent) <= ?'
         + ' ORDER BY person_id;'
         ;
+    places.push(currentDivision, MINIMUM_WAIT_MONTHS);
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             options.peopleReceived = resQuery;
+            options.currentDivision = currentDivision;
+            options.endMonthDivision = endMonthDivision;
             return selectTodayRecipients(options);
         },
         options);
 };
 
-// the set of people who didn't receive an email this year yet
-// is divided between the remainig days of the year
+// the set of people who didn't receive an email recently
+// is divided between the remainig days of the "division"
 var selectTodayRecipients = function (options) {
-    let { req, res, next, peopleList, peopleReceived } = options;
+    let { req, res, next, peopleList, peopleReceived,
+         currentDivision, endMonthDivision } = options;
     let today = time.moment();
     let year = today.year();
     let endYear = time.moment(year + '-12-15'); // to avoid the Christmas season
-    let scriptStartDate = time.moment(year + '-01-15'); // to avoid the Christmas season
+    let scriptStartDate = time.moment(year + '-01-06'); // to avoid the Christmas season
     if (today.isBefore(scriptStartDate)) {
         return responses.sendJSONResponseOptions({
             response: res,
@@ -256,29 +199,22 @@ var selectTodayRecipients = function (options) {
             }
         });
     } else {
-        let numberDays = endYear.diff(today,'days');
-        options.year = year;
-        //debug:
-        /*peopleList = [
-            {person_id: 1, name: 'MJR', colloquial_name: 'MJR2'},
-            {person_id: 5, name: 'CLE', colloquial_name: 'CLE'},
-            {person_id: 7, name: 'PMVB', colloquial_name: 'PMVB'},
-            {person_id: 19, name: 'ISN', colloquial_name: 'ISN'},
-            {person_id: 202, name: 'Jam D', colloquial_name: 'Jam D'},
-        ]
-        let peopleListObj = {}
-        for (let ind in peopleList) {
-            peopleListObj[peopleList[ind].person_id] = peopleList[ind]
+        let numberDays = 0;
+        //console.log(currentDivision == NUMBER_EMAILS_YEAR)
+        if (currentDivision == NUMBER_EMAILS_YEAR) {
+            numberDays = endYear.diff(today,'days');
+        } else {
+            let daysInMonth = time.moment([year, endMonthDivision - 1]).daysInMonth();
+            let endDateDivision = time.moment([year, endMonthDivision - 1, daysInMonth])
+            //console.log('endMonthDivision',endMonthDivision)
+            //console.log('daysInMonth',daysInMonth)
+            //console.log(endDateDivision.format('YYYY-MM-DD'))
+            numberDays = endDateDivision.diff(today,'days');
         }
-        options.peopleListObj = peopleListObj
-        peopleReceived = [
-            {person_id: 1, },
-            {person_id: 5, },
-            {person_id: 7, },
-            //{person_id: 19,},
-            //{person_id: 202,},
-        ]
-        */
+        //console.log('currentdivision',currentDivision)
+        //console.log('number days',numberDays)
+
+        options.year = year;
         //easier to do if these lists are converted into a simple array
         let peopleListArray = peopleList.map(el => el.person_id);
         let peopleReceivedArray = new Set(peopleReceived.map(el => el.person_id));
@@ -299,7 +235,11 @@ var selectTodayRecipients = function (options) {
                     possibleRecipients.splice(randIndex, 1);
                 }
                 options.todayRecipients = todayRecipients;
-                console.log(todayRecipients)
+                //Debug
+                //console.log('totalRecipients',totalRecipients)
+                //console.log('peopleReceivedArray len',peopleReceived.length)
+                //console.log('maxTodayRecipients',maxTodayRecipients)
+                //console.log('todayRecipients',todayRecipients)
             }
             options.i = 0;
             return getPersonPersonalEmail(options)
@@ -320,9 +260,7 @@ var selectTodayRecipients = function (options) {
 var getPersonPersonalEmail = function (options) {
     let { req, res, next, i, todayRecipients } = options;
     let person_id = todayRecipients[i];
-
-    console.log(i,'----------', person_id)
-
+    //console.log(i,'----------', person_id)
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'SELECT * FROM personal_emails WHERE person_id = ?;';
@@ -341,6 +279,7 @@ var getPersonPersonalEmail = function (options) {
 var getPersonWorkEmail = function (options) {
     let { req, res, next, i, todayRecipients } = options;
     let person_id = todayRecipients[i];
+    options.person_id = person_id;
     var querySQL = '';
     var places = [];
     querySQL = querySQL + 'SELECT * FROM emails WHERE person_id = ?;';
@@ -362,7 +301,7 @@ var getPersonWorkEmail = function (options) {
         options);
 };
 async function sendNotificationMessage(options) {
-    let { req, res, next, this_work_email, this_personal_email } = options;
+    let { req, res, next, this_work_email, this_personal_email, person_id } = options;
     let recipients = '';
     if (this_personal_email !== undefined && this_personal_email !== null) {
         recipients = recipients + this_personal_email + ', ';
@@ -403,19 +342,20 @@ async function sendNotificationMessage(options) {
         return writeRecipientDatabase(options);
     } else {
         options.sent = false;
+        console.log('Person with ID', person_id, 'has no email registered in the platform.')
         return writeRecipientDatabase(options);
     }
 }
 var writeRecipientDatabase = function (options) {
-    let { req, res, next, i, todayRecipients, year } = options;
+    let { req, res, next, i, todayRecipients, year, currentDivision } = options;
     let person_id = todayRecipients[i];
     var querySQL = '';
     var places = [];
     querySQL = querySQL
-        + 'INSERT INTO yearly_notification_email (person_id, year, date_sent)'
-        + ' VALUES (?,?, NOW());'
+        + 'INSERT INTO regular_notification_email (person_id, year, division, date_sent)'
+        + ' VALUES (?,?,?, NOW());'
         ;
-    places.push(person_id, year);
+    places.push(person_id, year, currentDivision);
     return sql.makeSQLOperation(req, res, querySQL, places,
         (options) => {
             return finalVerification(options);

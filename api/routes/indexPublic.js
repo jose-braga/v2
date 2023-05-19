@@ -13,10 +13,10 @@ var calls = require('../controllers/calls/calls');
 var lists = require('../controllers/lists/lists');
 var people = require('../controllers/public_API/people');
 const birthdays = require('../controllers/public_API/birthdays');
-const yearlyNotifications = require('../controllers/public_API/yearly_notifications');
+const regularNotifications = require('../controllers/public_API/regular_notifications');
 
 router.post('/people-todays-birthdays', cors(corsOptions), birthdays.getBirthdayPeople);
-router.post('/people-yearly-notifications', cors(corsOptions), yearlyNotifications.getActivePeople);
+router.post('/people-regular-notifications', cors(corsOptions), regularNotifications.getActivePeople);
 
 router.get('/calls/:callSegment', cors(corsOptions), calls.getCallInfo);
 router.post('/calls/:callSegment/applications', cors(corsOptions), calls.createApplication);
