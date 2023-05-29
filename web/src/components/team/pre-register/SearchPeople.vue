@@ -1,8 +1,9 @@
 <template>
 <v-card class="mb-6">
     <v-card-title primary-title>
+        <v-icon size="40">mdi-numeric-1-box-outline</v-icon>
         <div>
-            <h3 class="headline">Search person in database</h3>
+            <h3 class="headline ml-4">Search person in database</h3>
         </div>
     </v-card-title>
     <v-card-text>Check if person you want to add to the team is already in the database.

@@ -2,9 +2,11 @@
 <v-card flat fluid>
     <v-card-title primary-title>
     </v-card-title>
-    <v-card-text>Search your ORCID profile (only publicly accessible data).
-        Search results will show only publications that are
-        <b>not part of the LAQV/UCIBIO database</b>.<br>
+    <v-card-text>
+        <span class="text-h5">Search results will show only publications that are
+        <b>not part of the LAQV/UCIBIO database</b></span>.<br>
+        Search your ORCID profile (only publicly accessible data).
+        <br>
         It is advisable to check individual publication info before submitting (e.g. possible mismatches in journal info).<br>
         Items tagged <v-icon color="red">mdi-alert-circle-outline</v-icon> are missing
         crucial data.<br>
@@ -683,6 +685,13 @@ export default {
                     let delta = timeInterval * 1.0 / (numberEventsInterval * 1.0);
                     let pubToAddNumber = this.data.publications.length;
                     let counter = 0;
+                    console.log(this.data.publications.length)
+                    if (this.data.publications.length === 0) {
+                        this.onResize();
+                        this.progressORCID = false;
+                        this.finishedGetORCID = true;
+
+                    }
                     for (let ind in this.data.publications) {
                         let instant = parseInt(ind,10) * delta;
                         setTimeout(() => {

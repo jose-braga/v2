@@ -30,7 +30,7 @@
         </v-tooltip>
         <v-tooltip bottom>
             <template v-slot:activator="{ on }">
-                <v-btn icon v-on="on" @click.stop="showHelp(); showHelp2()">
+                <v-btn id="help-icon" icon v-on="on" @click.stop="showHelp(); showHelp2()">
                     <v-icon>mdi-help</v-icon>
                 </v-btn>
             </template>
@@ -108,4 +108,29 @@ export default {
 </script>
 
 <style scoped>
+#help-icon .v-icon {
+    animation-duration: 3s;
+    animation-name: help-highlight;
+    animation-iteration-count: infinite;
+    animation-direction: normal;
+}
+
+@keyframes help-highlight {
+  from {
+    font-size: 24px;
+  }
+
+  10% {
+    font-size: 35px;
+  }
+
+  20% {
+    font-size: 24px;
+  }
+
+  to {
+    font-size: 24px;
+  }
+}
+
 </style>

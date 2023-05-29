@@ -92,7 +92,7 @@
     </v-tabs>
     <v-container fluid>
         <v-row cols="12" v-if="!loggedIn" class="pa-4">
-            <v-col>Please login first (
+            <v-col class="text-h5">Please login first (
                 the symbol <v-icon color="green darken">mdi-login</v-icon>
                 in the toolbar above).
             </v-col>

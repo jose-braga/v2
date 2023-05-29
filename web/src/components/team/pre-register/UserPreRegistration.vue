@@ -1,8 +1,9 @@
 <template>
 <v-card>
     <v-card-title primary-title>
+        <v-icon size="40">mdi-numeric-2-box-outline</v-icon>
         <div>
-            <h3 class="headline">Pre-register new member</h3>
+            <h3 class="headline ml-4">Pre-register new member</h3>
         </div>
     </v-card-title>
     <v-card-text>
