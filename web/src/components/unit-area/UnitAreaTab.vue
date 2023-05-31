@@ -1,22 +1,26 @@
 <template>
 <v-container fluid>
 <v-row>
+
     <v-col v-if="hasPermissions" cols="12">
         <UsersDocumentsList
             :unit-id="unitID"
             :city-id="cityID"
+            :sub-tab-id="subTabId"
         ></UsersDocumentsList>
     </v-col>
     <v-col v-if="hasPermissions && hasManagement" cols="12">
         <ManagersDocumentsList
             :unit-id="unitID"
             :city-id="cityID"
+            :sub-tab-id="subTabId"
         ></ManagersDocumentsList>
     </v-col>
     <v-col v-if="hasPermissions && hasManagement" cols="12">
         <ManagersDocumentAdd
             :unit-id="unitID"
             :city-id="cityID"
+            :sub-tab-id="subTabId"
         ></ManagersDocumentAdd>
     </v-col>
     <v-col v-if="!hasPermissions">
@@ -38,8 +42,10 @@ export default {
         ManagersDocumentAdd,
     },
     props: {
-        cityName: String,
         unitName: String,
+        cityName: String,
+        subTabName: String,
+        subTabId: Number,
     },
     data () {
         return {
@@ -47,20 +53,25 @@ export default {
             hasManagement: false,
             unitID: undefined,
             cityID: undefined,
-            activeTab: 2,
-            openPanel: [],
+            //showSubTabs: false,
+            //activeTab: 2,
+            //openPanel: [],
         }
     },
     mounted () {
         this.initialize();
     },
     watch: {
-        cityName () {
-            this.initialize();
-        },
         unitName () {
             this.initialize();
         },
+        cityName () {
+            this.initialize();
+        },
+        subTabName () {
+            this.initialize();
+        },
+
     },
     methods: {
         initialize () {
@@ -68,7 +79,10 @@ export default {
             this.cityID = undefined;
             this.hasPermissions = false;
             this.hasManagement = false;
-            if (this.unitName === 'UCIBIO') this.unitID = 1;
+            if (this.unitName === 'UCIBIO') {
+                this.unitID = 1;
+                //this.showSubTabs  = true;
+            }
             if (this.unitName === 'LAQV') this.unitID = 2;
             if (this.cityName === 'Lisboa') this.cityID = 1;
             if (this.cityName === 'Porto') this.cityID = 2;

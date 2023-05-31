@@ -152,14 +152,14 @@ export default {
                 text: 'My UCIBIO',
                 icon: false,
                 image: '/images/logo/ucibio-logo.png',
-                link: '/unit-area/UCIBIO',
+                link: '/unit-area/UCIBIO/sub-tab/general',
                 isActive: false,
             },
             {
                 text: 'Docs LAQV',
                 icon: false,
                 image: '/images/logo/laqv-logo.png',
-                link: '/unit-area/LAQV',
+                link: '/unit-area/LAQV/sub-tab/general',
                 isActive: false,
             },
             {

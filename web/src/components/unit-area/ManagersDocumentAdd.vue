@@ -137,6 +137,7 @@ export default {
     props: {
         cityId: Number,
         unitId: Number,
+        subTabId: Number,
     },
     data() {
         return {
@@ -177,6 +178,7 @@ export default {
                 const formData = new FormData()
                 formData.append('title',this.data.document.title);
                 formData.append('content',this.data.document.content);
+                formData.append('tab_id', this.subTabId);
                 formData.append('doc_type_id',this.data.document.doc_type_id);
                 formData.append('sort_order',this.data.document.sort_order);
                 if (this.data.document.valid_from !== null

@@ -42,25 +42,26 @@ var storage = multer.diskStorage({ //multers disk storage settings
 var actionGetDocs = function (options) {
     let { req, res, next } = options;
     let unitID = req.params.unitID;
+    let tabID = req.params.tabID;
     var querySQL = '';
     var places = [];
     if (req.query.status !== 'all') {
         querySQL = querySQL
                 + 'SELECT unit_documents.*, document_types.name AS doc_type_name FROM unit_documents'
                 +' JOIN document_types ON unit_documents.doc_type_id = document_types.id'
-                +' WHERE unit_documents.unit_id = ?'
+                +' WHERE unit_documents.unit_id = ? AND unit_documents.tab_id = ?'
                 +' AND ((unit_documents.valid_from <= CURRENT_DATE() OR unit_documents.valid_from IS NULL) '
                 + ' AND (unit_documents.valid_until >= CURRENT_DATE() OR unit_documents.valid_until IS NULL))'
                 + ' ORDER BY sort_order DESC';
-        places.push(unitID)
+        places.push(unitID, tabID)
     } else {
         querySQL = querySQL
                 + 'SELECT unit_documents.*, document_types.name AS doc_type_name FROM unit_documents'
                 +' JOIN document_types ON unit_documents.doc_type_id = document_types.id'
-                +' WHERE unit_documents.unit_id = ?'
+                +' WHERE unit_documents.unit_id = ? AND unit_documents.tab_id = ?'
                 + ' ORDER BY sort_order DESC'
                 ;
-        places.push(unitID)
+        places.push(unitID, tabID)
     }
     return sql.makeSQLOperation(req, res, querySQL, places)
 };
@@ -133,7 +134,7 @@ var createDocAddRemainingDataDB = function (req, res, next) {
     let querySQL = '';
     let places = [];
     querySQL = 'UPDATE unit_documents'
-                + ' SET doc_type_id = ?,'
+                + ' SET tab_id = ?, doc_type_id = ?,'
                 + ' title = ?,'
                 + ' content = ?,'
                 + ' attachment_url = ?,'
@@ -141,7 +142,8 @@ var createDocAddRemainingDataDB = function (req, res, next) {
                 + ' valid_until = ?,'
                 + ' sort_order = ?'
                 + ' WHERE id = ?'
-    places.push(docData.doc_type_id,
+    places.push(docData.tab_id,
+                docData.doc_type_id,
                 docData.title,
                 docData.content,
                 url,
@@ -199,7 +201,7 @@ var updateDocDataDB = function (req, res, next) {
     let querySQL = '';
     let places = [];
     querySQL = 'UPDATE unit_documents'
-                + ' SET doc_type_id = ?,'
+                + ' SET tab_id = ?, doc_type_id = ?,'
                 + ' title = ?,'
                 + ' content = ?,'
                 + ' attachment_url = ?,'
@@ -207,7 +209,8 @@ var updateDocDataDB = function (req, res, next) {
                 + ' valid_until = ?,'
                 + ' sort_order = ?'
                 + ' WHERE id = ?';
-    places.push(docData.doc_type_id,
+    places.push(docData.tab_id,
+                docData.doc_type_id,
                 docData.title,
                 docData.content,
                 url,
@@ -220,7 +223,7 @@ var updateDocDataDB = function (req, res, next) {
 var updateOnlyInDB = function (options) {
     let { req, res, next } = options;
     var docData = req.body.data;
-    console.log(docData)
+    //console.log(docData)
     let docID = req.params.docID;
     let valid_from = null;
     let valid_until = null;
@@ -230,12 +233,16 @@ var updateOnlyInDB = function (options) {
     if (docData.valid_until !== null && docData.valid_until !== undefined && docData.valid_until !== '') {
         valid_until = time.momentToDate(docData.valid_until);
     }
-    let url = docData.attachment_url.replace(/\s/g,'%20');
-
+    let url = null
+    if (docData.attachment_url !== null && docData.attachment_url !== undefined
+        && docData.attachment_url !== ''
+    ) {
+        url = docData.attachment_url.replace(/\s/g,'%20');
+    }
     let querySQL = '';
     let places = [];
     querySQL = 'UPDATE unit_documents'
-                + ' SET doc_type_id = ?,'
+                + ' SET tab_id = ?, doc_type_id = ?,'
                 + ' title = ?,'
                 + ' content = ?,'
                 + ' attachment_url = ?,'
@@ -243,7 +250,8 @@ var updateOnlyInDB = function (options) {
                 + ' valid_until = ?,'
                 + ' sort_order = ?'
                 + ' WHERE id = ?';
-    places.push(docData.doc_type_id,
+    places.push(docData.tab_id,
+                docData.doc_type_id,
                 docData.title,
                 docData.content,
                 url,

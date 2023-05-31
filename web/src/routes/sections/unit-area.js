@@ -8,20 +8,20 @@ const routes = {
     component: UnitArea,
     children: [
         {
-            path: '',
+            path: 'sub-tab/:subTabName',
             components: {
                 default: UnitAreaTab,
                 help: UnitAreaTabHelp
             }
         },
         {
-            path: 'city/:cityName',
+            path: 'city/:cityName/sub-tab/:subTabName',
             components: {
                 default: UnitAreaTab,
                 help: UnitAreaTabHelp
             }
         },
-        { path: '', redirect: 'messages' }
+        { path: '', redirect: 'sub-tab/general' }
     ],
 }
 

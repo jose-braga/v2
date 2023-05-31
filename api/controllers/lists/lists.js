@@ -899,6 +899,18 @@ var getNews = function (req, res, next) {
     sql.makeSQLOperation(req, res, querySQL, places);
     return;
 };
+var getDocumentTabs = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'SELECT *'
+        + ' FROM unit_city_tabs'
+        + ';'
+        ;
+    //places.push()
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
 
 module.exports.listItems = function (req, res, next) {
     let category = req.params.listCategory;
@@ -1090,6 +1102,9 @@ module.exports.listItems = function (req, res, next) {
     }
     if (category === 'news') {
         getNews(req, res, next);
+    }
+    if (category === 'document-tabs') {
+        getDocumentTabs(req, res, next);
     }
 };
 
