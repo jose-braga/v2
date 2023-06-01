@@ -1,5 +1,6 @@
 const sql = require('../utilities/sql')
 const responses = require('../utilities/responses');
+const polls_manage = require('./polls_manage');
 
 var checkPermissions = function (options, callback)  {
     let { req, res, next, action } = options;
@@ -158,6 +159,42 @@ var getPollTexts = function (options) {
 module.exports.getPollData = function (req, res, next) {
     let options = { req, res, next };
     return checkPermissions(options, actionGetPollData)
+};
+
+var actionGetPollAccess = function (options) {
+    let { req, res, next } = options;
+    let personID = req.params.personID;
+    let pollID = req.params.pollID;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL + 'SELECT *'
+                        + ' FROM people_polls'
+                        + ' WHERE poll_id = ? AND person_id = ? AND access_type_id = 2;'
+                        ;
+    places.push(pollID, personID);
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            if (resQuery.length === 1) {
+                options.getPollResults = true;
+                return polls_manage.peopleGetResults(options);
+            } else {
+                return responses.sendJSONResponseOptions({
+                    response: res,
+                    status: 403,
+                    message: {
+                        "status": "Error", "statusCode": 403,
+                        "count": 1,
+                        "result": "Error no autorization!",
+                    }
+                });
+            }
+        },
+        options
+    );
+};
+module.exports.getPollResultsAccess = function (req, res, next) {
+    let options = { req, res, next };
+    return checkPermissions(options, actionGetPollAccess)
 };
 
 var checkVoteValid = function (options) {

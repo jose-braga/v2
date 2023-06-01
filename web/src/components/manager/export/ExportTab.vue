@@ -590,10 +590,6 @@ function processForSpreadsheet(members) {
             thisMember['Age'] = today.diff(time.moment(members[ind].birth_date),'years');
         }
         thisMember['Gender'] = members[ind].gender;
-        thisMember.Email = '';
-        if (members[ind].personal_email.length > 0) {
-            thisMember.Email = members[ind].personal_email[0].email;
-        }
         thisMember['Nationalities'] = '';
         if (members[ind].countries.length > 0) {
             for (let indCountry in members[ind].countries) {
@@ -604,6 +600,10 @@ function processForSpreadsheet(members) {
         thisMember['Work Email'] = '';
         if (members[ind].email.length > 0) {
             thisMember['Work Email'] = members[ind].email[0].email;
+        }
+        thisMember.Email = '';
+        if (members[ind].personal_email.length > 0) {
+            thisMember.Email = members[ind].personal_email[0].email;
         }
 
         thisMember['DQ (FCT NOVA) Team'] = undefined;

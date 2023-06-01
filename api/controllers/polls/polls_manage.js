@@ -737,9 +737,6 @@ var actionGetPeopleList = function (options) {
             return;
         },
         options);
-
-
-
 };
 module.exports.getPeopleList = function (req, res, next) {
     let options = { req, res, next };
@@ -880,3 +877,7 @@ module.exports.getResults = function (req, res, next) {
     options.getPollResults = true;
     return checkPermissions(options, actionGetPollData)
 };
+
+module.exports.peopleGetResults = function (options) {
+    return actionGetPollData(options);
+}
