@@ -749,7 +749,7 @@ var actionGetPeoplePoll = function (options) {
     var querySQL = '';
     var places = [];
     querySQL = querySQL
-        + 'SELECT people.id, people.name'
+        + 'SELECT people.id, people.name, people_polls.access_type_id'
         + ' FROM people_polls'
         + ' JOIN people ON people.id = people_polls.person_id'
         + ' WHERE people_polls.poll_id = ?'
@@ -798,6 +798,23 @@ var actionDeleteUserPoll = function (options) {
 module.exports.deleteUserPoll = function (req, res, next) {
     let options = { req, res, next };
     return checkPermissions(options, actionDeleteUserPoll)
+};
+
+var actionUpdatePersonPermissions = function (options) {
+    let { req, res, next } = options;
+    let pollID = req.params.pollID;
+    let personID = req.params.personID;
+    let data = req.body.data;
+    var querySQL = '';
+    var places = [];
+    querySQL = querySQL
+        + 'UPDATE people_polls SET access_type_id = ? WHERE person_id = ? AND poll_id = ?;';
+    places.push(data.access_type_id, personID, pollID);
+    return sql.makeSQLOperation(req, res, querySQL, places);
+}
+module.exports.updatePersonPermissions = function (req, res, next) {
+    let options = { req, res, next };
+    return checkPermissions(options, actionUpdatePersonPermissions)
 };
 
 var countRegistered = function (options) {

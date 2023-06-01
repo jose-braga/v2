@@ -50,6 +50,7 @@ router.delete('/:pollID/managers/:managerID/texts/:textID', cors(corsOptions), p
 router.get('/:pollID/managers/:managerID/people-list', cors(corsOptions), polls_manage.getPeopleList);
 router.get('/:pollID/managers/:managerID/people', cors(corsOptions), polls_manage.getPeoplePoll);
 router.post('/:pollID/managers/:managerID/people', cors(corsOptions), polls_manage.addUserPoll);
+router.put('/:pollID/managers/:managerID/people/:personID', cors(corsOptions), polls_manage.updatePersonPermissions);
 router.delete('/:pollID/managers/:managerID/people/:personID', cors(corsOptions), polls_manage.deleteUserPoll);
 
 

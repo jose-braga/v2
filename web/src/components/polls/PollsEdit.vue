@@ -277,7 +277,6 @@
                     </v-btn>
                 </v-row>
                 <v-divider vertical></v-divider>
-
                 <v-row>
                     <h2>People Access Management</h2>
                 </v-row>
@@ -305,6 +304,23 @@
                                         </span>
                                     </v-list-item-content>
                                     <v-list-item-action>
+                                        <v-btn v-if="item.access_type_id === 2"
+                                            icon
+                                            @click="accessPermissions(item)"
+                                            color="green darken"
+                                        >
+                                            <v-icon>mdi-eye</v-icon>
+                                        </v-btn>
+                                        <v-btn v-else
+                                            icon
+                                            @click="accessPermissions(item)"
+                                            color="red darken"
+                                        >
+                                            <v-icon>mdi-eye-off</v-icon>
+                                        </v-btn>
+
+                                    </v-list-item-action>
+                                    <v-list-item-action>
                                         <v-checkbox v-model="item.toDelete"
                                         >
                                         </v-checkbox>
@@ -312,6 +328,34 @@
                                 </v-list-item>
                             </template>
                         </v-virtual-scroll>
+                        <v-row>
+                            <v-col cols="8">
+                                <v-btn
+                                    class="ma-4"
+                                    outlined
+                                    color="orange darken"
+                                    @click="setAllPermissions(data.people)"
+                                >
+                                    Give All View
+                                </v-btn>
+                                <v-btn
+                                    class="ma-4"
+                                    outlined
+                                    color="green"
+                                    @click="submitPermissions(data.changedPermissions)"
+                                >
+                                    Set Permissions
+                                </v-btn>
+                            </v-col>
+                            <v-col cols="4">
+                                <v-progress-circular indeterminate
+                                        v-show="progressPermission"
+                                        :size="20" :width="2"
+                                        color="primary"></v-progress-circular>
+                                <v-icon v-show="successPermission" color="green">mdi-check</v-icon>
+                                <v-icon v-show="errorPermission" color="red">mdi-alert-circle-outline</v-icon>
+                            </v-col>
+                        </v-row>
                         <v-row>
                             <v-col cols="8">
                                 <v-btn
@@ -462,6 +506,9 @@ export default {
             progressDelete: false,
             successDelete: false,
             errorDelete: false,
+            progressPermission: false,
+            successPermission: false,
+            errorPermission: false,
             progressPollDelete: false,
             successPollDelete: false,
             errorPollDelete: false,
@@ -469,6 +516,7 @@ export default {
                 isManager: false,
                 poll: [],
                 people: [],
+                changedPermissions: [],
             },
             textTypes: [],
             questionTypes: [],
@@ -1013,7 +1061,72 @@ export default {
             for (let ind in list) {
                 this.$set(list[ind], 'selected', true);
             }
-        }
+        },
+        accessPermissions(item) {
+            if (item.access_type_id === null || item.access_type_id === 1) {
+                item.access_type_id = 2;
+            } else if (item.access_type_id === 2) {
+                item.access_type_id = 1;
+            }
+            let found = false;
+
+            for (let ind in this.data.changedPermissions) {
+                if (item.id === this.data.changedPermissions[ind].id) {
+                    found = true;
+                    this.data.changedPermissions[ind] = item;
+                    break
+                }
+            }
+            if (!found) {
+                this.data.changedPermissions.push(item);
+            }
+
+        },
+        setAllPermissions(items) {
+            this.data.changedPermissions = [];
+            items.forEach(el => {
+                el.access_type_id = 2;
+                this.data.changedPermissions.push(el);
+            })
+        },
+        submitPermissions(items) {
+            if (this.$store.state.session.loggedIn) {
+                let pollID = this.$route.params.pollId;
+                let personID = this.$store.state.session.personID;
+                this.progressPermission = true;
+                let urlUpdate = [];
+                for (let ind in items) {
+                    urlUpdate.push({
+                        url: 'api/polls/' + pollID
+                            + '/managers/'+ personID
+                            + '/people/' + items[ind].id,
+                        body: items[ind],
+                    });
+                }
+                Promise.all(
+                    urlUpdate.map(el =>
+                        this.$http.put(el.url,
+                            { data: el.body, },
+                            { headers: {'Authorization': 'Bearer ' + localStorage['v2-token']},}
+                        )
+                ))
+                .then( () => {
+                    this.progressPermission = false;
+                    this.successPermission = true;
+                    setTimeout(() => {this.successPermission = false;}, 1500)
+                    this.initialize();
+                })
+                .catch((error) => {
+                    this.progressPermission = false;
+                    this.errorPermission = true;
+                    this.initialize();
+                    setTimeout(() => {this.errorPermission = false;}, 6000)
+                    // eslint-disable-next-line
+                    console.log(error)
+                })
+            }
+
+        },
     },
 
 }
