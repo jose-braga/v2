@@ -207,7 +207,7 @@
 <script>
 import subUtil from '@/components/common/submit-utils'
 import time from '@/components/common/date-utils'
-import XLSX from 'xlsx'
+import {utils, writeFileXLSX} from 'xlsx/xlsx.mjs'
 
 function processResults(vm, people) {
     let currentMembers = [];
@@ -1660,9 +1660,9 @@ export default {
             //console.log(items)
             //console.log(itemsSpreadsheet)
             //alert('asasa')
-            let wb = XLSX.utils.book_new();
-            let ws  = XLSX.utils.json_to_sheet(itemsSpreadsheet);
-            XLSX.utils.book_append_sheet(wb, ws, 'Data');
+            let wb = utils.book_new();
+            let ws  = utils.json_to_sheet(itemsSpreadsheet);
+            utils.book_append_sheet(wb, ws, 'Data');
             let filename = 'members_'
             if (this.filterUnitID !== null && this.filterUnitID !== undefined) {
                 filename = filename + 'unit_' + this.namesFilters.unitName + '_' + this.filterUnitID;
@@ -1695,7 +1695,7 @@ export default {
             if (this.filterDateUntil !== null && this.filterDateUntil !== undefined) {
                 filename = filename + '_until_' + this.filterDateUntil;
             }
-            XLSX.writeFile(wb, filename + '_' + dateFile + '.xlsx');
+            writeFileXLSX(wb, filename + '_' + dateFile + '.xlsx');
             this.progress = false;
             this.success = true;
             setTimeout(() => {this.success = false;}, 1500)
@@ -1731,55 +1731,55 @@ export default {
             //console.log(data)
             //let itemsSpreadsheet = data.peoplePublications
 
-            let wb = XLSX.utils.book_new();
-            let ws  = XLSX.utils.json_to_sheet(data.peoplePublications);
-            XLSX.utils.book_append_sheet(wb, ws, 'People-Publications');
-            ws  = XLSX.utils.json_to_sheet(data.publications);
-            XLSX.utils.book_append_sheet(wb, ws, 'Publications');
-            ws  = XLSX.utils.json_to_sheet(data.publicationTeamsLabs);
-            XLSX.utils.book_append_sheet(wb, ws, 'Teams-Publications');
-            ws  = XLSX.utils.json_to_sheet(data.peopleCommunications);
-            XLSX.utils.book_append_sheet(wb, ws, 'People-Communications');
-            ws  = XLSX.utils.json_to_sheet(data.peopleOrganizationMeetings);
-            XLSX.utils.book_append_sheet(wb, ws, 'People-Org.Meetings');
-            ws  = XLSX.utils.json_to_sheet(data.organizationMeetings);
-            XLSX.utils.book_append_sheet(wb, ws, 'Org.Meetings');
-            ws  = XLSX.utils.json_to_sheet(data.peopleProjects);
-            XLSX.utils.book_append_sheet(wb, ws, 'People-Projects');
-            ws  = XLSX.utils.json_to_sheet(data.projects);
-            XLSX.utils.book_append_sheet(wb, ws, 'Projects');
-            ws  = XLSX.utils.json_to_sheet(data.peopleIndustryProjects);
-            XLSX.utils.book_append_sheet(wb, ws, 'People-Agreements');
-            ws  = XLSX.utils.json_to_sheet(data.industryProjects);
-            XLSX.utils.book_append_sheet(wb, ws, 'Agreements');
-            ws  = XLSX.utils.json_to_sheet(data.peopleTrainingNetworks);
-            XLSX.utils.book_append_sheet(wb, ws, 'People-Training Networks');
-            ws  = XLSX.utils.json_to_sheet(data.trainingNetworks);
-            XLSX.utils.book_append_sheet(wb, ws, 'Training Networks');
-            ws  = XLSX.utils.json_to_sheet(data.peopleStartups);
-            XLSX.utils.book_append_sheet(wb, ws, 'People-Startups');
-            ws  = XLSX.utils.json_to_sheet(data.startups);
-            XLSX.utils.book_append_sheet(wb, ws, 'Startups');
-            ws  = XLSX.utils.json_to_sheet(data.peoplePrizes);
-            XLSX.utils.book_append_sheet(wb, ws, 'People-Prizes');
-            ws  = XLSX.utils.json_to_sheet(data.prizes);
-            XLSX.utils.book_append_sheet(wb, ws, 'Prizes');
-            ws  = XLSX.utils.json_to_sheet(data.peopleBoards);
-            XLSX.utils.book_append_sheet(wb, ws, 'People-Boards');
-            ws  = XLSX.utils.json_to_sheet(data.boards);
-            XLSX.utils.book_append_sheet(wb, ws, 'Boards');
-            ws  = XLSX.utils.json_to_sheet(data.peoplePatents);
-            XLSX.utils.book_append_sheet(wb, ws, 'People-Patents');
-            ws  = XLSX.utils.json_to_sheet(data.patents);
-            XLSX.utils.book_append_sheet(wb, ws, 'Patents');
-            ws  = XLSX.utils.json_to_sheet(data.peopleDatasets);
-            XLSX.utils.book_append_sheet(wb, ws, 'People-Datasets');
-            ws  = XLSX.utils.json_to_sheet(data.datasets);
-            XLSX.utils.book_append_sheet(wb, ws, 'Datasets');
-            ws  = XLSX.utils.json_to_sheet(data.peopleOutreach);
-            XLSX.utils.book_append_sheet(wb, ws, 'People-Outreach');
-            ws  = XLSX.utils.json_to_sheet(data.outreach);
-            XLSX.utils.book_append_sheet(wb, ws, 'Outreach');
+            let wb = utils.book_new();
+            let ws  = utils.json_to_sheet(data.peoplePublications);
+            utils.book_append_sheet(wb, ws, 'People-Publications');
+            ws  = utils.json_to_sheet(data.publications);
+            utils.book_append_sheet(wb, ws, 'Publications');
+            ws  = utils.json_to_sheet(data.publicationTeamsLabs);
+            utils.book_append_sheet(wb, ws, 'Teams-Publications');
+            ws  = utils.json_to_sheet(data.peopleCommunications);
+            utils.book_append_sheet(wb, ws, 'People-Communications');
+            ws  = utils.json_to_sheet(data.peopleOrganizationMeetings);
+            utils.book_append_sheet(wb, ws, 'People-Org.Meetings');
+            ws  = utils.json_to_sheet(data.organizationMeetings);
+            utils.book_append_sheet(wb, ws, 'Org.Meetings');
+            ws  = utils.json_to_sheet(data.peopleProjects);
+            utils.book_append_sheet(wb, ws, 'People-Projects');
+            ws  = utils.json_to_sheet(data.projects);
+            utils.book_append_sheet(wb, ws, 'Projects');
+            ws  = utils.json_to_sheet(data.peopleIndustryProjects);
+            utils.book_append_sheet(wb, ws, 'People-Agreements');
+            ws  = utils.json_to_sheet(data.industryProjects);
+            utils.book_append_sheet(wb, ws, 'Agreements');
+            ws  = utils.json_to_sheet(data.peopleTrainingNetworks);
+            utils.book_append_sheet(wb, ws, 'People-Training Networks');
+            ws  = utils.json_to_sheet(data.trainingNetworks);
+            utils.book_append_sheet(wb, ws, 'Training Networks');
+            ws  = utils.json_to_sheet(data.peopleStartups);
+            utils.book_append_sheet(wb, ws, 'People-Startups');
+            ws  = utils.json_to_sheet(data.startups);
+            utils.book_append_sheet(wb, ws, 'Startups');
+            ws  = utils.json_to_sheet(data.peoplePrizes);
+            utils.book_append_sheet(wb, ws, 'People-Prizes');
+            ws  = utils.json_to_sheet(data.prizes);
+            utils.book_append_sheet(wb, ws, 'Prizes');
+            ws  = utils.json_to_sheet(data.peopleBoards);
+            utils.book_append_sheet(wb, ws, 'People-Boards');
+            ws  = utils.json_to_sheet(data.boards);
+            utils.book_append_sheet(wb, ws, 'Boards');
+            ws  = utils.json_to_sheet(data.peoplePatents);
+            utils.book_append_sheet(wb, ws, 'People-Patents');
+            ws  = utils.json_to_sheet(data.patents);
+            utils.book_append_sheet(wb, ws, 'Patents');
+            ws  = utils.json_to_sheet(data.peopleDatasets);
+            utils.book_append_sheet(wb, ws, 'People-Datasets');
+            ws  = utils.json_to_sheet(data.datasets);
+            utils.book_append_sheet(wb, ws, 'Datasets');
+            ws  = utils.json_to_sheet(data.peopleOutreach);
+            utils.book_append_sheet(wb, ws, 'People-Outreach');
+            ws  = utils.json_to_sheet(data.outreach);
+            utils.book_append_sheet(wb, ws, 'Outreach');
 
             let filename = 'people_productivity_'
             if (this.filterUnitID !== null && this.filterUnitID !== undefined) {
@@ -1803,7 +1803,7 @@ export default {
             if (this.filterDateUntil !== null && this.filterDateUntil !== undefined) {
                 filename = filename + '_until_' + this.filterDateUntil;
             }
-            XLSX.writeFile(wb, filename + '_' + dateFile + '.xlsx');
+            writeFileXLSX(wb, filename + '_' + dateFile + '.xlsx');
             this.progress = false;
             this.success = true;
             setTimeout(() => {this.success = false;}, 1500)
@@ -1838,11 +1838,11 @@ export default {
             let spacesData = processForSpacesSpreadsheet(items);
 
 
-            let wb = XLSX.utils.book_new();
-            let ws  = XLSX.utils.json_to_sheet(spacesData.peopleSpaces);
-            XLSX.utils.book_append_sheet(wb, ws, 'People-Spaces');
-            ws  = XLSX.utils.json_to_sheet(spacesData.teamsSpaces);
-            XLSX.utils.book_append_sheet(wb, ws, 'Team-Spaces');
+            let wb = utils.book_new();
+            let ws  = utils.json_to_sheet(spacesData.peopleSpaces);
+            utils.book_append_sheet(wb, ws, 'People-Spaces');
+            ws  = utils.json_to_sheet(spacesData.teamsSpaces);
+            utils.book_append_sheet(wb, ws, 'Team-Spaces');
 
 
             let filename = 'people_teams_spaces_'
@@ -1867,7 +1867,7 @@ export default {
             if (this.filterDateUntil !== null && this.filterDateUntil !== undefined) {
                 filename = filename + '_until_' + this.filterDateUntil;
             }
-            XLSX.writeFile(wb, filename + '_' + dateFile + '.xlsx');
+            writeFileXLSX(wb, filename + '_' + dateFile + '.xlsx');
             this.progress = false;
             this.success = true;
             setTimeout(() => {this.success = false;}, 1500)
@@ -1903,9 +1903,9 @@ export default {
             let supervisionData = processForSupervisionSpreadsheet(items);
 
 
-            let wb = XLSX.utils.book_new();
-            let ws  = XLSX.utils.json_to_sheet(supervisionData.peopleSupervisors);
-            XLSX.utils.book_append_sheet(wb, ws, 'Supervisions');
+            let wb = utils.book_new();
+            let ws  = utils.json_to_sheet(supervisionData.peopleSupervisors);
+            utils.book_append_sheet(wb, ws, 'Supervisions');
 
 
             let filename = 'people_supervision_'
@@ -1930,7 +1930,7 @@ export default {
             if (this.filterDateUntil !== null && this.filterDateUntil !== undefined) {
                 filename = filename + '_until_' + this.filterDateUntil;
             }
-            XLSX.writeFile(wb, filename + '_' + dateFile + '.xlsx');
+            writeFileXLSX(wb, filename + '_' + dateFile + '.xlsx');
             this.progress = false;
             this.success = true;
             setTimeout(() => {this.success = false;}, 1500)

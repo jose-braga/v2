@@ -47,86 +47,10 @@
                             </v-col>
                         </v-row>
                     </v-container>
-                    <!--
-                    <v-list three-line>
-                        <v-list-item
-                            v-for="(doc, j) in type.documents"
-                            :key="i + '-' + j"
-                        >
-
-                            <v-list-item-content>
-                                <v-list-item-title class="item-title">{{ doc.title }}</v-list-item-title>
-                                <span class="item-content">{{ doc.content }}</span>
-                                <span v-if="doc.attachment_url !== null"
-                                    class="item-url"
-                                >
-                                    <a :href="doc.attachment_url" target="_blank">Link</a>
-                                </span>
-                                <span class="item-dates">
-                                    Visible from
-                                    <span v-if="doc.valid_from !== null">{{doc.valid_from | formatDate}}</span>
-                                    <span v-else>-∞</span>
-                                    to
-                                    <span v-if="doc.valid_until !== null">{{doc.valid_until | formatDate}}</span>
-                                    <span v-else>+∞</span>
-                                </span>
-                                <v-divider></v-divider>
-
-                            </v-list-item-content>
-
-                        </v-list-item>
-                    </v-list>
-                    -->
                 </v-expansion-panel-content>
             </v-expansion-panel>
         </v-expansion-panels>
     </v-card-text>
-    <!--
-    <v-container fluid>
-        <v-row>
-            <v-col v-for="(col, i) in data.col_documents"
-                cols="12" md="4"
-                :key="i"
-            >
-                <v-row v-for="(type, j) in col"
-                    :key="i + '-' + j"
-                >
-                    <v-col>
-                        <v-card>
-                            <v-card-title>
-                                <span class="type-name">{{type.type}}</span>
-                            </v-card-title>
-                            <v-row v-for="(item, k) in type.items"
-                                :key="i + '-' + j + '-' + k"
-                                align="center"
-                                class="px-3"
-                            >
-                                <v-col cols="12" class="item-title">{{item.title}}</v-col>
-                                <v-col cols="12" class="item-content">{{item.content}}</v-col>
-                                <v-col cols="12" v-if="item.attachment_url !== null"
-                                    class="item-url"
-                                >
-                                    <a :href="item.attachment_url" target="_blank">Link</a>
-                                </v-col>
-                                <v-col cols="12" class="item-dates">
-                                    Visible from
-                                    <span v-if="item.valid_from !== null">{{item.valid_from | formatDate}}</span>
-                                    <span v-else>-∞</span>
-                                    to
-                                    <span v-if="item.valid_until !== null">{{item.valid_until | formatDate}}</span>
-                                    <span v-else>+∞</span>
-                                </v-col>
-                                <v-col cols="12">
-                                    <v-divider></v-divider>
-                                </v-col>
-                            </v-row>
-                        </v-card>
-                    </v-col>
-                </v-row>
-            </v-col>
-        </v-row>
-    </v-container>
-    -->
 </v-card>
 </template>
 

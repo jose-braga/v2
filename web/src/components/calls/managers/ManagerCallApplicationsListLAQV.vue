@@ -245,7 +245,7 @@
 
 <script>
 import time from '@/components/common/date-utils'
-import XLSX from 'xlsx'
+import {utils, writeFileXLSX} from 'xlsx/xlsx.mjs'
 
 const scoreSum = (obj, sum) => {
     if (sum === undefined) sum = 0;
@@ -411,10 +411,10 @@ export default {
             let username = this.$store.state.session.username;
             let itemsCurated = processForSpreadsheet(items);
 
-            let wb = XLSX.utils.book_new();
-            let ws  = XLSX.utils.json_to_sheet(itemsCurated);
-            XLSX.utils.book_append_sheet(wb, ws, 'Applicants');
-            XLSX.writeFile(wb, username
+            let wb = utils.book_new();
+            let ws  = utils.json_to_sheet(itemsCurated);
+            utils.book_append_sheet(wb, ws, 'Applicants');
+            writeFileXLSX(wb, username
                     + '_' + this.callName
                     + '_applicants_' + dateFile + '.xlsx');
         },

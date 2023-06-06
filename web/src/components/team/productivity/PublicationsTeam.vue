@@ -124,7 +124,7 @@
 <script>
 import time from '@/components/common/date-utils'
 import {orderBy} from 'lodash'
-import XLSX from 'xlsx'
+import {utils, writeFileXLSX} from 'xlsx/xlsx.mjs'
 
 function processForSpreadsheet(items) {
     let itemsCurated = [];
@@ -308,9 +308,9 @@ export default {
             let dateFile = time.momentToDate(today, 'Europe/Lisbon', 'YYYY-MM-DDTHHmmss')
             let itemsCurated = processForSpreadsheet(items);
 
-            let wb = XLSX.utils.book_new();
-            let ws  = XLSX.utils.json_to_sheet(itemsCurated);
-            XLSX.utils.book_append_sheet(wb, ws, 'Team Publications');
+            let wb = utils.book_new();
+            let ws  = utils.json_to_sheet(itemsCurated);
+            utils.book_append_sheet(wb, ws, 'Team Publications');
             let filename = ''
             if (this.componentType === 'lab') {
                 filename = this.labData.name.replace(/[^a-z0-9]/gi, '_');
@@ -318,7 +318,7 @@ export default {
                 filename = this.depTeamData.name.replace(/[^a-z0-9]/gi, '_');
             }
 
-            XLSX.writeFile(wb, filename + '_publications_' + dateFile + '.xlsx');
+            writeFileXLSX(wb, filename + '_publications_' + dateFile + '.xlsx');
         },
         customSort (items, sortBy, sortDesc) {
             let funcOrderArray = [];

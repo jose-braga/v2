@@ -146,7 +146,7 @@ import subUtil from '@/components/common/submit-utils'
 import MemberDetails from '../member_details/MemberDetails'
 import AddMember from './AddMember'
 import {debounce} from 'lodash'
-import XLSX from 'xlsx'
+import {utils, writeFileXLSX} from 'xlsx/xlsx.mjs'
 
 function processResults(vm, result, unitID) {
     let currentMembers = [];
@@ -685,9 +685,9 @@ export default {
                     items = processResults (this, items, false);
                 }
                 let itemsCurated = processForSpreadsheet(items);
-                let wb = XLSX.utils.book_new();
-                let ws  = XLSX.utils.json_to_sheet(itemsCurated);
-                XLSX.utils.book_append_sheet(wb, ws, 'Data');
+                let wb = utils.book_new();
+                let ws  = utils.json_to_sheet(itemsCurated);
+                utils.book_append_sheet(wb, ws, 'Data');
                 let filename = 'members_'
                 if (this.unitId !== null && this.unitId !== undefined) {
                     filename = filename + 'unit_' + this.unitId;
@@ -695,7 +695,7 @@ export default {
                 if (this.cityId !== null && this.cityId !== undefined) {
                     filename = filename + '_city_' + this.cityId;
                 }
-                XLSX.writeFile(wb, filename + '_' + dateFile + '.xlsx');
+                writeFileXLSX(wb, filename + '_' + dateFile + '.xlsx');
                 setTimeout(() => {this.success = false;}, 1500)
             })
             .catch((error) => {

@@ -83,7 +83,7 @@ import time from '@/components/common/date-utils'
 import subUtil from '@/components/common/submit-utils'
 import MemberDetails from '../member_details/MemberDetails'
 import {debounce} from 'lodash'
-import XLSX from 'xlsx'
+import {utils, writeFileXLSX} from 'xlsx/xlsx.mjs'
 
 function processResults(vm, result) {
     let currentMembers = [];
@@ -422,11 +422,11 @@ export default {
                 let items = result.data.result;
                 items = processResults (this, items);
                 let itemsCurated = processForSpreadsheet(items);
-                let wb = XLSX.utils.book_new();
-                let ws  = XLSX.utils.json_to_sheet(itemsCurated);
-                XLSX.utils.book_append_sheet(wb, ws, 'Data');
+                let wb = utils.book_new();
+                let ws  = utils.json_to_sheet(itemsCurated);
+                utils.book_append_sheet(wb, ws, 'Data');
                 let filename = 'members_with unknown associations_'
-                XLSX.writeFile(wb, filename + '_' + dateFile + '.xlsx');
+                writeFileXLSX(wb, filename + '_' + dateFile + '.xlsx');
                 setTimeout(() => {this.success = false;}, 1500)
             })
             .catch((error) => {

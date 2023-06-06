@@ -763,7 +763,7 @@
 import ManagerCallApplicationsListLAQV from './ManagerCallApplicationsListLAQV'
 import subUtil from '@/components/common/submit-utils'
 import time from '@/components/common/date-utils'
-import XLSX from 'xlsx'
+import {utils, writeFileXLSX} from 'xlsx/xlsx.mjs'
 import { PDFDocument, PageSizes,
     StandardFonts,
     rgb
@@ -1139,10 +1139,10 @@ export default {
             let username = this.$store.state.session.username;
             let itemsCurated = processForSpreadsheet(items);
 
-            let wb = XLSX.utils.book_new();
-            let ws  = XLSX.utils.json_to_sheet(itemsCurated);
-            XLSX.utils.book_append_sheet(wb, ws, 'Applicants');
-            XLSX.writeFile(wb, username
+            let wb = utils.book_new();
+            let ws  = utils.json_to_sheet(itemsCurated);
+            utils.book_append_sheet(wb, ws, 'Applicants');
+            writeFileXLSX(wb, username
                     + '_' + this.callName
                     + '_applicants_' + dateFile + '.xlsx');
         },
@@ -1265,29 +1265,29 @@ export default {
                     ],
                 );
 
-                let ws = XLSX.utils.aoa_to_sheet(ws_data);
+                let ws = utils.aoa_to_sheet(ws_data);
                 ws['!merges'] = [
-                    XLSX.utils.decode_range("B4:D4"),
-                    XLSX.utils.decode_range("E4:I4"),
-                    XLSX.utils.decode_range("B6:D6"),
-                    XLSX.utils.decode_range("C7:E7"),
-                    XLSX.utils.decode_range("C8:E8"),
-                    XLSX.utils.decode_range("C13:D13"),
-                    XLSX.utils.decode_range("C14:E14"),
-                    XLSX.utils.decode_range("B15:H15"),
-                    XLSX.utils.decode_range("B18:G18"),
-                    XLSX.utils.decode_range("B19:G19"),
-                    XLSX.utils.decode_range("B20:G20"),
-                    XLSX.utils.decode_range("B22:G22"),
-                    XLSX.utils.decode_range("B23:G23"),
-                    XLSX.utils.decode_range("B25:E25"),
-                    XLSX.utils.decode_range("B26:H26"),
-                    XLSX.utils.decode_range("B29:G29"),
+                    utils.decode_range("B4:D4"),
+                    utils.decode_range("E4:I4"),
+                    utils.decode_range("B6:D6"),
+                    utils.decode_range("C7:E7"),
+                    utils.decode_range("C8:E8"),
+                    utils.decode_range("C13:D13"),
+                    utils.decode_range("C14:E14"),
+                    utils.decode_range("B15:H15"),
+                    utils.decode_range("B18:G18"),
+                    utils.decode_range("B19:G19"),
+                    utils.decode_range("B20:G20"),
+                    utils.decode_range("B22:G22"),
+                    utils.decode_range("B23:G23"),
+                    utils.decode_range("B25:E25"),
+                    utils.decode_range("B26:H26"),
+                    utils.decode_range("B29:G29"),
                 ];
                 if (integratedMaster) {
-                    ws['!merges'].push(XLSX.utils.decode_range("B12:D12"));
+                    ws['!merges'].push(utils.decode_range("B12:D12"));
                 } else {
-                    ws['!merges'].push(XLSX.utils.decode_range("F12:G12"));
+                    ws['!merges'].push(utils.decode_range("F12:G12"));
                 }
                 ws['!rows'] = [
                     {},{},{},{},{},{},{},{},{},{},{},{},{},{},
@@ -1298,9 +1298,9 @@ export default {
                 ws['!cols'] = [
                     {wpx: 47},{wpx: 61},{wpx: 47},{wpx: 47},{wpx: 47},{wpx: 47},{wpx: 47},{wpx: 47},{wpx: 47}
                 ]
-                let wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, ws_name);
-                XLSX.writeFile(wb, candidateName + 'PDQS 2021_Candidate File' + dateFile + '.xlsx');
+                let wb = utils.book_new();
+                utils.book_append_sheet(wb, ws, ws_name);
+                writeFileXLSX(wb, candidateName + 'PDQS 2021_Candidate File' + dateFile + '.xlsx');
             }
         },
         async exportDocumentation (application) {

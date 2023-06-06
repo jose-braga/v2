@@ -157,7 +157,7 @@
 import subUtil from '@/components/common/submit-utils'
 import time from '@/components/common/date-utils'
 import {orderBy} from 'lodash'
-import XLSX from 'xlsx'
+import {utils, writeFileXLSX} from 'xlsx/xlsx.mjs'
 
 import PublicationDetails from './PublicationDetails'
 
@@ -346,10 +346,10 @@ export default {
             let username = this.$store.state.session.username;
             let itemsCurated = processForSpreadsheet(items);
 
-            let wb = XLSX.utils.book_new();
-            let ws  = XLSX.utils.json_to_sheet(itemsCurated);
-            XLSX.utils.book_append_sheet(wb, ws, 'My Publications');
-            XLSX.writeFile(wb, username + '_publications_' + dateFile + '.xlsx');
+            let wb = utils.book_new();
+            let ws  = utils.json_to_sheet(itemsCurated);
+            utils.book_append_sheet(wb, ws, 'My Publications');
+            writeFileXLSX(wb, username + '_publications_' + dateFile + '.xlsx');
         },
         customSort (items, sortBy, sortDesc) {
             let funcOrderArray = [];

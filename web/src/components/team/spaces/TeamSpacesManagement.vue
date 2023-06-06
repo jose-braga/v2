@@ -192,7 +192,7 @@
 <script>
 import subUtil from '@/components/common/submit-utils'
 import time from '@/components/common/date-utils'
-import XLSX from 'xlsx'
+import {utils, writeFileXLSX} from 'xlsx/xlsx.mjs'
 
 const SpaceDetails = () => import(/* webpackChunkName: "space-lab-details" */ './SpaceLabDetails')
 
@@ -391,10 +391,10 @@ export default {
                 filename = this.depTeamData.name.replace(/[^a-z0-9]/gi, '_');
             }
             let membersCurated = processForSpreadsheet(members);
-            let wb = XLSX.utils.book_new();
-            let ws  = XLSX.utils.json_to_sheet(membersCurated);
-            XLSX.utils.book_append_sheet(wb, ws, 'Current Team');
-            XLSX.writeFile(wb, filename + '_team-spaces_' + dateFile + '.xlsx');
+            let wb = utils.book_new();
+            let ws  = utils.json_to_sheet(membersCurated);
+            utils.book_append_sheet(wb, ws, 'Current Team');
+            writeFileXLSX(wb, filename + '_team-spaces_' + dateFile + '.xlsx');
             /*
             let url = [];
             for (let ind in members) {

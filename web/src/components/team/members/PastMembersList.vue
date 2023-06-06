@@ -549,7 +549,7 @@
 import time from '@/components/common/date-utils'
 import subUtil from '@/components/common/submit-utils'
 import {orderBy} from 'lodash'
-import XLSX from 'xlsx'
+import {utils, writeFileXLSX} from 'xlsx/xlsx.mjs'
 //import {requiredIf} from 'vuelidate/lib/validators'
 import {minValue, maxValue, integer} from 'vuelidate/lib/validators'
 
@@ -1397,10 +1397,10 @@ export default {
                         members[ind].situations = situations[ind].data.result;
                     }
                     let membersCurated = processForSpreadsheet(members);
-                    let wb = XLSX.utils.book_new();
-                    let ws  = XLSX.utils.json_to_sheet(membersCurated);
-                    XLSX.utils.book_append_sheet(wb, ws, 'Past Members or Positions');
-                    XLSX.writeFile(wb, filename + '_past-team-members_' + dateFile + '.xlsx');
+                    let wb = utils.book_new();
+                    let ws  = utils.json_to_sheet(membersCurated);
+                    utils.book_append_sheet(wb, ws, 'Past Members or Positions');
+                    writeFileXLSX(wb, filename + '_past-team-members_' + dateFile + '.xlsx');
                 })
                 .catch((error) => {
                     console.log(error)
