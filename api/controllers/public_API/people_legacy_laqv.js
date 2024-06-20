@@ -835,7 +835,13 @@ module.exports.searchPeople = function (req, res, next) {
         places.push(rgID);
     }
     if (unitID !== null) {
-        querySQL = querySQL + ' AND (units.id = ? OR technicians_units.unit_id = ? OR science_managers_units.unit_id = ? OR people_administrative_units.unit_id = ?)';
+        querySQL = querySQL + ' AND ((units.id = ? AND ('
+        + ' (people_labs.valid_from <= curdate() and people_labs.valid_until >= curdate())'
+        + ' OR (people_labs.valid_from <= curdate() and people_labs.valid_until IS NULL)'
+        + ' OR (people_labs.valid_from IS NULL and people_labs.valid_until IS NULL)'
+        + ' OR (people_labs.valid_from IS NULL and people_labs.valid_until >= curdate())'
+        + '))'
+        + ' OR technicians_units.unit_id = ? OR science_managers_units.unit_id = ? OR people_administrative_units.unit_id = ?)';
         places.push(unitID, unitID, unitID, unitID);
     }
     let querySQLForTotals = querySQL;

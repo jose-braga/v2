@@ -36,7 +36,7 @@ var actionGetCurrentMembersList = function (options) {
         likeNameExpression = likeNameExpression + 'researchers_info.ciencia_id LIKE ?';
         qArray.push(qraw);
         likeNameExpression = likeNameExpression + ' OR ';
-        likeNameExpression = likeNameExpression + 'people.id = ?';
+        likeNameExpression = likeNameExpression + 'BINARY people.id = ?';
         qArray.push(qraw);
         likeNameExpression = likeNameExpression + ') ';
     }
@@ -197,7 +197,7 @@ var actionGetPastMembersList = function (options) {
         likeNameExpression = likeNameExpression + 'researchers_info.ciencia_id LIKE ?';
         qArray.push(qraw);
         likeNameExpression = likeNameExpression + ' OR ';
-        likeNameExpression = likeNameExpression + 'people.id = ?';
+        likeNameExpression = likeNameExpression + 'BINARY people.id = ?';
         qArray.push(qraw);
         likeNameExpression = likeNameExpression + ') ';
     }
