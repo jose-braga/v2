@@ -696,6 +696,10 @@ export default {
                     let delta = timeInterval * 1.0 / (numberEventsInterval * 1.0);
                     let pubToAddNumber = this.data.publications.length;
                     let counter = 0;
+                    if (pubToAddNumber === 0) {
+                        this.progressORCID = false;
+                        this.finishedGetORCID = true;
+                    }
                     for (let ind in this.data.publications) {
                         let instant = parseInt(ind,10) * delta;
                         setTimeout(() => {

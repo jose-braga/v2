@@ -9,7 +9,7 @@ let transporter = nodemailer.transporter;
 var emailTexts = function (options){
     let { req, res, next, i, people } = options;
     let person = people[i];
-    console.log(person)
+    //console.log(person)
     if (person.active_unit === undefined && person.inactive_unit === undefined ) {
         // no affiliations defined
         return {
@@ -91,7 +91,7 @@ var emailTexts = function (options){
             + '<p>We take this opportunity to inform you that according to our'
             + ' records you do not have an ongoing affiliation with UCIBIO.'
             + ' If this information is wrong or if you don\'t want to receive'
-            + ' more automatic emails like this please let us know by'
+            + ' more automatic emails like this please let us know'
             + ' by sending an email to <a href="mailto:josebraga@fct.unl.pt">José Braga</a>.</p>'
             + '<p>Best regards,<br>'
             + 'UCIBIO Team</p>'
@@ -159,6 +159,7 @@ var actionGetBirthdays = function (options) {
     var places = [];
     let month_day = time.momentToDate(time.moment(),
                                      undefined, '-MM-DD');
+    //month_day = '-06-07'
     let this_birthday = '%' + month_day;
     querySQL = querySQL
         + 'SELECT * FROM people'
@@ -190,8 +191,8 @@ var actionGetBirthdays = function (options) {
 var getPersonStatusActive = function (options) {
     let { req, res, next, i, people } = options;
     let person = people[i];
-    console.log('////////////////////////////////////////////////////////////')
-    console.log(person.name)
+    //console.log('////////////////////////////////////////////////////////////')
+    //console.log(person.name)
     var querySQL = '';
     var places = [];
     querySQL = querySQL
@@ -212,16 +213,16 @@ var getPersonStatusActive = function (options) {
     places.push(person.id);
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
-            console.log(resQuery)
+            //console.log(resQuery)
             if (resQuery.length > 0) {
-                console.log('-----------Active--------------')
-                console.log(resQuery)
+                //console.log('-----------Active--------------')
+                //console.log(resQuery)
                 options.people[i].active_unit = resQuery[0].unit_name;
                 options.people[i].inactive_unit = undefined;
                 // if there's an active position it does not matter what are the inactive ones
                 return getPersonWorkEmail(options);
             } else {
-                console.log('-----------Inactive--------------')
+                //console.log('-----------Inactive--------------')
                 options.people[i].active_unit = undefined;
                 return getPersonStatusInactive(options);
             }
@@ -310,7 +311,7 @@ async function sendBirthdayMessage(options) {
     if (recipients !== '') {
         let mailOptions;
         let texts = emailTexts(options);
-        console.log(texts)
+        //console.log(texts)
         if (texts.subjectText !== undefined) {
             if (process.env.NODE_ENV === 'production') {
                 mailOptions = {

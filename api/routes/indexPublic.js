@@ -15,6 +15,9 @@ var people = require('../controllers/public_API/people');
 const birthdays = require('../controllers/public_API/birthdays');
 const regularNotifications = require('../controllers/public_API/regular_notifications');
 
+const exam_monitor = require('../controllers/public_API/exam_monitor');
+router.post('/exam-monitor', cors(corsOptions), exam_monitor.insertStudentConnection);
+
 router.post('/people-todays-birthdays', cors(corsOptions), birthdays.getBirthdayPeople);
 router.post('/people-regular-notifications', cors(corsOptions), regularNotifications.getActivePeople);
 

@@ -102,7 +102,7 @@ var authenticate = function (options) {
 };
 
 /**
- * This shows all people with a current or with a recently finished association
+ * This gets all people with a current or with a recently finished association
  * @param {*} options
  * @returns
  */
@@ -134,13 +134,20 @@ var getAllPeopleRecent = function (options) {
         },
         options);
 };
+
+/*
+The year will be divided in slots (which I called divisions). Everybody
+    should receive an email within a division, but we also try to ensure
+    that people who just received an email in a previous division do not receive
+    an email right after entering the current division.
+*/
 var getPeopleAlreadyReceived = function (options) {
     let { req, res, next } = options;
     var querySQL = '';
     var places = [];
     let currentMonth = time.moment().month() + 1;
     let currentDivision = Math.ceil(currentMonth / MONTH_INTERVAL);
-    // Quick algorithm to find the end date of the "division"
+    // Quick algorithm to find the ending month of the "division"
     let endMonthDivision = MONTH_NUMBER;
     for (let i=1; i<=MONTH_NUMBER; i++) {
         if (Math.ceil(i / MONTH_INTERVAL) == currentDivision + 1) {
@@ -175,6 +182,8 @@ var selectTodayRecipients = function (options) {
     let { req, res, next, peopleList, peopleReceived,
          currentDivision, endMonthDivision } = options;
     let today = time.moment();
+    //debug:
+    //let today = time.moment('2024-06-30');
     let year = today.year();
     let endYear = time.moment(year + '-12-15'); // to avoid the Christmas season
     let scriptStartDate = time.moment(year + '-01-06'); // to avoid the Christmas season
@@ -335,8 +344,8 @@ async function sendNotificationMessage(options) {
                 };
             }
             // send mail with defined transport object
-            let info = await transporter.sendMail(mailOptions);
-            console.log(recipients, '- Message', info.messageId,'sent:', info.response);
+            //let info = await transporter.sendMail(mailOptions);
+            //console.log(recipients, '- Message', info.messageId,'sent:', info.response);
         }
         options.sent = true;
         return writeRecipientDatabase(options);
