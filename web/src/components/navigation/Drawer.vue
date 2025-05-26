@@ -156,6 +156,13 @@ export default {
                 isActive: false,
             },
             {
+                text: 'Private UCIBIO',
+                icon: 'mdi-lock',
+                image: false,
+                link: '/private-area/UCIBIO/tab/general',
+                isActive: false,
+            },
+            {
                 text: 'Docs LAQV',
                 icon: false,
                 image: '/images/logo/laqv-logo.png',

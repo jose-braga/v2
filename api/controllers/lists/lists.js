@@ -912,6 +912,21 @@ var getDocumentTabs = function (req, res, next) {
     return;
 };
 
+var getPrivateDocumentTabs = function (req, res, next) {
+    var querySQL = '';
+    var places = [];
+    var unit_id = req.query.unit_id
+    querySQL = querySQL
+        + 'SELECT *'
+        + ' FROM private_documents_tabs'
+        + ' WHERE unit_id = ?'
+        + ';'
+        ;
+    places.push(unit_id)
+    sql.makeSQLOperation(req, res, querySQL, places);
+    return;
+};
+
 module.exports.listItems = function (req, res, next) {
     let category = req.params.listCategory;
     if (category === 'countries') {
@@ -1105,6 +1120,9 @@ module.exports.listItems = function (req, res, next) {
     }
     if (category === 'document-tabs') {
         getDocumentTabs(req, res, next);
+    }
+    if (category === 'private-document-tabs') {
+        getPrivateDocumentTabs(req, res, next);
     }
 };
 

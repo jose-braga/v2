@@ -156,7 +156,7 @@ export default {
                 } else if (this.unitName === 'LAQV') {
                     this.cities = ['Aveiro', 'Lisboa', 'Porto']
                     this.$store.commit('setActiveTile', {
-                        newTile: 8,
+                        newTile: 9,
                         newToolbarText: 'Documents and information shared for LAQV members'
                     });
                     if (this.cityName === 'Lisboa') {

@@ -1,5 +1,7 @@
 require('dotenv').config()
 var express = require('express');
+var { expressjwt: jwt } = require("express-jwt");
+var cors = require('cors')
 
 //var path = require('path');
 var cookieParser = require('cookie-parser');
@@ -14,6 +16,7 @@ var routesAPIDepartmentTeams = require('./routes/indexDepartmentTeams');
 var routesAPIManagers = require('./routes/indexManager');
 var routesAPIAdmins = require('./routes/indexAdmins');
 var routesAPIAreas = require('./routes/indexUnitAreas');
+var routesAPIPrivateAreas = require('./routes/indexPrivateAreas');
 var routesAPIPreRegister = require('./routes/indexPreRegister');
 var routesAPIApplications = require('./routes/indexApplications');
 var routesAPIApplicationsLAQV = require('./routes/indexApplicationsLAQV');
@@ -41,6 +44,7 @@ app.use('/api/department-teams', routesAPIDepartmentTeams);
 app.use('/api/managers', routesAPIManagers);
 app.use('/api/admins', routesAPIAdmins);
 app.use('/api/unit-areas', routesAPIAreas);
+app.use('/api/private-areas', routesAPIPrivateAreas);
 app.use('/api/pre-register/people', routesAPIPreRegister);
 app.use('/api/calls', routesAPIApplications); // for UCIBIO
 app.use('/api/polls', routesAPIPolls);

@@ -40,7 +40,7 @@ export default {
     },
     created () {
         this.$store.commit('setActiveTile', {
-            newTile: 9,
+            newTile: 10,
             newToolbarText: 'Platform News'
         });
         this.initialize()

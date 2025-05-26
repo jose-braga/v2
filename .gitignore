@@ -79,6 +79,7 @@ database/
 prod_settings/
 api/images/people/
 api/documents/
+api/private-areas/
 api/applications/
 v2.code-workspace
 
