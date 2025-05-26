@@ -313,9 +313,10 @@ var actionUpdateSection = function (options) {
     let places = [];
     querySQL = querySQL
                 + 'UPDATE private_documents_sections'
-                + ' SET section_name = ?'
+                + ' SET section_name = ?,'
+                + ' sort_order = ?'
                 + ' WHERE id = ?;';
-    places.push(data.name, sectionID)
+    places.push(data.name, data.sort_order, sectionID)
     return sql.makeSQLOperation(req, res, querySQL, places);
 }
 
@@ -337,9 +338,10 @@ var actionUpdateGroup = function (options) {
     querySQL = querySQL
                 + 'UPDATE private_documents_groups'
                 + ' SET title = ?,'
-                + ' content = ?'
+                + ' content = ?,'
+                + ' sort_order = ?'
                 + ' WHERE id = ?;';
-    places.push(data.name, data.content, groupID)
+    places.push(data.name, data.content, data.sort_order, groupID)
     return sql.makeSQLOperation(req, res, querySQL, places);
 }
 

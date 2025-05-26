@@ -24,14 +24,22 @@
                     {{ 'mdi-alert-circle'}}
                 </v-icon>
                 <v-text-field v-if="item.editable"
+                    v-model="item.sort_order"
+                    label="Sort order">
+                </v-text-field>
+                <v-text-field v-if="item.editable && !item.content"
                     v-model="item.name"
-                    label="Change name">
+                    label="Change section name">
+                </v-text-field>
+                <v-text-field v-if="item.editable && item.content"
+                    v-model="item.name"
+                    label="Change group name">
                 </v-text-field>
                 <v-textarea v-if="item.editable && item.content"
                     v-model="item.content"
-                    label="Change content">
+                    label="Change group content">
                 </v-textarea>
-                <span v-else>
+                <span v-if="!item.editable">
                     {{ item.name }}
                 </span>
             </template>
