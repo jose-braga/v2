@@ -40,8 +40,12 @@ router.put('/:personID/tabs/:tabID/sections/:sectionID/groups/:groupID',
 router.put('/:personID/tabs/:tabID/sections/:sectionID',
   cors(corsOptions), privateDocs.updateSection);
 
+router.put('/:personID/tabs/:tabID/sections/:sectionID/groups/:groupID/documents/:docID',
+  cors(corsOptions), privateDocs.updateDocument);
 router.delete('/:personID/tabs/:tabID/sections/:sectionID/groups/:groupID/documents/:docID',
   cors(corsOptions), privateDocs.deleteDocument);
+
+
 
 
 //router.get('/:unitID/documents/tabs/:tabID', cors(corsOptions), unitDocs.getDocs);

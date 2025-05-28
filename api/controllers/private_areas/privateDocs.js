@@ -238,9 +238,9 @@ var actionCreateDocDBEntry = function (options) {
     var places = [];
     querySQL = querySQL
                 + 'INSERT INTO private_documents'
-                + ' (group_id, display_name, attachment_url)'
-                + ' VALUES (?,?,?);';
-    places.push(groupID, filename, filename);
+                + ' (group_id, display_name, attachment_url, sort_order)'
+                + ' VALUES (?,?,?,?);';
+    places.push(groupID, filename.display_name, filename.name, filename.sort_order);
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
             req.body.data.docIDs.push(resQuery.insertId)
@@ -348,6 +348,28 @@ var actionUpdateGroup = function (options) {
 module.exports.updateGroup = function (req, res, next) {
     checkPermissionsPrivateDocs(
         (options) => { actionUpdateGroup(options) },
+        { req, res, next }
+    );
+};
+
+var actionUpdateDocument = function (options) {
+    let { req, res, next } = options;
+    let documentID = req.params.docID;
+    let data = req.body.data;
+    let querySQL = '';
+    let places = [];
+    querySQL = querySQL
+                + 'UPDATE private_documents'
+                + ' SET display_name = ?,'
+                + ' sort_order = ?'
+                + ' WHERE id = ?;';
+    places.push(data.display_name, data.sort_order, documentID)
+    return sql.makeSQLOperation(req, res, querySQL, places);
+}
+
+module.exports.updateDocument = function (req, res, next) {
+    checkPermissionsPrivateDocs(
+        (options) => { actionUpdateDocument(options) },
         { req, res, next }
     );
 };

@@ -109,7 +109,9 @@
                         v-model="data.document.files"
                         show-size
                         name
-                        label="Files">
+                        label="Files"
+                        @change="processFileList()"
+                    >
                     </v-file-input>
                 </v-col>
                 <v-col cols="3" v-if="formError">
@@ -137,7 +139,13 @@
                     <ol>
                         <li v-for="(item,i) in data.document.files"
                         :key="i">
-                        {{ item.name }}
+                        <v-row align="center">
+                            <v-col cols="4">{{ item.name }}</v-col>
+                            <v-col cols="4"><v-text-field v-model="item.display_name" label="Display name"></v-text-field></v-col>
+                            <v-col cols="4"><v-text-field v-model="item.sort_order" label="Sort Order"></v-text-field></v-col>
+
+                        </v-row>
+
                         </li>
                     </ol>
                 </v-col>
@@ -214,7 +222,11 @@ export default {
                                 + '/documents-info';
                 let filenames = [];
                 for (let ind in this.data.document.files) {
-                    filenames.push(this.data.document.files[ind].name)
+                    filenames.push({
+                        name: this.data.document.files[ind].name,
+                        display_name: this.data.document.files[ind].display_name,
+                        sort_order: this.data.document.files[ind].sort_order
+                    })
                 }
                 let {section_id, group_id, new_section_name, section_sort_order,
                     group_sort_order, title, content} = this.data.document;
@@ -351,7 +363,15 @@ export default {
             }
 
 
-        }
+        },
+        processFileList () {
+            for (let ind in this.data.document.files) {
+                this.$set(this.data.document.files[ind], 'display_name',
+                    this.data.document.files[ind].name
+                )
+            }
+
+        },
     },
 }
 </script>

@@ -7,6 +7,7 @@
     </v-card-title>
 
     <v-container class="px-4">
+        {{ documentsToUpdate }}
         <v-form ref="form"
                 @submit.prevent="submitForm">
         <v-treeview :items="data.sections"
@@ -39,8 +40,31 @@
                     v-model="item.content"
                     label="Change group content">
                 </v-textarea>
-                <span v-if="!item.editable">
+                <span v-if="!item.editable && !item.display_name">
                     {{ item.name }}
+                </span>
+                <span v-if="!item.editable && item.display_name">
+                    <v-container>
+                        <v-row align="center">
+                            <v-col col="4">
+                                {{ item.name }}
+                            </v-col>
+                            <v-col col="4">
+                                <v-text-field v-model="item.display_name"
+                                    label="Display name"
+                                    @input="editDocumentInfo(item)"
+                                >
+                                </v-text-field>
+                            </v-col>
+                            <v-col col="4">
+                                <v-text-field v-model="item.sort_order"
+                                    label="Sort order"
+                                    @input="editDocumentInfo(item)"
+                                >
+                                </v-text-field>
+                            </v-col>
+                        </v-row>
+                    </v-container>
                 </span>
             </template>
             <!--
@@ -116,6 +140,7 @@ export default {
             hasFile: false,
             hasURL: false,
             toDelete: [],
+            documentsToUpdate: [],
             sectionsToUpdate: [],
             groupsToUpdate: [],
         }
@@ -220,6 +245,7 @@ export default {
                 let personID = this_session.personID;
                 this.progress = true;
                 let toDeleteIDs = []
+                let toupdateIDs = []
                 for (let ind in this.toDelete) {
                     let found = false
                     // finds section_id of document
@@ -231,6 +257,25 @@ export default {
                                     section_id: this.data.sections[ind2].id,
                                     group_id: this.toDelete[ind].group_id,
                                     doc_id: this.toDelete[ind].id,
+                                })
+                            }
+                        }
+                        if (found) break;
+                    }
+                }
+                for (let ind in this.documentsToUpdate) {
+                    let found = false
+                    // finds section_id of document
+                    for (let ind2 in this.data.sections) {
+                        for (let ind3 in this.data.sections[ind2].children) {
+                            if (this.data.sections[ind2].children[ind3].id === this.documentsToUpdate[ind].group_id) {
+                                toupdateIDs.push({
+                                    tab_id: this.tabId,
+                                    section_id: this.data.sections[ind2].id,
+                                    group_id: this.documentsToUpdate[ind].group_id,
+                                    doc_id: this.documentsToUpdate[ind].id,
+                                    display_name: this.documentsToUpdate[ind].display_name,
+                                    sort_order: this.documentsToUpdate[ind].sort_order,
                                 })
                             }
                         }
@@ -250,6 +295,22 @@ export default {
                             }
                     ))
                 )
+                .then( () => {
+                    return Promise.all(
+                        toupdateIDs.map(el =>
+                            this.$http.put(
+                                'api/private-areas/' + personID
+                                + '/tabs/' + el.tab_id
+                                + '/sections/' + el.section_id
+                                + '/groups/' + el.group_id
+                                + '/documents/' + el.doc_id,
+                                { data: el, },
+                                { headers:
+                                    {'Authorization': 'Bearer ' + localStorage['v2-token']},
+                                }
+                        ))
+                    )
+                })
                 .then( () => {
                     return Promise.all(
                         this.groupsToUpdate.map(el =>
@@ -319,7 +380,11 @@ export default {
 
             }
         },
-
+        editDocumentInfo (item) {
+            if (this.documentsToUpdate.indexOf(item) === -1) {
+                this.documentsToUpdate.push(item);
+            }
+        },
         editItem(item) {
             if (item.display_name) {
                 if (item.to_delete) {

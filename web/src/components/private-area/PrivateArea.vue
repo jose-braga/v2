@@ -42,6 +42,18 @@
 <script>
 import subUtil from '@/components/common/submit-utils'
 
+function customSorter (a,b) {
+    if (a.sort_order !== null && b.sort_order !== null) {
+        return -(a.sort_order - b.sort_order);
+    } else if (a.sort_order === null) {
+        return +1;
+    } else if (b.sort_order === null) {
+        return -1;
+    } else {
+        return a.id - b.id;
+    }
+}
+
 export default {
     components: {
     },
@@ -90,6 +102,7 @@ export default {
             }
             this.getDocumentTabs(unit_id)
             .then(() => {
+                this.allTabs = this.allTabs.sort(customSorter)
                 for (let ind in this.allTabs) {
                     if (this.allTabs[ind].tab_path === this.tabName ) {
                         this.tabID = this.allTabs[ind].id;
