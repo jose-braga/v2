@@ -7,7 +7,6 @@
     </v-card-title>
 
     <v-container class="px-4">
-        {{ documentsToUpdate }}
         <v-form ref="form"
                 @submit.prevent="submitForm">
         <v-treeview :items="data.sections"
@@ -347,6 +346,7 @@ export default {
                     this.toDelete = [];
                     this.sectionsToUpdate = [],
                     this.groupsToUpdate = [],
+                    this.documentsToUpdate = [],
                     this.$root.$emit('updatePrivateDocumentsList')
                     this.initialize();
                 })

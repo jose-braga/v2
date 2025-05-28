@@ -12,7 +12,8 @@
 
         <p>Only members of a given governing body can view and access the
             documents in their respective tab. Access to documents from other
-            governing bodies is not possible.</p>
+            governing bodies is not possible, unless you have the required
+            permissions.</p>
 
         <p>This feature ensures that sensitive information is shared only with
              the intended recipients, maintaining confidentiality and
