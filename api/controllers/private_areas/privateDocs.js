@@ -57,14 +57,20 @@ var checkPermissionsPrivateDocs = function (callback, callbackOptions) {
             (resQuery, callbackOptions) => {
                 let routeFound = false;
                 resQuery.forEach(element => {
+                    if (element.tab_path === 'admin' && routeFound === false) {
+                        routeFound = true;
+                        return callback(callbackOptions);
+                    }
                     if (req.method === 'GET'
-                        && element.priv_tab_id === tabID) {
+                        && element.priv_tab_id === tabID
+                        && routeFound === false) {
                         routeFound = true;
                         return callback(callbackOptions);
                     }
                     if (req.method !== 'GET'
                         && element.priv_tab_id === tabID
                         && element.management_permission === 1
+                         && routeFound === false
                     ) {
                         routeFound = true;
                         return callback(callbackOptions);
@@ -401,3 +407,82 @@ module.exports.deleteDocument = function (req, res, next) {
     );
 };
 
+
+var actionGetPeopleTab = function (options) {
+    let { req, res, next } = options;
+    let tabID = req.params.tabID;
+    let querySQL = '';
+    let places = [];
+    querySQL = querySQL
+                + 'SELECT private_documents_permissions.*, people.name'
+                + ' FROM private_documents_permissions'
+                + ' JOIN people ON people.id = private_documents_permissions.person_id'
+                + ' WHERE private_documents_permissions.priv_tab_id = ?'
+                + ' AND private_documents_permissions.permission_active = 1;';
+    places.push(tabID)
+    return sql.makeSQLOperation(req, res, querySQL, places);
+}
+
+module.exports.getTabPeoplePermissions = function (req, res, next) {
+    checkPermissionsPrivateDocs(
+        (options) => { actionGetPeopleTab(options) },
+        { req, res, next }
+    );
+};
+
+var actionAddPersonTab = function (options) {
+    /*TODO*/
+    let { req, res, next } = options;
+    let tabID = req.params.tabID;
+    let data = req.body.data;
+    let querySQL = '';
+    let places = [];
+    querySQL = querySQL
+                + 'INSERT INTO private_documents_permissions'
+                + ' (person_id, priv_tab_id, management_permission, permission_active)'
+                + ' VALUES (?,?,?,1)';
+    places.push(data.person_id, data.tab_id, data.management_permission)
+    return sql.makeSQLOperation(req, res, querySQL, places);
+}
+
+module.exports.addPersonTab = function (req, res, next) {
+    checkPermissionsPrivateDocs(
+        (options) => { actionAddPersonTab(options) },
+        { req, res, next }
+    );
+};
+
+
+var actionUpdatePersonTab = function (options) {
+    let { req, res, next } = options;
+    let tabID = req.params.tabID;
+    let otherPersonID = req.params.otherPersonID;
+    let data = req.body.data;
+    let querySQL = '';
+    let places = [];
+    querySQL = querySQL
+                + 'UPDATE private_documents_permissions'
+                + ' SET permission_active = ?, management_permission = ?'
+                + ' WHERE id = ?;';
+    places.push(data.tab_permission, data.management_permission, data.id)
+    return sql.makeSQLOperation(req, res, querySQL, places);
+}
+
+module.exports.updatePersonTab = function (req, res, next) {
+    checkPermissionsPrivateDocs(
+        (options) => { actionUpdatePersonTab(options) },
+        { req, res, next }
+    );
+};
+
+
+var actionDeletePersonTab = function (options) {
+    /* Probably not necessary */
+}
+
+module.exports.deletePersonTab = function (req, res, next) {
+    checkPermissionsPrivateDocs(
+        (options) => { actionDeletePersonTab(options) },
+        { req, res, next }
+    );
+};

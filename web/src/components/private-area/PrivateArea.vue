@@ -17,6 +17,7 @@
             <keep-alive>
                 <router-view
                     :unit-name="unitName"
+                    :unit-id="unit_id"
                     :tab-name="tabName"
                     :tab-id="tabID"
                 ></router-view>
@@ -64,6 +65,7 @@ export default {
             tabID: 0,
             allTabs: [],
             activeTab: 0,
+            unit_id: 1,
         }
     },
     mounted() {
@@ -93,14 +95,13 @@ export default {
         initialize () {
             this.unitName = this.$route.params.unitName;
             this.tabName = this.$route.params.tabName;
-            let unit_id = null;
             if (this.unitName === 'UCIBIO') {
-                unit_id = 1;
+                this.unit_id = 1;
 
             } else if (this.unitName === 'LAQV'){
-                unit_id = 2;
+                this.unit_id = 2;
             }
-            this.getDocumentTabs(unit_id)
+            this.getDocumentTabs()
             .then(() => {
                 this.allTabs = this.allTabs.sort(customSorter)
                 for (let ind in this.allTabs) {
@@ -126,9 +127,9 @@ export default {
                 }
             })
         },
-        getDocumentTabs (unit_id) {
+        getDocumentTabs () {
             let vm = this;
-            const urlSubmit = 'api/v2/' + 'private-document-tabs?unit_id=' + unit_id;
+            const urlSubmit = 'api/v2/' + 'private-document-tabs?unit_id=' + this.unit_id;
             return subUtil.getPublicInfo(vm, urlSubmit, 'allTabs');
         },
         tabChanged: function(tab) {

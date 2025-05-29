@@ -45,7 +45,10 @@ router.put('/:personID/tabs/:tabID/sections/:sectionID/groups/:groupID/documents
 router.delete('/:personID/tabs/:tabID/sections/:sectionID/groups/:groupID/documents/:docID',
   cors(corsOptions), privateDocs.deleteDocument);
 
-
+router.get('/:personID/tabs/:tabID/people', cors(corsOptions), privateDocs.getTabPeoplePermissions);
+router.post('/:personID/tabs/:tabID/people', cors(corsOptions), privateDocs.addPersonTab);
+router.put('/:personID/tabs/:tabID/people/:otherPersonID', cors(corsOptions), privateDocs.updatePersonTab);
+router.delete('/:personID/tabs/:tabID/people/:otherPersonID', cors(corsOptions), privateDocs.deletePersonTab);
 
 
 //router.get('/:unitID/documents/tabs/:tabID', cors(corsOptions), unitDocs.getDocs);

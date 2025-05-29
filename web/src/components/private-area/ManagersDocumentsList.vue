@@ -45,17 +45,17 @@
                 <span v-if="!item.editable && item.display_name">
                     <v-container>
                         <v-row align="center">
-                            <v-col col="4">
+                            <v-col cols="4">
                                 {{ item.name }}
                             </v-col>
-                            <v-col col="4">
+                            <v-col cols="4">
                                 <v-text-field v-model="item.display_name"
                                     label="Display name"
                                     @input="editDocumentInfo(item)"
                                 >
                                 </v-text-field>
                             </v-col>
-                            <v-col col="4">
+                            <v-col cols="4">
                                 <v-text-field v-model="item.sort_order"
                                     label="Sort order"
                                     @input="editDocumentInfo(item)"
@@ -93,7 +93,7 @@
                     <v-icon v-show="success" color="green">mdi-check</v-icon>
                     <v-icon v-show="error" color="red">mdi-alert-circle-outline</v-icon>
                 </v-col>
-            </v-row>
+        </v-row>
         </v-form>
 
     </v-container>

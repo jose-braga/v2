@@ -260,9 +260,10 @@ export default {
                 .then(() => {
                     this.progress = false;
                     this.success = true;
-                    setTimeout(() => {this.success = false;}, 1500);
+                    setTimeout(() => {
+                        this.success = false;
+                        this.$refs.form.reset();}, 1500);
                     this.$root.$emit('updatePrivateDocumentsList');
-                    this.$refs.form.reset()
                     this.initialize();
                 })
                 .catch((error) => {
@@ -273,64 +274,6 @@ export default {
                     console.log(error)
                 });
             }
-            /*
-            if (this.$store.state.session.loggedIn) {
-                let this_session = this.$store.state.session;
-                let personID = this_session.personID;
-                this.progress = true;
-                let urlCreate = 'api/private-areas/' + personID
-                                + '/tabs/' + this.tabId
-                                + '/sections/' + this.data.document.section_id
-                                + '/groups/' + this.data.document.group_id
-                                + '/documents';
-                const formData = new FormData()
-                formData.append('title',this.data.document.title);
-                formData.append('content',this.data.document.content);
-                formData.append('tab_id', this.tabId);
-                formData.append('section_id', this.data.document.section_id);
-                formData.append('group_id', this.data.document.group_id);
-                formData.append('new_section_name',this.data.document.new_section_name);
-                formData.append('new_group_name',this.data.document.new_group_name);
-                formData.append('section_sort_order',this.data.document.section_sort_order);
-                formData.append('group_sort_order',this.data.document.group_sort_order);
-                if (this.data.document.valid_from !== null
-                        && this.data.document.valid_from !== undefined) {
-                    formData.append('valid_from', this.data.document.valid_from);
-                }
-                if (this.data.document.valid_until !== null
-                        && this.data.document.valid_until !== undefined) {
-                    formData.append('valid_until', this.data.document.valid_until);
-                }
-                for (let ind in this.data.document.files) {
-                        //formData.append('file_name', this.data.document.files[ind].name);
-                        formData.append('files', this.data.document.files[ind],this.data.document.files[ind].name);
-                }
-                console.log(formData)
-                this.$http.post(urlCreate,
-                    formData,
-                    {
-                        headers: {
-                            'Authorization': 'Bearer ' + localStorage['v2-token'],
-                            'Content-Type': 'multipart/form-data'
-                        },
-                    }
-                )
-                .then(() => {
-                    this.progress = false;
-                    this.success = true;
-                    setTimeout(() => {this.success = false;}, 1500);
-                    this.$root.$emit('updatePrivateDocumentsList');
-                    this.$refs.form.reset()
-                })
-                .catch((error) => {
-                    this.progress = false;
-                    this.error = true;
-                    setTimeout(() => {this.error = false;}, 6000)
-                    // eslint-disable-next-line
-                    console.log(error)
-                });
-            }
-            */
         },
         initialize() {
             let this_session = this.$store.state.session;

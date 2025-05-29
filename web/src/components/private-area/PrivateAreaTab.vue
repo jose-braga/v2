@@ -10,7 +10,7 @@
         ></GeneralInfoTab>
     </v-col>
 
-    <v-col v-if="hasPermissions && tabId !== 0" cols="12">
+    <v-col v-if="hasPermissions && tabId !== 0 && !isAdminTab()" cols="12">
         <UsersDocumentsList
             :unit-name="unitName"
             :unit-id="unitID"
@@ -18,7 +18,7 @@
             :tab-id="tabId"
         ></UsersDocumentsList>
     </v-col>
-    <v-col v-if="hasPermissions && hasManagement  && tabId !== 0" cols="12">
+    <v-col v-if="isManagerTab()" cols="12">
         <ManagersDocumentsList
             :unit-name="unitName"
             :unit-id="unitID"
@@ -26,13 +26,21 @@
             :tab-id="tabId"
         ></ManagersDocumentsList>
     </v-col>
-    <v-col v-if="hasPermissions && hasManagement && tabId !== 0" cols="12">
+    <v-col v-if="isManagerTab()" cols="12">
         <ManagersDocumentAdd
             :unit-name="unitName"
             :unit-id="unitID"
             :tab-name="tabName"
             :tab-id="tabId"
         ></ManagersDocumentAdd>
+    </v-col>
+    <v-col v-if="isAdminTab()" cols="12">
+        <AdminTab
+            :unit-name="unitName"
+            :unit-id="unitID"
+            :tab-name="tabName"
+            :tab-id="tabId"
+        ></AdminTab>
     </v-col>
     <v-col v-if="!hasPermissions">
         <div>You do not have permission to access this section.</div>
@@ -48,6 +56,7 @@ const UsersDocumentsList = () => import(/* webpackChunkName: "private-area-docum
 const ManagersDocumentsList = () => import(/* webpackChunkName: "private-area-managers-documents-list" */ './ManagersDocumentsList')
 const ManagersDocumentAdd = () => import(/* webpackChunkName: "private-area-managers-document-add" */ './ManagersDocumentAdd')
 const GeneralInfoTab = () => import(/* webpackChunkName: "private-area-managers-documents-list" */ './GeneralInfoTab')
+const AdminTab = () => import(/* webpackChunkName: "private-area-admin" */ './AdminTab')
 
 export default {
     components: {
@@ -55,6 +64,7 @@ export default {
         ManagersDocumentsList,
         ManagersDocumentAdd,
         GeneralInfoTab,
+        AdminTab,
     },
     props: {
         unitName: String,
@@ -111,7 +121,20 @@ export default {
                         }
                     });
                 })
-        }
+        },
+        isManagerTab () {
+            if (this.hasPermissions && this.hasManagement
+                && this.tabId !== 0 && this.tabName !== 'admin'){
+                return true;
+            }
+        },
+        isAdminTab () {
+            if (this.hasPermissions && this.hasManagement  && this.tabName === 'admin'){
+                return true;
+            }
+
+        },
+
     },
 
 
