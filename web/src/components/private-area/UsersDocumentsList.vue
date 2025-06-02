@@ -1,73 +1,81 @@
 <template>
 <v-card class="px-4" flat>
     <v-card-text>
+        <v-container>
+            <v-row>
+                <v-col>
+                    <v-text-field
+                        v-model="searchDocs"
+                        label="Search documents or section names"
+                        clearable
+                        @input="filterDocs(searchDocs)"
+                    ></v-text-field>
+
+                </v-col>
+            </v-row>
+        </v-container>
         <v-expansion-panels>
             <v-expansion-panel
                 v-for="(section,i) in data.sections"
                 :key="i"
             >
-                <v-expansion-panel-header>
+                <v-expansion-panel-header v-if="section.show || section.show === undefined">
                     <span class="type-name">{{section.section_name}}</span>
                 </v-expansion-panel-header>
-                <v-expansion-panel-content>
+                <v-expansion-panel-content v-if="section.show || section.show === undefined">
                     <v-container>
                         <v-row>
                             <v-col cols="12" md="6" lg="4"
-                                v-for="(group, j) in section.groups"
+                                v-for="(group, j) in section.groups.filter(group => group.show || group.show === undefined)"
                                 :key="i + '-' + j"
                             >
-                                <v-card class="pa-2">
-                                <v-card-text>
-                                    <v-row>
-                                        <span class="item-title">{{ group.title }}</span>
-                                    </v-row>
-                                    <v-row>
-                                        <span class="item-content">{{ group.content }}</span>
-                                    </v-row>
-                                    <v-row>
-                                        <span class="item-dates">
-                                            Visible from
-                                            <span v-if="group.valid_from !== null">{{group.valid_from | formatDate}}</span>
-                                            <span v-else>-∞</span>
-                                            to
-                                            <span v-if="group.valid_until !== null">{{group.valid_until | formatDate}}</span>
-                                            <span v-else>+∞</span>
-                                        </span>
-                                    </v-row>
-                                    <v-row>
-                                        <v-col cols="12">
-                                            <v-list dense>
-                                                <v-list-group
-                                                    :value="false"
-                                                >
-                                                    <template v-slot:activator>
-                                                        <v-list-item-title>Files</v-list-item-title>
-                                                    </template>
+                                <v-card class="pa-2"
+                                >
+                                    <v-card-text>
+                                        <v-row>
+                                            <span class="item-title">{{ group.title }}</span>
+                                        </v-row>
+                                        <v-row>
+                                            <span class="item-content">{{ group.content }}</span>
+                                        </v-row>
+                                        <v-row>
+                                            <span class="item-dates">
+                                                Visible from
+                                                <span v-if="group.valid_from !== null">{{group.valid_from | formatDate}}</span>
+                                                <span v-else>-∞</span>
+                                                to
+                                                <span v-if="group.valid_until !== null">{{group.valid_until | formatDate}}</span>
+                                                <span v-else>+∞</span>
+                                            </span>
+                                        </v-row>
+                                        <v-row>
+                                            <v-col cols="12">
+                                                <v-list dense>
+                                                    <v-list-group
+                                                        :value="false"
+                                                    >
+                                                        <template v-slot:activator>
+                                                            <v-list-item-title>Files</v-list-item-title>
+                                                        </template>
 
-                                                        <v-list-item
-                                                            v-for="(item, k) in group.documents"
-                                                            :key="i + '-' + j + '-' + k"
-                                                            @click="downloadFile(tabId, section, group, item)"
-                                                        >
-                                                            <v-list-item-content>
-                                                                <v-list-item-title>
-                                                                    {{ item.display_name }}
-                                                                </v-list-item-title>
+                                                            <v-list-item
+                                                                v-for="(item, k) in group.documents.filter(doc => doc.show || doc.show === undefined)"
+                                                                :key="i + '-' + j + '-' + k"
+                                                                @click="downloadFile(tabId, section, group, item)"
+                                                            >
+                                                                <v-list-item-content>
+                                                                    <v-list-item-title>
+                                                                        {{ item.display_name }}
+                                                                    </v-list-item-title>
 
-                                                            </v-list-item-content>
-                                                        </v-list-item>
-
-
-
-                                                </v-list-group>
-
-
-                                            </v-list>
-                                        </v-col>
-                                    </v-row>
-                                </v-card-text>
+                                                                </v-list-item-content>
+                                                            </v-list-item>
+                                                    </v-list-group>
+                                                </v-list>
+                                            </v-col>
+                                        </v-row>
+                                    </v-card-text>
                                 </v-card>
-
                             </v-col>
                         </v-row>
                     </v-container>
@@ -106,16 +114,20 @@ export default {
     },
     data () {
         return {
+            searchDocs: '',
             data: {
-                documents: [],
-                documentsByType: {},
-                documentsSortedTypes: [],
                 sections: [],
+                ///sections_show: [],
             },
             path: '/private-areas/tabs/',
             noDocuments: true,
         }
     },
+    //computed: {
+    //    visibleGroups() {
+//
+    //    }
+    //},
     mounted () {
         this.initialize();
         this.$root.$on('updatePrivateDocumentsList',
@@ -201,6 +213,7 @@ export default {
                     }
                 })
                 ;
+
         },
         downloadFile (tabID, section, group, doc) {
             let this_session = this.$store.state.session;
@@ -230,6 +243,68 @@ export default {
             });
 
         },
+        filterDocs (strSearch) {
+            if (strSearch === '' || strSearch === null) { strSearch = ''; }
+            let search = strSearch.toLowerCase();
+            let sections = this.data.sections;
+            for (let ind in sections) {
+                if (sections[ind].section_name.toLowerCase().includes(search)) {
+                    this.$set(sections[ind],'show', true);
+                    // show everything inside this section
+                    for (let indGrp in this.data.sections[ind].groups) {
+                        this.$set(this.data.sections[ind].groups[indGrp],'show', true);
+                        for (let indDoc in this.data.sections[ind].groups[indGrp].documents) {
+                            this.$set(this.data.sections[ind].groups[indGrp].documents[indDoc],
+                            'show', true);
+                        }
+                    }
+                } else {
+                    // set as false, can be changed if something inside is found
+                    this.$set(sections[ind],'show', false);
+                    // see if anything inside should be shown
+                    let foundAny = false;
+                    for (let indGrp in this.data.sections[ind].groups) {
+                        if (sections[ind].groups[indGrp].title.toLowerCase().includes(search)
+                            || sections[ind].groups[indGrp].content.toLowerCase().includes(search)) {
+                            foundAny = true;
+                            this.$set(this.data.sections[ind],'show', true);
+                            this.$set(this.data.sections[ind].groups[indGrp],'show', true);
+                            for (let indDoc in this.data.sections[ind].groups[indGrp].documents) {
+                                this.$set(this.data.sections[ind].groups[indGrp].documents[indDoc],
+                                'show', true);
+                            }
+                        } else {
+                            this.$set(this.data.sections[ind].groups[indGrp],'show', false);
+                            for (let indDoc in this.data.sections[ind].groups[indGrp].documents) {
+                                if (sections[ind].groups[indGrp].documents[indDoc].display_name.toLowerCase().includes(search)
+                                    || sections[ind].groups[indGrp].documents[indDoc].attachment_url.toLowerCase().includes(search)
+                                ) {
+                                    foundAny = true;
+                                    this.$set(this.data.sections[ind],'show', true);
+                                    this.$set(this.data.sections[ind].groups[indGrp],'show', true);
+                                    this.$set(this.data.sections[ind].groups[indGrp].documents[indDoc],
+                                        'show', true);
+                                } else {
+                                    this.$set(this.data.sections[ind].groups[indGrp].documents[indDoc],
+                                        'show', false);
+                                }
+                            }
+                        }
+                    }
+                    if (!foundAny) {
+                        this.$set(sections[ind],'show', false);
+                        for (let indGrp in this.data.sections[ind].groups) {
+                            this.$set(this.data.sections[ind].groups[indGrp],'show', false);
+                            for (let indDoc in this.data.sections[ind].groups[indGrp].documents) {
+                                this.$set(this.data.sections[ind].groups[indGrp].documents[indDoc],
+                                        'show', false);
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
     }
 }
 </script>

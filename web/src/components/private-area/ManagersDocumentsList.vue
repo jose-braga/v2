@@ -13,6 +13,7 @@
             hoverable
             item-text="name"
             open-on-click
+            item-key="unique-id"
         >
             <template v-slot:prepend="{ item }">
                 <v-icon @click="editItem(item)">
@@ -45,7 +46,7 @@
                 <span v-if="!item.editable && item.display_name">
                     <v-container>
                         <v-row align="center">
-                            <v-col cols="4">
+                            <v-col cols="4" class="text-pre-wrap">
                                 {{ item.name }}
                             </v-col>
                             <v-col cols="4">
@@ -174,6 +175,7 @@ export default {
                     if (result.length > 0) this.noDocuments = false;
                     return Promise.all(
                         this.data.sections.map(el => {
+                            this.$set(el,'unique-id', 'sct-' + el.id)
                             url = 'api/private-areas/' + personID
                                 + '/tabs/' + this.tabId
                                 + '/sections/' + el.id
@@ -195,6 +197,11 @@ export default {
                             this.$set(this.data.sections[ind].children[ind2], 'children', [])
                             this.$set(this.data.sections[ind].children[ind2], 'name',
                                 this.data.sections[ind].children[ind2].title)
+                            this.$set(this.data.sections[ind].children[ind2],
+                                'unique-id',
+                                'sct-' + this.data.sections[ind].children[ind2].section_id
+                                + '-grp-' + this.data.sections[ind].children[ind2].id
+                            )
                             url = 'api/private-areas/' + personID
                                 + '/tabs/' + this.tabId
                                 + '/sections/' + this.data.sections[ind].id
@@ -229,6 +236,10 @@ export default {
                                     for (let ind4 in this.data.sections[ind2].children[ind3].children) {
                                         this.$set(this.data.sections[ind2].children[ind3].children[ind4], 'name',
                                             this.data.sections[ind2].children[ind3].children[ind4].display_name)
+                                        this.$set(this.data.sections[ind2].children[ind3].children[ind4],
+                                        'unique-id',
+                                        this.data.sections[ind2].children[ind3].children[ind4].id
+                                    )
                                     }
 
                                 }

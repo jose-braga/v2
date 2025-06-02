@@ -15,6 +15,7 @@
                 hoverable
                 item-text="name"
                 open-on-click
+                item-key="unique-id"
             >
                 <template v-slot:prepend="{ item }">
                     <v-icon v-if="item.person_id"
@@ -269,6 +270,7 @@ export default {
                 return Promise.all(
                         this.tabs.map(el => {
                             this.$set(el, 'name', el.tab_name);
+                            this.$set(el, 'unique-id', 'tab-' + el.id);
                             url = 'api/private-areas/' + personID
                                 + '/tabs/' + el.id
                                 + '/people'
@@ -284,7 +286,9 @@ export default {
                 for (let ind in result) {
                     let people = result[ind].data.result;
                     for (let ind2 in people) {
-                        people[ind2].tab_permission = true;
+                        this.$set(people[ind2], 'tab_permission', true);
+                        this.$set(people[ind2], 'unique-id',
+                            'tab-' + people[ind2].priv_tab_id + '-person-' + people[ind2].id);
                     }
                     this.$set(this.tabs[ind], 'children', people);
                 }
