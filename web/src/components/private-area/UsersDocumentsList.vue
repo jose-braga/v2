@@ -24,7 +24,7 @@
                 </v-expansion-panel-header>
                 <v-expansion-panel-content v-if="section.show || section.show === undefined">
                     <v-container>
-                        <v-row>
+                        <v-row v-if="section.groups">
                             <v-col cols="12" md="6" lg="4"
                                 v-for="(group, j) in section.groups.filter(group => group.show || group.show === undefined)"
                                 :key="i + '-' + j"
@@ -117,7 +117,6 @@ export default {
             searchDocs: '',
             data: {
                 sections: [],
-                ///sections_show: [],
             },
             path: '/private-areas/tabs/',
             noDocuments: true,
@@ -265,7 +264,8 @@ export default {
                     let foundAny = false;
                     for (let indGrp in this.data.sections[ind].groups) {
                         if (sections[ind].groups[indGrp].title.toLowerCase().includes(search)
-                            || sections[ind].groups[indGrp].content.toLowerCase().includes(search)) {
+                            || (sections[ind].groups[indGrp].content !== null &&
+                                sections[ind].groups[indGrp].content.toLowerCase().includes(search))) {
                             foundAny = true;
                             this.$set(this.data.sections[ind],'show', true);
                             this.$set(this.data.sections[ind].groups[indGrp],'show', true);

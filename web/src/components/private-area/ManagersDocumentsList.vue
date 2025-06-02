@@ -28,15 +28,15 @@
                     v-model="item.sort_order"
                     label="Sort order">
                 </v-text-field>
-                <v-text-field v-if="item.editable && !item.content"
+                <v-text-field v-if="item.editable && !item.title"
                     v-model="item.name"
                     label="Change section name">
                 </v-text-field>
-                <v-text-field v-if="item.editable && item.content"
+                <v-text-field v-if="item.editable && item.title"
                     v-model="item.name"
                     label="Change group name">
                 </v-text-field>
-                <v-textarea v-if="item.editable && item.content"
+                <v-textarea v-if="item.editable && item.title"
                     v-model="item.content"
                     label="Change group content">
                 </v-textarea>
