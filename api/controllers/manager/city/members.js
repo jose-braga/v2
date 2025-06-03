@@ -8,7 +8,8 @@ var actionGetCurrentMembersList = function (options) {
     let today = time.moment().format('YYYY-MM-DD');
     let cityID = req.params.cityID;
     let qArray = []
-    let lab = '%'
+    let lab = '%';
+    let labID = '';
     let group = '%'
     let limit = 10;
     let offset = 0;
@@ -42,7 +43,8 @@ var actionGetCurrentMembersList = function (options) {
     }
     if (req.query.lab !== undefined) {
         let labraw = req.query.lab;
-        lab = '%' + labraw.replace(/\s/gi,'%') + '%'
+        lab = '%' + labraw.replace(/\s/gi,'%') + '%';
+        labID = labraw;
     }
     if (req.query.group !== undefined) {
         let groupraw = req.query.group;
@@ -71,7 +73,7 @@ var actionGetCurrentMembersList = function (options) {
         + ' WHERE people.status = 1'
         + ' AND people_institution_city.city_id = ?'
         + likeNameExpression
-        + ' AND (labs.name LIKE ? OR labs.short_name = ?)'
+        + ' AND (labs.name LIKE ? OR labs.short_name = ? OR BINARY labs.id = ?)'
         + ' AND (groups.name LIKE ? OR groups.short_name = ?)'
         + ' AND ((people_labs.valid_from IS NULL AND people_labs.valid_until IS NULL)'
         + '     OR (people_labs.valid_from <= ? AND people_labs.valid_until IS NULL)'
@@ -139,7 +141,7 @@ var actionGetCurrentMembersList = function (options) {
         + '    OR (people_administrative_offices.valid_from <= ? AND people_administrative_offices.valid_until >= ?))'
         + ' AND ((people_institution_city.valid_from IS NULL OR people_institution_city.valid_from <= ?)'
         + '    AND (people_institution_city.valid_until IS NULL OR people_institution_city.valid_until >= ?))';
-    places = [cityID].concat(qArray).concat([lab, lab, group, group, today, today, today, today, today, today])
+    places = [cityID].concat(qArray).concat([lab, lab, labID, group, group, today, today, today, today, today, today])
         .concat([cityID]).concat(qArray).concat([lab, lab, today, today, today, today, today, today])
         .concat([cityID]).concat(qArray).concat([lab, lab, today, today, today, today, today, today])
         .concat([cityID]).concat(qArray).concat([lab, lab, today, today, today, today, today, today])
@@ -184,7 +186,8 @@ var actionGetPastMembersList = function (options) {
     let today = time.moment().format('YYYY-MM-DD');
     let cityID = req.params.cityID;
     let qArray = [];
-    let lab = '%'
+    let lab = '%';
+    let labID = '';
     let group = '%'
     let limit = 10;
     let offset = 0;
@@ -218,7 +221,8 @@ var actionGetPastMembersList = function (options) {
     }
     if (req.query.lab !== undefined) {
         let labraw = req.query.lab;
-        lab = '%' + labraw.replace(/\s/gi,'%') + '%'
+        lab = '%' + labraw.replace(/\s/gi,'%') + '%';
+        labID = labraw;
     }
     if (req.query.group !== undefined) {
         let groupraw = req.query.group;
@@ -247,7 +251,7 @@ var actionGetPastMembersList = function (options) {
         + ' WHERE people.status = 1'
         + ' AND people_institution_city.city_id = ?'
         + likeNameExpression
-        + ' AND (labs.name LIKE ? OR labs.short_name = ?)'
+        + ' AND (labs.name LIKE ? OR labs.short_name = ? OR BINARY labs.id = ?)'
         + ' AND (groups.name LIKE ? OR groups.short_name = ?)'
         + ' AND ((people_labs.valid_from < ? OR people_labs.valid_from IS NULL)'
         + '     AND (people_labs.valid_until IS NOT NULL AND people_labs.valid_until < ?)'
@@ -312,7 +316,7 @@ var actionGetPastMembersList = function (options) {
         //+ ' AND (( people_institution_city.valid_from < ? OR people_institution_city.valid_from IS NULL)'
         //+ '    AND (people_institution_city.valid_until IS NOT NULL AND people_institution_city.valid_until < ?))'
         ;
-    places = [cityID].concat(qArray).concat([lab, lab, group, group, today, today])
+    places = [cityID].concat(qArray).concat([lab, lab, labID, group, group, today, today])
         .concat([cityID]).concat(qArray).concat([lab, lab, today, today])
         .concat([cityID]).concat(qArray).concat([lab, lab, today, today])
         .concat([cityID]).concat(qArray).concat([lab, lab, today, today])

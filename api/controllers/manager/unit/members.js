@@ -9,6 +9,7 @@ var actionGetCurrentMembersList = function (options) {
     let unitID = req.params.unitID;
     let qArray = []
     let lab = '%';
+    let labID = '';
     let group = '%';
     let limit = 10;
     let offset = 0;
@@ -42,7 +43,8 @@ var actionGetCurrentMembersList = function (options) {
     }
     if (req.query.lab !== undefined) {
         let labraw = req.query.lab;
-        lab = '%' + labraw.replace(/\s/gi,'%') + '%'
+        lab = '%' + labraw.replace(/\s/gi,'%') + '%';
+        labID = labraw;
     }
     if (req.query.group !== undefined) {
         let groupraw = req.query.group;
@@ -69,7 +71,7 @@ var actionGetCurrentMembersList = function (options) {
         + ' LEFT JOIN researchers_info ON researchers_info.person_id = people.id'
         + ' WHERE people.status = 1 AND groups_units.unit_id = ?'
         + likeNameExpression
-        + ' AND (labs.name LIKE ? OR labs.short_name = ?)'
+        + ' AND (labs.name LIKE ? OR labs.short_name = ? OR BINARY labs.id = ?)'
         + ' AND (groups.name LIKE ? OR groups.short_name = ?)'
         + ' AND ((people_labs.valid_from IS NULL AND people_labs.valid_until IS NULL)'
         + '     OR (people_labs.valid_from <= ? AND people_labs.valid_until IS NULL)'
@@ -123,7 +125,7 @@ var actionGetCurrentMembersList = function (options) {
         + '    OR (people_administrative_offices.valid_from <= ? AND people_administrative_offices.valid_until IS NULL)'
         + '    OR (people_administrative_offices.valid_from IS NULL AND people_administrative_offices.valid_until >= ?)'
         + '    OR (people_administrative_offices.valid_from <= ? AND people_administrative_offices.valid_until >= ?))';
-    places = [unitID].concat(qArray).concat([lab, lab, group, group, today, today, today, today])
+    places = [unitID].concat(qArray).concat([lab, lab, labID, group, group, today, today, today, today])
         .concat([unitID]).concat(qArray).concat([lab, lab, today, today, today, today])
         .concat([unitID]).concat(qArray).concat([lab, lab, today, today, today, today])
         .concat([unitID]).concat(qArray).concat([lab, lab, today, today, today, today])
@@ -169,7 +171,8 @@ var actionGetPastMembersList = function (options) {
     let today = time.moment().format('YYYY-MM-DD');
     let unitID = req.params.unitID;
     let qArray = [];
-    let lab = '%'
+    let lab = '%';
+    let labID = '';
     let group = '%'
     let limit = 10;
     let offset = 0;
@@ -203,7 +206,8 @@ var actionGetPastMembersList = function (options) {
     }
     if (req.query.lab !== undefined) {
         let labraw = req.query.lab;
-        lab = '%' + labraw.replace(/\s/gi,'%') + '%'
+        lab = '%' + labraw.replace(/\s/gi,'%') + '%';
+        labID = labraw;
     }
     if (req.query.group !== undefined) {
         let groupraw = req.query.group;
@@ -230,7 +234,7 @@ var actionGetPastMembersList = function (options) {
         + ' LEFT JOIN researchers_info ON researchers_info.person_id = people.id'
         + ' WHERE people.status = 1 AND groups_units.unit_id = ?'
         + likeNameExpression
-        + ' AND (labs.name LIKE ? OR labs.short_name = ?)'
+        + ' AND (labs.name LIKE ? OR labs.short_name = ? OR BINARY labs.id = ?)'
         + ' AND (groups.name LIKE ? OR groups.short_name = ?)'
         + ' AND ((people_labs.valid_from < ? OR people_labs.valid_from IS NULL)'
         + '     AND (people_labs.valid_until IS NOT NULL AND people_labs.valid_until < ?)'
@@ -280,7 +284,7 @@ var actionGetPastMembersList = function (options) {
         + ' AND (( people_administrative_offices.valid_from < ? OR people_administrative_offices.valid_from IS NULL)'
         + '    AND (people_administrative_offices.valid_until IS NOT NULL AND people_administrative_offices.valid_until < ?)'
         + ')';
-    places = [unitID].concat(qArray).concat([lab, lab, group, group, today, today])
+    places = [unitID].concat(qArray).concat([lab, lab, labID, group, group, today, today])
         .concat([unitID]).concat(qArray).concat([lab, lab, today, today])
         .concat([unitID]).concat(qArray).concat([lab, lab, today, today])
         .concat([unitID]).concat(qArray).concat([lab, lab, today, today])

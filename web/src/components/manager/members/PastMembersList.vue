@@ -23,7 +23,7 @@
                 <v-text-field
                     v-model="searchLab"
                     append-icon="mdi-magnify"
-                    label="Search by lab"
+                    label="Search by lab / lab ID"
                     single-line
                     hide-details
                     @input="filterData"
