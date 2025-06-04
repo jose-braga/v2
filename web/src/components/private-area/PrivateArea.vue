@@ -70,6 +70,9 @@ export default {
     },
     mounted() {
         this.initialize();
+        this.$root.$on('privateDocumentsTabUpdate', () => {
+            this.initialize();
+        });
     },
     computed: {
         loggedIn () {

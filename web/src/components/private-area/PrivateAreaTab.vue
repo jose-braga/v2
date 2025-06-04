@@ -41,6 +41,12 @@
             :tab-name="tabName"
             :tab-id="tabId"
         ></AdminTab>
+        <AdminTabManagement class="mt-4"
+            :unit-name="unitName"
+            :unit-id="unitID"
+            :tab-name="tabName"
+            :tab-id="tabId"
+        ></AdminTabManagement>
     </v-col>
     <v-col v-if="!hasPermissions">
         <div>You do not have permission to access this section.</div>
@@ -57,6 +63,7 @@ const ManagersDocumentsList = () => import(/* webpackChunkName: "private-area-ma
 const ManagersDocumentAdd = () => import(/* webpackChunkName: "private-area-managers-document-add" */ './ManagersDocumentAdd')
 const GeneralInfoTab = () => import(/* webpackChunkName: "private-area-managers-documents-list" */ './GeneralInfoTab')
 const AdminTab = () => import(/* webpackChunkName: "private-area-admin" */ './AdminTab')
+const AdminTabManagement = () => import(/* webpackChunkName: "private-area-admin-management" */ './AdminTabManagement')
 
 export default {
     components: {
@@ -65,6 +72,7 @@ export default {
         ManagersDocumentAdd,
         GeneralInfoTab,
         AdminTab,
+        AdminTabManagement,
     },
     props: {
         unitName: String,

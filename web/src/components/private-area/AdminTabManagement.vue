@@ -2,10 +2,11 @@
 <v-card class="px-4">
     <v-card-title primary-title>
         <div>
-            <h3 class="headline">Manage People Permissions</h3>
+            <h3 class="headline">Manage Tabs</h3>
         </div>
     </v-card-title>
     <v-card-text>
+        <h3>Do not change Admin tab!</h3>
     </v-card-text>
     <v-container class="px-4">
         <v-form ref="form"
@@ -13,80 +14,74 @@
         >
             <v-treeview :items="tabs"
                 hoverable
-                item-text="name"
+                item-text="tab_name"
                 open-on-click
-                item-key="unique-id"
+                item-key="id"
             >
                 <template v-slot:prepend="{ item }">
-                    <v-icon v-if="item.person_id"
+                    <v-icon
                         @click="editItem(item)">
                         {{ 'mdi-pencil'}}
+                    </v-icon>
+                    <v-icon class="ml-2"
+                        @click="deleteItem(item)">
+                        {{ item.to_delete? 'mdi-alert-circle' : 'mdi-delete'}}
                     </v-icon>
                 </template>
                 <template v-slot:label="{ item }">
                     <div v-if="!item.editable">
-                        {{ item.name }}
+                        {{ item.tab_name }}
                     </div>
                     <div v-else>
                         <v-container>
                             <v-row align="center">
-                                <v-col cols="6">
-                                    {{ item.name }}
+                                <v-col cols="5">
+                                    <v-text-field
+                                        v-model="item.tab_name"
+                                        label="Tab name">
+                                    </v-text-field>
                                 </v-col>
-                                <v-col cols="3">
-                                    <v-checkbox
-                                        v-model="item.tab_permission"
-                                        @change="accessChange(item)"
-                                        label="Access tab"
-                                        >
-                                    </v-checkbox>
+                                <v-col cols="5">
+                                    <v-text-field
+                                        v-model="item.tab_path"
+                                        label="Tab path">
+                                    </v-text-field>
                                 </v-col>
-                                <v-col cols="3">
-                                    <v-checkbox
-                                        v-model="item.management_permission"
-                                        @change="managementChange(item)"
-                                        label="Manage tab"
-                                        >
-                                    </v-checkbox>
+                                <v-col cols="2">
+                                    <v-text-field
+                                        v-model="item.sort_order"
+                                        label="Sort order">
+                                    </v-text-field>
                                 </v-col>
                             </v-row>
                         </v-container>
-
                     </div>
                 </template>
             </v-treeview>
             <v-row class="mt-4">
                 <v-col cols="12">
-                    <h3>Add person to a tab</h3>
+                    <h3>Add a tab</h3>
                 </v-col>
             </v-row>
             <v-row align="center">
                 <v-col cols="4">
-                    <v-autocomplete
-                        v-model="toCreate.person_id"
-                        :items="people"
-                        item-value="id" item-text="name"
-                        :filter="customSearch"
-                        label="Person name"
-                        dense>
-                    </v-autocomplete>
+                    <v-text-field
+                        v-model="toCreate.tab_name"
+                        label="New tab name">
+                    </v-text-field>
                 </v-col>
                 <v-col cols="4">
-                    <v-select v-model="toCreate.tab_id"
-                        :items="tabs"
-                        item-value="id" item-text="tab_name"
-                        label="Tab"
-                        dense>
-                    </v-select>
+                    <v-text-field
+                        v-model="toCreate.tab_path"
+                        label="New tab path">
+                    </v-text-field>
                 </v-col>
-                <v-col cols="3">
-                    <v-checkbox
-                        v-model="toCreate.management_permission"
-                        label="Manage tab"
-                    >
-                    </v-checkbox>
+                <v-col cols="2">
+                    <v-text-field
+                        v-model="toCreate.sort_order"
+                        label="Sort order">
+                    </v-text-field>
                 </v-col>
-
             </v-row>
             <v-row align-content="center" justify="end" class="mb-1">
                 <v-col cols="3" v-if="formError">
@@ -167,7 +162,6 @@ export default {
             error: false,
             formError: false,
             tabs: [],
-            people: [],
             toDelete: [],
             toUpdate: [],
             toCreate: {},
@@ -175,11 +169,6 @@ export default {
     },
     created () {
         this.initialize();
-    },
-    mounted () {
-        this.$root.$on('privateDocumentsTabUpdate', () => {
-            this.initialize();
-        });
     },
     watch: {
         tabName () {
@@ -195,24 +184,24 @@ export default {
     methods: {
         submitForm() {
             // Create submit data first for creating DB entries
-            // Then upload files
             if (this.$store.state.session.loggedIn) {
                 let this_session = this.$store.state.session;
                 let personID = this_session.personID;
                 this.progress = true;
                 let create = [];
-                if (this.toCreate.person_id != null && this.toCreate.person_id != undefined) {
+                if (this.toCreate.tab_name != null && this.toCreate.tab_name != undefined) {
                     create = [this.toCreate]
                 }
                 Promise.all(
-                    create.map(el =>
-                        this.$http.post('api/private-areas/' + personID
-                                + '/tabs/' + el.tab_id
-                                + '/people',
+                    create.map(el => {
+                        el.unit_id = this.unitId
+                        return this.$http.post('api/private-areas/' + personID
+                                + '/tabs',
                             { data: el, },
                             { headers:
                                 {'Authorization': 'Bearer ' + localStorage['v2-token']},
                             })
+                        }
                     )
                 )
                 .then(() => {
@@ -220,29 +209,25 @@ export default {
                         this.toUpdate.map(el =>
                             this.$http.put(
                                 'api/private-areas/' + personID
-                                + '/tabs/' + el.priv_tab_id
-                                + '/people/' + el.person_id,
+                                + '/tabs/' + el.id,
                             { data: el, },
                             { headers:
                                 {'Authorization': 'Bearer ' + localStorage['v2-token']},
                             })
                     ))
                 })
-                /*
                 .then(() => {
                     return Promise.all(
                         this.toDelete.map(el =>
                             this.$http.delete(
                                 'api/private-areas/' + personID
-                                + '/tabs/' + el.priv_tab_id
-                                + '/people/' + el.person_id,
+                                + '/tabs/' + el.id,
                                 { headers:
                                     {'Authorization': 'Bearer ' + localStorage['v2-token']},
                                 }
                             )
                     ))
                 })
-                    */
                 .then(() => {
                     this.progress = false;
                     this.success = true;
@@ -252,6 +237,7 @@ export default {
                     this.toDelete = [];
                     this.toUpdate = [];
                     this.toCreate = {};
+                    this.$root.$emit('privateDocumentsTabUpdate');
                     this.initialize();
                 })
                 .catch((error) => {
@@ -264,40 +250,12 @@ export default {
             }
         },
         initialize() {
-            let this_session = this.$store.state.session;
-            let personID = this_session.personID;
-            this.getPeople();
+            //let this_session = this.$store.state.session;
+            //let personID = this_session.personID;
             const urlSubmit = 'api/v2/' + 'private-document-tabs?unit_id=' + this.unitId;
             subUtil.getPublicInfo(this, urlSubmit, 'tabs')
-            .then(() => {
+            .then( () => {
                 this.tabs.sort(customSorter)
-                let url = '';
-                return Promise.all(
-                        this.tabs.map(el => {
-                            this.$set(el, 'name', el.tab_name);
-                            this.$set(el, 'unique-id', 'tab-' + el.id);
-                            url = 'api/private-areas/' + personID
-                                + '/tabs/' + el.id
-                                + '/people'
-                            return this.$http.get(url,
-                            {
-                                headers: {'Authorization': 'Bearer ' + localStorage['v2-token']},
-                            })
-                        })
-                    )
-
-            })
-            .then((result) => {
-                for (let ind in result) {
-                    let people = result[ind].data.result;
-                    for (let ind2 in people) {
-                        this.$set(people[ind2], 'tab_permission', true);
-                        this.$set(people[ind2], 'unique-id',
-                            'tab-' + people[ind2].priv_tab_id + '-person-' + people[ind2].id);
-                    }
-                    this.$set(this.tabs[ind], 'children', people);
-                }
-
             })
             .catch((error) => {
                 // eslint-disable-next-line
@@ -315,22 +273,16 @@ export default {
                 }
             }
         },
-        accessChange(item) {
-            if (item.tab_permission === 0 || item.tab_permission === false) {
-                item.management_permission = false;
-            }
-        },
-        managementChange(item) {
-            if (item.management_permission === 1 || item.management_permission === true ) {
-                item.tab_permission = true;
-            }
-
-        },
-        getPeople() {
-            var vm = this;
-            if (this.$store.state.session.loggedIn) {
-                const urlSubmit = 'api/v2/' + 'people-simple';
-                return subUtil.getPublicInfo(vm, urlSubmit, 'people', 'colloquial_name');
+        deleteItem(item) {
+            if (item.to_delete) {
+                item.to_delete = !item.to_delete;
+                let undeleteIndex = this.toDelete.indexOf(item)
+                this.toDelete.splice(undeleteIndex,1)
+            } else {
+                this.$set(item, 'to_delete', true);
+                if (this.toDelete.indexOf(item) === -1) {
+                    this.toDelete.push(item)
+                }
             }
         },
         customSearch (item, queryText, itemText) {

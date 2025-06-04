@@ -51,6 +51,11 @@ router.put('/:personID/tabs/:tabID/people/:otherPersonID', cors(corsOptions), pr
 router.delete('/:personID/tabs/:tabID/people/:otherPersonID', cors(corsOptions), privateDocs.deletePersonTab);
 
 
+router.post('/:personID/tabs', cors(corsOptions), privateDocs.addTab);
+router.put('/:personID/tabs/:tabID', cors(corsOptions), privateDocs.updateTab);
+router.delete('/:personID/tabs/:tabID', cors(corsOptions), privateDocs.deleteTab);
+
+
 //router.get('/:unitID/documents/tabs/:tabID', cors(corsOptions), unitDocs.getDocs);
 
 //router.put('/:unitID/documents/:docID', cors(corsOptions), unitDocs.updateDoc); //only if has permission

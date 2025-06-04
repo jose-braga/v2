@@ -486,3 +486,176 @@ module.exports.deletePersonTab = function (req, res, next) {
         { req, res, next }
     );
 };
+
+var actionAddTab = function (options) {
+    let { req, res, next } = options;
+    let data = req.body.data;
+    let querySQL = '';
+    let places = [];
+    querySQL = querySQL
+                + 'INSERT INTO private_documents_tabs'
+                + ' (unit_id, tab_name, tab_path, visible, sort_order)'
+                + ' VALUES (?,?,?,1,?)';
+    places.push(data.unit_id, data.tab_name, data.tab_path, data.sort_order)
+    return sql.makeSQLOperation(req, res, querySQL, places);
+}
+
+module.exports.addTab = function (req, res, next) {
+    checkPermissionsPrivateDocs(
+        (options) => { actionAddTab(options) },
+        { req, res, next }
+    );
+};
+
+var actionUpdateTab = function (options) {
+    let { req, res, next } = options;
+    let tabID = req.params.tabID;
+    let data = req.body.data;
+    let querySQL = '';
+    let places = [];
+    querySQL = querySQL
+                + 'UPDATE private_documents_tabs'
+                + ' SET tab_name = ?, tab_path = ?, sort_order = ?'
+                + ' WHERE id = ?';
+    places.push(data.tab_name, data.tab_path, data.sort_order, tabID)
+    return sql.makeSQLOperation(req, res, querySQL, places);
+}
+
+module.exports.updateTab = function (req, res, next) {
+    checkPermissionsPrivateDocs(
+        (options) => { actionUpdateTab(options) },
+        { req, res, next }
+    );
+};
+
+var actionGetTabInfo = function (options) {
+    let { req, res, next } = options;
+    let tabID = req.params.tabID;
+    let data = req.body.data;
+    let querySQL = '';
+    let places = [];
+    querySQL = querySQL
+                + 'SELECT private_documents_sections.id AS section_id, private_documents_groups.id AS group_id, private_documents.id AS doc_id'
+                + ' FROM private_documents_sections'
+                + ' JOIN private_documents_groups ON private_documents_groups.section_id = private_documents_sections.id'
+                + ' JOIN private_documents ON private_documents.group_id = private_documents_groups.id'
+                + ' WHERE private_documents_sections.priv_tab_id = ?;';
+    places.push(tabID)
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            options.info = resQuery;
+            if (resQuery.length > 0) {
+                options.i = 0
+                return deleteTabDocs(options);
+            } else {
+                return deleteTabPermissions(options);
+            }
+
+
+        },
+        options);
+}
+
+var deleteTabDocs = function (options) {
+    let { req, res, next, info, i } = options;
+    let tabID = req.params.tabID;
+    let querySQL = '';
+    let places = [];
+    querySQL = querySQL
+                + 'DELETE FROM private_documents'
+                + ' WHERE id = ?;';
+    places.push(info[i].doc_id)
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            if (i + 1 < info.length) {
+                options.i = i + 1;
+                return deleteTabDocs(options);
+            } else {
+                options.i = 0;
+                return deleteTabGroups(options);
+            }
+        },
+        options);
+}
+var deleteTabGroups = function (options) {
+    let { req, res, next, info, i } = options;
+    let tabID = req.params.tabID;
+    let querySQL = '';
+    let places = [];
+    querySQL = querySQL
+                + 'DELETE FROM private_documents_groups'
+                + ' WHERE id = ?;';
+    places.push(info[i].group_id)
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            if (i + 1 < info.length) {
+                options.i = i + 1;
+                return deleteTabGroups(options);
+            } else {
+                options.i = 0;
+                return deleteTabSections(options);
+            }
+        },
+        options);
+}
+var deleteTabSections = function (options) {
+    let { req, res, next, info, i } = options;
+    let tabID = req.params.tabID;
+    let querySQL = '';
+    let places = [];
+    querySQL = querySQL
+                + 'DELETE FROM private_documents_sections'
+                + ' WHERE id = ?;';
+    places.push(info[i].section_id)
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            if (i + 1 < info.length) {
+                options.i = i + 1;
+                return deleteTabSections(options);
+            } else {
+                return deleteTabPermissions(options);
+            }
+        },
+        options);
+}
+var deleteTabPermissions = function (options) {
+    let { req, res, next } = options;
+    let tabID = req.params.tabID;
+    let querySQL = '';
+    let places = [];
+    querySQL = querySQL
+                + 'DELETE FROM private_documents_permissions'
+                + ' WHERE priv_tab_id = ?;';
+    places.push(tabID)
+    return sql.getSQLOperationResult(req, res, querySQL, places,
+        (resQuery, options) => {
+            return deleteTabFinal(options);
+        },
+        options);
+}
+var deleteTabFinal = function (options) {
+    let { req, res, next } = options;
+    let tabID = req.params.tabID;
+    let querySQL = '';
+    let places = [];
+    querySQL = querySQL
+                + 'DELETE FROM private_documents_tabs'
+                + ' WHERE id = ?;';
+    places.push(tabID)
+    return sql.makeSQLOperation(req, res, querySQL, places);
+}
+module.exports.deleteTab = function (req, res, next) {
+    checkPermissionsPrivateDocs(
+        (options) => {
+            // need to:
+            // 1. get the documents, groups and sections related to tab
+            // 2. delete documents related to those groups
+            // 3. delete groups related to those sections
+            // 4. delete sections related to tab
+            // 5. delete the permissions related to tab
+            // 6. delete tab
+            return actionGetTabInfo(options)
+        },
+        { req, res, next }
+    );
+};
