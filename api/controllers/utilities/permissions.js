@@ -286,6 +286,10 @@ module.exports.checkPermissions = function (callback, callbackOptions) {
                 }
             }
         }
+    } else if (reqEndpointParts[0] === 'private-areas' &&
+        resourcePersonID !== undefined && personID === resourcePersonID
+    ) {
+        return callback(callbackOptions);
     } else if (hasAccessEndpoint(reqMethod, reqEndpoint, permissionsEndpoints)
                 && reqEndpointParts[2] !== 'external-api-authorization') {
         // a user on behalf of another cannot change authorization for that user
