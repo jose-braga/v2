@@ -97,10 +97,17 @@
             </v-row>
             <v-row align="center">
                 <v-col cols="12">
+                <!--
                     <v-textarea
                         v-model="data.document.content"
                         label="Contents">
                     </v-textarea>
+                -->
+                    <tiptap-vuetify
+                        v-model="data.document.content"
+                        placeholder="Contents for text above document"
+                        :extensions="extensions"
+                    />
                 </v-col>
             </v-row>
             <v-row align-content="center" justify="end" class="mb-1">
@@ -132,8 +139,11 @@
 
 <script>
 import subUtil from '@/components/common/submit-utils'
+import { TiptapVuetify, Bold, Italic, Underline,
+    BulletList, OrderedList, ListItem, Link, History } from 'tiptap-vuetify'
 
 export default {
+    components: { TiptapVuetify },
     props: {
         cityId: Number,
         unitId: Number,
@@ -150,6 +160,16 @@ export default {
                 'Just text',
                 'Text + URL link',
                 'Text + File',
+            ],
+            extensions: [
+                History,
+                Link,
+                Bold,
+                Underline,
+                Italic,
+                ListItem,
+                BulletList,
+                OrderedList,
             ],
             hasFile: false,
             hasURL: false,

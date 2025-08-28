@@ -36,7 +36,7 @@
                                             <span class="item-title">{{ group.title }}</span>
                                         </v-row>
                                         <v-row>
-                                            <span class="item-content">{{ group.content }}</span>
+                                            <span class="item-content"><div v-html="group.content"></div></span>
                                         </v-row>
                                         <v-row>
                                             <span class="item-dates">

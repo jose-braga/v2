@@ -36,10 +36,17 @@
                     v-model="item.name"
                     label="Change group name">
                 </v-text-field>
+                <!--
                 <v-textarea v-if="item.editable && item.title"
                     v-model="item.content"
                     label="Change group content">
                 </v-textarea>
+                -->
+                <tiptap-vuetify v-if="item.editable && item.title"
+                    v-model="item.content"
+                    placeholder="Change group content"
+                    :extensions="extensions"
+                />
                 <span v-if="!item.editable && !item.display_name">
                     {{ item.name }}
                 </span>
@@ -105,6 +112,8 @@
 <script>
 import subUtil from '@/components/common/submit-utils'
 //import time from '@/components/common/date-utils'
+import { TiptapVuetify, Bold, Italic, Underline,
+    BulletList, OrderedList, ListItem, Link, History } from 'tiptap-vuetify'
 
 function customSorter (a,b) {
     if (a.sort_order !== null && b.sort_order !== null) {
@@ -120,6 +129,7 @@ function customSorter (a,b) {
 
 
 export default {
+    components: { TiptapVuetify },
     props: {
         unitName: String,
         unitId: Number,
@@ -133,10 +143,19 @@ export default {
             success: false,
             error: false,
             search: '',
+            extensions: [
+                History,
+                Link,
+                Bold,
+                Underline,
+                Italic,
+                ListItem,
+                BulletList,
+                OrderedList,
+            ],
             data: {
                 sections: [],
             },
-
             hasFile: false,
             hasURL: false,
             toDelete: [],

@@ -95,10 +95,17 @@
             </v-row>
             <v-row align="center" v-if="data.document.group_id === 'new'">
                 <v-col cols="12">
+                    <!--
                     <v-textarea
                         v-model="data.document.content"
                         label="Contents">
                     </v-textarea>
+                    -->
+                    <tiptap-vuetify
+                        v-model="data.document.content"
+                        placeholder="Contents for text above documents"
+                        :extensions="extensions"
+                    />
                 </v-col>
             </v-row>
             <v-row align="center"  class="mb-2">
@@ -158,6 +165,9 @@
 
 <script>
 import subUtil from '@/components/common/submit-utils'
+import { TiptapVuetify, Bold, Italic, Underline,
+    BulletList, OrderedList, ListItem, Link, History } from 'tiptap-vuetify'
+
 
 function customSorter (a,b) {
     if (a.sort_order !== null && b.sort_order !== null) {
@@ -172,6 +182,7 @@ function customSorter (a,b) {
 }
 
 export default {
+    components: { TiptapVuetify },
     props: {
         unitName: String,
         unitId: Number,
@@ -188,6 +199,16 @@ export default {
             groups: [],
             hasFile: false,
             hasURL: false,
+            extensions: [
+                History,
+                Link,
+                Bold,
+                Underline,
+                Italic,
+                ListItem,
+                BulletList,
+                OrderedList,
+            ],
             data: {
                 document: {},
             },

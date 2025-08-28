@@ -132,10 +132,17 @@
                                     </v-row>
                                     <v-row align="center">
                                         <v-col cols="12">
+                                            <!--
                                             <v-textarea
                                                 v-model="data.item.content"
                                                 label="Contents">
                                             </v-textarea>
+                                            -->
+                                            <tiptap-vuetify
+                                                v-model="data.item.content"
+                                                placeholder="Contents for text above document"
+                                                :extensions="extensions"
+                                            />
                                         </v-col>
                                     </v-row>
                                     <v-row align-content="center" justify="end" class="mb-1">
@@ -211,8 +218,11 @@
 <script>
 import subUtil from '@/components/common/submit-utils'
 import time from '@/components/common/date-utils'
+import { TiptapVuetify, Bold, Italic, Underline,
+    BulletList, OrderedList, ListItem, Link, History } from 'tiptap-vuetify'
 
 export default {
+    components: { TiptapVuetify },
     props: {
         cityId: Number,
         unitId: Number,
@@ -237,6 +247,16 @@ export default {
             footerProps: {
                 'items-per-page-options': [10,20,50,-1]
             },
+            extensions: [
+                History,
+                Link,
+                Bold,
+                Underline,
+                Italic,
+                ListItem,
+                BulletList,
+                OrderedList,
+            ],
             data: {
                 documents: [],
                 item: { contentOption: 'Just text', },

@@ -22,7 +22,7 @@
                                         <span class="item-title">{{ doc.title }}</span>
                                     </v-row>
                                     <v-row>
-                                        <span class="item-content">{{ doc.content }}</span>
+                                        <span class="item-content"><div v-html="doc.content"></div></span>
                                     </v-row>
                                     <v-row>
                                         <span v-if="doc.attachment_url !== null"
