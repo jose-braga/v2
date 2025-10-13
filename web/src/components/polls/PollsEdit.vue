@@ -921,7 +921,7 @@ export default {
                     this.data.poll.valid_from = time.momentToDate(this.data.poll.valid_from)
                     this.data.isManager = true;
                     this.$store.commit('setActiveTile', {
-                        newTile: 10,
+                        newTile: 11,
                         newToolbarText: 'Edit poll: ' + this.data.poll.title
                     });
                 }
