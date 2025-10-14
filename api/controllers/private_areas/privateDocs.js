@@ -5,6 +5,7 @@ const permissions = require('../utilities/permissions');
 const fs = require('fs-extra');
 var path = require('path');
 var multer = require('multer');
+const checkDiskSpace = require('check-disk-space').default
 
 var storage = multer.diskStorage({ //multers disk storage settings
     destination: function (req, file, callback) {
@@ -37,6 +38,32 @@ var storage = multer.diskStorage({ //multers disk storage settings
         callback(null, file.originalname);
     }
 });
+
+
+module.exports.getAvailableSpace = function (req, res, next) {
+     if (process.env.NODE_ENV === 'production') {
+        volumePath = '/app/private-areas/';
+    } else {
+        volumePath = '/app/';
+    }
+    checkDiskSpace(volumePath)
+    .then((diskspace) =>  {
+        let percFree = diskspace.free / diskspace.size * 100
+        responses.sendJSONResponse(res, 200,
+            {
+                "status": "success",
+                "statusCode": 200,
+                "result": {
+                    "free": diskspace.free,
+                    "size": diskspace.size,
+                    "free_gb": diskspace.free / 1024 ** 3,
+                    "size_gb": diskspace.size / 1024 ** 3,
+                    "percFree": percFree.toFixed(1),
+                }
+            }
+        )
+    })
+};
 
 var checkPermissionsPrivateDocs = function (callback, callbackOptions) {
     let { req, res, next } = callbackOptions; // should contain always these 3

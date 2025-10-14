@@ -1,4 +1,24 @@
 <template>
+<div>
+<v-card class="px-4 mb-2">
+    <v-card-title primary-title>
+        Disk space available
+    </v-card-title>
+    <v-container class="px-4">
+        <v-progress-linear class="mt-2"
+        :value="diskSpace.percFree"
+
+        height="25"
+    >
+        {{ diskSpace.free_gb.toFixed(1) }} GB / {{ diskSpace.size_gb.toFixed(1) }} GB
+        &nbsp;
+        <strong>({{ diskSpace.percFree }}%)</strong>
+    </v-progress-linear>
+
+    </v-container>
+
+
+</v-card>
 <v-card class="px-4">
     <v-card-title primary-title>
         <div>
@@ -115,7 +135,7 @@
     </v-container>
 
 </v-card>
-
+</div>
 </template>
 
 <script>
@@ -171,6 +191,7 @@ export default {
             toDelete: [],
             toUpdate: [],
             toCreate: {},
+            diskSpace: {}
         }
     },
     created () {
@@ -298,6 +319,16 @@ export default {
                     this.$set(this.tabs[ind], 'children', people);
                 }
 
+            })
+            .then(() => {
+                let url = 'api/private-areas/' + personID
+                                + '/available-space'
+                return this.$http.get(url,
+                            { headers: {'Authorization': 'Bearer ' + localStorage['v2-token']}}
+                        )
+            })
+            .then((result) => {
+                this.diskSpace = result.data.result;
             })
             .catch((error) => {
                 // eslint-disable-next-line

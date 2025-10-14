@@ -20,6 +20,7 @@ router.options('*', cors())
 const privateDocs = require('../controllers/private_areas/privateDocs');
 
 router.get('/:personID/permissions', cors(corsOptions), privateDocs.getPermissionsList);
+router.get('/:personID/available-space', cors(corsOptions), privateDocs.getAvailableSpace);
 router.get('/:personID/tabs/:tabID/sections',
   cors(corsOptions), privateDocs.getSections);
 router.get('/:personID/tabs/:tabID/sections/:sectionID/groups',
