@@ -59,6 +59,7 @@ module.exports.getAvailableSpace = function (req, res, next) {
                     "free_gb": diskspace.free / 1024 ** 3,
                     "size_gb": diskspace.size / 1024 ** 3,
                     "percFree": percFree.toFixed(1),
+                    "percUsed": (100 - percFree).toFixed(1),
                 }
             }
         )

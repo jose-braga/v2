@@ -6,13 +6,14 @@
     </v-card-title>
     <v-container class="px-4">
         <v-progress-linear class="mt-2"
-        :value="diskSpace.percFree"
+        :value="diskSpace.percUsed"
 
         height="25"
     >
-        {{ diskSpace.free_gb.toFixed(1) }} GB / {{ diskSpace.size_gb.toFixed(1) }} GB
+        {{ (diskSpace.size_gb-diskSpace.free_gb).toFixed(1) }} GB /
+        {{ diskSpace.size_gb.toFixed(1) }} GB
         &nbsp;
-        <strong>({{ diskSpace.percFree }}%)</strong>
+        <strong>({{ diskSpace.percUsed }}%)</strong>
     </v-progress-linear>
 
     </v-container>
