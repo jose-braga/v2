@@ -375,7 +375,13 @@ export default {
                             this.$set(this.data.current_positions[ind],
                                 'unit_group_labs',
                                 unit_group_lab_altered);
-                            this.$set(this.data.current_positions[ind], 'lab_id', null);
+                            if (unit_group_lab_altered.length == 1) {
+                                console.log(unit_group_lab_altered)
+                                this.$set(this.data.current_positions[ind], 'lab_id', unit_group_lab_altered[0].id);
+                            } else {
+                                this.$set(this.data.current_positions[ind], 'lab_id', null);
+                            }
+
                             break;
                         }
                     }
