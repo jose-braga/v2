@@ -1,9 +1,10 @@
 <template>
 <div>
     <!--
+        currentlab: {{currentLab}}<br>
+        labData: {{labData}}<br>
+        labs: {{labs}}<br>
     labId: {{labID}}<br>
-    currentlab: {{currentLab}}<br>
-    labData: {{labData}}<br>
     myLabMan: {{data.myLabsManagement}}<br>
     depTeamId: {{depTeamID}}<br>
     currentDepartmentTeam: {{currentDepartmentTeam}}<br>
@@ -281,6 +282,7 @@ export default {
                         && this_session.permissionsEndpoints[ind].method_name === 'POST'
                     ) {
                         let urlSubmit = 'api' + '/labs/' + decomposedPath[1];
+                        console.log(urlSubmit)
                         subUtil.getInfoPopulate(this, urlSubmit, true)
                         .then( (result) => {
                             this.data.myLabsManagement.push(result);
@@ -341,14 +343,27 @@ export default {
                 this.data.myDepartmentTeams = [];
                 this.data.myDepartmentTeamsManagement = [];
 
-                this.data.myLabs = [];
-                this.data.myLabs.push(this.data.managerCurrentLab);
-                this.data.myLabsManagement = [];
-                this.data.myLabsManagement.push(this.data.managerCurrentLab);
-                this.currentLab = this.data.managerCurrentLab
-                this.labID = this.data.managerCurrentLab.id;
-                let link = '/team/' + this.data.managerCurrentLab.name.toLowerCase().replace(/\s/g,'-');
-                this.$router.replace(link).catch((err)=>console.log(err));
+                let urlSubmit = 'api/labs/' + this.data.managerCurrentLab.id;
+                subUtil.getInfoPopulate(this, urlSubmit, true)
+                .then( (result) => {
+                    this.data.myLabs = [];
+                    this.data.myLabs.push(result);
+                    this.data.myLabsManagement = [];
+                    this.data.myLabsManagement.push(result);
+                    this.currentLab = result;
+                    this.labID = this.data.managerCurrentLab.id;
+                    let link = '/team/' + this.data.managerCurrentLab.name.toLowerCase().replace(/\s/g,'-');
+                    this.$router.replace(link).catch((err)=>console.log(err));
+                })
+
+                //this.data.myLabs = [];
+                //this.data.myLabs.push(this.data.managerCurrentLab);
+                //this.data.myLabsManagement = [];
+                //this.data.myLabsManagement.push(this.data.managerCurrentLab);
+                //this.currentLab = this.data.managerCurrentLab
+                //this.labID = this.data.managerCurrentLab.id;
+                //let link = '/team/' + this.data.managerCurrentLab.name.toLowerCase().replace(/\s/g,'-');
+                //this.$router.replace(link).catch((err)=>console.log(err));
 
             } else if (type === 'team') {
                 this.data.managerCurrentLab = undefined;

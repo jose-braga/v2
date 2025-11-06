@@ -795,9 +795,9 @@ export default {
                         time.moment(this.labData.groups_history[ind].valid_from).isBefore(today))
                         && time.moment(this.labData.groups_history[ind].valid_until).isBefore(today)) {
                         pastGroups.push(this.labData.groups_history[ind]);
-                        return pastGroups;
                     }
                 }
+                return pastGroups;
             }
             return false;
         },
