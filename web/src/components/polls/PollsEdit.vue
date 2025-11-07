@@ -151,7 +151,12 @@
                     :key="'text-'+ i"
                 >
                     <v-col cols="12" sm="7">
-                        <v-text-field
+                        <tiptap-vuetify v-if="text.text_type_id !== 1"
+                            v-model="text.text"
+                            placeholder="Paragraph text"
+                            :extensions="extensions"
+                        />
+                        <v-text-field v-else
                             v-model="text.text"
                             label="Paragraph text">
                         </v-text-field>
@@ -192,10 +197,17 @@
                     :key="i"
                 >
                     <v-col cols="12" sm="5">
+                        <!--
                         <v-text-field
                             v-model="question.question"
                             label="Question">
                         </v-text-field>
+                        -->
+                        <tiptap-vuetify
+                            v-model="question.question"
+                            placeholder="Question"
+                            :extensions="extensions"
+                        />
                     </v-col>
                     <v-col cols="12" sm="3">
                         <v-select v-model="question.question_type_id"
@@ -491,10 +503,13 @@
 
 <script>
 import subUtil from '@/components/common/submit-utils'
+import { TiptapVuetify, Bold, Italic, Underline,
+    BulletList, OrderedList, ListItem, Link, History } from 'tiptap-vuetify'
 import time from '@/components/common/date-utils'
 import {debounce} from 'lodash'
 
 export default {
+    components: { TiptapVuetify },
     data() {
         return {
             progress: false,
@@ -525,11 +540,19 @@ export default {
             searchUnit: null,
             searchCity: null,
             searchPosition: null,
-
-
             toDeleteTexts: [],
             toDeleteQuestions: [],
             toDeleteQuestionOptions: [],
+            extensions: [
+                History,
+                Link,
+                Bold,
+                Underline,
+                Italic,
+                ListItem,
+                BulletList,
+                OrderedList,
+            ],
         }
     },
     mounted: function () {

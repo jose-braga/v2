@@ -18,12 +18,12 @@
                 <span v-else-if="text.text_type_name_en === 'Normal Text'"
                     class="poll-normal-text"
                 >
-                    {{text.text}}
+                    <div v-html="text.text"></div>
                 </span>
                 <span v-else-if="text.text_type_name_en === 'Small letter text'"
                     class="poll-small-text"
                 >
-                    {{text.text}}
+                    <div v-html="text.text"></div>
                 </span>
             </v-row>
         </v-container>
@@ -44,12 +44,20 @@
                                         :error="v.answer.$error"
                                     >
                                         <template v-slot:label>
+                                        <!--
                                             <h3 class="black--text mb-2">
                                                 {{v.$model.question}}
                                                 <span v-if="v.$model.required === 1" class="red--text mb-2">
                                                     *
                                                 </span>
                                             </h3>
+                                        -->
+                                            <div class="question black--text mb-2">
+                                                <span v-if="v.$model.required === 1" class="red--text mb-2 mr-2">
+                                                    *
+                                                </span>
+                                                <span v-html="v.$model.question"></span>
+                                            </div>
 
                                         </template>
                                         <v-radio v-for="(option, j) in v.$model.options"
@@ -270,5 +278,8 @@ export default {
 }
 .poll-small-text {
     font-size: 0.7em;
+}
+.question {
+    display: flex;
 }
 </style>
