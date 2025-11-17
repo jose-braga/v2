@@ -12,3 +12,10 @@ module.exports.insertStudentConnection = function (req, res, next) {
     //console.log(places)
     return sql.makeSQLOperation(req, res, querySQL, places)
 };
+
+
+module.exports.getCurrentTime = function (req, res, next) {
+    let currentTime = time.momentToDate(undefined, undefined, 'YYYY-MM-DD HH:mm:ss');
+    return responses.sendJSONResponse( res, 200, { currentTime: currentTime });
+
+};
