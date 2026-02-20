@@ -589,6 +589,11 @@ function processForSpreadsheet(members) {
             thisMember['Birth Date'] = time.momentToDate(members[ind].birth_date);
             thisMember['Age'] = today.diff(time.moment(members[ind].birth_date),'years');
         }
+        thisMember['Nationalities'] = '';
+        for (let indCountry in members[ind].countries) {
+            thisMember['Nationalities'] = thisMember['Nationalities'] + members[ind].countries[indCountry].country_name + '\n';
+
+        }
         thisMember['Gender'] = members[ind].gender;
         thisMember['Nationalities'] = '';
         if (members[ind].countries.length > 0) {
