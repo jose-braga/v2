@@ -976,7 +976,6 @@ export default {
                 ORCID: null,
                 current_institutional_affiliations: [],
                 poles: null,
-                roles: [],
                 currentUnit: null,
                 isScientific: false,
                 isTechnical: false,

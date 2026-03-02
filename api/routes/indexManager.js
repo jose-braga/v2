@@ -19,6 +19,7 @@ router.options('*', cors())
 
 const externalAPI = require('../controllers/people/external_api'); //authorization of visibility to external partners
 const addMember = require('../controllers/manager/addMember');
+const addBulkMember = require('../controllers/manager/addBulkMember');
 const dataExport = require('../controllers/manager/data_export');
 const membersAll = require('../controllers/manager/all/members');
 const membersUnit = require('../controllers/manager/unit/members');
@@ -89,6 +90,10 @@ router.get('/:userID/units/:unitID/', cors(corsOptions), membersUnit.getUnitInfo
 router.post('/:userID/units/:unitID/cities/:cityID/members', cors(corsOptions), addMember.addMember);
 router.post('/:userID/cities/:cityID/members', cors(corsOptions), addMember.addMember);
 router.post('/:userID/units/:unitID/members', cors(corsOptions), addMember.addMember);
+
+router.post('/:userID/units/:unitID/cities/:cityID/bulk-members', cors(corsOptions), addBulkMember.addMember);
+router.post('/:userID/cities/:cityID/bulk-members', cors(corsOptions), addBulkMember.addMember);
+router.post('/:userID/units/:unitID/bulk-members', cors(corsOptions), addBulkMember.addMember);
 
 // Routes for Undefined associations
 router.get('/:userID/unknown-associations', cors(corsOptions), membersUnknown.getMembersList);

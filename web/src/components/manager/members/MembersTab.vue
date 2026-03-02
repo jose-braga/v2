@@ -24,6 +24,16 @@
     </v-row>
     <v-row>
         <v-col cols="12">
+            <BulkAddMember
+                :segment-type="segmentType"
+                :unit-id="unitId"
+                :unit-data="unitData"
+            ></BulkAddMember>
+        </v-col>
+    </v-row>
+    <!--
+    <v-row>
+        <v-col cols="12">
             <FctManagement
                 :segment-type="segmentType"
                 :unit-id="unitId"
@@ -33,20 +43,23 @@
             ></FctManagement>
         </v-col>
     </v-row>
+    -->
 </v-container>
 </template>
 
 <script>
 import CurrentMembers from './CurrentMembersList'
 import PastMembers from './PastMembersList'
-import FctManagement from './FctManagement'
+import BulkAddMember from './BulkAddMember'
+//import FctManagement from './FctManagement'
 
 
 export default {
     components: {
        CurrentMembers,
        PastMembers,
-       FctManagement,
+       BulkAddMember,
+       //FctManagement,
     },
     props: {
        segmentType: String,
