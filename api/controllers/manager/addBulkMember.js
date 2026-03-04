@@ -271,7 +271,7 @@ var addJob = function (options) {
             options);
 
     } else {
-        return actionSendChangeMessage(options, resQuery)
+        return actionSendChangeMessage(options)
             .catch((e) => {
                 console.log(e);
                 return writeMessageDB(options, e);
