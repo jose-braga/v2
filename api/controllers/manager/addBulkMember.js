@@ -333,6 +333,7 @@ async function actionSendChangeMessage(options) {
     let unitName = data.unitData.short_name;
 
     let recipients = data.email;
+    let ccRecipients = '';
     let mailOptions;
     let subjectText = 'Profile creation on the LAQV/UCIBIO data management platform';
 
@@ -346,10 +347,12 @@ Password: ${password}
 You should change your password when you log in for the first time.`;
 
     if (unitName === 'UCIBIO') {
+        ccRecipients = 'ucibio.secretariado@fct.unl.pt';
         emailBody = emailBody + `
 
 The platform feeds the information displayed on the public UCIBIO website (https://ucibio.pt/). Therefore, I ask that after logging into the platform (https://v2.laqv-ucibio.info), you authorize some of your data to appear on the public website. Specifically, a personal page will be automatically generated (similar to https://ucibio.pt/people/maria-joao-romao) and you will be included in your Research Lab's member list.`;
     } else {
+        ccRecipients = 'laqv@requimte.pt';
         emailBody = emailBody + `
 
 The platform feeds the information displayed on the LAQV public website (https://laqv.requimte.pt/). Therefore, I ask that, after logging into the platform (https://v2.laqv-ucibio.info), you authorize a portion of your platform data to appear on the public website. Additionally, please add a profile photo. This will automatically generate a personal page and include you in your Group's member list. Access to the MyLAQV area on the website uses the same credentials defined for the platform.`;
@@ -358,7 +361,7 @@ The platform feeds the information displayed on the LAQV public website (https:/
 
 The information contained in the platform is visible to the research units' science managers for internal processes (such as the preparation of activity reports or applications). You may edit all fields except for your Research Lab affiliation; if you wish to change anything in that section, you must contact a science manager from the Unit.
 
-If you have any questions, please do not hesitate to contact the science management team.
+If you have any questions, please do not hesitate to contact the science management team (${ccRecipients}).
 
 Best regards,
 The ${unitName} Science Management Team`;
@@ -369,7 +372,7 @@ The ${unitName} Science Management Team`;
         mailOptions = {
             from: '"Admin" <admin@laqv-ucibio.info>', // sender address
             to: recipients, // list of receivers (comma-separated)
-            cc: [process.env.EMAIL_DEVELOPER,], // list of CC receivers (comma-separated)
+            cc: ccRecipients, // list of CC receivers (comma-separated)
             subject: subjectText, // Subject line
             text: emailBody,
         };
@@ -383,7 +386,7 @@ The ${unitName} Science Management Team`;
         mailOptions = {
             from: '"Admin" <admin@laqv-ucibio.info>', // sender address
             to: recipients, // list of receivers (comma-separated)
-            cc: [process.env.EMAIL_DEVELOPER,], // list of CC receivers (comma-separated)
+            cc: ccRecipients, // list of CC receivers (comma-separated)
             subject: 'TESTING: ' + subjectText, // Subject line
             text: emailBody,
         };
