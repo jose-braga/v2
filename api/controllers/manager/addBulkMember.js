@@ -352,7 +352,7 @@ You should change your password when you log in for the first time.`;
         if (pole_id === 1) {
             ccRecipients = ccRecipients + '';
         } else if (pole_id === 2) {
-            ccRecipients = 'apoio.id@ff.up.pt, ' + ccRecipients;
+            ccRecipients = 'apoio.id@ff.up.pt,' + ccRecipients;
         }
         emailBody = emailBody + `
 
