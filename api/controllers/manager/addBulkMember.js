@@ -154,6 +154,7 @@ var addPole = function (options) {
     );
     return sql.getSQLOperationResult(req, res, querySQL, places,
         (resQuery, options) => {
+            options.pole_id = data.pole_id;
             return addRole(options);
         },
         options);
@@ -327,7 +328,7 @@ var updateJobCategorySituationID = function (options) {
 };
 
 async function actionSendChangeMessage(options) {
-    let { req, res, next, colloquial_name, username, password } = options;
+    let { req, res, next, colloquial_name, username, password, pole_id } = options;
 
     let data = req.body.data;
     let unitName = data.unitData.short_name;
@@ -348,6 +349,11 @@ You should change your password when you log in for the first time.`;
 
     if (unitName === 'UCIBIO') {
         ccRecipients = 'ucibio.secretariado@fct.unl.pt';
+        if (pole_id === 1) {
+            ccRecipients = ccRecipients + '';
+        } else if (pole_id === 2) {
+            ccRecipients = ccRecipients + ', scmendes@ff.up.pt';
+        }
         emailBody = emailBody + `
 
 The platform feeds the information displayed on the public UCIBIO website (https://ucibio.pt/). Therefore, I ask that after logging into the platform (https://v2.laqv-ucibio.info), you authorize some of your data to appear on the public website. Specifically, a personal page will be automatically generated (similar to https://ucibio.pt/people/maria-joao-romao) and you will be included in your Research Lab's member list.`;
