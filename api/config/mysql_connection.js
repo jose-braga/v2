@@ -1,9 +1,9 @@
-const mysql = require('mysql');
+const mysql = require('mysql2');
 // When X DevAPI return objecys instead of array maybe it is worth to use it
 /*
 const mysqlx = require('@mysql/xdevapi');
 
-// right now settings for production or development are the same, 
+// right now settings for production or development are the same,
 // but this could change
 const options = {
     host: process.env.DB_HOST,
@@ -13,10 +13,10 @@ const options = {
     schema: process.env.DB_DB
   };
 
-const pool = mysqlx.getClient( options, 
-    { pooling: { 
-        enabled: true, 
-        maxSize: 50 
+const pool = mysqlx.getClient( options,
+    { pooling: {
+        enabled: true,
+        maxSize: 50
     } });
 */
 
@@ -30,6 +30,7 @@ if (process.env.NODE_ENV === 'production') {
         password: process.env.DB_PASS,
         database: process.env.DB_DB,
         charset: 'utf8mb4',
+        //allowPublicKeyRetrieval: true
     });
 } else {
     pool = mysql.createPool({
@@ -40,6 +41,7 @@ if (process.env.NODE_ENV === 'production') {
         password: process.env.DB_PASS,
         database: process.env.DB_DB,
         charset: 'utf8mb4',
+        //allowPublicKeyRetrieval: true
     });
 }
 

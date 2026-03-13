@@ -161,7 +161,7 @@ passport.use(
             if (err) {
                 return done(err);
             }
-            connection.query(query, places,
+            connection.execute(query, places,
                 function (err, rows) {
                     // And done with the connection.
                     connection.release();
@@ -196,7 +196,7 @@ var getUserLabs = function (req, done, user) {
         if (err) {
             return done(err);
         }
-        connection.query(query, places, function (err, rows) {
+        connection.execute(query, places, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -223,7 +223,7 @@ var getLabGroupHierarchyInfo = function (req, done, user, labs, i) {
         if (err) {
             return done(err);
         }
-        connection.query(query, places, function (err, rows) {
+        connection.execute(query, places, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -246,7 +246,7 @@ var getGroupUnitHierarchyInfo = function (req, done, user, labs, groups, i, j) {
         if (err) {
             return done(err);
         }
-        connection.query(query, places, function (err, rows) {
+        connection.execute(query, places, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -277,7 +277,7 @@ var getUserTechnicianOffices = function (req, done, user) {
         if (err) {
             return done(err);
         }
-        connection.query(query, places, function (err, rows) {
+        connection.execute(query, places, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -305,7 +305,7 @@ var getTechnicianUnitsInfo = function (req, done, user, tech_offices, i) {
         if (err) {
             return done(err);
         }
-        connection.query(query, places, function (err, rows) {
+        connection.execute(query, places, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -333,7 +333,7 @@ var getUserScienceManagerOffices = function (req, done, user) {
         if (err) {
             return done(err);
         }
-        connection.query(query, places, function (err, rows) {
+        connection.execute(query, places, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -361,7 +361,7 @@ var getScienceManagerUnitsInfo = function (req, done, user, sc_man_offices, i) {
         if (err) {
             return done(err);
         }
-        connection.query(query, places, function (err, rows) {
+        connection.execute(query, places, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -389,7 +389,7 @@ var getUserAdministrativeOffices = function (req, done, user) {
         if (err) {
             return done(err);
         }
-        connection.query(query, places, function (err, rows) {
+        connection.execute(query, places, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -417,7 +417,7 @@ var getAdministrativeUnitsInfo = function (req, done, user, administrative_offic
         if (err) {
             return done(err);
         }
-        connection.query(query, places, function (err, rows) {
+        connection.execute(query, places, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -443,7 +443,7 @@ var getStoreRegularUser = function (req, done, user) {
         if (err) {
             return done(err);
         }
-        connection.query(query, places, function (err, rows) {
+        connection.execute(query, places, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -476,7 +476,7 @@ var getStoreStockManagers = function (req, done, user) {
         if (err) {
             return done(err);
         }
-        connection.query(query, places, function (err, rows) {
+        connection.execute(query, places, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -498,7 +498,7 @@ var getStoreAccountManagers = function (req, done, user) {
         if (err) {
             return done(err);
         }
-        connection.query(query, places, function (err, rows) {
+        connection.execute(query, places, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -529,7 +529,7 @@ var getCurrentCity = function (req, done, user) {
         if (err) {
             return done(err);
         }
-        connection.query(query, places, function (err, rows) {
+        connection.execute(query, places, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -560,7 +560,7 @@ var getCurrentDepartment = function (req, done, user) {
         if (err) {
             return done(err);
         }
-        connection.query(query, places, function (err, rows) {
+        connection.execute(query, places, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -591,7 +591,7 @@ var getUserEndpointPermissions = function (req, done, user) {
         if (err) {
             return done(err);
         }
-        connection.query(query, places, function (err, rows) {
+        connection.execute(query, places, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -613,7 +613,7 @@ var getPermissionWebAreas = function (req, done, user) {
         if (err) {
             return done(err);
         }
-        connection.query(query, places, function (err, rows) {
+        connection.execute(query, places, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -643,7 +643,7 @@ passport.use(
             if (err) {
                 return done(err);
             }
-            connection.query(query, places,
+            connection.execute(query, places,
                 function (err, rows) {
                     // And done with the connection.
                     connection.release();
@@ -687,7 +687,7 @@ passport.use(
             if (err) {
                 return done(err);
             }
-            connection.query(query, places,
+            connection.execute(query, places,
                 function (err, rows) {
                     // And done with the connection.
                     connection.release();
@@ -728,7 +728,7 @@ passport.use(
             if (err) {
                 return done(err);
             }
-            connection.query(query, places,
+            connection.execute(query, places,
                 function (err, rows) {
                     // And done with the connection.
                     connection.release();
@@ -761,7 +761,7 @@ var getApplicationInfo = function (req, done, user) {
         if (err) {
             return done(err);
         }
-        connection.query(query, places, function (err, rows) {
+        connection.execute(query, places, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -780,7 +780,7 @@ var getCallInfo = function (req, done, user) {
         if (err) {
             return done(err);
         }
-        connection.query(query, places, function (err, rows) {
+        connection.execute(query, places, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -809,7 +809,7 @@ passport.use(
             if (err) {
                 return done(err);
             }
-            connection.query(query, places,
+            connection.execute(query, places,
                 function (err, rows) {
                     // And done with the connection.
                     connection.release();

@@ -17,7 +17,7 @@ var makeSQLOperation = function (req, res, sql, places, callback, callbackOption
             responses.sendJSONResponse(res, 500, { "status": "error", "statusCode": 500, "error": err.stack });
             return;
         }
-        connection.query(sql, places,
+        connection.execute(sql, places,
             function (err, resQuery) {
                 // And done with the connection.
                 connection.release();
@@ -61,7 +61,7 @@ var getSQLOperationResult = function (req, res, sql, places, callback, callbackO
             console.log(err.stack);
             return;
         }
-        connection.query(sql, places,
+        connection.execute(sql, places,
             function (err, resQuery) {
                 // And done with the connection.
                 connection.release();
