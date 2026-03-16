@@ -12,12 +12,15 @@ var pool = server.pool;
  * @param {*} callbackOptions
  */
 var makeSQLOperation = function (req, res, sql, places, callback, callbackOptions) {
+    // Change undefined values to null from places array (otherwise mysql2 throws an error)
+    const cleanParams = places.map(param => param === undefined ? null : param);
+
     pool.getConnection(function (err, connection) {
         if (err) {
             responses.sendJSONResponse(res, 500, { "status": "error", "statusCode": 500, "error": err.stack });
             return;
         }
-        connection.execute(sql, places,
+        connection.execute(sql, cleanParams,
             function (err, resQuery) {
                 // And done with the connection.
                 connection.release();
@@ -56,12 +59,15 @@ var makeSQLOperation = function (req, res, sql, places, callback, callbackOption
  * @param {*} callbackOptions
  */
 var getSQLOperationResult = function (req, res, sql, places, callback, callbackOptions) {
+    // Change undefined values to null from places array (otherwise mysql2 throws an error)
+    const cleanParams = places.map(param => param === undefined ? null : param);
+
     pool.getConnection(function (err, connection) {
         if (err) {
             console.log(err.stack);
             return;
         }
-        connection.execute(sql, places,
+        connection.execute(sql, cleanParams,
             function (err, resQuery) {
                 // And done with the connection.
                 connection.release();

@@ -157,11 +157,12 @@ passport.use(
             ' LEFT JOIN people ON people.user_id = users.id' +
             ' WHERE users.username = ? AND users.deactivated = 0 AND people.status = 1;';
         var places = [username];
+        const cleanParams = places.map(param => param === undefined ? null : param);
         pool.getConnection(function (err, connection) {
             if (err) {
                 return done(err);
             }
-            connection.execute(query, places,
+            connection.execute(query, cleanParams,
                 function (err, rows) {
                     // And done with the connection.
                     connection.release();
@@ -219,11 +220,12 @@ var getLabGroupHierarchyInfo = function (req, done, user, labs, i) {
         ' JOIN `groups` ON `groups`.id = labs_groups.group_id' +
         ' WHERE labs_groups.lab_id = ?;';
     var places = [this_lab.id];
+    const cleanParams = places.map(param => param === undefined ? null : param);
     pool.getConnection(function (err, connection) {
         if (err) {
             return done(err);
         }
-        connection.execute(query, places, function (err, rows) {
+        connection.execute(query, cleanParams, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -242,11 +244,12 @@ var getGroupUnitHierarchyInfo = function (req, done, user, labs, groups, i, j) {
         ' JOIN units ON units.id = groups_units.unit_id' +
         ' WHERE groups_units.group_id = ?;';
     var places = [this_group.id];
+    const cleanParams = places.map(param => param === undefined ? null : param);
     pool.getConnection(function (err, connection) {
         if (err) {
             return done(err);
         }
-        connection.execute(query, places, function (err, rows) {
+        connection.execute(query, cleanParams, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -273,11 +276,12 @@ var getUserTechnicianOffices = function (req, done, user) {
         ' JOIN technician_offices ON technician_offices.id = technicians.technician_office_id' +
         ' WHERE technicians.person_id = ?;';
     var places = [personID];
+    const cleanParams = places.map(param => param === undefined ? null : param);
     pool.getConnection(function (err, connection) {
         if (err) {
             return done(err);
         }
-        connection.execute(query, places, function (err, rows) {
+        connection.execute(query, cleanParams, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -301,11 +305,12 @@ var getTechnicianUnitsInfo = function (req, done, user, tech_offices, i) {
         ' JOIN units ON units.id = technicians_units.unit_id' +
         ' WHERE technicians_units.technician_id = ?;';
     var places = [this_tech_office.technician_id];
+    const cleanParams = places.map(param => param === undefined ? null : param);
     pool.getConnection(function (err, connection) {
         if (err) {
             return done(err);
         }
-        connection.execute(query, places, function (err, rows) {
+        connection.execute(query, cleanParams, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -329,11 +334,12 @@ var getUserScienceManagerOffices = function (req, done, user) {
         ' JOIN science_manager_offices ON science_manager_offices.id = science_managers.science_manager_office_id' +
         ' WHERE science_managers.person_id = ?;';
     var places = [personID];
+    const cleanParams = places.map(param => param === undefined ? null : param);
     pool.getConnection(function (err, connection) {
         if (err) {
             return done(err);
         }
-        connection.execute(query, places, function (err, rows) {
+        connection.execute(query, cleanParams, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -357,11 +363,12 @@ var getScienceManagerUnitsInfo = function (req, done, user, sc_man_offices, i) {
         ' JOIN units ON units.id = science_managers_units.unit_id' +
         ' WHERE science_managers_units.science_manager_id = ?;';
     var places = [this_sc_man_office.science_manager_id];
+    const cleanParams = places.map(param => param === undefined ? null : param);
     pool.getConnection(function (err, connection) {
         if (err) {
             return done(err);
         }
-        connection.execute(query, places, function (err, rows) {
+        connection.execute(query, cleanParams, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -385,11 +392,12 @@ var getUserAdministrativeOffices = function (req, done, user) {
         ' JOIN administrative_offices ON administrative_offices.id = people_administrative_offices.administrative_office_id' +
         ' WHERE people_administrative_offices.person_id = ?;';
     var places = [personID];
+    const cleanParams = places.map(param => param === undefined ? null : param);
     pool.getConnection(function (err, connection) {
         if (err) {
             return done(err);
         }
-        connection.execute(query, places, function (err, rows) {
+        connection.execute(query, cleanParams, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -413,11 +421,12 @@ var getAdministrativeUnitsInfo = function (req, done, user, administrative_offic
         ' JOIN units ON units.id = people_administrative_units.unit_id' +
         ' WHERE people_administrative_units.administrative_id = ?;';
     var places = [this_administrative_office.administrative_id];
+    const cleanParams = places.map(param => param === undefined ? null : param);
     pool.getConnection(function (err, connection) {
         if (err) {
             return done(err);
         }
-        connection.execute(query, places, function (err, rows) {
+        connection.execute(query, cleanParams, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -439,11 +448,12 @@ var getStoreRegularUser = function (req, done, user) {
         ' FROM accounts_people' +
         ' WHERE user_id = ?;';
     var places = [user.user_id];
+    const cleanParams = places.map(param => param === undefined ? null : param);
     pool.getConnection(function (err, connection) {
         if (err) {
             return done(err);
         }
-        connection.execute(query, places, function (err, rows) {
+        connection.execute(query, cleanParams, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -472,11 +482,12 @@ var getStoreStockManagers = function (req, done, user) {
         ' FROM stock_managers' +
         ' WHERE user_id = ?;';
     var places = [user.user_id];
+    const cleanParams = places.map(param => param === undefined ? null : param);
     pool.getConnection(function (err, connection) {
         if (err) {
             return done(err);
         }
-        connection.execute(query, places, function (err, rows) {
+        connection.execute(query, cleanParams, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -494,11 +505,12 @@ var getStoreAccountManagers = function (req, done, user) {
         ' FROM account_managers' +
         ' WHERE user_id = ?;';
     var places = [user.user_id];
+    const cleanParams = places.map(param => param === undefined ? null : param);
     pool.getConnection(function (err, connection) {
         if (err) {
             return done(err);
         }
-        connection.execute(query, places, function (err, rows) {
+        connection.execute(query, cleanParams, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -525,11 +537,12 @@ var getCurrentCity = function (req, done, user) {
         + '     OR (people_institution_city.valid_from <= CURDATE() AND people_institution_city.valid_until IS NULL)'
         + '     OR (people_institution_city.valid_from IS NULL AND people_institution_city.valid_until IS NULL));';
     var places = [person_id];
+    const cleanParams = places.map(param => param === undefined ? null : param);
     pool.getConnection(function (err, connection) {
         if (err) {
             return done(err);
         }
-        connection.execute(query, places, function (err, rows) {
+        connection.execute(query, cleanParams, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -556,11 +569,12 @@ var getCurrentDepartment = function (req, done, user) {
         + ' AND (people_departments.valid_until IS NULL OR people_departments.valid_until >= CURDATE())'
         + ');';
     var places = [person_id];
+    const cleanParams = places.map(param => param === undefined ? null : param);
     pool.getConnection(function (err, connection) {
         if (err) {
             return done(err);
         }
-        connection.execute(query, places, function (err, rows) {
+        connection.execute(query, cleanParams, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -587,11 +601,12 @@ var getUserEndpointPermissions = function (req, done, user) {
         + ' JOIN endpoint_methods ON endpoint_methods.id = permissions_endpoints.method_id'
         + ' WHERE permissions_endpoints.user_id = ?;';
     var places = [userID];
+    const cleanParams = places.map(param => param === undefined ? null : param);
     pool.getConnection(function (err, connection) {
         if (err) {
             return done(err);
         }
-        connection.execute(query, places, function (err, rows) {
+        connection.execute(query, cleanParams, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -609,11 +624,12 @@ var getPermissionWebAreas = function (req, done, user) {
         + ' JOIN web_app_areas ON web_app_areas.id = permissions_web_app_areas.app_area_id'
         + ' WHERE permissions_web_app_areas.user_id = ?;';
     var places = [user.user_id];
+    const cleanParams = places.map(param => param === undefined ? null : param);
     pool.getConnection(function (err, connection) {
         if (err) {
             return done(err);
         }
-        connection.execute(query, places, function (err, rows) {
+        connection.execute(query, cleanParams, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -639,11 +655,12 @@ passport.use(
             ' LEFT JOIN people ON people.user_id = users.id' +
             ' WHERE users.username = ? AND users.deactivated = 0 AND people.status = 1;';
         var places = [username];
+        const cleanParams = places.map(param => param === undefined ? null : param);
         pool.getConnection(function (err, connection) {
             if (err) {
                 return done(err);
             }
-            connection.execute(query, places,
+            connection.execute(query, cleanParams,
                 function (err, rows) {
                     // And done with the connection.
                     connection.release();
@@ -683,11 +700,12 @@ passport.use(
             ' LEFT JOIN people ON people.user_id = users.id' +
             ' WHERE users.username = ? AND users.deactivated = 0 AND people.status = 2;';
         var places = [username];
+        const cleanParams = places.map(param => param === undefined ? null : param);
         pool.getConnection(function (err, connection) {
             if (err) {
                 return done(err);
             }
-            connection.execute(query, places,
+            connection.execute(query, cleanParams,
                 function (err, rows) {
                     // And done with the connection.
                     connection.release();
@@ -724,11 +742,12 @@ passport.use(
             ' FROM application_recommenders' +
             ' WHERE id = ? AND submitted IS NULL;';
         var places = [username];
+        const cleanParams = places.map(param => param === undefined ? null : param);
         pool.getConnection(function (err, connection) {
             if (err) {
                 return done(err);
             }
-            connection.execute(query, places,
+            connection.execute(query, cleanParams,
                 function (err, rows) {
                     // And done with the connection.
                     connection.release();
@@ -757,11 +776,12 @@ var getApplicationInfo = function (req, done, user) {
                 + ' JOIN applicants ON applicants.application_id = applications.id'
                 + ' WHERE applications.id = ?;';
     var places = [applicationID];
+    const cleanParams = places.map(param => param === undefined ? null : param);
     pool.getConnection(function (err, connection) {
         if (err) {
             return done(err);
         }
-        connection.execute(query, places, function (err, rows) {
+        connection.execute(query, cleanParams, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -776,11 +796,12 @@ var getCallInfo = function (req, done, user) {
                 + ' FROM call_applications'
                 + ' WHERE id = ?;';
     var places = [user.application.call_id];
+    const cleanParams = places.map(param => param === undefined ? null : param);
     pool.getConnection(function (err, connection) {
         if (err) {
             return done(err);
         }
-        connection.execute(query, places, function (err, rows) {
+        connection.execute(query, cleanParams, function (err, rows) {
             connection.release();
             if (err) {
                 return done(err);
@@ -805,11 +826,12 @@ passport.use(
             ' FROM application_reviewers' +
             ' WHERE username = ?;';
         var places = [username];
+        const cleanParams = places.map(param => param === undefined ? null : param);
         pool.getConnection(function (err, connection) {
             if (err) {
                 return done(err);
             }
-            connection.execute(query, places,
+            connection.execute(query, cleanParams,
                 function (err, rows) {
                     // And done with the connection.
                     connection.release();

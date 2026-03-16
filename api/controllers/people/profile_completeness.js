@@ -813,6 +813,11 @@ var computeCompleteness = function (options) {
             }
             if (unit === 2 && currentPoles[0] !== 2 && thisFilled[indFill] === 'Cost Centers') thisScore--;
         }
+        if (thisFilled.indexOf('Workplace') !== -1 &&
+            thisFilled.indexOf('Academic Institutions') !== -1
+        ) {
+            thisScore = thisScore - 1; // only counts 1 of the 2 fields
+        }
         for (let indFill in thisNotFilled) {
             if (thisUnitFilled.indexOf(thisNotFilled[indFill]) !== -1) {
                 if (currentPoles[0] === 2 && thisNotFilled[indFill] === 'Cost Centers') {
